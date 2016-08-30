@@ -1,1 +1,1 @@
-# EmbeddedSystemDesign_Team02
+# Embedded System Design Project - Team02
