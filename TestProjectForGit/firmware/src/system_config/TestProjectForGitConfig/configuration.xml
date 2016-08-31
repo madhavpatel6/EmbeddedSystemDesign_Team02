@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration version="2.0.0.12">
+  <General>
+    <HarmonyPath path="../../../../../../home/stephen/microchip/harmony/v1_08_01"/>
+    <Processor name=""/>
+    <Board name=" "/>
+    <ForceOptimization flag="true"/>
+    <MergeStrategy flag="USER_ALL"/>
+  </General>
+</configuration>
