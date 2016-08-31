@@ -1,5 +1,4 @@
 #Git Ignore
 
-nbproject/
 build/
 test/
