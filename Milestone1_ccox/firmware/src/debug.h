@@ -38,7 +38,6 @@ extern "C" {
 #define BEFORE_RECEIVE_FROM_Q_APP1 0x09
 #define AFTER_SEND_TO_Q_APP1 0x10
 #define AFTER_RECEIVE_FROM_Q_APP1 0x11
-#define SEND_TO_Q_FROM_ISR 0x12
     
 #endif
     
