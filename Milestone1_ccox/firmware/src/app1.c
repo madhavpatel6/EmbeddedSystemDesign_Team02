@@ -126,15 +126,13 @@ QueueHandle_t createApp1Q(){
     //8 b/c "team 2" //10 is size of Q
     return xQueueCreate(10,sizeof(char)); 
 }
-//////////////////////////////////////////////
-//////////////////////////////////////////////
-//NOT SURE IF BOTH OF THESE FUNCTIONS SHOULD BE BLOCKING OR NOT
-//////////////////////////////////////////////
-//////////////////////////////////////////////
+
+/* Sends value from timer to app1 Queue */
 int app1SendTimerValToMsgQ(char msgVal){
     return xQueueSend(app1Data.app1Q, &msgVal, portMAX_DELAY);
 }
 
+/* Sends value from timer ISR to app1 Queue */
 int app1SendTimerValToMsgQFromISR(char msgVal){
     return xQueueSendFromISR(app1Data.app1Q, &msgVal, NULL);
 }
@@ -150,13 +148,16 @@ int app1SendTimerValToMsgQFromISR(char msgVal){
  */
 void APP1_Tasks ( void )
 {
-    dbgOutputLoc(ENTER_APP1_TASK);
+    dbgOutputLoc(ENTER_TASK_APP1);
     unsigned char valRecv;
-    dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_APP1);
-    if(xQueueReceive(app1Data.app1Q, &valRecv, portMAX_DELAY)){
-        dbgOutputValue(valRecv);
+    dbgOutputLoc(BEFORE_WHILE_APP1);
+    while(1){
+        dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_APP1);
+        if(xQueueReceive(app1Data.app1Q, &valRecv, portMAX_DELAY)){
+            dbgOutputValue(valRecv);
+        }
+        dbgOutputLoc(AFTER_RECEIVE_FROM_Q_APP1);
     }
-    dbgOutputLoc(AFTER_RECEIVE_FROM_Q_APP1);
 }
 
  

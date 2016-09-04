@@ -81,7 +81,7 @@ void IntHandlerDrvTmrInstance0(void)
         team2_i = 0;
     }
     dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
-    app1SendTimerValToMsgQFromISR(team2[team2_i]);
+    dbgCheckFuncReturn(app1SendTimerValToMsgQFromISR(team2[team2_i]));
     dbgOutputLoc(AFTER_SEND_TO_Q_ISR);
     team2_i = team2_i + 1;
     dbgOutputLoc(LEAVE_TIMER_ISR);

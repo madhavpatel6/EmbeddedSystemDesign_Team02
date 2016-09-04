@@ -32,18 +32,23 @@ extern "C" {
 #define AFTER_RECEIVE_FROM_Q_ISR 0x05   
     
     // TASK debug locations
-#define ENTER_APP1_TASK 0x06
-#define BEFORE_APP1_WHILE 0x07
+#define ENTER_TASK_APP1 0x06
+#define BEFORE_WHILE_APP1 0x07
 #define BEFORE_SEND_TO_Q_APP1 0x08
 #define BEFORE_RECEIVE_FROM_Q_APP1 0x09
 #define AFTER_SEND_TO_Q_APP1 0x10
 #define AFTER_RECEIVE_FROM_Q_APP1 0x11
+    
+    //Broken function
+#define ERROR_RETURN 0x12
+#define CORRECT_RETURN 0x13
     
 #endif
     
     void dbgOutputValue(char outVal);
     void dbgOutputLoc(unsigned int outVal);
     void dbgLocTrigger(bool trigger);
+    void dbgCheckFuncReturn(int checkVal);
     /* Provide C++ Compatibility */
 #ifdef __cplusplus
 }

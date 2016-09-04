@@ -91,6 +91,18 @@ void dbgLocTrigger(bool trigger){
         SYS_PORTS_PinClear(PORTS_ID_0, PORT_CHANNEL_F, PORTS_BIT_POS_1);
     }
 }
+
+/* Checks the return values of the functions */
+void dbgCheckFuncReturn(int checkVal){
+    if(checkVal != 1){
+        dbgOutputLoc(ERROR_RETURN);
+        while(1){
+        }
+    }
+    else{
+        dbgOutputLoc(CORRECT_RETURN);
+    }
+}
 /* *****************************************************************************
  End of File
  */
