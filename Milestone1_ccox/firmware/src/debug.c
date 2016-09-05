@@ -83,6 +83,10 @@ void dbgOutputLoc(unsigned int outVal){
     }
 }
 
+/* Purpose: 
+ *         This function takes in a boolean value then prints it on the
+ *         I/O line Pin: 46 Port: RF1
+ */
 void dbgLocTrigger(bool trigger){
     if(trigger == true){
         SYS_PORTS_PinSet(PORTS_ID_0, PORT_CHANNEL_F, PORTS_BIT_POS_1);
