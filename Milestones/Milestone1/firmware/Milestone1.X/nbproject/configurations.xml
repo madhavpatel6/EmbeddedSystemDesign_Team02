@@ -108,8 +108,8 @@
         <itemPath>../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include/task.h</itemPath>
         <itemPath>../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include/timers.h</itemPath>
       </logicalFolder>
-      <itemPath>C:/ECE4534/Milestones/Milestone1/firmware/src/app1_public.h</itemPath>
-      <itemPath>C:/ECE4534/Milestones/Milestone1/firmware/src/debug.h</itemPath>
+      <itemPath>../src/app1_public.h</itemPath>
+      <itemPath>../src/debug.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -191,10 +191,10 @@
         <itemPath>../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/timers.c</itemPath>
         <itemPath>../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/event_groups.c</itemPath>
       </logicalFolder>
-      <itemPath>C:/ECE4534/Milestones/Milestone1/firmware/src/app1.c</itemPath>
-      <itemPath>C:/ECE4534/Milestones/Milestone1/firmware/src/app1.h</itemPath>
-      <itemPath>C:/ECE4534/Milestones/Milestone1/firmware/src/debug.c</itemPath>
-      <itemPath>C:/ECE4534/Milestones/Milestone1/firmware/src/main.c</itemPath>
+      <itemPath>../src/app1.c</itemPath>
+      <itemPath>../src/app1.h</itemPath>
+      <itemPath>../src/debug.c</itemPath>
+      <itemPath>../src/main.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -220,7 +220,7 @@
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC32</languageToolchain>
         <languageToolchainVersion>1.42</languageToolchainVersion>
-        <platform>3</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
