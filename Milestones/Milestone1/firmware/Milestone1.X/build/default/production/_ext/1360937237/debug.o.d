@@ -1,7 +1,7 @@
-build/default/production/_ext/460128676/debug.o:  \
- C:/ECE4534/Milestones/Milestone1/firmware/src/debug.c  \
- C:/ECE4534/Milestones/Milestone1/firmware/src/debug.h  \
- ../src/system_config/default/system_config.h  \
+build/default/production/_ext/1360937237/debug.o:  \
+../src/debug.c  \
+ ../src/debug.h  \
+../src/system_config/default/system_config.h  \
  ../src/system_config/default/system_definitions.h  \
  ../../../../../microchip/harmony/v1_08_01/framework/system/common/sys_common.h  \
  ../../../../../microchip/harmony/v1_08_01/framework/system/common/sys_module.h  \

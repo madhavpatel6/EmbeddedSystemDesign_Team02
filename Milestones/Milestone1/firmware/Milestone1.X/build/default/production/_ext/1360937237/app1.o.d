@@ -1,7 +1,7 @@
-build/default/production/_ext/460128676/app1.o:  \
- C:/ECE4534/Milestones/Milestone1/firmware/src/app1.c  \
- C:/ECE4534/Milestones/Milestone1/firmware/src/app1.h  \
- ../src/system_config/default/system_config.h  \
+build/default/production/_ext/1360937237/app1.o:  \
+../src/app1.c  \
+ ../src/app1.h  \
+../src/system_config/default/system_config.h  \
  ../src/system_config/default/system_definitions.h  \
  ../../../../../microchip/harmony/v1_08_01/framework/system/common/sys_common.h  \
  ../../../../../microchip/harmony/v1_08_01/framework/system/common/sys_module.h  \
@@ -158,5 +158,5 @@ build/default/production/_ext/460128676/app1.o:  \
  ../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include/list.h  \
  ../src/app1.h  \
  ../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include/queue.h  \
- C:/ECE4534/Milestones/Milestone1/firmware/src/debug.h  \
- C:/ECE4534/Milestones/Milestone1/firmware/src/app1_public.h 
+ ../src/debug.h  \
+../src/app1_public.h 
