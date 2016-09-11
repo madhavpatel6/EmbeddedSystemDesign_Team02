@@ -134,8 +134,6 @@ void APP_Initialize ( void )
     See prototype in app.h.
  */
 
-int x = 0;
-static const char test[] = "Hello this was sent from the PIC32.\n\r";
 void APP_Tasks ( void )
 {
     while(1){
