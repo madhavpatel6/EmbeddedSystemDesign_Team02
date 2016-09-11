@@ -121,9 +121,11 @@ void APP_Initialize ( void )
     /* TODO: Initialize your application's state machine and other
      * parameters.
      */
+    if(!(DRV_USART_TRANSFER_STATUS_TRANSMIT_FULL & DRV_USART0_TransferStatus()) )
+    {
+        DRV_USART0_WriteByte('T');
+    }
 }
-
-
 /******************************************************************************
   Function:
     void APP_Tasks ( void )
@@ -132,41 +134,15 @@ void APP_Initialize ( void )
     See prototype in app.h.
  */
 
+int x = 0;
+static const char test[] = "Hello this was sent from the PIC32.\n\r";
 void APP_Tasks ( void )
 {
-
-    /* Check the application's current state. */
-    switch ( appData.state )
-    {
-        /* Application's initial state. */
-        case APP_STATE_INIT:
+    while(1){
+        /*if(!(DRV_USART_TRANSFER_STATUS_TRANSMIT_FULL & DRV_USART0_TransferStatus()) )
         {
-            bool appInitialized = true;
-       
-        
-            if (appInitialized)
-            {
-            
-                appData.state = APP_STATE_SERVICE_TASKS;
-            }
-            break;
-        }
-
-        case APP_STATE_SERVICE_TASKS:
-        {
-        
-            break;
-        }
-
-        /* TODO: implement your application state machine.*/
-        
-
-        /* The default state should never be executed. */
-        default:
-        {
-            /* TODO: Handle error in application's state machine. */
-            break;
-        }
+            DRV_USART0_WriteByte(test[x]);
+        }*/
     }
 }
 

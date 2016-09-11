@@ -114,7 +114,6 @@ typedef struct
     APP_STATES state;
 
     /* TODO: Define any additional data used by the application. */
-
 } APP_DATA;
 
 

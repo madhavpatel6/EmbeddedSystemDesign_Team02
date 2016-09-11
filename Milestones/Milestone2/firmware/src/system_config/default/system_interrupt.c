@@ -69,7 +69,31 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // Section: System Interrupt Vector Functions
 // *****************************************************************************
 // *****************************************************************************
+void IntHandlerDrvUsartInstance0(void)
+{
+    DRV_USART_TasksTransmit(sysObj.drvUsart0);
+    DRV_USART_TasksReceive(sysObj.drvUsart0);
+    DRV_USART_TasksError(sysObj.drvUsart0);
+    if (!DRV_USART0_ReceiverBufferIsEmpty())
+    {
+       uint8_t c = DRV_USART0_ReadByte(); // read received byte
+       dbgOutputVal(c);
+    }
+}
  
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+  
 /*******************************************************************************
  End of File
 */
