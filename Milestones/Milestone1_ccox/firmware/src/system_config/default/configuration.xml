@@ -322,11 +322,11 @@
         <Include value="../src/system_config/default"/>
       </C32-AS>
       <C32>
-        <Include value="C:\microchip\harmony\v1_08_01\apps\Milestone1_ccox\firmware\src"/>
-        <Include value="C:\microchip\harmony\v1_08_01\apps\Milestone1_ccox\firmware\src\system_config\default"/>
-        <Include value="C:\microchip\harmony\v1_08_01\apps\Milestone1_ccox\firmware\src\default"/>
-        <Include value="C:\microchip\harmony\v1_08_01\framework"/>
-        <Include value="C:\microchip\harmony\v1_08_01\apps\Milestone1_ccox\firmware\src\system_config\default\framework"/>
+        <Include value="C:/microchip/harmony/v1_08_01/apps/Milestone1_ccox/firmware/src"/>
+        <Include value="C:/microchip/harmony/v1_08_01/apps/Milestone1_ccox/firmware/src/system_config/default"/>
+        <Include value="C:/microchip/harmony/v1_08_01/apps/Milestone1_ccox/firmware/src/default"/>
+        <Include value="C:/microchip/harmony/v1_08_01/framework"/>
+        <Include value="C:/microchip/harmony/v1_08_01/apps/Milestone1_ccox/firmware/src/system_config/default/framework"/>
         <Include value="../../../../third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX"/>
         <Include value="../../../../third_party/rtos/FreeRTOS/Source/include"/>
         <Include value="../src/system_config/default"/>

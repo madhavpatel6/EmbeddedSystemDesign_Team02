@@ -133,8 +133,8 @@ int app1SendTimerValToMsgQ(char msgVal){
 }
 
 /* Sends value from timer ISR to app1 Queue */
-int app1SendTimerValToMsgQFromISR(char msgVal){
-    return xQueueSendFromISR(app1Data.app1Q, &msgVal, NULL);
+int app1SendTimerValToMsgQFromISR(char msgVal, BaseType_t *pxHigherPriorityTaskWoken){
+    return xQueueSendFromISR(app1Data.app1Q, &msgVal, pxHigherPriorityTaskWoken);
 }
 
 
