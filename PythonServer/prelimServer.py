@@ -1,14 +1,10 @@
 
 
-import subprocess
-# subprocess.run(["ls"],["-l"])
-# subprocess.run(["echo", "-l"])
-
 import socket
 sock = socket.socket()
 sock2 = socket.socket()
-# sock.connect(("192.168.12.196", 2000))
 
+# allow ports to be reused, helpful when programs crash and restart
 sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR, 1);
 sock2.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR, 1);
 
