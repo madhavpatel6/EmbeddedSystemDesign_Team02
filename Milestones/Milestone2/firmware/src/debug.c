@@ -59,7 +59,6 @@ void dbgOutputLoc(unsigned char outVal) {
 void dbgOutputBlock(int check) {
     if(!check) {
         dbgOutputLoc(0xff);
-        DRV_TMR0_Stop();
         vTaskSuspendAll();
     }
 }
@@ -71,7 +70,6 @@ void dbgOutputBlock(int check) {
 void dbgOutputBlockISR(int check) {
     if(!check) {
         dbgOutputLoc(0xff);
-        DRV_TMR0_Stop();
         vTaskSuspendAll();
     }
 }

@@ -48,6 +48,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include "system_config.h"
 #include "system_definitions.h"
+#include "system_interrupt_public.h"
 
 
 // ****************************************************************************
@@ -178,10 +179,11 @@ void SYS_Initialize ( void* data )
     SYS_INT_Initialize();
   
     /* Initialize Middleware */
-
+    InitializeISRQueues();
 
     /* Initialize the Application */
-    APP_Initialize();
+    UARTRXTHREAD_Initialize();
+    UARTTXTHREAD_Initialize();
 }
 
 

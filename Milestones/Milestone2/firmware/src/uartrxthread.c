@@ -5,7 +5,7 @@
     Microchip Technology Inc.
   
   File Name:
-    app.c
+    uartrxthread.c
 
   Summary:
     This file contains the source code for the MPLAB Harmony application.
@@ -53,7 +53,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-#include "app.h"
+#include "uartrxthread.h"
+#include "uartrxthread_public.h"
 #include "debug.h"
 // *****************************************************************************
 // *****************************************************************************
@@ -76,97 +77,60 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
     Application strings and buffers are be defined outside this structure.
 */
 
-APP_DATA appData;
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Application Callback Functions
-// *****************************************************************************
-// *****************************************************************************
-
-/* TODO:  Add any necessary callback functions.
-*/
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Application Local Functions
-// *****************************************************************************
-// *****************************************************************************
-
-
-/* TODO:  Add any necessary local functions.
-*/
-
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Application Initialization and State Machine Functions
-// *****************************************************************************
-// *****************************************************************************
-
-//void APP_USARTTransmitEventHandler (const SYS_MODULE_INDEX index) {
-//    // Byte has been transmitted. Handle the event.
-//    dbgOutputVal('F');
-//}
-//
-//void APP_USARTReceiveEventHandler(const SYS_MODULE_INDEX index) {
-//    DRV_USART_ReadByte(index);
-//    // Byte has been Received. Handle the event.
-//    // Read byte using DRV_USART_ReadByte ()
-//    // DRV_USART_ReceiverBufferIsEmpty() function can be used to
-//    // check if the receiver buffer is empty.
-//}
-
+QueueHandle_t _queue;
+#define TYPEOFQUEUE char
+#define SIZEOFQUEUE 10
 /*******************************************************************************
   Function:
-    void APP_Initialize ( void )
+    void UARTRXTHREAD_Initialize ( void )
 
   Remarks:
-    See prototype in app.h.
+    See prototype in uartrxthread.h.
  */
 
-void APP_Initialize ( void )
+void UARTRXTHREAD_Initialize ( void )
 {
-    /* Place the App state machine in its initial state. */
-    appData.state = APP_STATE_INIT;
-
-    
-    /* TODO: Initialize your application's state machine and other
-     * parameters.
-     */
-//    appData.usarthandle = DRV_USART_Open(DRV_USART_INDEX_0, DRV_IO_INTENT_READWRITE);
-//    DRV_USART_ByteTransmitCallbackSet (DRV_USART_INDEX_0, APP_USARTTransmitEventHandler);
-//    DRV_USART_ByteReceiveCallbackSet(DRV_USART_INDEX_0, APP_USARTReceiveEventHandler)
+    UARTRXTHREAD_InitializeQueue();
 }
+
+
 /******************************************************************************
   Function:
-    void APP_Tasks ( void )
+    void UARTRXTHREAD_Tasks ( void )
 
   Remarks:
-    See prototype in app.h.
+    See prototype in uartrxthread.h.
  */
 
-
-void APP_Tasks ( void )
+void UARTRXTHREAD_Tasks ( void )
 {
-    dbgOutputLoc(APP1_ENTER_TASK);
-    dbgOutputLoc(APP1_BEFORE_WHILELOOP);
+    dbgOutputLoc(UARTRXTHREAD_ENTER_TASK);
+    dbgOutputLoc(UARTRXTHREAD_BEFORE_WHILELOOP);
     while(1){
-        /*if(!(DRV_USART_TRANSFER_STATUS_TRANSMIT_FULL & DRV_USART0_TransferStatus()) )
-        {
-            DRV_USART0_WriteByte(test[x]);
-            if(x == 4) {
-                x = 0;
-            }
-            else {
-                x++;
-            }
-        }*/
     }
 }
 
+void UARTRXTHREAD_InitializeQueue() {
+    _queue = xQueueCreate(SIZEOFQUEUE, sizeof(TYPEOFQUEUE));
+    if(_queue == 0) {
+        /*Handle this Error*/
+        dbgOutputBlock(pdFALSE);
+    }
+}
  
+void UARTRXTHREAD_ReadFromQueue(void* pvBuffer) {
+    dbgOutputLoc(UARTRXTHREAD_BEFORE_RECEIVE_FR_QUEUE);
+    dbgOutputBlock(xQueueReceive(_queue, pvBuffer, portMAX_DELAY));
+    dbgOutputLoc(UARTRXTHREAD_AFTER_RECEIVE_FR_QUEUE);
+}
 
+void UARTRXTHREAD_SendToQueue(char buffer) {
+    dbgOutputBlock(xQueueSendToBack(_queue, &buffer, portMAX_DELAY));
+}
+
+void UARTRXTHREAD_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken) {
+    dbgOutputBlockISR(xQueueSendToBackFromISR(_queue, &buffer, pxHigherPriorityTaskWoken));
+}
 /*******************************************************************************
  End of File
  */

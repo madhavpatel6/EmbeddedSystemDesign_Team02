@@ -228,4 +228,5 @@ build/default/production/_ext/327000265/drv_usart_mapping.o:  \
  ../../../../../microchip/harmony/v1_08_01/framework/peripheral/ports/processor/../templates/ports_ChannelChangeNoticeMethod_Unsupported.h  \
  ../../../../../microchip/harmony/v1_08_01/framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeControl_Unsupported.h  \
  ../../../../../microchip/harmony/v1_08_01/framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeStatus_Unsupported.h  \
- ../src/app.h 
+ ../src/uartrxthread.h  \
+../src/uarttxthread.h 

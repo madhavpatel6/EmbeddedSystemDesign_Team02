@@ -54,7 +54,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include "system_config.h"
 #include "system_definitions.h"
-#include "app.h"
+#include "uartrxthread.h"
+#include "uarttxthread.h"
 
 
 // *****************************************************************************
@@ -66,7 +67,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
  
 static void _SYS_Tasks ( void );
-static void _APP_Tasks(void);
+static void _UARTRXTHREAD_Tasks(void);
+static void _UARTTXTHREAD_Tasks(void);
 
 
 // *****************************************************************************
@@ -90,9 +92,14 @@ void SYS_Tasks ( void )
                 "Sys Tasks",
                 1024, NULL, 0, NULL);
 
-    /* Create OS Thread for APP Tasks. */
-    xTaskCreate((TaskFunction_t) _APP_Tasks,
-                "APP Tasks",
+    /* Create OS Thread for UARTRXTHREAD Tasks. */
+    xTaskCreate((TaskFunction_t) _UARTRXTHREAD_Tasks,
+                "UARTRXTHREAD Tasks",
+                1024, NULL, 1, NULL);
+
+    /* Create OS Thread for UARTTXTHREAD Tasks. */
+    xTaskCreate((TaskFunction_t) _UARTTXTHREAD_Tasks,
+                "UARTTXTHREAD Tasks",
                 1024, NULL, 1, NULL);
 
     /**************
@@ -127,17 +134,34 @@ static void _SYS_Tasks ( void)
 
 /*******************************************************************************
   Function:
-    void _APP_Tasks ( void )
+    void _UARTRXTHREAD_Tasks ( void )
 
   Summary:
-    Maintains state machine of APP.
+    Maintains state machine of UARTRXTHREAD.
 */
 
-static void _APP_Tasks(void)
+static void _UARTRXTHREAD_Tasks(void)
 {
     while(1)
     {
-        APP_Tasks();
+        UARTRXTHREAD_Tasks();
+    }
+}
+
+
+/*******************************************************************************
+  Function:
+    void _UARTTXTHREAD_Tasks ( void )
+
+  Summary:
+    Maintains state machine of UARTTXTHREAD.
+*/
+
+static void _UARTTXTHREAD_Tasks(void)
+{
+    while(1)
+    {
+        UARTTXTHREAD_Tasks();
     }
 }
 

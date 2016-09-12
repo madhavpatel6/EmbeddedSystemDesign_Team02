@@ -124,7 +124,8 @@ SYS_MODULE_OBJ DRV_USART0_Initialize(void)
 
     /* Enable the Receive interrupt source */
     SYS_INT_SourceEnable(INT_SOURCE_USART_1_RECEIVE);
-
+    
+    SYS_INT_SourceEnable(INT_SOURCE_USART_1_TRANSMIT);
     /* Return the driver instance value*/
     return (SYS_MODULE_OBJ)DRV_USART_INDEX_0;
 }

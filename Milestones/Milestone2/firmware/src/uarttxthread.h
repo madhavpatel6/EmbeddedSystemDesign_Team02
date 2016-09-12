@@ -5,7 +5,7 @@
     Microchip Technology Inc.
 
   File Name:
-    app.h
+    uarttxthread.h
 
   Summary:
     This header file provides prototypes and definitions for the application.
@@ -43,8 +43,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  *******************************************************************************/
 //DOM-IGNORE-END
 
-#ifndef _APP_H
-#define _APP_H
+#ifndef _UARTTXTHREAD_H
+#define _UARTTXTHREAD_H
 
 // *****************************************************************************
 // *****************************************************************************
@@ -67,74 +67,9 @@ extern "C" {
 #endif
 // DOM-IGNORE-END 
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Type Definitions
-// *****************************************************************************
-// *****************************************************************************
-
-// *****************************************************************************
-/* Application states
-
-  Summary:
-    Application states enumeration
-
-  Description:
-    This enumeration defines the valid application states.  These states
-    determine the behavior of the application at various times.
-*/
-
-typedef enum
-{
-	/* Application's state machine's initial state. */
-	APP_STATE_INIT=0,
-	APP_STATE_SERVICE_TASKS,
-
-	/* TODO: Define states used by the application state machine. */
-
-} APP_STATES;
-
-
-// *****************************************************************************
-/* Application Data
-
-  Summary:
-    Holds application data
-
-  Description:
-    This structure holds the application's data.
-
-  Remarks:
-    Application strings and buffers are be defined outside this structure.
- */
-
-typedef struct
-{
-    /* The application's current state */
-    APP_STATES state;
-
-    /* TODO: Define any additional data used by the application. */
-    DRV_HANDLE usarthandle;
-} APP_DATA;
-
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Application Callback Routines
-// *****************************************************************************
-// *****************************************************************************
-/* These routines are called by drivers when certain events occur.
-*/
-	
-// *****************************************************************************
-// *****************************************************************************
-// Section: Application Initialization and State Machine Functions
-// *****************************************************************************
-// *****************************************************************************
-
 /*******************************************************************************
   Function:
-    void APP_Initialize ( void )
+    void UARTTXTHREAD_Initialize ( void )
 
   Summary:
      MPLAB Harmony application initialization routine.
@@ -156,19 +91,19 @@ typedef struct
 
   Example:
     <code>
-    APP_Initialize();
+    UARTTXTHREAD_Initialize();
     </code>
 
   Remarks:
     This routine must be called from the SYS_Initialize function.
 */
 
-void APP_Initialize ( void );
+void UARTTXTHREAD_Initialize ( void );
 
 
 /*******************************************************************************
   Function:
-    void APP_Tasks ( void )
+    void UARTTXTHREAD_Tasks ( void )
 
   Summary:
     MPLAB Harmony Demo application tasks function
@@ -189,17 +124,20 @@ void APP_Initialize ( void );
 
   Example:
     <code>
-    APP_Tasks();
+    UARTTXTHREAD_Tasks();
     </code>
 
   Remarks:
     This routine must be called from SYS_Tasks() routine.
  */
 
-void APP_Tasks( void );
+void UARTTXTHREAD_Tasks( void );
 
+void UARTTXTHREAD_InitializeQueue(); 
 
-#endif /* _APP_H */
+void UARTTXTHREAD_ReadFromQueue(void* pvBuffer);
+
+#endif /* _UARTTXTHREAD_H */
 
 //DOM-IGNORE-BEGIN
 #ifdef __cplusplus

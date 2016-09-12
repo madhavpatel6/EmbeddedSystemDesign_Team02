@@ -61,39 +61,76 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include <xc.h>
 #include <sys/attribs.h>
-#include "app.h"
+#include "debug.h"
+#include "uartrxthread.h"
+#include "uarttxthread.h"
+#include "uarttxthread_public.h"
+#include "uartrxthread_public.h"
 #include "system_definitions.h"
-
+#include "system_interrupt_public.h"
 // *****************************************************************************
 // *****************************************************************************
 // Section: System Interrupt Vector Functions
 // *****************************************************************************
 // *****************************************************************************
+
+QueueHandle_t _usartqueue;
+#define USARTTYPEOFQUEUE char
+#define USARTSIZEOFQUEUE 10
+
+void Usart0_InitializeQueue() {
+    _usartqueue = xQueueCreate(USARTSIZEOFQUEUE, sizeof(USARTTYPEOFQUEUE));
+    if(_usartqueue == 0) {
+        /*Handle this Error*/
+        dbgOutputBlock(pdFALSE);
+    }
+}
+
+int Usart0_ReadFromQueue(void* pvBuffer, BaseType_t *pxHigherPriorityTaskWoken) {
+    dbgOutputLoc(UARTTXTHREAD_BEFORE_RECEIVE_FR_QUEUE);
+    int ret = xQueueReceiveFromISR(_usartqueue, pvBuffer, pxHigherPriorityTaskWoken);
+    dbgOutputLoc(UARTTXTHREAD_AFTER_RECEIVE_FR_QUEUE);
+    return ret;
+}
+
+void Usart0_SendToQueue(char buffer) {
+    dbgOutputBlock(xQueueSendToBack(_usartqueue, &buffer, portMAX_DELAY));
+}
+
+void Usart0_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken) {
+    dbgOutputBlockISR(xQueueSendToBackFromISR(_usartqueue, &buffer, pxHigherPriorityTaskWoken));
+}
+
 void IntHandlerDrvUsartInstance0(void)
 {
-    if (!DRV_USART0_ReceiverBufferIsEmpty())
+    dbgOutputLoc(USART0_ENTER_ISR);
+    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
+    if (SYS_INT_SourceStatusGet(INT_SOURCE_USART_1_RECEIVE) && !DRV_USART0_ReceiverBufferIsEmpty())
     {
-       uint8_t c = DRV_USART0_ReadByte(); // read received byte
-       dbgOutputVal(c);
+        dbgOutputLoc(USART0_BEFORE_SEND_TO_QUEUE);
+        UARTRXTHREAD_SendToQueueISR(DRV_USART0_ReadByte(), &pxHigherPriorityTaskWoken); // read received byte
+        dbgOutputLoc(USART0_AFTER_SEND_TO_QUEUE);
+    }
+    if(SYS_INT_SourceStatusGet(INT_SOURCE_USART_1_TRANSMIT) && (!(DRV_USART_TRANSFER_STATUS_TRANSMIT_FULL & DRV_USART0_TransferStatus()) ))
+    {
+        dbgOutputLoc(USART0_BEFORE_RECEIVE_FR_QUEUE);
+        char buf;
+        if(Usart0_ReadFromQueue(&buf, &pxHigherPriorityTaskWoken)) {
+            DRV_USART0_WriteByte(buf);
+        }
+        dbgOutputLoc(USART0_AFTER_RECEIVE_FR_QUEUE);
     }
     DRV_USART_TasksTransmit(sysObj.drvUsart0);
     DRV_USART_TasksReceive(sysObj.drvUsart0);
     DRV_USART_TasksError(sysObj.drvUsart0);
+    dbgOutputLoc(USART0_LEAVE_ISR);
+    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
 }
- 
- 
- 
 
- 
+void InitializeISRQueues() {
+    Usart0_InitializeQueue();
+}
 
- 
-
- 
-
- 
-
- 
-  
 /*******************************************************************************
  End of File
 */

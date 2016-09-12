@@ -229,5 +229,6 @@ build/default/production/_ext/1688732426/system_exceptions.o:  \
  ../../../../../microchip/harmony/v1_08_01/framework/peripheral/ports/processor/../templates/ports_ChannelChangeNoticeMethod_Unsupported.h  \
  ../../../../../microchip/harmony/v1_08_01/framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeControl_Unsupported.h  \
  ../../../../../microchip/harmony/v1_08_01/framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeStatus_Unsupported.h  \
- ../src/app.h  \
-../src/system_config/default/system_definitions.h 
+ ../src/uartrxthread.h  \
+../src/system_config/default/system_definitions.h  \
+ ../src/uarttxthread.h 
