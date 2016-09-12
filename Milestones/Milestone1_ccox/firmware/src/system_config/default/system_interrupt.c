@@ -76,16 +76,18 @@ int team2_i = 0;
 
 void IntHandlerDrvTmrInstance0(void)
 {
+    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     dbgOutputLoc(ENTER_TIMER_ISR);
     if(team2[team2_i] == '\0'){
         team2_i = 0;
     }
     dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
-    dbgCheckFuncReturn(app1SendTimerValToMsgQFromISR(team2[team2_i]));
+    app1SendTimerValToMsgQFromISR(team2[team2_i], &pxHigherPriorityTaskWoken);
     dbgOutputLoc(AFTER_SEND_TO_Q_ISR);
     team2_i = team2_i + 1;
     dbgOutputLoc(LEAVE_TIMER_ISR);
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
+    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
 }
   
 /*******************************************************************************

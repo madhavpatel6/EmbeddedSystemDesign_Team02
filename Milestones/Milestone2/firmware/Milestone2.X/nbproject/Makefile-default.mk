@@ -188,6 +188,7 @@ ${OBJECTDIR}/_ext/1688732426/rtos_hooks.o: ../src/system_config/default/rtos_hoo
 	@${RM} ${OBJECTDIR}/_ext/1688732426/rtos_hooks.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1688732426/rtos_hooks.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -O1 -D__XC -I"../src" -I"../src/system_config/default" -I"../src/default" -I"../../../../../microchip/harmony/v1_08_01/framework" -I"../src/system_config/default/framework" -I"../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX" -I"../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include" -MMD -MF "${OBJECTDIR}/_ext/1688732426/rtos_hooks.o.d" -o ${OBJECTDIR}/_ext/1688732426/rtos_hooks.o ../src/system_config/default/rtos_hooks.c    -DXPRJ_default=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD) 
 	
+	
 ${OBJECTDIR}/_ext/1360937237/main.o: ../src/main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/_ext/1360937237" 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/main.o.d 
@@ -289,7 +290,6 @@ ${OBJECTDIR}/_ext/1402670172/messagelayer.o: ../src/communication/messagelayer.c
 	@${RM} ${OBJECTDIR}/_ext/1402670172/messagelayer.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1402670172/messagelayer.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1402670172/messagelayer.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -O1 -D__XC -I"../src" -I"../src/system_config/default" -I"../src/default" -I"../../../../../microchip/harmony/v1_08_01/framework" -I"../src/system_config/default/framework" -I"../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX" -I"../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include" -MMD -MF "${OBJECTDIR}/_ext/1402670172/messagelayer.o.d" -o ${OBJECTDIR}/_ext/1402670172/messagelayer.o ../src/communication/messagelayer.c    -DXPRJ_default=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD) 
-	
 else
 ${OBJECTDIR}/_ext/327000265/drv_usart_mapping.o: ../src/system_config/default/framework/driver/usart/src/drv_usart_mapping.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/_ext/327000265" 
@@ -452,7 +452,6 @@ ${OBJECTDIR}/_ext/1402670172/messagelayer.o: ../src/communication/messagelayer.c
 	@${RM} ${OBJECTDIR}/_ext/1402670172/messagelayer.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1402670172/messagelayer.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1402670172/messagelayer.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -ffunction-sections -O1 -D__XC -I"../src" -I"../src/system_config/default" -I"../src/default" -I"../../../../../microchip/harmony/v1_08_01/framework" -I"../src/system_config/default/framework" -I"../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX" -I"../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include" -MMD -MF "${OBJECTDIR}/_ext/1402670172/messagelayer.o.d" -o ${OBJECTDIR}/_ext/1402670172/messagelayer.o ../src/communication/messagelayer.c    -DXPRJ_default=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD) 
-	
 endif
 
 # ------------------------------------------------------------------------------------

@@ -41,13 +41,13 @@ extern "C" {
     
     //Broken function
 #define ERROR_RETURN 0x12
-#define CORRECT_RETURN 0x13
     
 #endif
     
     void dbgOutputValue(char outVal);
     void dbgOutputLoc(unsigned int outVal);
     void dbgLocTrigger(bool trigger);
+    void dbgCheckFuncReturnISR(int checkVal);
     void dbgCheckFuncReturn(int checkVal);
     /* Provide C++ Compatibility */
 #ifdef __cplusplus

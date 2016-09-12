@@ -18,7 +18,7 @@
 extern "C" {
 #endif
     int app1SendTimerValToMsgQ(char msgVal);
-    int app1SendTimerValToMsgQFromISR(char msgVal);
+    int app1SendTimerValToMsgQFromISR(char msgVal, BaseType_t *pxHigherPriorityTaskWoken);
     
     /* Provide C++ Compatibility */
 #ifdef __cplusplus

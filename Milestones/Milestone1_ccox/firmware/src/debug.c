@@ -97,14 +97,17 @@ void dbgLocTrigger(bool trigger){
 }
 
 /* Checks the return values of the functions */
+void dbgCheckFuncReturnISR(int checkVal){
+    if(checkVal != 1){
+        dbgOutputLoc(ERROR_RETURN);
+        SYS_INT_Disable();
+    }
+}
+
+/* Checks the return values of the functions */
 void dbgCheckFuncReturn(int checkVal){
     if(checkVal != 1){
         dbgOutputLoc(ERROR_RETURN);
-        while(1){
-        }
-    }
-    else{
-        dbgOutputLoc(CORRECT_RETURN);
     }
 }
 /* *****************************************************************************
