@@ -55,6 +55,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include "uarttxthread.h"
 #include "uarttxthread_public.h"
+#include "system_interrupt_public.h"
 #include "debug.h"
 // *****************************************************************************
 // *****************************************************************************
@@ -92,6 +93,8 @@ QueueHandle_t _queue;
 void UARTTXTHREAD_Initialize ( void )
 {
     UARTTXTHREAD_InitializeQueue();
+    /*Send a trash character to allow the ISR to fire initially*/
+    DRV_USART0_WriteByte(NULL);
 }
 
 /******************************************************************************
@@ -102,12 +105,22 @@ void UARTTXTHREAD_Initialize ( void )
     See prototype in uarttxthread.h.
  */
 
+const char test[] = "test";
+int x = 0;
 void UARTTXTHREAD_Tasks ( void )
 {
     dbgOutputLoc(UARTRXTHREAD_ENTER_TASK);
     dbgOutputLoc(UARTRXTHREAD_BEFORE_WHILELOOP);
     while(1){
-        
+        dbgOutputLoc(UARTRXTHREAD_BEFORE_SEND_TO_QUEUE);
+        Usart0_SendToQueue(test[x]);
+        dbgOutputLoc(UARTRXTHREAD_AFTER_SEND_TO_QUEUE);
+        if(x == 3) {
+            x = 0;
+        }
+        else {
+            x++;
+        }
     }
 }
 

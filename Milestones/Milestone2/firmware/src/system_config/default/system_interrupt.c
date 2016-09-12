@@ -87,18 +87,18 @@ void Usart0_InitializeQueue() {
 }
 
 int Usart0_ReadFromQueue(void* pvBuffer, BaseType_t *pxHigherPriorityTaskWoken) {
-    dbgOutputLoc(UARTTXTHREAD_BEFORE_RECEIVE_FR_QUEUE);
+    dbgOutputLoc(USART0_BEFORE_RECEIVE_FR_QUEUE);
     int ret = xQueueReceiveFromISR(_usartqueue, pvBuffer, pxHigherPriorityTaskWoken);
-    dbgOutputLoc(UARTTXTHREAD_AFTER_RECEIVE_FR_QUEUE);
+    dbgOutputLoc(USART0_AFTER_RECEIVE_FR_QUEUE);
     return ret;
 }
 
 void Usart0_SendToQueue(char buffer) {
-    dbgOutputBlock(xQueueSendToBack(_usartqueue, &buffer, portMAX_DELAY));
+    xQueueSendToBack(_usartqueue, &buffer, portMAX_DELAY);
 }
 
 void Usart0_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken) {
-    dbgOutputBlockISR(xQueueSendToBackFromISR(_usartqueue, &buffer, pxHigherPriorityTaskWoken));
+    xQueueSendToBackFromISR(_usartqueue, &buffer, pxHigherPriorityTaskWoken);
 }
 
 void IntHandlerDrvUsartInstance0(void)
@@ -118,6 +118,11 @@ void IntHandlerDrvUsartInstance0(void)
         if(Usart0_ReadFromQueue(&buf, &pxHigherPriorityTaskWoken)) {
             DRV_USART0_WriteByte(buf);
         }
+        else {
+            /*If we do not have a character to send then we just send garbage.
+                This allows us to still generate an interrupt.*/
+            DRV_USART0_WriteByte(NULL);
+        }
         dbgOutputLoc(USART0_AFTER_RECEIVE_FR_QUEUE);
     }
     DRV_USART_TasksTransmit(sysObj.drvUsart0);
@@ -131,6 +136,18 @@ void InitializeISRQueues() {
     Usart0_InitializeQueue();
 }
 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+  
 /*******************************************************************************
  End of File
 */

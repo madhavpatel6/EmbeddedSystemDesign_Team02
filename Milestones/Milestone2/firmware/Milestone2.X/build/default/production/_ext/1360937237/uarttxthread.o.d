@@ -232,4 +232,5 @@ build/default/production/_ext/1360937237/uarttxthread.o:  \
  ../src/uartrxthread.h  \
 ../src/uarttxthread.h  \
 ../src/uarttxthread_public.h  \
- ../src/debug.h 
+ ../src/system_interrupt_public.h  \
+../src/debug.h 

@@ -37,6 +37,7 @@ void dbgOutputVal(unsigned char outVal) {
  * @param outVal [The location value to put to the bus; see debug.h for the LocationEnum]
  */
 void dbgOutputLoc(unsigned char outVal) {
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 5, 0);
     SYS_PORTS_Clear(PORTS_ID_0, PORT_CHANNEL_B, 0b0011100000000000);
     SYS_PORTS_Clear(PORTS_ID_0, PORT_CHANNEL_G, 0b100000000);
     SYS_PORTS_Clear(PORTS_ID_0, PORT_CHANNEL_A, 0b10000000000);
@@ -50,6 +51,7 @@ void dbgOutputLoc(unsigned char outVal) {
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_F, 0,(outVal & 0b100) >> 2);
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_F, 1,(outVal & 0b10));
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 6,(outVal & 0b1));
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 5, 1);
 }
 
 /**

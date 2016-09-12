@@ -30,7 +30,7 @@ bool ParseMessage(char* packedData, char* messageData) {
     
 }
 
-bool CreateMessage(char* messageData, char* packedData) {
+bool CreateMessage(char* messageData, DestionationType destination, char* packedData) {
     if(packedData == NULL || messageData == NULL) {
         dbgOutputBlock(false);
     }

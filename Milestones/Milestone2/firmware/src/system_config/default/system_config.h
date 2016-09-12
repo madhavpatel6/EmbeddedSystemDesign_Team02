@@ -102,7 +102,7 @@ extern "C" {
 #define SYS_PORT_B_LAT          0x0
 #define SYS_PORT_B_ODC          0x0
 
-#define SYS_PORT_D_TRIS         0xffbf
+#define SYS_PORT_D_TRIS         0xff9f
 #define SYS_PORT_D_LAT          0x0
 #define SYS_PORT_D_ODC          0x0
 

@@ -180,6 +180,7 @@ void SYS_Initialize ( void* data )
   
     /* Initialize Middleware */
     InitializeISRQueues();
+    
 
     /* Initialize the Application */
     UARTRXTHREAD_Initialize();
