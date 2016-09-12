@@ -226,7 +226,6 @@
         <Name>drv_usart_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/usart/src</Path>
         <Checksum>2A4AED7552D145ED28C2C52BFC04AD9D</Checksum>
-        <ProjectFileChecksum>64F9BAAB6E41A4838A1928C41210C10C</ProjectFileChecksum>
       </Template>
       <Template>
         <Name>sys_ports_static.c</Name>
@@ -237,7 +236,6 @@
         <Name>system_init.c</Name>
         <Path>Source Files/app/system_config/default</Path>
         <Checksum>C659F4C203123AB70C0795C078D1731C</Checksum>
-        <ProjectFileChecksum>7255C2262EA808759F508346F7BE014A</ProjectFileChecksum>
       </Template>
       <Template>
         <Name>main.c</Name>
@@ -290,7 +288,6 @@
         <Name>drv_usart_static_byte_model.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/usart/src</Path>
         <Checksum>E56B5A603F0427F96760518142226E69</Checksum>
-        <ProjectFileChecksum>6A462D050F427D77479EF06856E2ADB2</ProjectFileChecksum>
       </Template>
       <Template>
         <Name>system_config.h</Name>
@@ -310,7 +307,6 @@
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/default</Path>
         <Checksum>772044ADDA469C1A87C2490B9A26AD25</Checksum>
-        <ProjectFileChecksum>F7AA9AF8BDA31D4A1B54467E816298C3</ProjectFileChecksum>
       </Template>
       <Template>
         <Name>rtos_hooks.c</Name>
