@@ -81,7 +81,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 QueueHandle_t _queue;
 
 #define SIZEOFQUEUE 10
-#define TYPEOFQUEUE char
+#define TYPEOFQUEUE char[1000]
 /*******************************************************************************
   Function:
     void UARTTXTHREAD_Initialize ( void )
@@ -94,7 +94,6 @@ void UARTTXTHREAD_Initialize ( void )
 {
     UARTTXTHREAD_InitializeQueue();
     /*Send a trash character to allow the ISR to fire initially*/
-    DRV_USART0_WriteByte(NULL);
 }
 
 /******************************************************************************
@@ -110,8 +109,15 @@ int x = 0;
 void UARTTXTHREAD_Tasks ( void )
 {
     dbgOutputLoc(UARTRXTHREAD_ENTER_TASK);
+//    DRV_USART0_WriteByte(NULL);
     dbgOutputLoc(UARTRXTHREAD_BEFORE_WHILELOOP);
     while(1){
+        //receive from our local queue
+//        UARTTXTHREAD_ReadFromQueue(/*json message*/);
+        //packs our message
+        //while(packed message)
+        //  send to usart queue(char)
+        
         dbgOutputLoc(UARTRXTHREAD_BEFORE_SEND_TO_QUEUE);
         Usart0_SendToQueue(test[x]);
         dbgOutputLoc(UARTRXTHREAD_AFTER_SEND_TO_QUEUE);
@@ -121,6 +127,8 @@ void UARTTXTHREAD_Tasks ( void )
         else {
             x++;
         }
+        SYS_INT_SourceEnable(INT_SOURCE_USART_1_TRANSMIT);
+        //after we finish sending packet; disable tx isr
     }
 }
 

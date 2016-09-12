@@ -107,6 +107,8 @@ void UARTRXTHREAD_Tasks ( void )
     dbgOutputLoc(UARTRXTHREAD_ENTER_TASK);
     dbgOutputLoc(UARTRXTHREAD_BEFORE_WHILELOOP);
     while(1){
+        char c;
+        UARTRXTHREAD_ReadFromQueue(&c);
     }
 }
 
@@ -120,7 +122,7 @@ void UARTRXTHREAD_InitializeQueue() {
  
 void UARTRXTHREAD_ReadFromQueue(void* pvBuffer) {
     dbgOutputLoc(UARTRXTHREAD_BEFORE_RECEIVE_FR_QUEUE);
-    dbgOutputBlock(xQueueReceive(_queue, pvBuffer, portMAX_DELAY));
+    xQueueReceive(_queue, pvBuffer, portMAX_DELAY);
     dbgOutputLoc(UARTRXTHREAD_AFTER_RECEIVE_FR_QUEUE);
 }
 

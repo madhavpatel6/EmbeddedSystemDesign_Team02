@@ -84,7 +84,7 @@ uint8_t DRV_USART0_ReadByte(void)
     /* Receive one byte */
     readValue = PLIB_USART_ReceiverByteReceive(USART_ID_1);
 
-    OSAL_MUTEX_Unlock(&(gDrvUSART0Obj.mutexDriverInstance));
+//    OSAL_MUTEX_Unlock(&(gDrvUSART0Obj.mutexDriverInstance));
 
 
     return readValue;

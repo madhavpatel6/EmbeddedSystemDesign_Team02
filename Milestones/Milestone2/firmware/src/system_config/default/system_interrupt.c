@@ -111,7 +111,7 @@ void IntHandlerDrvUsartInstance0(void)
         UARTRXTHREAD_SendToQueueISR(DRV_USART0_ReadByte(), &pxHigherPriorityTaskWoken); // read received byte
         dbgOutputLoc(USART0_AFTER_SEND_TO_QUEUE);
     }
-    if(SYS_INT_SourceStatusGet(INT_SOURCE_USART_1_TRANSMIT) && (!(DRV_USART_TRANSFER_STATUS_TRANSMIT_FULL & DRV_USART0_TransferStatus()) ))
+    if(SYS_INT_SourceStatusGet(INT_SOURCE_USART_1_TRANSMIT) && !(DRV_USART_TRANSFER_STATUS_TRANSMIT_FULL & DRV_USART0_TransferStatus()) )
     {
         char buf;
         dbgOutputLoc(USART0_BEFORE_RECEIVE_FR_QUEUE);
@@ -119,13 +119,12 @@ void IntHandlerDrvUsartInstance0(void)
             DRV_USART0_WriteByte(buf);
         }
         else {
-            /*If we do not have a character to send then we just send garbage.
-                This allows us to still generate an interrupt.*/
-            DRV_USART0_WriteByte(NULL);
+            SYS_INT_SourceDisable(INT_SOURCE_USART_1_TRANSMIT);
+            SYS_INT_SourceStatusClear(INT_SOURCE_USART_1_TRANSMIT);
         }
         dbgOutputLoc(USART0_AFTER_RECEIVE_FR_QUEUE);
     }
-    DRV_USART_TasksTransmit(sysObj.drvUsart0);
+    //DRV_USART_TasksTransmit(sysObj.drvUsart0);
     DRV_USART_TasksReceive(sysObj.drvUsart0);
     DRV_USART_TasksError(sysObj.drvUsart0);
     dbgOutputLoc(USART0_LEAVE_ISR);
