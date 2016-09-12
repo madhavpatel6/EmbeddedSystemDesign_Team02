@@ -37,6 +37,7 @@
         <itemPath>../src/uartrxthread_public.h</itemPath>
         <itemPath>../src/uarttxthread_public.h</itemPath>
         <itemPath>../src/system_interrupt_public.h</itemPath>
+        <itemPath>../src/debug.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="framework" projectFiles="true">
         <logicalFolder name="f1" displayName="driver" projectFiles="true">
@@ -160,7 +161,6 @@
         </logicalFolder>
         <itemPath>../src/main.c</itemPath>
         <itemPath>../src/debug.c</itemPath>
-        <itemPath>../src/debug.h</itemPath>
         <itemPath>../src/uartrxthread.c</itemPath>
         <itemPath>../src/uarttxthread.c</itemPath>
       </logicalFolder>

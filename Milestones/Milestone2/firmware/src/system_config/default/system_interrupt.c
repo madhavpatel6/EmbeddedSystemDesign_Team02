@@ -113,8 +113,8 @@ void IntHandlerDrvUsartInstance0(void)
     }
     if(SYS_INT_SourceStatusGet(INT_SOURCE_USART_1_TRANSMIT) && (!(DRV_USART_TRANSFER_STATUS_TRANSMIT_FULL & DRV_USART0_TransferStatus()) ))
     {
-        dbgOutputLoc(USART0_BEFORE_RECEIVE_FR_QUEUE);
         char buf;
+        dbgOutputLoc(USART0_BEFORE_RECEIVE_FR_QUEUE);
         if(Usart0_ReadFromQueue(&buf, &pxHigherPriorityTaskWoken)) {
             DRV_USART0_WriteByte(buf);
         }
