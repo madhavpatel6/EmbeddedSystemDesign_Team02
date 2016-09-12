@@ -22,8 +22,8 @@ extern "C" {
 #endif
     
     
-    int adc_app_SendValToMsgQ(char adcVal);
-    int adc_app_SendValToMsgQFromISR(char adcVal);
+    int adc_app_SendValToMsgQ(float adcVal);
+    int adc_app_SendValToMsgQFromISR(float adcVal, BaseType_t *pxHigherPriorityTaskWoken);
 
 
     /* Provide C++ Compatibility */

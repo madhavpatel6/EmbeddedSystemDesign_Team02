@@ -114,7 +114,8 @@ ADC_ISR_DATA adc_ISRData;
 
 void ADC_APP_Initialize ( void )
 {
-    adc_ISRData.adcQ = createApp1Q();
+    adc_ISRData.adcQ = createAdcQ();
+    DRV_ADC_Open();
     /* TODO: Initialize your application's state machine and other
      * parameters.
      */
@@ -130,31 +131,34 @@ void ADC_APP_Initialize ( void )
  */
 
 /* Following functions are for milestone1 */
-QueueHandle_t createApp1Q(){
+QueueHandle_t createAdcQ(){
     //8 b/c "team 2" //10 is size of Q
-    return xQueueCreate(10,sizeof(char)); 
+    return xQueueCreate(10,sizeof(float)); 
 }
 
-/* Sends value from timer to app1 Queue */
-int adc_app_SendValToMsgQ(char adcVal){
-    return xQueueSend(app1Data.app1Q, &adcVal, portMAX_DELAY);
+/* Sends value from adc to adc_app Queue */
+int adc_app_SendValToMsgQ(float adcVal){
+    return xQueueSend(adc_ISRData.adcQ, &adcVal, portMAX_DELAY);
 }
 
-/* Sends value from timer ISR to app1 Queue */
-int adc_app_SendValToMsgQFromISR(char adcVal){
-    return xQueueSendFromISR(app1Data.app1Q, &adcVal, NULL);
+/* Sends value from adc ISR to adc_app Queue */
+int adc_app_SendValToMsgQFromISR(float adcVal, BaseType_t *pxHigherPriorityTaskWoken){
+    return xQueueSendFromISR(adc_ISRData.adcQ, &adcVal, pxHigherPriorityTaskWoken);
 }
 
 
 void ADC_APP_Tasks ( void )
 {
     dbgOutputLoc(ENTER_TASK_APP1);
-    unsigned char valRecv;
+    float valRecv;
     dbgOutputLoc(BEFORE_WHILE_APP1);
     while(1){
         dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_APP1);
         if(xQueueReceive(adc_ISRData.adcQ, &valRecv, portMAX_DELAY)){
-            dbgOutputValue(valRecv);
+//            dbgOutputValue(valRecv);
+//            dbgOutputValue((int)valRecv >> 8);
+//            dbgOutputValue((int)valRecv >> 16);
+//            dbgOutputValue((int)valRecv >> 24);
         }
         dbgOutputLoc(AFTER_RECEIVE_FROM_Q_APP1);
     }

@@ -11,8 +11,8 @@
 /* Section: Included Files                                                    */
 /* ************************************************************************** */
 /* ************************************************************************** */
-
-#include "../../../../framework/system/ports/sys_ports.h"
+#include "system_config.h"
+#include "system_definitions.h"
 
 
 /* Provide C++ Compatibility */

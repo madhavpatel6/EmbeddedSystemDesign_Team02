@@ -64,7 +64,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "adc_app.h"
 #include "system_definitions.h"
 #include "../../adc_app_public.h"
-
+#include "debug.h"
 // *****************************************************************************
 // *****************************************************************************
 // Section: System Interrupt Vector Functions
@@ -72,12 +72,28 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 void IntHandlerDrvAdc(void)
 {
+    int i = 0;
+    int adcValToQ;
+    int adcValToQF = 1;
+    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
+    dbgOutputLoc(ENTER_TIMER_ISR);
+    dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
+    //Read data before clearing interrupt flag
+    for(i; i < 16; i++) {
+        adcValToQ += PLIB_ADC_ResultGetByIndex(ADC_ID_1, i);
+    }
+    adcValToQF = (adcValToQ)/(16);
+//    float adcVoltage = adcValToQF*5/(1024.0); 
+    int adcSensorDistance = adcValToQF/2;//(adcVoltage / 0.009766) * 2.54;
+    dbgOutputValue(adcSensorDistance);
+    adc_app_SendValToMsgQFromISR(adcSensorDistance, &pxHigherPriorityTaskWoken);
+    dbgOutputLoc(AFTER_SEND_TO_Q_ISR);
+    dbgOutputLoc(LEAVE_TIMER_ISR);
+    PLIB_ADC_SampleAutoStartEnable(ADC_ID_1);
+    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
     /* Clear ADC Interrupt Flag */
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
 }
-
-
-
  
 /*******************************************************************************
  End of File

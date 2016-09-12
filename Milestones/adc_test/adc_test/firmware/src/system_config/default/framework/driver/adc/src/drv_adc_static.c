@@ -84,14 +84,14 @@ void DRV_ADC_Initialize(void)
     /* Channel Selections */
     /* MUX A Negative Input Select */
     PLIB_ADC_MuxChannel0InputNegativeSelect(DRV_ADC_ID_1, ADC_MUX_A, ADC_INPUT_NEGATIVE_VREF_MINUS);
- 
-/*scan enable*/
-    /* Select Scan Input 0 */
-    PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN0);
-    
-    /* Enable Scan mode */
-    PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
+/*scan false*/
+/*escan false*/
 
+    /* MUX A Positive Input Select dfdfd*/
+    PLIB_ADC_MuxChannel0InputPositiveSelect(DRV_ADC_ID_1, ADC_MUX_A, ADC_INPUT_POSITIVE_AN0);
+
+
+ 
  
     /* Initialize ADC Interrupt */
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
