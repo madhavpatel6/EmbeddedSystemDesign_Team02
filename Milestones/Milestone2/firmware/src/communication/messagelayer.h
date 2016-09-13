@@ -20,10 +20,11 @@
 
 #include "debug.h"
 
+#define MAXMESSAGESIZE 512
 #define STARTOFTEXT 0x02
 
 typedef enum DestinationType { PIC32_SearcherMover, PIC32_TargetLocator, PIC32_PathFinder, PIC32_TargetGrabber } DestionationType;
-bool ParseMessage(char* packedData, char* messageData);
+bool ParseMessage(char packedData[], char messageData[]);
 
 bool CreateMessage(char* messageData, DestionationType destination,char* packedData);
 

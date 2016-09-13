@@ -120,7 +120,7 @@ void UARTTXTHREAD_Tasks ( void )
         //packs our message
         //while(packed message)
         //  send to usart queue(char)
-        sprintf(floatToStr,"%0.2f\n\r",adcValRecv);
+        sprintf(floatToStr,"%0.2f",adcValRecv);
         int i = 0;
         for(i = 0; i < strlen(floatToStr); i++) {
             Usart0_SendToQueue(floatToStr[i]);

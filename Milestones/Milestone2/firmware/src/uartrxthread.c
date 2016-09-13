@@ -56,6 +56,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "uartrxthread.h"
 #include "uartrxthread_public.h"
 #include "debug.h"
+//#include "messagelayer.h"
 // *****************************************************************************
 // *****************************************************************************
 // Section: Global Data Definitions
@@ -79,7 +80,14 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 QueueHandle_t _queue;
 #define TYPEOFQUEUE char
-#define SIZEOFQUEUE 1000
+#define SIZEOFQUEUE 10
+#define MAXMESSAGESIZE 512
+char _internalBuffer[MAXMESSAGESIZE];
+
+char _internalMessageData[MAXMESSAGESIZE];
+
+size_t _internalBufferIndex = 0;
+
 /*******************************************************************************
   Function:
     void UARTRXTHREAD_Initialize ( void )
@@ -109,6 +117,13 @@ void UARTRXTHREAD_Tasks ( void )
     while(1){
         char c;
         UARTRXTHREAD_ReadFromQueue(&c);
+//        if(_internalBufferIndex == MAXMESSAGESIZE - 1) {
+//            _internalBufferIndex = 0;
+//            ParseMessage(_internalBuffer, _internalMessageData);
+//        }
+//        else {
+//            _internalBufferIndex++;
+//        }
     }
 }
 
