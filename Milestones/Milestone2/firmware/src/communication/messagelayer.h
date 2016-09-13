@@ -31,6 +31,10 @@ void ParseMessage(char buf[], char messageData[]);
 
 void CreateMessage(char buf[], char messageData[], char destination);
 
+void BuildJSON(char buf[]);
+
+char checksum(char* s);
+
 #endif /* _MESSAGELAYER_H */
 
 /* *****************************************************************************
