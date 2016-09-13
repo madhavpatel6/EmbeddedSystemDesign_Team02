@@ -116,11 +116,15 @@ void UARTTXTHREAD_Tasks ( void )
     while(1){
         //receive from our local queue
         UARTTXTHREAD_ReadFromQueue(&adcValRecv);
-        UARTTXTHREAD_SendToQueue(adcValRecv);
+        dbgOutputVal(adcValRecv);
         //packs our message
         //while(packed message)
         //  send to usart queue(char)
-        
+        sprintf(floatToStr,"%0.2f\n\r",adcValRecv);
+        int i = 0;
+        for(i = 0; i < strlen(floatToStr); i++) {
+            Usart0_SendToQueue(floatToStr[i]);
+        }
         dbgOutputLoc(UARTRXTHREAD_BEFORE_SEND_TO_QUEUE);
    
         dbgOutputLoc(UARTRXTHREAD_AFTER_SEND_TO_QUEUE);
