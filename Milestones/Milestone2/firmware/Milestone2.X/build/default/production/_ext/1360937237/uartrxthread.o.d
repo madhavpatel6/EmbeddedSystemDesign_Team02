@@ -265,4 +265,6 @@ build/default/production/_ext/1360937237/uartrxthread.o:  \
  ../src/adc_app_public.h  \
 ../src/debug.h  \
 ../src/uarttxthread_public.h  \
- ../src/uartrxthread_public.h 
+ ../src/uartrxthread_public.h  \
+../src/communication/messagelayer.h  \
+ ../src/debug.h 

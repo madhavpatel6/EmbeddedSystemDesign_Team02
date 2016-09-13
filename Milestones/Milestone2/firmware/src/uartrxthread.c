@@ -56,7 +56,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "uartrxthread.h"
 #include "uartrxthread_public.h"
 #include "debug.h"
-//#include "messagelayer.h"
+#include "communication/messagelayer.h"
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Global Data Definitions
@@ -81,7 +82,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 QueueHandle_t _queue;
 #define TYPEOFQUEUE char
 #define SIZEOFQUEUE 10
-#define MAXMESSAGESIZE 512
+
 char _internalBuffer[MAXMESSAGESIZE];
 
 char _internalMessageData[MAXMESSAGESIZE];
@@ -99,6 +100,7 @@ size_t _internalBufferIndex = 0;
 void UARTRXTHREAD_Initialize ( void )
 {
     UARTRXTHREAD_InitializeQueue();
+    SYS_INT_SourceEnable(INT_SOURCE_USART_1_RECEIVE);
 }
 
 
@@ -142,11 +144,11 @@ void UARTRXTHREAD_ReadFromQueue(void* pvBuffer) {
 }
 
 void UARTRXTHREAD_SendToQueue(char buffer) {
-    dbgOutputBlock(xQueueSendToBack(_queue, &buffer, portMAX_DELAY));
+    xQueueSendToBack(_queue, &buffer, portMAX_DELAY);
 }
 
 void UARTRXTHREAD_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken) {
-    dbgOutputBlockISR(xQueueSendToBackFromISR(_queue, &buffer, pxHigherPriorityTaskWoken));
+    xQueueSendToBackFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
 }
 /*******************************************************************************
  End of File

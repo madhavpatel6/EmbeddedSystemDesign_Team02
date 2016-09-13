@@ -57,6 +57,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "uarttxthread_public.h"
 #include "system_interrupt_public.h"
 #include "debug.h"
+#include "communication/messagelayer.h"
 // *****************************************************************************
 // *****************************************************************************
 // Section: Global Data Definitions
@@ -104,9 +105,10 @@ void UARTTXTHREAD_Initialize ( void )
     See prototype in uarttxthread.h.
  */
 
-const char test[] = "test";
 int x = 0;
+char buf[512];
 char floatToStr[50];
+
 void UARTTXTHREAD_Tasks ( void )
 {
     dbgOutputLoc(UARTRXTHREAD_ENTER_TASK);
@@ -117,13 +119,12 @@ void UARTTXTHREAD_Tasks ( void )
         //receive from our local queue
         UARTTXTHREAD_ReadFromQueue(&adcValRecv);
         dbgOutputVal(adcValRecv);
-        //packs our message
-        //while(packed message)
-        //  send to usart queue(char)
         sprintf(floatToStr,"%0.2f",adcValRecv);
+        CreateMessage(buf, floatToStr, PATHFINDER);
+        
         int i = 0;
-        for(i = 0; i < strlen(floatToStr); i++) {
-            Usart0_SendToQueue(floatToStr[i]);
+        for(i = 0; i < strlen(buf); i++) {
+            Usart0_SendToQueue(buf[i]);
         }
         dbgOutputLoc(UARTRXTHREAD_BEFORE_SEND_TO_QUEUE);
    

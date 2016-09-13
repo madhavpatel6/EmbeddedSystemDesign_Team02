@@ -73,6 +73,8 @@ enum LocationEnum {
     BEFORE_RECEIVE_FROM_Q_ADC_APP,      // 43
     AFTER_SEND_TO_Q_ADC_APP,            // 44
     AFTER_RECEIVE_FROM_Q_ADC_APP,       // 45
+    
+    CREATE_MESSAGE_DONE //46        
 };
 
 /**
