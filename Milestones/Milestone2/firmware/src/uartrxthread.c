@@ -79,7 +79,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 QueueHandle_t _queue;
 #define TYPEOFQUEUE char
-#define SIZEOFQUEUE 10
+#define SIZEOFQUEUE 1000
 /*******************************************************************************
   Function:
     void UARTRXTHREAD_Initialize ( void )

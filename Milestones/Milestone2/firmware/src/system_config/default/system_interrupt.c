@@ -61,6 +61,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include <xc.h>
 #include <sys/attribs.h>
+#include "adc_app.h"
+#include "../../adc_app_public.h"
 #include "debug.h"
 #include "uartrxthread.h"
 #include "uarttxthread.h"
@@ -77,6 +79,31 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 QueueHandle_t _usartqueue;
 #define USARTTYPEOFQUEUE char
 #define USARTSIZEOFQUEUE 10
+
+void IntHandlerDrvAdc(void)
+{
+    int i = 0;
+    float adcValToQ = 0.0;
+    float adcValToQF = 0.0;
+    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
+    dbgOutputLoc(ENTER_ADC_ISR);
+    //Read data before clearing interrupt flag
+    dbgOutputLoc(ADDING_ADC_VAL_ISR);
+    for(i; i < 16; i++) {
+        adcValToQ = adcValToQ + PLIB_ADC_ResultGetByIndex(ADC_ID_1, i);
+    }
+    adcValToQF = ((adcValToQ)/(16.0))*(1.0);
+    float adcVoltage = (adcValToQF*5.0)/(1024.0); 
+    float adcSensorDistance = (adcVoltage / 0.009766) * (2.54);
+    dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
+    adc_app_SendValToMsgQFromISR(adcSensorDistance, &pxHigherPriorityTaskWoken);
+    dbgOutputLoc(AFTER_SEND_TO_Q_ISR);
+    dbgOutputLoc(LEAVE_ADC_ISR);
+    PLIB_ADC_SampleAutoStartEnable(ADC_ID_1);
+    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
+    /* Clear ADC Interrupt Flag */
+    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
+}
 
 void Usart0_InitializeQueue() {
     _usartqueue = xQueueCreate(USARTSIZEOFQUEUE, sizeof(USARTTYPEOFQUEUE));

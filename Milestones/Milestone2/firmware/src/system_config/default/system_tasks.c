@@ -56,6 +56,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_definitions.h"
 #include "uartrxthread.h"
 #include "uarttxthread.h"
+#include "adc_app.h"
 
 
 // *****************************************************************************
@@ -69,6 +70,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 static void _SYS_Tasks ( void );
 static void _UARTRXTHREAD_Tasks(void);
 static void _UARTTXTHREAD_Tasks(void);
+static void _ADC_APP_Tasks(void);
 
 
 // *****************************************************************************
@@ -100,6 +102,11 @@ void SYS_Tasks ( void )
     /* Create OS Thread for UARTTXTHREAD Tasks. */
     xTaskCreate((TaskFunction_t) _UARTTXTHREAD_Tasks,
                 "UARTTXTHREAD Tasks",
+                1024, NULL, 1, NULL);
+
+    /* Create OS Thread for ADC_APP Tasks. */
+    xTaskCreate((TaskFunction_t) _ADC_APP_Tasks,
+                "ADC_APP Tasks",
                 1024, NULL, 1, NULL);
 
     /**************
@@ -162,6 +169,23 @@ static void _UARTTXTHREAD_Tasks(void)
     while(1)
     {
         UARTTXTHREAD_Tasks();
+    }
+}
+
+
+/*******************************************************************************
+  Function:
+    void _ADC_APP_Tasks ( void )
+
+  Summary:
+    Maintains state machine of ADC_APP.
+*/
+
+static void _ADC_APP_Tasks(void)
+{
+    while(1)
+    {
+        ADC_APP_Tasks();
     }
 }
 

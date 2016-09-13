@@ -5,7 +5,7 @@
     Microchip Technology Inc.
   
   File Name:
-    uarttxthread.c
+    adc_app.c
 
   Summary:
     This file contains the source code for the MPLAB Harmony application.
@@ -53,10 +53,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-#include "uarttxthread.h"
-#include "uarttxthread_public.h"
-#include "system_interrupt_public.h"
-#include "debug.h"
+#include "adc_app.h"
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Global Data Definitions
@@ -78,78 +76,93 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
     Application strings and buffers are be defined outside this structure.
 */
 
-QueueHandle_t _queue;
+ADC_APP_DATA adc_appData;
+ADC_ISR_DATA adc_ISRData;
+// *****************************************************************************
+// *****************************************************************************
+// Section: Application Callback Functions
+// *****************************************************************************
+// *****************************************************************************
 
-#define SIZEOFQUEUE 10
-#define TYPEOFQUEUE float
+/* TODO:  Add any necessary callback functions.
+*/
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Application Local Functions
+// *****************************************************************************
+// *****************************************************************************
+
+
+/* TODO:  Add any necessary local functions.
+*/
+
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Application Initialization and State Machine Functions
+// *****************************************************************************
+// *****************************************************************************
+
 /*******************************************************************************
   Function:
-    void UARTTXTHREAD_Initialize ( void )
+    void ADC_APP_Initialize ( void )
 
   Remarks:
-    See prototype in uarttxthread.h.
+    See prototype in adc_app.h.
  */
 
-void UARTTXTHREAD_Initialize ( void )
+void ADC_APP_Initialize ( void )
 {
-    UARTTXTHREAD_InitializeQueue();
-    /*Send a trash character to allow the ISR to fire initially*/
+    adc_ISRData.adcQ = createAdcQ();
+    DRV_ADC_Open();
+    /* TODO: Initialize your application's state machine and other
+     * parameters.
+     */
 }
+
 
 /******************************************************************************
   Function:
-    void UARTTXTHREAD_Tasks ( void )
+    void ADC_APP_Tasks ( void )
 
   Remarks:
-    See prototype in uarttxthread.h.
+    See prototype in adc_app.h.
  */
 
-const char test[] = "test";
-int x = 0;
-char floatToStr[50];
-void UARTTXTHREAD_Tasks ( void )
+/* Following functions are for milestone1 */
+QueueHandle_t createAdcQ(){
+    //8 b/c "team 2" //10 is size of Q
+    return xQueueCreate(10,sizeof(float)); 
+}
+
+/* Sends value from adc to adc_app Queue */
+int adc_app_SendValToMsgQ(float adcVal){
+    return xQueueSend(adc_ISRData.adcQ, &adcVal, portMAX_DELAY);
+}
+
+/* Sends value from adc ISR to adc_app Queue */
+int adc_app_SendValToMsgQFromISR(float adcVal, BaseType_t *pxHigherPriorityTaskWoken){
+    return xQueueSendFromISR(adc_ISRData.adcQ, &adcVal, pxHigherPriorityTaskWoken);
+}
+
+
+void ADC_APP_Tasks ( void )
 {
-    dbgOutputLoc(UARTRXTHREAD_ENTER_TASK);
-    float adcValRecv = 0.0;
-//    DRV_USART0_WriteByte(NULL);
-    dbgOutputLoc(UARTRXTHREAD_BEFORE_WHILELOOP);
+    dbgOutputLoc(ENTER_TASK_ADC_APP);
+    float valRecv;
+    dbgOutputLoc(BEFORE_WHILE_ADC_APP);
     while(1){
-        //receive from our local queue
-        UARTTXTHREAD_ReadFromQueue(&adcValRecv);
-        UARTTXTHREAD_SendToQueue(adcValRecv);
-        //packs our message
-        //while(packed message)
-        //  send to usart queue(char)
-        
-        dbgOutputLoc(UARTRXTHREAD_BEFORE_SEND_TO_QUEUE);
-   
-        dbgOutputLoc(UARTRXTHREAD_AFTER_SEND_TO_QUEUE);
-        SYS_INT_SourceEnable(INT_SOURCE_USART_1_TRANSMIT);
-        //after we finish sending packet; disable tx isr
+        dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_ADC_APP);
+        if(xQueueReceive(adc_ISRData.adcQ, &valRecv, portMAX_DELAY)){
+            dbgOutputVal(valRecv); /* This is where we will send to UART Tx */
+            UARTTXTHREAD_SendToQueue(valRecv); // Sending to Tx Thread Q
+        }
+        dbgOutputLoc(AFTER_RECEIVE_FROM_Q_ADC_APP);
     }
 }
 
-void UARTTXTHREAD_InitializeQueue() {
-    _queue = xQueueCreate(SIZEOFQUEUE, sizeof(TYPEOFQUEUE));
-    if(_queue == 0) {
-        /*Handle this Error*/
-        dbgOutputBlock(pdFALSE);
-    }
-}
-
-void UARTTXTHREAD_ReadFromQueue(void* pvBuffer) {
-    dbgOutputLoc(UARTTXTHREAD_BEFORE_RECEIVE_FR_QUEUE);
-    dbgOutputBlock(xQueueReceive(_queue, pvBuffer, portMAX_DELAY));
-    dbgOutputLoc(UARTTXTHREAD_AFTER_RECEIVE_FR_QUEUE);
-}
-
-void UARTTXTHREAD_SendToQueue(float buffer) {
-    dbgOutputBlock(xQueueSendToBack(_queue, &buffer, portMAX_DELAY));
-}
-
-void UARTTXTHREAD_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken) {
-    dbgOutputBlockISR(xQueueSendToBackFromISR(_queue, &buffer, pxHigherPriorityTaskWoken));
-}
+ 
 
 /*******************************************************************************
  End of File

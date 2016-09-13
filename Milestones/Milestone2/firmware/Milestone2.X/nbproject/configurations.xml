@@ -9,7 +9,10 @@
           <logicalFolder name="f1" displayName="default" projectFiles="true">
             <logicalFolder name="f1" displayName="framework" projectFiles="true">
               <logicalFolder name="f1" displayName="driver" projectFiles="true">
-                <logicalFolder name="f1" displayName="usart" projectFiles="true">
+                <logicalFolder name="f1" displayName="adc" projectFiles="true">
+                  <itemPath>../src/system_config/default/framework/driver/adc/drv_adc_static.h</itemPath>
+                </logicalFolder>
+                <logicalFolder name="f2" displayName="usart" projectFiles="true">
                   <logicalFolder name="f1" displayName="src" projectFiles="true">
                     <itemPath>../src/system_config/default/framework/driver/usart/src/drv_usart_static_local.h</itemPath>
                   </logicalFolder>
@@ -29,6 +32,8 @@
         </logicalFolder>
         <itemPath>../src/uartrxthread.h</itemPath>
         <itemPath>../src/uarttxthread.h</itemPath>
+        <itemPath>../src/adc_app_public.h</itemPath>
+        <itemPath>../src/adc_app.h</itemPath>
       </logicalFolder>
       <logicalFolder name="communication"
                      displayName="communication"
@@ -130,7 +135,12 @@
           <logicalFolder name="f1" displayName="default" projectFiles="true">
             <logicalFolder name="f1" displayName="framework" projectFiles="true">
               <logicalFolder name="f1" displayName="driver" projectFiles="true">
-                <logicalFolder name="f1" displayName="usart" projectFiles="true">
+                <logicalFolder name="f1" displayName="adc" projectFiles="true">
+                  <logicalFolder name="f1" displayName="src" projectFiles="true">
+                    <itemPath>../src/system_config/default/framework/driver/adc/src/drv_adc_static.c</itemPath>
+                  </logicalFolder>
+                </logicalFolder>
+                <logicalFolder name="f2" displayName="usart" projectFiles="true">
                   <logicalFolder name="f1" displayName="src" projectFiles="true">
                     <itemPath>../src/system_config/default/framework/driver/usart/src/drv_usart_mapping.c</itemPath>
                     <itemPath>../src/system_config/default/framework/driver/usart/src/drv_usart_static.c</itemPath>
@@ -162,6 +172,7 @@
         <itemPath>../src/uartrxthread.c</itemPath>
         <itemPath>../src/uarttxthread.c</itemPath>
         <itemPath>../src/main.c</itemPath>
+        <itemPath>../src/adc_app.c</itemPath>
       </logicalFolder>
       <logicalFolder name="communication"
                      displayName="communication"
