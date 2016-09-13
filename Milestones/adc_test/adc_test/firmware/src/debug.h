@@ -24,24 +24,25 @@ extern "C" {
 #ifdef DEBUG_ON
 
     // ISR debug locations
-#define ENTER_TIMER_ISR 0x00
-#define LEAVE_TIMER_ISR 0x01
+#define ENTER_ADC_ISR 0x00
+#define LEAVE_ADC_ISR 0x01
 #define BEFORE_SEND_TO_Q_ISR 0x02
 #define BEFORE_RECEIVE_FROM_Q_ISR 0x03
 #define AFTER_SEND_TO_Q_ISR 0x04
-#define AFTER_RECEIVE_FROM_Q_ISR 0x05   
+#define AFTER_RECEIVE_FROM_Q_ISR 0x05  
+#define ADDING_ADC_VAL_ISR 0x06
     
     // TASK debug locations
-#define ENTER_TASK_APP1 0x06
-#define BEFORE_WHILE_APP1 0x07
-#define BEFORE_SEND_TO_Q_APP1 0x08
-#define BEFORE_RECEIVE_FROM_Q_APP1 0x09
-#define AFTER_SEND_TO_Q_APP1 0x10
-#define AFTER_RECEIVE_FROM_Q_APP1 0x11
+#define ENTER_TASK_ADC_APP 0x07
+#define BEFORE_WHILE_ADC_APP 0x08
+#define BEFORE_SEND_TO_Q_ADC_APP 0x09
+#define BEFORE_RECEIVE_FROM_Q_ADC_APP 0x10
+#define AFTER_SEND_TO_Q_ADC_APP 0x11
+#define AFTER_RECEIVE_FROM_Q_ADC_APP 0x12
     
     //Broken function
-#define ERROR_RETURN 0x12
-#define CORRECT_RETURN 0x13
+#define ERROR_RETURN 0x13
+#define CORRECT_RETURN 0x14
     
 #endif
     

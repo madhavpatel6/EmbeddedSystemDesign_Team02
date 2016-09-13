@@ -73,22 +73,22 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 void IntHandlerDrvAdc(void)
 {
     int i = 0;
-    int adcValToQ;
-    int adcValToQF = 1;
+    float adcValToQ = 0.0;
+    float adcValToQF = 0.0;
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-    dbgOutputLoc(ENTER_TIMER_ISR);
-    dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
+    dbgOutputLoc(ENTER_ADC_ISR);
     //Read data before clearing interrupt flag
+    dbgOutputLoc(ADDING_ADC_VAL_ISR);
     for(i; i < 16; i++) {
-        adcValToQ += PLIB_ADC_ResultGetByIndex(ADC_ID_1, i);
+        adcValToQ = adcValToQ + PLIB_ADC_ResultGetByIndex(ADC_ID_1, i);
     }
-    adcValToQF = (adcValToQ)/(16);
-//    float adcVoltage = adcValToQF*5/(1024.0); 
-    int adcSensorDistance = adcValToQF/2;//(adcVoltage / 0.009766) * 2.54;
-    dbgOutputValue(adcSensorDistance);
+    adcValToQF = ((adcValToQ)/(16.0))*(1.0);
+    float adcVoltage = (adcValToQF*5.0)/(1024.0); 
+    float adcSensorDistance = (adcVoltage / 0.009766) * (2.54);
+    dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
     adc_app_SendValToMsgQFromISR(adcSensorDistance, &pxHigherPriorityTaskWoken);
     dbgOutputLoc(AFTER_SEND_TO_Q_ISR);
-    dbgOutputLoc(LEAVE_TIMER_ISR);
+    dbgOutputLoc(LEAVE_ADC_ISR);
     PLIB_ADC_SampleAutoStartEnable(ADC_ID_1);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
     /* Clear ADC Interrupt Flag */

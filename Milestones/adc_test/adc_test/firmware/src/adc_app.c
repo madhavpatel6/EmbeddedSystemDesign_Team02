@@ -149,18 +149,15 @@ int adc_app_SendValToMsgQFromISR(float adcVal, BaseType_t *pxHigherPriorityTaskW
 
 void ADC_APP_Tasks ( void )
 {
-    dbgOutputLoc(ENTER_TASK_APP1);
+    dbgOutputLoc(ENTER_TASK_ADC_APP);
     float valRecv;
-    dbgOutputLoc(BEFORE_WHILE_APP1);
+    dbgOutputLoc(BEFORE_WHILE_ADC_APP);
     while(1){
-        dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_APP1);
+        dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_ADC_APP);
         if(xQueueReceive(adc_ISRData.adcQ, &valRecv, portMAX_DELAY)){
-//            dbgOutputValue(valRecv);
-//            dbgOutputValue((int)valRecv >> 8);
-//            dbgOutputValue((int)valRecv >> 16);
-//            dbgOutputValue((int)valRecv >> 24);
+            dbgOutputValue(valRecv); /* This is where we will send to UART Tx */
         }
-        dbgOutputLoc(AFTER_RECEIVE_FROM_Q_APP1);
+        dbgOutputLoc(AFTER_RECEIVE_FROM_Q_ADC_APP);
     }
 }
 
