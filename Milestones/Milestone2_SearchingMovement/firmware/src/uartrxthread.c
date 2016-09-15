@@ -79,7 +79,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
     Application strings and buffers are be defined outside this structure.
 */
 
-QueueHandle_t _queue;
+static QueueHandle_t _queue;
 #define TYPEOFQUEUE char
 #define SIZEOFQUEUE 10
 

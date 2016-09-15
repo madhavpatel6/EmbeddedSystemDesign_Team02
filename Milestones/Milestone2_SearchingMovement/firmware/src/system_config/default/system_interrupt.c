@@ -76,7 +76,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-QueueHandle_t _usartqueue;
+static QueueHandle_t _usartqueue;
 #define USARTTYPEOFQUEUE char
 #define USARTSIZEOFQUEUE 600
 
