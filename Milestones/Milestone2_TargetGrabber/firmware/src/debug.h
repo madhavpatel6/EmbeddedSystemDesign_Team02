@@ -41,15 +41,6 @@ enum LocationEnum {
     USART0_AFTER_SEND_TO_QUEUE,     // 4
     USART0_BEFORE_RECEIVE_FR_QUEUE, // 5
     USART0_AFTER_RECEIVE_FR_QUEUE,  // 6
-    
-    // ADC ISR
-    ENTER_ADC_ISR = 10,         // 10
-    LEAVE_ADC_ISR,              // 11
-    BEFORE_SEND_TO_Q_ISR,       // 12
-    BEFORE_RECEIVE_FROM_Q_ISR,  // 13
-    AFTER_SEND_TO_Q_ISR,        // 14
-    AFTER_RECEIVE_FROM_Q_ISR,   // 15
-    ADDING_ADC_VAL_ISR,         // 16
 
     //Task Specific
     UARTTXTHREAD_ENTER_TASK = 20,           // 20
@@ -66,15 +57,43 @@ enum LocationEnum {
     UARTRXTHREAD_BEFORE_RECEIVE_FR_QUEUE,   // 30
     UARTRXTHREAD_AFTER_RECEIVE_FR_QUEUE,    // 31
     
-    // ADC APP DEBUG
-    ENTER_TASK_ADC_APP = 40,            // 40
-    BEFORE_WHILE_ADC_APP,               // 41
-    BEFORE_SEND_TO_Q_ADC_APP,           // 42
-    BEFORE_RECEIVE_FROM_Q_ADC_APP,      // 43
-    AFTER_SEND_TO_Q_ADC_APP,            // 44
-    AFTER_RECEIVE_FROM_Q_ADC_APP,       // 45
     
-    CREATE_MESSAGE_DONE //46        
+    CREATE_MESSAGE_DONE = 46,                  //46      
+    
+    // GRABBER THREAD DEBUG
+    ENTER_GRABBER_THREAD = 100,                // 100
+    BEFORE_WHILE_GRABBER_THREAD,               // 101
+    BEFORE_SEND_TO_Q_GRABBER_THREAD,           // 102
+    BEFORE_RECEIVE_FROM_Q_GRABBER_THREAD,      // 103
+    AFTER_SEND_TO_Q_GRABBER_THREAD,            // 104
+    AFTER_RECEIVE_FROM_Q_GRABBER_THREAD,       // 105
+    
+    // COMPUTATION THREAD DEBUG
+    ENTER_COMPUTATION_THREAD = 130,                // 130
+    BEFORE_WHILE_COMPUTATION_THREAD,               // 131
+    BEFORE_SEND_TO_Q_COMPUTATION_THREAD,           // 132
+    BEFORE_RECEIVE_FROM_Q_COMPUTATION_THREAD,      // 133
+    AFTER_SEND_TO_Q_COMPUTATION_THREAD,            // 134
+    AFTER_RECEIVE_FROM_Q_COMPUTATION_THREAD,       // 135
+    
+        // ADC ISR
+    ENTER_ADC_ISR = 160,                        // 160
+    LEAVE_ADC_ISR,                              // 161
+    BEFORE_SEND_IR0_TO_Q_ADC_ISR,               // 162
+    BEFORE_SEND_IR1_TO_Q_ADC_ISR,               // 163
+    BEFORE_SEND_IR2_TO_Q_ADC_ISR,               // 164
+    BEFORE_RECEIVE_FROM_Q_ADC_ISR,              // 165
+    AFTER_SEND_IR0_TO_Q_ADC_ISR,                // 166
+    AFTER_SEND_IR1_TO_Q_ADC_ISR,                // 167
+    AFTER_SEND_IR2_TO_Q_ADC_ISR,                // 168
+    AFTER_RECEIVE_FROM_Q_ADC_ISR,               // 169
+    ADDING_VAL_ADC_ISR,                         // 170
+    BEFORE_CONVERT_IR0_TO_CM_ADC_ISR,           // 171
+    BEFORE_CONVERT_IR1_TO_CM_ADC_ISR,           // 172
+    BEFORE_CONVERT_IR2_TO_CM_ADC_ISR,           // 173
+    AFTER_CONVERT_IR0_TO_CM_ADC_ISR,            // 174
+    AFTER_CONVERT_IR1_TO_CM_ADC_ISR,            // 175
+    AFTER_CONVERT_IR2_TO_CM_ADC_ISR,            // 176
 };
 
 /**

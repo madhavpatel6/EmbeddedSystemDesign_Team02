@@ -67,7 +67,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "task.h"
 #include "uartrxthread.h"
 #include "uarttxthread.h"
-#include "adc_app.h"
+#include "computationthread.h"
+#include "grabberthread.h"
 
 
 // DOM-IGNORE-BEGIN

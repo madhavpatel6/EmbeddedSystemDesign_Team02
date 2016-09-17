@@ -15,9 +15,12 @@
  */
 /* ************************************************************************** */
 
-#ifndef _SYSTEM_INTERRUPT_PUBLIC_H    /* Guard against multiple inclusion */
-#define _SYSTEM_INTERRUPT_PUBLIC_H
+#ifndef _COMPUTATIONTHREAD_PUBLIC_H    /* Guard against multiple inclusion */
+#define _COMPUTATIONTHREAD_PUBLIC_H
 
+#include "queue.h"
+
+#define COMPUTATION_ISR_Q_SIZE float
 
 /* ************************************************************************** */
 /* ************************************************************************** */
@@ -26,25 +29,21 @@
 /* ************************************************************************** */
 
 
+
 /* Provide C++ Compatibility */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void InitializeISRQueues();
+    int computationthread_SendValToSensorQFromISR(float sensorAdcVal, BaseType_t *pxHigherPriorityTaskWoken);
 
-void Usart0_SendToQueue(char buffer);
-
-void Usart0_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken);
-
-void convertTocm(float *sensorDigitalVal);
 
     /* Provide C++ Compatibility */
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _EXAMPLE_FILE_NAME_H */
+#endif /* _COMPUTATIONTHREAD_PUBLIC_H */
 
 /* *****************************************************************************
  End of File

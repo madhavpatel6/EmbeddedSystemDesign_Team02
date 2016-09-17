@@ -61,8 +61,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include <xc.h>
 #include <sys/attribs.h>
-#include "adc_app.h"
-#include "../../adc_app_public.h"
+#include "computationthread.h"
+#include "grabberthread.h"
 #include "debug.h"
 #include "uartrxthread.h"
 #include "uarttxthread.h"
@@ -83,21 +83,43 @@ QueueHandle_t _usartqueue;
 void IntHandlerDrvAdc(void)
 {
     int i = 0;
-    float adcValToQ = 0.0;
-    float adcValToQF = 0.0;
+    float IR0_adcVal = 0.0;
+    float IR1_adcVal = 0.0;
+    float IR2_adcVal = 0.0;
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     dbgOutputLoc(ENTER_ADC_ISR);
     //Read data before clearing interrupt flag
-    dbgOutputLoc(ADDING_ADC_VAL_ISR);
-    for(i; i < 16; i++) {
-        adcValToQ = adcValToQ + PLIB_ADC_ResultGetByIndex(ADC_ID_1, i);
+    dbgOutputLoc(ADDING_VAL_ADC_ISR);
+    for(i; i < 16; i+=3) {
+        IR0_adcVal = IR0_adcVal + DRV_ADC_SamplesRead(i);
+        IR1_adcVal = IR1_adcVal + DRV_ADC_SamplesRead(i+1);
+        IR2_adcVal = IR2_adcVal + DRV_ADC_SamplesRead(i+2);
     }
-    adcValToQF = ((adcValToQ)/(16.0))*(1.0);
-    float adcVoltage = (adcValToQF*5.0)/(1024.0); 
-    float adcSensorDistance = (adcVoltage / 0.009766) * (2.54);
-    dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
-    adc_app_SendValToMsgQFromISR(adcSensorDistance, &pxHigherPriorityTaskWoken);
-    dbgOutputLoc(AFTER_SEND_TO_Q_ISR);
+    
+    dbgOutputLoc(BEFORE_CONVERT_IR0_TO_CM_ADC_ISR);
+    convertTocm(&IR0_adcVal);
+    dbgOutputLoc(AFTER_CONVERT_IR0_TO_CM_ADC_ISR);
+    
+    dbgOutputLoc(BEFORE_CONVERT_IR1_TO_CM_ADC_ISR);
+    convertTocm(&IR1_adcVal);
+    dbgOutputLoc(AFTER_CONVERT_IR1_TO_CM_ADC_ISR);
+    
+    dbgOutputLoc(BEFORE_CONVERT_IR2_TO_CM_ADC_ISR);
+    convertTocm(&IR2_adcVal);
+    dbgOutputLoc(AFTER_CONVERT_IR2_TO_CM_ADC_ISR);
+    
+    dbgOutputLoc(BEFORE_SEND_IR0_TO_Q_ADC_ISR);
+    computationthread_SendValToSensorQFromISR(IR0_adcVal, &pxHigherPriorityTaskWoken);
+    dbgOutputLoc(AFTER_SEND_IR0_TO_Q_ADC_ISR);
+    
+    dbgOutputLoc(BEFORE_SEND_IR1_TO_Q_ADC_ISR);
+    computationthread_SendValToSensorQFromISR(IR1_adcVal, &pxHigherPriorityTaskWoken);
+    dbgOutputLoc(AFTER_SEND_IR1_TO_Q_ADC_ISR);
+    
+    dbgOutputLoc(BEFORE_SEND_IR2_TO_Q_ADC_ISR);
+    computationthread_SendValToSensorQFromISR(IR2_adcVal, &pxHigherPriorityTaskWoken);
+    dbgOutputLoc(AFTER_SEND_IR2_TO_Q_ADC_ISR);
+    
     dbgOutputLoc(LEAVE_ADC_ISR);
     PLIB_ADC_SampleAutoStartEnable(ADC_ID_1);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
