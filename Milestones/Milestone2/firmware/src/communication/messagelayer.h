@@ -21,13 +21,15 @@
 #include "debug.h"
 
 #define STARTOFTEXT 0x02
+#define ENDOFTEXT 0x03
 #define SEARCHERMOVER 's'
 #define TARGETLOCATOR 'l'
 #define PATHFINDER 'p'
 #define TARGETGRABBER 'g'
 #define MAXMESSAGESIZE 512
+#define WHATPICAMI 'p'
 
-void ParseMessage(char buf[], char messageData[]);
+bool ParseMessage(char messageData[], char buf[]);
 
 void CreateMessage(char buf[], char messageData[], char destination);
 

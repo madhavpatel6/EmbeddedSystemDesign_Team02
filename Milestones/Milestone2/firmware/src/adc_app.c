@@ -76,33 +76,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
     Application strings and buffers are be defined outside this structure.
 */
 
-ADC_APP_DATA adc_appData;
-ADC_ISR_DATA adc_ISRData;
-// *****************************************************************************
-// *****************************************************************************
-// Section: Application Callback Functions
-// *****************************************************************************
-// *****************************************************************************
-
-/* TODO:  Add any necessary callback functions.
-*/
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Application Local Functions
-// *****************************************************************************
-// *****************************************************************************
-
-
-/* TODO:  Add any necessary local functions.
-*/
-
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Application Initialization and State Machine Functions
-// *****************************************************************************
-// *****************************************************************************
+static QueueHandle_t _queue;
 
 /*******************************************************************************
   Function:
@@ -114,7 +88,7 @@ ADC_ISR_DATA adc_ISRData;
 
 void ADC_APP_Initialize ( void )
 {
-    adc_ISRData.adcQ = createAdcQ();
+    _queue = createAdcQ();
     DRV_ADC_Open();
     /* TODO: Initialize your application's state machine and other
      * parameters.
@@ -138,12 +112,12 @@ QueueHandle_t createAdcQ(){
 
 /* Sends value from adc to adc_app Queue */
 int adc_app_SendValToMsgQ(float adcVal){
-    return xQueueSend(adc_ISRData.adcQ, &adcVal, portMAX_DELAY);
+    return xQueueSend(_queue, &adcVal, portMAX_DELAY);
 }
 
 /* Sends value from adc ISR to adc_app Queue */
 int adc_app_SendValToMsgQFromISR(float adcVal, BaseType_t *pxHigherPriorityTaskWoken){
-    return xQueueSendFromISR(adc_ISRData.adcQ, &adcVal, pxHigherPriorityTaskWoken);
+    return xQueueSendFromISR(_queue, &adcVal, pxHigherPriorityTaskWoken);
 }
 
 

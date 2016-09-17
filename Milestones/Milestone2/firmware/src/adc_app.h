@@ -111,22 +111,6 @@ typedef enum
     Application strings and buffers are be defined outside this structure.
  */
 
-typedef struct
-{
-    /* The application's current state */
-    ADC_APP_STATES state;
-
-    /* TODO: Define any additional data used by the application. */
-
-} ADC_APP_DATA;
-
-typedef struct
-{
-	QueueHandle_t adcQ;
-    
-} ADC_ISR_DATA;
-
-
 // *****************************************************************************
 // *****************************************************************************
 // Section: Application Callback Routines
