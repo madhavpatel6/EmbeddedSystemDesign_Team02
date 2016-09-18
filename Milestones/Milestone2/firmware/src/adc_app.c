@@ -129,6 +129,9 @@ void ADC_APP_Tasks ( void )
     dbgOutputLoc(ENTER_TASK_ADC_APP);
     CommunicationObject com;
     com.type = FLOAT;
+    com.floatVal = 0;
+    com.intVal = 0;
+    
     dbgOutputLoc(BEFORE_WHILE_ADC_APP);
     while(1){
         dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_ADC_APP);
