@@ -18,7 +18,10 @@
 #ifndef _MESSAGELAYER_H    /* Guard against multiple inclusion */
 #define _MESSAGELAYER_H
 
-#include "debug.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define STARTOFTEXT 0x02
 #define ENDOFTEXT 0x03
@@ -29,9 +32,22 @@
 #define MAXMESSAGESIZE 512
 #define WHATPICAMI 'p'
 
-//bool ParseMessage(char messageData[], char buf[]);
+typedef enum CommunicationType_enum { 
+    INT,
+    FLOAT,
+    STRING,
+} CommunicationType;
 
-void CreateMessage(char buf[], char messageData[], char destination);
+//typedef CommunicationType_enum CommunicationType;
+
+typedef struct CommunicationObject_struct {
+    CommunicationType type;
+    int intVal;
+    float floatVal;
+    char string[MAXMESSAGESIZE];
+} CommunicationObject;
+
+int CreateMessage(char buf[], char messageData[], char destination);
 
 void BuildJSON(char buf[]);
 

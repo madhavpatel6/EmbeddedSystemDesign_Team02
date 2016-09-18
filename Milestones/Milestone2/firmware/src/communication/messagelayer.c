@@ -21,12 +21,11 @@
 /* ************************************************************************** */
 /* ************************************************************************** */
 #include "messagelayer.h"
-
+#include "debug.h"
 
 
 static STATES parserstate;
 static uint32_t internalBufferIndex = 0;
-static bool badMessage = false;
 static char internalCheckSum;
 
 bool ParseMessage(char c, char data[], size_t* size) {
@@ -34,7 +33,6 @@ bool ParseMessage(char c, char data[], size_t* size) {
 	case IDLE_STATE: {
 		internalBufferIndex = 0;
 		internalCheckSum = NULL;
-		badMessage = false;
 		*size = 0;
 		memset(data, 0, MAXMESSAGESIZE);
 		if (c == STARTOFTEXT) {
@@ -47,12 +45,13 @@ bool ParseMessage(char c, char data[], size_t* size) {
 			parserstate = CHECK_MESSAGE_COUNT;
 		}
 		else {
-			badMessage = true;
+			parserstate = IDLE_STATE;
 		}
 		return false;
 	}
 	case CHECK_MESSAGE_COUNT: {
 		parserstate = GET_DATALENGTH_UPPER;
+        //Fill here with check
 		return false;
 	}
 	case GET_DATALENGTH_UPPER: {
@@ -76,14 +75,14 @@ bool ParseMessage(char c, char data[], size_t* size) {
 	case GET_CHECK_SUM: {
 		internalCheckSum = c;
 		if (internalCheckSum != checksum(data)) {
-			badMessage = true;
+			parserstate = IDLE_STATE;
 		}
 		parserstate = CHECK_ENDCHAR;
 		return false;
 	}
 	case CHECK_ENDCHAR: {
 		parserstate = IDLE_STATE;
-		return c == ENDOFTEXT && !badMessage;
+		return c == ENDOFTEXT;
 	}
 	}
 }
@@ -95,7 +94,7 @@ bool ParseMessage(char c, char data[], size_t* size) {
  * @param destination character for who message is sent to
  * @return length of the message
  */
-int createMessage(char buf[], char messageData[], char destination) {
+int CreateMessage(char buf[], char messageData[], char destination) {
 	if (messageData == NULL) {
 		dbgOutputBlock(false);
 	}

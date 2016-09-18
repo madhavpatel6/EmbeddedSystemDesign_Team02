@@ -127,12 +127,13 @@ int adc_app_SendValToMsgQFromISR(float adcVal, BaseType_t *pxHigherPriorityTaskW
 void ADC_APP_Tasks ( void )
 {
     dbgOutputLoc(ENTER_TASK_ADC_APP);
-    float valRecv;
+    CommunicationObject com;
+    com.type = FLOAT;
     dbgOutputLoc(BEFORE_WHILE_ADC_APP);
     while(1){
         dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_ADC_APP);
-        if(xQueueReceive(_queue, &valRecv, portMAX_DELAY)){
-            UARTTXTHREAD_SendToQueue(valRecv); // Sending to Tx Thread Q
+        if(xQueueReceive(_queue, &com.floatVal, portMAX_DELAY)){
+            UARTTXTHREAD_SendToQueue(com); // Sending to Tx Thread Q
         }
         dbgOutputLoc(AFTER_RECEIVE_FROM_Q_ADC_APP);
     }

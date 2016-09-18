@@ -24,15 +24,15 @@
 /* Section: Included Files                                                    */
 /* ************************************************************************** */
 /* ************************************************************************** */
-
+#include "communication/messagelayer.h"
 /* Provide C++ Compatibility */
 #ifdef __cplusplus
 extern "C" {
 #endif
     
-void UARTTXTHREAD_SendToQueue(float buffer);
+void UARTTXTHREAD_SendToQueue(CommunicationObject buffer);
 
-void UARTTXTHREAD_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken);
+void UARTTXTHREAD_SendToQueueISR(CommunicationObject buffer, BaseType_t *pxHigherPriorityTaskWoken);
     
 #ifdef __cplusplus
 }

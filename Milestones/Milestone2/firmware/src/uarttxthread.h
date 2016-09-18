@@ -58,7 +58,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdlib.h>
 #include "system_config.h"
 #include "system_definitions.h"
-
+#include "communication/messagelayer.h"
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
@@ -135,7 +135,9 @@ void UARTTXTHREAD_Tasks( void );
 
 void UARTTXTHREAD_InitializeQueue(); 
 
-void UARTTXTHREAD_ReadFromQueue(void* pvBuffer);
+void UARTTXTHREAD_ReadFromQueue(CommunicationObject* pvBuffer);
+
+void ConvertCommObjectToString(CommunicationObject obj, char messageData[]);
 
 #endif /* _UARTTXTHREAD_H */
 

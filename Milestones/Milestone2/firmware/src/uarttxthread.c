@@ -57,7 +57,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "uarttxthread_public.h"
 #include "system_interrupt_public.h"
 #include "debug.h"
-#include "communication/messagelayer.h"
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Global Data Definitions
@@ -82,7 +82,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 static QueueHandle_t _queue;
 
 #define SIZEOFQUEUE 10
-#define TYPEOFQUEUE float
+#define TYPEOFQUEUE CommunicationType
 
 /*******************************************************************************
   Function:
@@ -105,25 +105,24 @@ void UARTTXTHREAD_Initialize ( void )
     See prototype in uarttxthread.h.
  */
 
-int x = 0;
-char buf[512];
-char floatToStr[50];
-
 void UARTTXTHREAD_Tasks ( void )
 {
     dbgOutputLoc(UARTRXTHREAD_ENTER_TASK);
-    float adcValRecv = 0.0;
+    CommunicationObject readObj;
+    char messageData[MAXMESSAGESIZE];
+    char packedMessage[MAXMESSAGESIZE];
     dbgOutputLoc(UARTRXTHREAD_BEFORE_WHILELOOP);
     while(1){
         //receive from our local queue
-        UARTTXTHREAD_ReadFromQueue(&adcValRecv);
-        dbgOutputVal(adcValRecv);
-        sprintf(floatToStr,"%0.2f",adcValRecv);
-        int len = createMessage(buf, floatToStr, PATHFINDER);
+        UARTTXTHREAD_ReadFromQueue(&readObj);
+        
+        ConvertCommObjectToString(readObj, messageData);
+        
+        int length = CreateMessage(packedMessage, messageData, PATHFINDER);
         
         int i = 0;
-        for(i = 0; i < len; i++) {
-            Usart0_SendToQueue(buf[i]);
+        for(i = 0; i < length; i++) {
+            Usart0_SendToQueue(packedMessage[i]);
         }
         dbgOutputLoc(UARTRXTHREAD_BEFORE_SEND_TO_QUEUE);
    
@@ -141,18 +140,36 @@ void UARTTXTHREAD_InitializeQueue() {
     }
 }
 
-void UARTTXTHREAD_ReadFromQueue(void* pvBuffer) {
+void UARTTXTHREAD_ReadFromQueue(CommunicationObject* pvBuffer) {
     dbgOutputLoc(UARTTXTHREAD_BEFORE_RECEIVE_FR_QUEUE);
-    dbgOutputBlock(xQueueReceive(_queue, pvBuffer, portMAX_DELAY));
+    xQueueReceive(_queue, pvBuffer, portMAX_DELAY);
     dbgOutputLoc(UARTTXTHREAD_AFTER_RECEIVE_FR_QUEUE);
 }
 
-void UARTTXTHREAD_SendToQueue(float buffer) {
-    dbgOutputBlock(xQueueSendToBack(_queue, &buffer, portMAX_DELAY));
+void UARTTXTHREAD_SendToQueue(CommunicationObject buffer) {
+    xQueueSendToBack(_queue, &buffer, portMAX_DELAY);
 }
 
-void UARTTXTHREAD_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken) {
-    dbgOutputBlockISR(xQueueSendToBackFromISR(_queue, &buffer, pxHigherPriorityTaskWoken));
+void UARTTXTHREAD_SendToQueueISR(CommunicationObject buffer, BaseType_t *pxHigherPriorityTaskWoken) {
+    xQueueSendToBackFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
+}
+
+void ConvertCommObjectToString(CommunicationObject obj, char messageData[]) {
+    memset(messageData, 0, MAXMESSAGESIZE);
+    switch(obj.type) {
+        case INT: {
+            sprintf(messageData, "%d", obj.intVal);
+            break;
+        }
+        case FLOAT: {
+            sprintf(messageData, "%0.2f", obj.floatVal);
+            break;
+        }
+        case STRING: {
+            sprintf(messageData, "%s", obj.string);
+            break;
+        }
+    }
 }
 
 /*******************************************************************************
