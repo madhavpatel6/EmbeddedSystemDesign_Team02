@@ -133,6 +133,8 @@ QueueHandle_t createComputationISRQ(){
 }
 
 /* Sends value from ISR to sensor Q for the Computation Thread */
+I Should change this function to take in a buffer like prof jones talked about
+with the functions that pack a message, check a message type, unpack a message
 int computationthread_SendValToSensorQFromISR(float sensorAdcVal, BaseType_t *pxHigherPriorityTaskWoken){
     return xQueueSendFromISR(computation_ISRData.sensor_ISR_Q, &sensorAdcVal, pxHigherPriorityTaskWoken);
 }
