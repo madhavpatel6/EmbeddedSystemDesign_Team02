@@ -15,8 +15,8 @@
  */
 /* ************************************************************************** */
 
-#ifndef _SYSTEM_INTERRUPT_PUBLIC_H    /* Guard against multiple inclusion */
-#define _SYSTEM_INTERRUPT_PUBLIC_H
+#ifndef _GRABBERTHREAD_PUBLIC_H    /* Guard against multiple inclusion */
+#define _GRABBERTHREAD_PUBLIC_H
 
 
 /* ************************************************************************** */
@@ -25,26 +25,25 @@
 /* ************************************************************************** */
 /* ************************************************************************** */
 
+#include "queue.h"
 
 /* Provide C++ Compatibility */
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-void InitializeISRQueues();
-
-void Usart0_SendToQueue(char buffer);
-
-void Usart0_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken);
-
-void convertTocm(float *sensorDigitalVal);
+    
+#define GRABBER_CMD_Q_SIZE char
+#define GRABBER_ISR_Q_SIZE float
+    
+    int grabberthread_SendToCMDQ(char grabberCMD);
+    int grabberthread_SendValToISRQ(float grabberAdcVal);
 
     /* Provide C++ Compatibility */
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _EXAMPLE_FILE_NAME_H */
+#endif /* _GRABBERTHREAD_PUBLIC_H */
 
 /* *****************************************************************************
  End of File

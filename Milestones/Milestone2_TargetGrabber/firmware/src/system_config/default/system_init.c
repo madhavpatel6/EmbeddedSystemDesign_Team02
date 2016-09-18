@@ -189,7 +189,8 @@ void SYS_Initialize ( void* data )
     /* Initialize the Application */
     UARTRXTHREAD_Initialize();
     UARTTXTHREAD_Initialize();
-    ADC_APP_Initialize();
+    COMPUTATIONTHREAD_Initialize();
+    GRABBERTHREAD_Initialize();
 }
 
 

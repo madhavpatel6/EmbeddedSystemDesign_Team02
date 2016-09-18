@@ -56,7 +56,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_definitions.h"
 #include "uartrxthread.h"
 #include "uarttxthread.h"
-#include "adc_app.h"
+#include "computationthread.h"
+#include "grabberthread.h"
 
 
 // *****************************************************************************
@@ -70,7 +71,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 static void _SYS_Tasks ( void );
 static void _UARTRXTHREAD_Tasks(void);
 static void _UARTTXTHREAD_Tasks(void);
-static void _ADC_APP_Tasks(void);
+static void _COMPUTATIONTHREAD_Tasks(void);
+static void _GRABBERTHREAD_Tasks(void);
 
 
 // *****************************************************************************
@@ -104,9 +106,14 @@ void SYS_Tasks ( void )
                 "UARTTXTHREAD Tasks",
                 1024, NULL, 1, NULL);
 
-    /* Create OS Thread for ADC_APP Tasks. */
-    xTaskCreate((TaskFunction_t) _ADC_APP_Tasks,
-                "ADC_APP Tasks",
+    /* Create OS Thread for COMPUTATIONTHREAD Tasks. */
+    xTaskCreate((TaskFunction_t) _COMPUTATIONTHREAD_Tasks,
+                "COMPUTATIONTHREAD Tasks",
+                1024, NULL, 1, NULL);
+
+    /* Create OS Thread for GRABBERTHREAD Tasks. */
+    xTaskCreate((TaskFunction_t) _GRABBERTHREAD_Tasks,
+                "GRABBERTHREAD Tasks",
                 1024, NULL, 1, NULL);
 
     /**************
@@ -175,17 +182,34 @@ static void _UARTTXTHREAD_Tasks(void)
 
 /*******************************************************************************
   Function:
-    void _ADC_APP_Tasks ( void )
+    void _COMPUTATIONTHREAD_Tasks ( void )
 
   Summary:
-    Maintains state machine of ADC_APP.
+    Maintains state machine of COMPUTATIONTHREAD.
 */
 
-static void _ADC_APP_Tasks(void)
+static void _COMPUTATIONTHREAD_Tasks(void)
 {
     while(1)
     {
-        ADC_APP_Tasks();
+        COMPUTATIONTHREAD_Tasks();
+    }
+}
+
+
+/*******************************************************************************
+  Function:
+    void _GRABBERTHREAD_Tasks ( void )
+
+  Summary:
+    Maintains state machine of GRABBERTHREAD.
+*/
+
+static void _GRABBERTHREAD_Tasks(void)
+{
+    while(1)
+    {
+        GRABBERTHREAD_Tasks();
     }
 }
 

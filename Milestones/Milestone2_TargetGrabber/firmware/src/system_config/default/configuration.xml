@@ -233,31 +233,31 @@
         <Checksum>2AADE7885E66E00DBB7FE911439FFA49</Checksum>
       </Template>
       <Template>
-        <Name>adc_app.h</Name>
-        <Path>Header Files/app</Path>
-      </Template>
-      <Template>
         <Name>uarttxthread.c</Name>
-        <Path>Source Files/app</Path>
-      </Template>
-      <Template>
-        <Name>adc_app.c</Name>
         <Path>Source Files/app</Path>
       </Template>
       <Template>
         <Name>drv_adc_static.h</Name>
         <Path>Header Files/app/system_config/default/framework/driver/adc</Path>
-        <Checksum>EB83B77B6F50631DF29C48BC407262EE</Checksum>
+        <Checksum>AF320FFD8C422507C45F9BDE3813B526</Checksum>
       </Template>
       <Template>
         <Name>drv_adc_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/adc/src</Path>
-        <Checksum>F1D4F6DDEAFA687DCEF00F67266CC5C9</Checksum>
+        <Checksum>0640854A5B4BA46942C7DE8D7D466E04</Checksum>
       </Template>
       <Template>
         <Name>drv_usart_mapping.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/usart/src</Path>
         <Checksum>115DDE4372E58D4116BC77DC36FD97DC</Checksum>
+      </Template>
+      <Template>
+        <Name>grabberthread.h</Name>
+        <Path>Header Files/app</Path>
+      </Template>
+      <Template>
+        <Name>computationthread.c</Name>
+        <Path>Source Files/app</Path>
       </Template>
       <Template>
         <Name>FreeRTOSConfig.h</Name>
@@ -268,7 +268,7 @@
         <Name>drv_usart_static_byte_model.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/usart/src</Path>
         <Checksum>E56B5A603F0427F96760518142226E69</Checksum>
-        <ProjectFileChecksum>6A462D050F427D77479EF06856E2ADB2</ProjectFileChecksum>
+        <ProjectFileChecksum>AF469721F422D35506AB9EE103F03772</ProjectFileChecksum>
       </Template>
       <Template>
         <Name>sys_clk_static.h</Name>
@@ -278,8 +278,12 @@
       <Template>
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>DE1EF797BD8C646CCF28F2679B93D767</Checksum>
-        <ProjectFileChecksum>F7AA9AF8BDA31D4A1B54467E816298C3</ProjectFileChecksum>
+        <Checksum>DF6026FDC80D0C02F4BB8CDDD5B5E5A4</Checksum>
+        <ProjectFileChecksum>E8A7F54D14164E68628503AB820CCE58</ProjectFileChecksum>
+      </Template>
+      <Template>
+        <Name>computationthread.h</Name>
+        <Path>Header Files/app</Path>
       </Template>
       <Template>
         <Name>uartrxthread.c</Name>
@@ -298,8 +302,8 @@
       <Template>
         <Name>system_init.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>FC47FE837C2C1923383EBC318CCFD5D7</Checksum>
-        <ProjectFileChecksum>7255C2262EA808759F508346F7BE014A</ProjectFileChecksum>
+        <Checksum>3632E0236B6E64B5A20A3DC57040DA1C</Checksum>
+        <ProjectFileChecksum>BFFCD24D6D2DB35580ECD67811FD5494</ProjectFileChecksum>
       </Template>
       <Template>
         <Name>main.c</Name>
@@ -308,7 +312,7 @@
       <Template>
         <Name>system_definitions.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>8F8C0FA2255B6BA101585F6B12879E7F</Checksum>
+        <Checksum>096351FA52CE88F43D68E0956EDDE2DB</Checksum>
       </Template>
       <Template>
         <Name>system_exceptions.c</Name>
@@ -320,6 +324,10 @@
         <Path>Header Files/app</Path>
       </Template>
       <Template>
+        <Name>grabberthread.c</Name>
+        <Path>Source Files/app</Path>
+      </Template>
+      <Template>
         <Name>drv_usart_static.h</Name>
         <Path>Header Files/app/system_config/default/framework/driver/usart</Path>
         <Checksum>AE37BD63B6EC9F6ADD6B8006CE192FCB</Checksum>
@@ -327,12 +335,12 @@
       <Template>
         <Name>system_tasks.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>48D66BD4EC2CA0D59BD40EE341EF3A78</Checksum>
+        <Checksum>16059D8076AB0CEAF758976D9CE9F419</Checksum>
       </Template>
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>1E1FB042718997143D522F21E25F7E2E</Checksum>
+        <Checksum>69A0052651FF6AF7B28DB49D9E6B630E</Checksum>
       </Template>
       <Template>
         <Name>uarttxthread.h</Name>
@@ -356,11 +364,11 @@
         <Include value="../src/system_config/default"/>
       </C32-AS>
       <C32>
-        <Include value="C:/ECE4534/Milestones/Milestone2/firmware/src"/>
-        <Include value="C:/ECE4534/Milestones/Milestone2/firmware/src/system_config/default"/>
-        <Include value="C:/ECE4534/Milestones/Milestone2/firmware/src/default"/>
+        <Include value="C:/ECE4534/Milestones/Milestone2_TargetGrabber/firmware/src"/>
+        <Include value="C:/ECE4534/Milestones/Milestone2_TargetGrabber/firmware/src/system_config/default"/>
+        <Include value="C:/ECE4534/Milestones/Milestone2_TargetGrabber/firmware/src/default"/>
         <Include value="C:/microchip/harmony/v1_08_01/framework"/>
-        <Include value="C:/ECE4534/Milestones/Milestone2/firmware/src/system_config/default/framework"/>
+        <Include value="C:/ECE4534/Milestones/Milestone2_TargetGrabber/firmware/src/system_config/default/framework"/>
         <Include value="../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX"/>
         <Include value="../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include"/>
         <Include value="../src/system_config/default"/>
