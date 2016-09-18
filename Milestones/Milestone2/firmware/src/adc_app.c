@@ -131,7 +131,7 @@ void ADC_APP_Tasks ( void )
     dbgOutputLoc(BEFORE_WHILE_ADC_APP);
     while(1){
         dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_ADC_APP);
-        if(xQueueReceive(adc_ISRData.adcQ, &valRecv, portMAX_DELAY)){
+        if(xQueueReceive(_queue, &valRecv, portMAX_DELAY)){
             UARTTXTHREAD_SendToQueue(valRecv); // Sending to Tx Thread Q
         }
         dbgOutputLoc(AFTER_RECEIVE_FROM_Q_ADC_APP);

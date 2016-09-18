@@ -29,7 +29,7 @@
 #define MAXMESSAGESIZE 512
 #define WHATPICAMI 'p'
 
-bool ParseMessage(char messageData[], char buf[]);
+//bool ParseMessage(char messageData[], char buf[]);
 
 void CreateMessage(char buf[], char messageData[], char destination);
 
@@ -44,10 +44,11 @@ typedef enum {
     GET_DATALENGTH_UPPER,
     GET_DATALENGTH_LOWER,
     GET_DATA,
+    GET_CHECK_SUM,
     CHECK_ENDCHAR,
 } STATES;
 
-bool ParseMessage(char c, char data[], size_t& size);
+bool ParseMessage(char c, char data[], size_t *size);
 
 
 #endif /* _MESSAGELAYER_H */

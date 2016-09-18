@@ -118,7 +118,7 @@ void UARTRXTHREAD_Tasks ( void )
     while(1){
         char c;
         UARTRXTHREAD_ReadFromQueue(&c);
-        if(MessageParser(c, _internalMessageData, _internalMessageSize)) {
+        if(ParseMessage(c, _internalMessageData, &_internalMessageSize)) {
             /*Since we returned true we assume the message is valid*/
         }
     }

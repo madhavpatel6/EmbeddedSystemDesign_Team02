@@ -21,49 +21,22 @@
 /* ************************************************************************** */
 /* ************************************************************************** */
 #include "messagelayer.h"
-#include <stdio.h>
+
 
 
 static STATES parserstate;
-static size_t internalBufferIndex = 0;
+static uint32_t internalBufferIndex = 0;
+static bool badMessage = false;
+static char internalCheckSum;
 
-bool ParseMessage(char messageData[], char buf[]) {
-	if (messageData == NULL) {
-		dbgOutputBlock(false);
-	}
-	memset(messageData, 0, MAXMESSAGESIZE);
-	if (buf[0] == STARTOFTEXT && buf[1] == WHATPICAMI) {
-		/*Get Message Count*/
-		uint8_t messagecount = buf[2];
-		/*Check Message Count Here*/
-
-		/*Message*/
-		uint16_t datalength = buf[3] << 8 | buf[4];
-		size_t i = 0;
-		/*The reason we have the i + 5 is because we want to skip the added characters when we packed the message*/
-		for (i = 0; i < datalength; i++) {
-			messageData[i] = buf[i + 5];
-		}
-		messageData[i] = '\0';
-		char readchecksum = buf[i + 5];
-		/*compute check sum and return early if error*/
-		if (readchecksum != checksum(buf)) {
-			return false;
-		}
-		return buf[++i + 5] == ENDOFTEXT;
-	}
-	else {
-		/*Discard the message*/
-		return false;
-	}
-}
-
-bool ParseMessage(char c, char data[], size_t& size) {
+bool ParseMessage(char c, char data[], size_t* size) {
 	switch (parserstate) {
 	case IDLE_STATE: {
-		size = 0;
+		internalBufferIndex = 0;
+		internalCheckSum = NULL;
+		badMessage = false;
+		*size = 0;
 		memset(data, 0, MAXMESSAGESIZE);
-		size = 0;
 		if (c == STARTOFTEXT) {
 			parserstate = CHECK_DESTINATION_CHAR;
 		}
@@ -74,7 +47,7 @@ bool ParseMessage(char c, char data[], size_t& size) {
 			parserstate = CHECK_MESSAGE_COUNT;
 		}
 		else {
-			parserstate = IDLE_STATE;
+			badMessage = true;
 		}
 		return false;
 	}
@@ -83,29 +56,38 @@ bool ParseMessage(char c, char data[], size_t& size) {
 		return false;
 	}
 	case GET_DATALENGTH_UPPER: {
-		size = c << 8;
+		*size = c << 8;
 		parserstate = GET_DATALENGTH_LOWER;
 		return false;
 	}
 	case GET_DATALENGTH_LOWER: {
-		size = size | c;
+		*size = *size | c;
 		parserstate = GET_DATA;
 		return false;
 	}
 	case GET_DATA: {
 		data[internalBufferIndex] = c;
 		internalBufferIndex++;
-		if (internalBufferIndex == size - 1) {
-			parserstate = CHECK_ENDCHAR;
+		if (internalBufferIndex == *size) {
+			parserstate = GET_CHECK_SUM;
 		}
+		return false;
+	}
+	case GET_CHECK_SUM: {
+		internalCheckSum = c;
+		if (internalCheckSum != checksum(data)) {
+			badMessage = true;
+		}
+		parserstate = CHECK_ENDCHAR;
 		return false;
 	}
 	case CHECK_ENDCHAR: {
 		parserstate = IDLE_STATE;
-		return c == ENDOFTEXT;
+		return c == ENDOFTEXT && !badMessage;
 	}
 	}
 }
+
 
 void CreateMessage(char buf[], char messageData[], char destination) {
 	if (messageData == NULL) {
@@ -124,7 +106,7 @@ void CreateMessage(char buf[], char messageData[], char destination) {
 
 	int index = len + 5; //length of the string + start of text, destination, message count, data length
 	// Calculate checksum of message
-	buf[index] = checksum(buf);
+	buf[index] = checksum(messageData);
 	buf[index + 1] = ENDOFTEXT;
 }
 

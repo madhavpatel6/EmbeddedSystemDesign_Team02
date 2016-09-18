@@ -26,9 +26,10 @@
 /* ************************************************************************** */
 #include "system_config.h"
 #include "system_definitions.h"
-#include "stdbool.h"
-#include "stddef.h"
-#include "stdio.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 /**
  * LocationEnum - This enum contains all of the locations at which to print debug
  *                information from using dbgOutputLoc()
