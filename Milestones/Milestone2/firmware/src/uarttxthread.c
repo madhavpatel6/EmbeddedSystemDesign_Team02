@@ -119,10 +119,10 @@ void UARTTXTHREAD_Tasks ( void )
         UARTTXTHREAD_ReadFromQueue(&adcValRecv);
         dbgOutputVal(adcValRecv);
         sprintf(floatToStr,"%0.2f",adcValRecv);
-        CreateMessage(buf, floatToStr, PATHFINDER);
+        int len = createMessage(buf, floatToStr, PATHFINDER);
         
         int i = 0;
-        for(i = 0; i < strlen(buf); i++) {
+        for(i = 0; i < len; i++) {
             Usart0_SendToQueue(buf[i]);
         }
         dbgOutputLoc(UARTRXTHREAD_BEFORE_SEND_TO_QUEUE);

@@ -88,8 +88,14 @@ bool ParseMessage(char c, char data[], size_t* size) {
 	}
 }
 
-
-void CreateMessage(char buf[], char messageData[], char destination) {
+/**
+ * Create a message using our format
+ * @param buf destination for message
+ * @param messageData data for the message
+ * @param destination character for who message is sent to
+ * @return length of the message
+ */
+int createMessage(char buf[], char messageData[], char destination) {
 	if (messageData == NULL) {
 		dbgOutputBlock(false);
 	}
@@ -108,6 +114,8 @@ void CreateMessage(char buf[], char messageData[], char destination) {
 	// Calculate checksum of message
 	buf[index] = checksum(messageData);
 	buf[index + 1] = ENDOFTEXT;
+    
+    return index + 2;
 }
 
 // Simple string checksum
