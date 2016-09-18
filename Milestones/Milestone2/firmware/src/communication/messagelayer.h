@@ -37,6 +37,19 @@ void BuildJSON(char buf[]);
 
 char checksum(char* s);
 
+typedef enum {
+    IDLE_STATE,
+    CHECK_DESTINATION_CHAR,
+    CHECK_MESSAGE_COUNT,
+    GET_DATALENGTH_UPPER,
+    GET_DATALENGTH_LOWER,
+    GET_DATA,
+    CHECK_ENDCHAR,
+} STATES;
+
+bool ParseMessage(char c, char data[], size_t& size);
+
+
 #endif /* _MESSAGELAYER_H */
 
 /* *****************************************************************************

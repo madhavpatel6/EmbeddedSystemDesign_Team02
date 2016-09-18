@@ -79,10 +79,11 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
     Application strings and buffers are be defined outside this structure.
 */
 
-QueueHandle_t _queue;
+static QueueHandle_t _queue;
 
 #define SIZEOFQUEUE 10
 #define TYPEOFQUEUE float
+
 /*******************************************************************************
   Function:
     void UARTTXTHREAD_Initialize ( void )
@@ -94,7 +95,6 @@ QueueHandle_t _queue;
 void UARTTXTHREAD_Initialize ( void )
 {
     UARTTXTHREAD_InitializeQueue();
-    /*Send a trash character to allow the ISR to fire initially*/
 }
 
 /******************************************************************************
@@ -113,7 +113,6 @@ void UARTTXTHREAD_Tasks ( void )
 {
     dbgOutputLoc(UARTRXTHREAD_ENTER_TASK);
     float adcValRecv = 0.0;
-//    DRV_USART0_WriteByte(NULL);
     dbgOutputLoc(UARTRXTHREAD_BEFORE_WHILELOOP);
     while(1){
         //receive from our local queue

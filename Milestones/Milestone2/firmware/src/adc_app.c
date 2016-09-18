@@ -78,6 +78,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 static QueueHandle_t _queue;
 
+#define SIZEOFQUEUE 10
+#define TYPEOFQUEUE float
+
 /*******************************************************************************
   Function:
     void ADC_APP_Initialize ( void )
@@ -107,7 +110,7 @@ void ADC_APP_Initialize ( void )
 /* Following functions are for milestone1 */
 QueueHandle_t createAdcQ(){
     //8 b/c "team 2" //10 is size of Q
-    return xQueueCreate(10,sizeof(float)); 
+    return xQueueCreate(SIZEOFQUEUE,sizeof(TYPEOFQUEUE)); 
 }
 
 /* Sends value from adc to adc_app Queue */

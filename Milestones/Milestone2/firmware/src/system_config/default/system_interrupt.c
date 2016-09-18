@@ -76,7 +76,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-QueueHandle_t _usartqueue;
+static QueueHandle_t _usartqueue;
 #define USARTTYPEOFQUEUE char
 #define USARTSIZEOFQUEUE 600
 
@@ -135,7 +135,7 @@ void IntHandlerDrvUsartInstance0(void)
     if (SYS_INT_SourceStatusGet(INT_SOURCE_USART_1_RECEIVE) && !DRV_USART0_ReceiverBufferIsEmpty())
     {
         dbgOutputLoc(USART0_BEFORE_SEND_TO_QUEUE);
-//        UARTRXTHREAD_SendToQueueISR(DRV_USART0_ReadByte(), &pxHigherPriorityTaskWoken); // read received byte
+        UARTRXTHREAD_SendToQueueISR(DRV_USART0_ReadByte(), &pxHigherPriorityTaskWoken); // read received byte
         dbgOutputLoc(USART0_AFTER_SEND_TO_QUEUE);
     }
     if(SYS_INT_SourceStatusGet(INT_SOURCE_USART_1_TRANSMIT) && !(DRV_USART_TRANSFER_STATUS_TRANSMIT_FULL & DRV_USART0_TransferStatus()) )

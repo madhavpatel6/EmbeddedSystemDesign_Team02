@@ -23,6 +23,10 @@
 #include "messagelayer.h"
 #include <stdio.h>
 
+
+static STATES parserstate;
+static size_t internalBufferIndex = 0;
+
 bool ParseMessage(char messageData[], char buf[]) {
 	if (messageData == NULL) {
 		dbgOutputBlock(false);
@@ -51,6 +55,55 @@ bool ParseMessage(char messageData[], char buf[]) {
 	else {
 		/*Discard the message*/
 		return false;
+	}
+}
+
+bool ParseMessage(char c, char data[], size_t& size) {
+	switch (parserstate) {
+	case IDLE_STATE: {
+		size = 0;
+		memset(data, 0, MAXMESSAGESIZE);
+		size = 0;
+		if (c == STARTOFTEXT) {
+			parserstate = CHECK_DESTINATION_CHAR;
+		}
+		return false;
+	}
+	case CHECK_DESTINATION_CHAR: {
+		if (c == WHATPICAMI) {
+			parserstate = CHECK_MESSAGE_COUNT;
+		}
+		else {
+			parserstate = IDLE_STATE;
+		}
+		return false;
+	}
+	case CHECK_MESSAGE_COUNT: {
+		parserstate = GET_DATALENGTH_UPPER;
+		return false;
+	}
+	case GET_DATALENGTH_UPPER: {
+		size = c << 8;
+		parserstate = GET_DATALENGTH_LOWER;
+		return false;
+	}
+	case GET_DATALENGTH_LOWER: {
+		size = size | c;
+		parserstate = GET_DATA;
+		return false;
+	}
+	case GET_DATA: {
+		data[internalBufferIndex] = c;
+		internalBufferIndex++;
+		if (internalBufferIndex == size - 1) {
+			parserstate = CHECK_ENDCHAR;
+		}
+		return false;
+	}
+	case CHECK_ENDCHAR: {
+		parserstate = IDLE_STATE;
+		return c == ENDOFTEXT;
+	}
 	}
 }
 

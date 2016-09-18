@@ -79,15 +79,14 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
     Application strings and buffers are be defined outside this structure.
 */
 
-QueueHandle_t _queue;
+static QueueHandle_t _queue;
+
 #define TYPEOFQUEUE char
 #define SIZEOFQUEUE 10
 
-char _internalBuffer[MAXMESSAGESIZE];
+static char _internalMessageData[MAXMESSAGESIZE];
 
-char _internalMessageData[MAXMESSAGESIZE];
-
-size_t _internalBufferIndex = 0;
+static size_t _internalMessageSize = 0;
 
 /*******************************************************************************
   Function:
@@ -119,13 +118,9 @@ void UARTRXTHREAD_Tasks ( void )
     while(1){
         char c;
         UARTRXTHREAD_ReadFromQueue(&c);
-//        if(_internalBufferIndex == MAXMESSAGESIZE - 1) {
-//            _internalBufferIndex = 0;
-//            ParseMessage(_internalBuffer, _internalMessageData);
-//        }
-//        else {
-//            _internalBufferIndex++;
-//        }
+        if(MessageParser(c, _internalMessageData, _internalMessageSize)) {
+            /*Since we returned true we assume the message is valid*/
+        }
     }
 }
 
@@ -150,6 +145,8 @@ void UARTRXTHREAD_SendToQueue(char buffer) {
 void UARTRXTHREAD_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken) {
     xQueueSendToBackFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
 }
+
+
 /*******************************************************************************
  End of File
  */
