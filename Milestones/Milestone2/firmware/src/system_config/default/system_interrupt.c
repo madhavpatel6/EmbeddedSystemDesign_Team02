@@ -83,18 +83,23 @@ static QueueHandle_t _usartqueue;
 
 void IntHandlerDrvAdc(void)
 {
+    dbgOutputLoc(ENTER_ADC_ISR);
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     int i = 0;
     float adcValToQ = 0.0;
-    DRV_ADC_Start();
+    float adcValToQF = 0.0;
+    float adcVoltage = 0.0;
     DRV_ADC_Stop();
-    dbgOutputLoc(ENTER_ADC_ISR);
     //Read data before clearing interrupt flag
     dbgOutputLoc(ADDING_ADC_VAL_ISR);
-    for(i; i < 16; i++) {
-        adcValToQ = adcValToQ + PLIB_ADC_ResultGetByIndex(ADC_ID_1, i);
-    }
+    //for(i; i < 16; i++) {
+        adcValToQ = adcValToQ + PLIB_ADC_ResultGetByIndex(ADC_ID_1, 0);
+    //}
+//    adcValToQF = ((adcValToQ)/(1.0))*(1.0);
+//    adcVoltage = (adcValToQF*5.0)/(1024.0); 
+//    float distance = (adcVoltage / 0.009766) * (2.54);
     dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
+//    adc_app_SendValToMsgQFromISR(distance, &pxHigherPriorityTaskWoken);
     adc_app_SendValToMsgQFromISR(adcValToQ, &pxHigherPriorityTaskWoken);
     dbgOutputLoc(AFTER_SEND_TO_Q_ISR);
     dbgOutputLoc(LEAVE_ADC_ISR);
@@ -108,6 +113,7 @@ void IntHandlerDrvAdc(void)
 void IntHandlerDrvTmrInstance0(void)
 {
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
+    DRV_ADC_Start();
     PLIB_INT_SourceFlagSet(INT_ID_0, INT_SOURCE_ADC_1);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);

@@ -28,7 +28,7 @@ static STATES parserstate;
 static uint32_t internalBufferIndex = 0;
 static char internalCheckSum;
 
-bool ParseMessage(char c, char data[], size_t* size, char* source) {
+bool ParseMessage(char c, char data[], size_t* size, char* source, char* messageCount) {
 	switch (parserstate) {
 	case IDLE_STATE: {
 		internalBufferIndex = 0;
@@ -76,7 +76,8 @@ bool ParseMessage(char c, char data[], size_t* size, char* source) {
     }
 	case CHECK_MESSAGE_COUNT: {
 		parserstate = GET_DATALENGTH_UPPER;
-        //Fill here with check
+        //Pass the message count back
+        *messageCount = c;
 		return false;
 	}
 	case GET_DATALENGTH_UPPER: {

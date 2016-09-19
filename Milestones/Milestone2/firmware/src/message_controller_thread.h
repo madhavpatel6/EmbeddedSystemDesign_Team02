@@ -73,15 +73,22 @@ typedef struct {
     float y;
 } Coordinates;
 
+//This is any data that someone else might request for
 typedef struct {
     Coordinates location;
     float orientation;
     float sensordata;
 }InternalData;
 
+//This should include a new enum for anything in the InternalData
 typedef enum UpdateType_enum { LOCATION, ORIENTATION, SENSORDATA } UpdateType;
 
+//This is any request that you would want to ... well ... request
+typedef enum InternalRequestType_enum { REQUEST_LOCATION, REQUEST_ARE_WE_THERE_YET, REQUEST_DO_YOU_HAVE_IT } InternalRequestType;
+
+//------------------------------------------------------------------------------
 //You should not need to change anything beyond this point
+//------------------------------------------------------------------------------
 typedef enum MessageItemType_enum {EXTERNAL_REQUEST_RESPONSE, SEND_REQUEST, UPDATE} MessageItemType;
 
 typedef struct {
@@ -93,9 +100,8 @@ typedef struct {
 typedef struct {
     char Source;
     char Data[MAXMESSAGESIZE];
+    char MessageCount;
 } ExternalObj;
-
-typedef enum InternalRequestType_enum { REQUEST_LOCATION, REQUEST_ARE_WE_THERE_YET, REQUEST_DO_YOU_HAVE_IT } InternalRequestType;
 
 typedef struct {
     //This is set to update when we are updating internal information
@@ -109,6 +115,12 @@ typedef struct {
     UpdateObj Update;
 } MessageObj;
 
+typedef struct {
+    uint8_t SearcherMover;
+    uint8_t TargetLocator;
+    uint8_t PathFinder;
+    uint8_t TargetGrabber;
+} SequenceCountObj;
 /*******************************************************************************
   Function:
     void MESSAGE_CONTROLLER_THREAD_Initialize ( void )

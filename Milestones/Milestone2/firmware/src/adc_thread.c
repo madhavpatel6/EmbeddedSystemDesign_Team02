@@ -128,7 +128,7 @@ int adc_app_SendValToMsgQFromISR(float adcVal, BaseType_t *pxHigherPriorityTaskW
 void convertTocm(float *sensorDigitalVal){
     float tempAdcVal = 0.0;
     float tempAdcVoltageConv = 0.0;
-    tempAdcVal = ((*sensorDigitalVal)/(16.0))*(1.0);
+    tempAdcVal = ((*sensorDigitalVal)/(1.0))*(1.0);
     tempAdcVoltageConv = (tempAdcVal*5.0)/(1024.0); 
     *sensorDigitalVal = (tempAdcVoltageConv / 0.009766) * (2.54);
 }

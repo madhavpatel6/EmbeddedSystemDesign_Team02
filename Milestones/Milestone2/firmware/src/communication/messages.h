@@ -50,7 +50,7 @@ typedef enum {
     CHECK_ENDCHAR,
 } STATES;
 
-bool ParseMessage(char c, char data[], size_t *size, char* source);
+bool ParseMessage(char c, char data[], size_t *size, char* source, char* messageCount);
 
 #endif /* _MESSAGELAYER_H */
 

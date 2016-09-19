@@ -88,7 +88,8 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
 {
     InternalData _internalData;
     memset(&_internalData, 0, sizeof(InternalData));
-    char test[] = "Hello";
+    SequenceCountObj _internalMessageCount;
+    memset(&_internalMessageCount, 0, sizeof(SequenceCountObj));
     while(1) {
         MessageObj obj;
         memset(&obj, 0, sizeof(MessageObj));
@@ -97,6 +98,16 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
         MESSAGE_CONTROLLER_THREAD_ReadFromQueue(&obj);
         switch(obj.Type) {
             case EXTERNAL_REQUEST_RESPONSE: {
+                switch(obj.External.Source) {
+                    case SEARCHERMOVER: _internalMessageCount.SearcherMover++;
+                        break;
+                    case TARGETLOCATOR: _internalMessageCount.TargetLocator++;
+                        break;
+                    case PATHFINDER: _internalMessageCount.PathFinder++;
+                        break;
+                    case TARGETGRABBER: _internalMessageCount.TargetGrabber++;
+                        break;
+                }
                 //Parse JSON request or response
                 //switch on response of request
                 //if it is a request
@@ -131,11 +142,11 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                     }
                     case SENSORDATA: {
                         _internalData.sensordata = obj.Update.Data.sensordata;
-// This is for debugging purposes
-//                        char buf[512];
-//                        memset(buf, 0, 512);
-//                        sprintf(buf, "%0.2f", _internalData.sensordata);
-//                        TX_THREAD_SendToQueue(buf);
+                        // This is for debugging purposes
+                        char buf[512];
+                        memset(buf, 0, 512);
+                        sprintf(buf, "%0.2f", _internalData.sensordata);
+                        TX_THREAD_SendToQueue(buf);
                         break;
                     }
                 }

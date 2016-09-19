@@ -100,7 +100,7 @@ void RX_THREAD_Tasks ( void )
     char c;
     while(1){
         RX_THREAD_ReadFromQueue(&c);
-        if(ParseMessage(c, obj.External.Data, &_internalMessageSize, &obj.External.Source)) {
+        if(ParseMessage(c, obj.External.Data, &_internalMessageSize, &obj.External.Source, &obj.External.MessageCount)) {
             /*Since we returned true we assume the message is valid*/
             MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
         }
