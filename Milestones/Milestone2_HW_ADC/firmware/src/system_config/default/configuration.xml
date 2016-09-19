@@ -21,6 +21,10 @@
         <Path>Header Files/FreeRTOS</Path>
       </File>
       <File>
+        <Name>driver_common.h</Name>
+        <Path>Header Files/framework/driver</Path>
+      </File>
+      <File>
         <Name>queue.h</Name>
         <Path>Header Files/FreeRTOS</Path>
       </File>
@@ -39,6 +43,10 @@
       <File>
         <Name>list.h</Name>
         <Path>Header Files/FreeRTOS</Path>
+      </File>
+      <File>
+        <Name>driver.h</Name>
+        <Path>Header Files/framework/driver</Path>
       </File>
       <File>
         <Name>peripheral_common.h</Name>
@@ -232,14 +240,13 @@
         <Checksum>759B3920B8F625675D855AA9771FCCEC</Checksum>
       </Template>
       <Template>
-        <Name>system_init.c</Name>
-        <Path>Source Files/app/system_config/default</Path>
-        <Checksum>79451A8E9B30054013405021EA370659</Checksum>
-      </Template>
-      <Template>
         <Name>system_interrupt_a.S</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>B6CBE423647A8929F1046AB6F68B1BD1</Checksum>
+        <Checksum>DB883BFB334F7880C66F24F1EF5B828A</Checksum>
+      </Template>
+      <Template>
+        <Name>tx_thread.h</Name>
+        <Path>Header Files/app</Path>
       </Template>
       <Template>
         <Name>drv_tmr_static.h</Name>
@@ -252,34 +259,42 @@
         <Checksum>0651845480D5D3E21D8BF17EE68DBEAC</Checksum>
       </Template>
       <Template>
-        <Name>system_definitions.h</Name>
-        <Path>Header Files/app/system_config/default</Path>
-        <Checksum>F13E8A9F5CFF2B6F8014B89A5C863448</Checksum>
+        <Name>drv_adc_static.h</Name>
+        <Path>Header Files/app/system_config/default/framework/driver/adc</Path>
+        <Checksum>EB83B77B6F50631DF29C48BC407262EE</Checksum>
       </Template>
       <Template>
-        <Name>system_exceptions.c</Name>
-        <Path>Source Files/app/system_config/default</Path>
-        <Checksum>C111969CA43D6CEA1E9E33A6164E7AE0</Checksum>
+        <Name>drv_adc_static.c</Name>
+        <Path>Source Files/app/system_config/default/framework/driver/adc/src</Path>
+        <Checksum>6CFEF20546A299EFE10BD1191AD82262</Checksum>
+      </Template>
+      <Template>
+        <Name>tx_thread.c</Name>
+        <Path>Source Files/app</Path>
+      </Template>
+      <Template>
+        <Name>drv_usart_mapping.c</Name>
+        <Path>Source Files/app/system_config/default/framework/driver/usart/src</Path>
+        <Checksum>115DDE4372E58D4116BC77DC36FD97DC</Checksum>
+      </Template>
+      <Template>
+        <Name>message_controller_thread.c</Name>
+        <Path>Source Files/app</Path>
       </Template>
       <Template>
         <Name>FreeRTOSConfig.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>A1F6B14C1BF51E577014DBC1D4C92CF1</Checksum>
+        <Checksum>375623C67A3F2F79B9F13FCEB2F47341</Checksum>
       </Template>
       <Template>
-        <Name>system_tasks.c</Name>
-        <Path>Source Files/app/system_config/default</Path>
-        <Checksum>CCAC804D0364435F03AAEEA18A639BFF</Checksum>
+        <Name>drv_usart_static_byte_model.c</Name>
+        <Path>Source Files/app/system_config/default/framework/driver/usart/src</Path>
+        <Checksum>E56B5A603F0427F96760518142226E69</Checksum>
+        <ProjectFileChecksum>1310BC3F96A139BFF9FFD650ABBF7FE4</ProjectFileChecksum>
       </Template>
       <Template>
-        <Name>system_config.h</Name>
-        <Path>Header Files/app/system_config/default</Path>
-        <Checksum>42F669A88BDF70F5EA6010A4BCED25BA</Checksum>
-      </Template>
-      <Template>
-        <Name>drv_tmr_static.c</Name>
-        <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
-        <Checksum>C5519AD29FBEB4673726E47FF44AE516</Checksum>
+        <Name>adc_thread.h</Name>
+        <Path>Header Files/app</Path>
       </Template>
       <Template>
         <Name>sys_clk_static.h</Name>
@@ -289,8 +304,74 @@
       <Template>
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>36106C93A6CCAD64C2C1F75CDFD9DB5D</Checksum>
-        <ProjectFileChecksum>70CC436FCDDF50FC0DC75D424AA5D172</ProjectFileChecksum>
+        <Checksum>3A9EDA65009749D2082553B8C693D671</Checksum>
+        <ProjectFileChecksum>E277AD9AFF4CA349947B130C39195F03</ProjectFileChecksum>
+      </Template>
+      <Template>
+        <Name>sys_clk_static.c</Name>
+        <Path>Source Files/app/system_config/default/framework/system/clk/src</Path>
+        <Checksum>E8C935BED4628875A8C3428DDD07355C</Checksum>
+      </Template>
+      <Template>
+        <Name>drv_usart_static.c</Name>
+        <Path>Source Files/app/system_config/default/framework/driver/usart/src</Path>
+        <Checksum>2A4AED7552D145ED28C2C52BFC04AD9D</Checksum>
+      </Template>
+      <Template>
+        <Name>system_init.c</Name>
+        <Path>Source Files/app/system_config/default</Path>
+        <Checksum>8D5878FD40F0FA05F3952AAEDC9DC539</Checksum>
+        <ProjectFileChecksum>442F24121A826C2EBC4409EB164DCA5D</ProjectFileChecksum>
+      </Template>
+      <Template>
+        <Name>main.c</Name>
+        <Path>Source Files/app</Path>
+      </Template>
+      <Template>
+        <Name>message_controller_thread.h</Name>
+        <Path>Header Files/app</Path>
+      </Template>
+      <Template>
+        <Name>adc_thread.c</Name>
+        <Path>Source Files/app</Path>
+      </Template>
+      <Template>
+        <Name>system_definitions.h</Name>
+        <Path>Header Files/app/system_config/default</Path>
+        <Checksum>6518D61BB2D225236B4B43CD72F8DAE5</Checksum>
+      </Template>
+      <Template>
+        <Name>system_exceptions.c</Name>
+        <Path>Source Files/app/system_config/default</Path>
+        <Checksum>C111969CA43D6CEA1E9E33A6164E7AE0</Checksum>
+      </Template>
+      <Template>
+        <Name>rx_thread.c</Name>
+        <Path>Source Files/app</Path>
+      </Template>
+      <Template>
+        <Name>drv_usart_static.h</Name>
+        <Path>Header Files/app/system_config/default/framework/driver/usart</Path>
+        <Checksum>AE37BD63B6EC9F6ADD6B8006CE192FCB</Checksum>
+      </Template>
+      <Template>
+        <Name>system_tasks.c</Name>
+        <Path>Source Files/app/system_config/default</Path>
+        <Checksum>A377A0EE160251C82DE4594012B1B575</Checksum>
+      </Template>
+      <Template>
+        <Name>rx_thread.h</Name>
+        <Path>Header Files/app</Path>
+      </Template>
+      <Template>
+        <Name>system_config.h</Name>
+        <Path>Header Files/app/system_config/default</Path>
+        <Checksum>B8287D19E6487786A0FE694FFEABD4E3</Checksum>
+      </Template>
+      <Template>
+        <Name>drv_tmr_static.c</Name>
+        <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
+        <Checksum>C5519AD29FBEB4673726E47FF44AE516</Checksum>
       </Template>
       <Template>
         <Name>rtos_hooks.c</Name>
@@ -298,9 +379,9 @@
         <Checksum>FA52743264536E5207D2ADBE57B48D05</Checksum>
       </Template>
       <Template>
-        <Name>sys_clk_static.c</Name>
-        <Path>Source Files/app/system_config/default/framework/system/clk/src</Path>
-        <Checksum>E8C935BED4628875A8C3428DDD07355C</Checksum>
+        <Name>drv_usart_static_local.h</Name>
+        <Path>Header Files/app/system_config/default/framework/driver/usart/src</Path>
+        <Checksum>2C3E6EE85E05512BB9836B81EB3DB0E4</Checksum>
       </Template>
     </Templates>
     <CompilerItems>
@@ -310,11 +391,11 @@
         <Include value="../src/system_config/default"/>
       </C32-AS>
       <C32>
-        <Include value="C:/ECE4534/Milestones/Milestone1/firmware/src"/>
-        <Include value="C:/ECE4534/Milestones/Milestone1/firmware/src/system_config/default"/>
-        <Include value="C:/ECE4534/Milestones/Milestone1/firmware/src/default"/>
-        <Include value="C:/microchip/harmony/v1_08_01/framework"/>
-        <Include value="C:/ECE4534/Milestones/Milestone1/firmware/src/system_config/default/framework"/>
+        <Include value="C:\ECE4534\Milestones\Milestone2_HW_ADC\firmware\src"/>
+        <Include value="C:\ECE4534\Milestones\Milestone2_HW_ADC\firmware\src\system_config\default"/>
+        <Include value="C:\ECE4534\Milestones\Milestone2_HW_ADC\firmware\src\default"/>
+        <Include value="C:\microchip\harmony\v1_08_01\framework"/>
+        <Include value="C:\ECE4534\Milestones\Milestone2_HW_ADC\firmware\src\system_config\default\framework"/>
         <Include value="../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX"/>
         <Include value="../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include"/>
         <Include value="../src/system_config/default"/>
