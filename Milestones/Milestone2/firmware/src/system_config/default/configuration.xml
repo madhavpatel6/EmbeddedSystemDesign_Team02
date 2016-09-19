@@ -13,6 +13,10 @@
         <Path>Header Files/FreeRTOS/portable/MPLAB/PIC32MX</Path>
       </File>
       <File>
+        <Name>drv_tmr_mapping.h</Name>
+        <Path>Header Files/framework/driver/tmr</Path>
+      </File>
+      <File>
         <Name>semphr.h</Name>
         <Path>Header Files/FreeRTOS</Path>
       </File>
@@ -101,8 +105,16 @@
         <Path>Header Files/framework/peripheral</Path>
       </File>
       <File>
+        <Name>drv_tmr_variant_mapping.h</Name>
+        <Path>Header Files/framework/driver/tmr/src</Path>
+      </File>
+      <File>
         <Name>list.c</Name>
         <Path>Source Files/FreeRTOS</Path>
+      </File>
+      <File>
+        <Name>drv_tmr.h</Name>
+        <Path>Header Files/framework/driver/tmr</Path>
       </File>
       <File>
         <Name>sys_devcon.c</Name>
@@ -230,11 +242,21 @@
       <Template>
         <Name>system_interrupt_a.S</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>2AADE7885E66E00DBB7FE911439FFA49</Checksum>
+        <Checksum>2989805F1102707DD6AFDC5B99708214</Checksum>
       </Template>
       <Template>
         <Name>tx_thread.h</Name>
         <Path>Header Files/app</Path>
+      </Template>
+      <Template>
+        <Name>drv_tmr_static.h</Name>
+        <Path>Header Files/app/system_config/default/framework/driver/tmr</Path>
+        <Checksum>3848B1C3EC270575ACBA3B9AE1CB12DD</Checksum>
+      </Template>
+      <Template>
+        <Name>drv_tmr_mapping.c</Name>
+        <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
+        <Checksum>2CAE56994AB8C4966A293572681FF5BE</Checksum>
       </Template>
       <Template>
         <Name>drv_adc_static.h</Name>
@@ -244,7 +266,7 @@
       <Template>
         <Name>drv_adc_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/adc/src</Path>
-        <Checksum>F1D4F6DDEAFA687DCEF00F67266CC5C9</Checksum>
+        <Checksum>6CFEF20546A299EFE10BD1191AD82262</Checksum>
       </Template>
       <Template>
         <Name>tx_thread.c</Name>
@@ -282,7 +304,7 @@
       <Template>
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>9527E27FDEE16EB96466E337EDA74E60</Checksum>
+        <Checksum>672B667C5883C513ED5C4C6939EBBC0B</Checksum>
         <ProjectFileChecksum>F7AA9AF8BDA31D4A1B54467E816298C3</ProjectFileChecksum>
       </Template>
       <Template>
@@ -298,7 +320,7 @@
       <Template>
         <Name>system_init.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>2757686E648ABE220260A4BFB344DB85</Checksum>
+        <Checksum>DBCFC1360E9865DFE006FA64831FF0EC</Checksum>
         <ProjectFileChecksum>7255C2262EA808759F508346F7BE014A</ProjectFileChecksum>
       </Template>
       <Template>
@@ -316,7 +338,7 @@
       <Template>
         <Name>system_definitions.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>20B454F54D6EAB6331E048ED5D985CC4</Checksum>
+        <Checksum>7FB82A734D8C8353F53627D697DD3C90</Checksum>
       </Template>
       <Template>
         <Name>system_exceptions.c</Name>
@@ -344,7 +366,12 @@
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>69A0052651FF6AF7B28DB49D9E6B630E</Checksum>
+        <Checksum>88C7F102D0094079AA54560A64A0AA2E</Checksum>
+      </Template>
+      <Template>
+        <Name>drv_tmr_static.c</Name>
+        <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
+        <Checksum>5B7291B0B64A5625A39256E1C1174BF4</Checksum>
       </Template>
       <Template>
         <Name>rtos_hooks.c</Name>

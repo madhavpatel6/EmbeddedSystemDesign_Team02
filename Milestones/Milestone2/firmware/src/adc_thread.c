@@ -93,6 +93,7 @@ static QueueHandle_t _queue;
 void ADC_THREAD_Initialize ( void )
 {
     _queue = createAdcQ();
+    DRV_TMR0_Start();
     DRV_ADC_Open();
     /* TODO: Initialize your application's state machine and other
      * parameters.
@@ -123,6 +124,15 @@ int adc_app_SendValToMsgQFromISR(float adcVal, BaseType_t *pxHigherPriorityTaskW
     return xQueueSendFromISR(_queue, &adcVal, pxHigherPriorityTaskWoken);
 }
 
+/* This converts the sensor values to cm */
+void convertTocm(float *sensorDigitalVal){
+    float tempAdcVal = 0.0;
+    float tempAdcVoltageConv = 0.0;
+    tempAdcVal = ((*sensorDigitalVal)/(16.0))*(1.0);
+    tempAdcVoltageConv = (tempAdcVal*5.0)/(1024.0); 
+    *sensorDigitalVal = (tempAdcVoltageConv / 0.009766) * (2.54);
+}
+
 
 /******************************************************************************
   Function:
@@ -143,6 +153,7 @@ void ADC_THREAD_Tasks ( void )
     while(1){
         dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_ADC_APP);
         if(xQueueReceive(_queue, &distance, portMAX_DELAY)){
+            convertTocm(&distance);
              // Sending to Tx Thread Q
             obj.Update.Data.sensordata = distance;
             MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);

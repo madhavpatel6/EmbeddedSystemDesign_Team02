@@ -141,6 +141,8 @@ void ADC_THREAD_Tasks( void );
 
 QueueHandle_t createAdcQ();
 
+void convertTocm(float *sensorDigitalVal);
+
 #endif /* _ADC_THREAD_H */
 
 //DOM-IGNORE-BEGIN

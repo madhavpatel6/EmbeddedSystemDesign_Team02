@@ -64,10 +64,6 @@ void DRV_ADC_Initialize(void)
     PLIB_ADC_VoltageReferenceSelect(DRV_ADC_ID_1, ADC_REFERENCE_VDD_TO_AVSS);
 
     /* Sampling Selections */
-    /* Enable Auto Sample Mode */
-    PLIB_ADC_SampleAutoStartEnable(DRV_ADC_ID_1);
-    /* Sample Acquisition Time (Auto Sample Mode) */	
-    PLIB_ADC_SampleAcquisitionTimeSet(DRV_ADC_ID_1, 31);
     /* Select Sampling Mode */
     PLIB_ADC_SamplingModeSelect(DRV_ADC_ID_1, ADC_SAMPLING_MODE_MUXA);
     /* Number of Samples Per Interrupt */
@@ -84,14 +80,11 @@ void DRV_ADC_Initialize(void)
     /* Channel Selections */
     /* MUX A Negative Input Select */
     PLIB_ADC_MuxChannel0InputNegativeSelect(DRV_ADC_ID_1, ADC_MUX_A, ADC_INPUT_NEGATIVE_VREF_MINUS);
-/*scan false*/
-/*escan false*/
-
-    /* MUX A Positive Input Select dfdfd*/
-    PLIB_ADC_MuxChannel0InputPositiveSelect(DRV_ADC_ID_1, ADC_MUX_A, ADC_INPUT_POSITIVE_AN0);
-
-
  
+
+
+    /* MUX A Positive Input Select */
+    PLIB_ADC_MuxChannel0InputPositiveSelect(DRV_ADC_ID_1, ADC_MUX_A, ADC_INPUT_POSITIVE_AN0);
  
     /* Initialize ADC Interrupt */
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
