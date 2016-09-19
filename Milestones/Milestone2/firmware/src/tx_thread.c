@@ -68,7 +68,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 static QueueHandle_t _queue;
 
 #define SIZEOFQUEUE 10
-#define TYPEOFQUEUE CommunicationObject
+#define TYPEOFQUEUE char[MAXMESSAGESIZE]
 
 
 /*******************************************************************************
@@ -96,15 +96,14 @@ void TX_THREAD_Initialize ( void )
 void TX_THREAD_Tasks ( void )
 {
     dbgOutputLoc(UARTRXTHREAD_ENTER_TASK);
-    CommunicationObject readObj;
     char messageData[MAXMESSAGESIZE];
     char packedMessage[MAXMESSAGESIZE];
     dbgOutputLoc(UARTRXTHREAD_BEFORE_WHILELOOP);
     while(1){
         //receive from our local queue
-        TX_THREAD_ReadFromQueue(&readObj);
+        TX_THREAD_ReadFromQueue(messageData);
         
-        ConvertCommObjectToString(readObj, messageData);
+        //ConvertCommObjectToString(readObj, messageData);
         
         int length = CreateMessage(packedMessage, messageData, PATHFINDER);
         
@@ -128,36 +127,18 @@ void TX_THREAD_InitializeQueue() {
     }
 }
 
-void TX_THREAD_ReadFromQueue(CommunicationObject* pvBuffer) {
+void TX_THREAD_ReadFromQueue(char pvBuffer[]) {
     dbgOutputLoc(UARTTXTHREAD_BEFORE_RECEIVE_FR_QUEUE);
     xQueueReceive(_queue, pvBuffer, portMAX_DELAY);
     dbgOutputLoc(UARTTXTHREAD_AFTER_RECEIVE_FR_QUEUE);
 }
 
-void TX_THREAD_SendToQueue(CommunicationObject buffer) {
-    xQueueSendToBack(_queue, &buffer, portMAX_DELAY);
+void TX_THREAD_SendToQueue(char buffer[]) {
+    xQueueSendToBack(_queue, buffer, portMAX_DELAY);
 }
 
-void TX_THREAD_SendToQueueISR(CommunicationObject buffer, BaseType_t *pxHigherPriorityTaskWoken) {
-    xQueueSendToBackFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
-}
-
-void ConvertCommObjectToString(CommunicationObject obj, char messageData[]) {
-    memset(messageData, 0, MAXMESSAGESIZE);
-    switch(obj.type) {
-        case INT: {
-            sprintf(messageData, "%d", obj.intVal);
-            break;
-        }
-        case FLOAT: {
-            sprintf(messageData, "%0.2f", obj.floatVal);
-            break;
-        }
-        case STRING: {
-            sprintf(messageData, "%s", obj.string);
-            break;
-        }
-    }
+void TX_THREAD_SendToQueueISR(char buffer[], BaseType_t *pxHigherPriorityTaskWoken) {
+    xQueueSendToBackFromISR(_queue, buffer, pxHigherPriorityTaskWoken);
 }
 
  

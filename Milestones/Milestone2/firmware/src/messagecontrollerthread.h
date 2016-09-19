@@ -5,7 +5,7 @@
     Microchip Technology Inc.
 
   File Name:
-    adc_thread.h
+    messagecontrollerthread.h
 
   Summary:
     This header file provides prototypes and definitions for the application.
@@ -43,8 +43,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  *******************************************************************************/
 //DOM-IGNORE-END
 
-#ifndef _ADC_THREAD_H
-#define _ADC_THREAD_H
+#ifndef _MESSAGECONTROLLERTHREAD_H
+#define _MESSAGECONTROLLERTHREAD_H
 
 // *****************************************************************************
 // *****************************************************************************
@@ -58,11 +58,6 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdlib.h>
 #include "system_config.h"
 #include "system_definitions.h"
-#include "adc_thread_public.h"
-#include "debug.h"
-
-
-
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -72,10 +67,74 @@ extern "C" {
 #endif
 // DOM-IGNORE-END 
 
+// *****************************************************************************
+// *****************************************************************************
+// Section: Type Definitions
+// *****************************************************************************
+// *****************************************************************************
+
+// *****************************************************************************
+/* Application states
+
+  Summary:
+    Application states enumeration
+
+  Description:
+    This enumeration defines the valid application states.  These states
+    determine the behavior of the application at various times.
+*/
+
+typedef enum
+{
+	/* Application's state machine's initial state. */
+	MESSAGECONTROLLERTHREAD_STATE_INIT=0,
+	MESSAGECONTROLLERTHREAD_STATE_SERVICE_TASKS,
+
+	/* TODO: Define states used by the application state machine. */
+
+} MESSAGECONTROLLERTHREAD_STATES;
+
+
+// *****************************************************************************
+/* Application Data
+
+  Summary:
+    Holds application data
+
+  Description:
+    This structure holds the application's data.
+
+  Remarks:
+    Application strings and buffers are be defined outside this structure.
+ */
+
+typedef struct
+{
+    /* The application's current state */
+    MESSAGECONTROLLERTHREAD_STATES state;
+
+    /* TODO: Define any additional data used by the application. */
+
+} MESSAGECONTROLLERTHREAD_DATA;
+
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Application Callback Routines
+// *****************************************************************************
+// *****************************************************************************
+/* These routines are called by drivers when certain events occur.
+*/
+	
+// *****************************************************************************
+// *****************************************************************************
+// Section: Application Initialization and State Machine Functions
+// *****************************************************************************
+// *****************************************************************************
 
 /*******************************************************************************
   Function:
-    void ADC_THREAD_Initialize ( void )
+    void MESSAGECONTROLLERTHREAD_Initialize ( void )
 
   Summary:
      MPLAB Harmony application initialization routine.
@@ -97,19 +156,19 @@ extern "C" {
 
   Example:
     <code>
-    ADC_THREAD_Initialize();
+    MESSAGECONTROLLERTHREAD_Initialize();
     </code>
 
   Remarks:
     This routine must be called from the SYS_Initialize function.
 */
 
-void ADC_THREAD_Initialize ( void );
+void MESSAGECONTROLLERTHREAD_Initialize ( void );
 
 
 /*******************************************************************************
   Function:
-    void ADC_THREAD_Tasks ( void )
+    void MESSAGECONTROLLERTHREAD_Tasks ( void )
 
   Summary:
     MPLAB Harmony Demo application tasks function
@@ -130,18 +189,17 @@ void ADC_THREAD_Initialize ( void );
 
   Example:
     <code>
-    ADC_THREAD_Tasks();
+    MESSAGECONTROLLERTHREAD_Tasks();
     </code>
 
   Remarks:
     This routine must be called from SYS_Tasks() routine.
  */
 
-void ADC_THREAD_Tasks( void );
+void MESSAGECONTROLLERTHREAD_Tasks( void );
 
-QueueHandle_t createAdcQ();
 
-#endif /* _ADC_THREAD_H */
+#endif /* _MESSAGECONTROLLERTHREAD_H */
 
 //DOM-IGNORE-BEGIN
 #ifdef __cplusplus

@@ -54,11 +54,14 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 
 #include "message_controller_thread.h"
+#include "message_controller_thread_public.h"
+#include "tx_thread_public.h"
 
 static QueueHandle_t _queue;
 
-#define TYPEOFQUEUE char
-#define SIZEOFQUEUE 10
+#define TYPEOFQUEUE MessageObj
+#define SIZEOFQUEUE 20
+
 /*******************************************************************************
   Function:
     void MESSAGE_CONTROLLER_THREAD_Initialize ( void )
@@ -83,13 +86,75 @@ void MESSAGE_CONTROLLER_THREAD_Initialize ( void )
 
 void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
 {
-
+    InternalData _internalData;
+    memset(&_internalData, 0, sizeof(InternalData));
+    char test[] = "Hello";
+    while(1) {
+        MessageObj obj;
+        memset(&obj, 0, sizeof(MessageObj));
+        char jsonmessage[MAXMESSAGESIZE];
+        memset(jsonmessage, 0, MAXMESSAGESIZE);
+        MESSAGE_CONTROLLER_THREAD_ReadFromQueue(&obj);
+        switch(obj.Type) {
+            case EXTERNAL_REQUEST_RESPONSE: {
+                //Parse JSON request or response
+                //switch on response of request
+                //if it is a request
+                    //Create JSON response from local crap
+                    //Send to TX
+                //if it is a response
+                    //convert the string to the proper 
+                break;
+            }
+            case SEND_REQUEST: {
+                switch(obj.Request) {
+                    case REQUEST_LOCATION: {
+                        break;
+                    }
+                    case REQUEST_ARE_WE_THERE_YET: {
+                        break;
+                    }
+                    case REQUEST_DO_YOU_HAVE_IT: {
+                        break;
+                    }
+                }
+            }
+            case UPDATE: {
+                switch(obj.Update.Type) {
+                    case LOCATION:{
+                        _internalData.location = obj.Update.Data.location;
+                        break;
+                    }
+                    case ORIENTATION: {
+                        _internalData.orientation = obj.Update.Data.orientation;
+                        break;
+                    }
+                    case SENSORDATA: {
+                        _internalData.sensordata = obj.Update.Data.sensordata;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+    }
 }
 
 void MESSAGE_CONTROLLER_THREAD_InitializeQueue() {
     _queue = xQueueCreate(SIZEOFQUEUE, sizeof(TYPEOFQUEUE));
 }
  
+void MESSAGE_CONTROLLER_THREAD_ReadFromQueue(MessageObj* pvBuffer) {
+    xQueueReceive(_queue, pvBuffer, portMAX_DELAY);
+}
+
+void MESSAGE_CONTROLLER_THREAD_SendToQueue(MessageObj buffer) {
+    xQueueSend(_queue, &buffer, portMAX_DELAY);
+}
+
+void MESSAGE_CONTROLLER_THREAD_SendToQueueISR(MessageObj buffer, BaseType_t *pxHigherPriorityTaskWoken) {
+    xQueueSendFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
+}
 
 /*******************************************************************************
  End of File

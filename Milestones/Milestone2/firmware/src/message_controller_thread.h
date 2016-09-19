@@ -58,7 +58,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdlib.h>
 #include "system_config.h"
 #include "system_definitions.h"
-
+#include "communication/messages.h"
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
@@ -66,6 +66,48 @@ extern "C" {
 
 #endif
 
+//Depending on what data you would need to send out you should create a member of this struct that can hold that data
+    
+typedef struct {
+    float x;
+    float y;
+} Coordinates;
+
+typedef struct {
+    Coordinates location;
+    float orientation;
+    float sensordata;
+}InternalData;
+
+typedef enum UpdateType_enum { LOCATION, ORIENTATION, SENSORDATA } UpdateType;
+
+//You should not need to change anything beyond this point
+typedef enum MessageItemType_enum {EXTERNAL_REQUEST_RESPONSE, SEND_REQUEST, UPDATE} MessageItemType;
+
+typedef struct {
+    //Set this to 
+    UpdateType Type;
+    InternalData Data;
+} UpdateObj;
+
+typedef struct {
+    char Source;
+    char Data[MAXMESSAGESIZE];
+} ExternalObj;
+
+typedef enum InternalRequestType_enum { REQUEST_LOCATION, REQUEST_ARE_WE_THERE_YET, REQUEST_DO_YOU_HAVE_IT } InternalRequestType;
+
+typedef struct {
+    //This is set to update when we are updating internal information
+    //It should be set to Request_response when we get an external message
+    MessageItemType Type;
+    //This source is set when we get a request or response from an external source
+    ExternalObj External;
+    //If this object is a SENDOUT_REQUEST
+    InternalRequestType Request;
+    //If if the MessageItemType is set to update then we will access the Update object and see what the update is from
+    UpdateObj Update;
+} MessageObj;
 
 /*******************************************************************************
   Function:
@@ -135,12 +177,8 @@ void MESSAGE_CONTROLLER_THREAD_Tasks( void );
 
 void MESSAGE_CONTROLLER_THREAD_InitializeQueue();
 
-typedef enum MessageItemType_enum {Request, Response, Update} MessageItemType;
-typedef struct {
-    MessageItemType Type;
-    char Source;
-    
-} QueueType;
+void MESSAGE_CONTROLLER_THREAD_ReadFromQueue(MessageObj* pvBuffer);
+
 #endif /* _MESSAGE_CONTROLLER_THREAD_H */
 
 //DOM-IGNORE-BEGIN

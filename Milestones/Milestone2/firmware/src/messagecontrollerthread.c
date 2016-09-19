@@ -5,7 +5,7 @@
     Microchip Technology Inc.
   
   File Name:
-    adc_thread.c
+    messagecontrollerthread.c
 
   Summary:
     This file contains the source code for the MPLAB Harmony application.
@@ -53,8 +53,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-#include "adc_thread.h"
-#include "message_controller_thread.h"
+#include "messagecontrollerthread.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -76,78 +75,98 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
     
     Application strings and buffers are be defined outside this structure.
 */
-static QueueHandle_t _queue;
 
-#define SIZEOFQUEUE 10
-#define TYPEOFQUEUE float
+MESSAGECONTROLLERTHREAD_DATA messagecontrollerthreadData;
 
+// *****************************************************************************
+// *****************************************************************************
+// Section: Application Callback Functions
+// *****************************************************************************
+// *****************************************************************************
+
+/* TODO:  Add any necessary callback functions.
+*/
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Application Local Functions
+// *****************************************************************************
+// *****************************************************************************
+
+
+/* TODO:  Add any necessary local functions.
+*/
+
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Application Initialization and State Machine Functions
+// *****************************************************************************
+// *****************************************************************************
 
 /*******************************************************************************
   Function:
-    void ADC_THREAD_Initialize ( void )
+    void MESSAGECONTROLLERTHREAD_Initialize ( void )
 
   Remarks:
-    See prototype in adc_thread.h.
+    See prototype in messagecontrollerthread.h.
  */
 
-void ADC_THREAD_Initialize ( void )
+void MESSAGECONTROLLERTHREAD_Initialize ( void )
 {
-    _queue = createAdcQ();
-    DRV_ADC_Open();
+    /* Place the App state machine in its initial state. */
+    messagecontrollerthreadData.state = MESSAGECONTROLLERTHREAD_STATE_INIT;
+
+    
     /* TODO: Initialize your application's state machine and other
      * parameters.
      */
 }
 
-/******************************************************************************
-  Function:
-    void ADC_APP_Tasks ( void )
-
-  Remarks:
-    See prototype in adc_app.h.
- */
-
-/* Following functions are for milestone1 */
-QueueHandle_t createAdcQ(){
-    //8 b/c "team 2" //10 is size of Q
-    return xQueueCreate(SIZEOFQUEUE,sizeof(TYPEOFQUEUE)); 
-}
-
-/* Sends value from adc to adc_app Queue */
-int adc_app_SendValToMsgQ(float adcVal){
-    return xQueueSend(_queue, &adcVal, portMAX_DELAY);
-}
-
-/* Sends value from adc ISR to adc_app Queue */
-int adc_app_SendValToMsgQFromISR(float adcVal, BaseType_t *pxHigherPriorityTaskWoken){
-    return xQueueSendFromISR(_queue, &adcVal, pxHigherPriorityTaskWoken);
-}
-
 
 /******************************************************************************
   Function:
-    void ADC_THREAD_Tasks ( void )
+    void MESSAGECONTROLLERTHREAD_Tasks ( void )
 
   Remarks:
-    See prototype in adc_thread.h.
+    See prototype in messagecontrollerthread.h.
  */
 
-void ADC_THREAD_Tasks ( void )
+void MESSAGECONTROLLERTHREAD_Tasks ( void )
 {
-    dbgOutputLoc(ENTER_TASK_ADC_APP);
-    MessageObj obj;
-    obj.Type = UPDATE;
-    obj.Update.Type = SENSORDATA;
-    dbgOutputLoc(BEFORE_WHILE_ADC_APP);
-    float distance = 0.0;
-    while(1){
-        dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_ADC_APP);
-        if(xQueueReceive(_queue, &distance, portMAX_DELAY)){
-             // Sending to Tx Thread Q
-            obj.Update.Data.sensordata = distance;
-            MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
+
+    /* Check the application's current state. */
+    switch ( messagecontrollerthreadData.state )
+    {
+        /* Application's initial state. */
+        case MESSAGECONTROLLERTHREAD_STATE_INIT:
+        {
+            bool appInitialized = true;
+       
+        
+            if (appInitialized)
+            {
+            
+                messagecontrollerthreadData.state = MESSAGECONTROLLERTHREAD_STATE_SERVICE_TASKS;
+            }
+            break;
         }
-        dbgOutputLoc(AFTER_RECEIVE_FROM_Q_ADC_APP);
+
+        case MESSAGECONTROLLERTHREAD_STATE_SERVICE_TASKS:
+        {
+        
+            break;
+        }
+
+        /* TODO: implement your application state machine.*/
+        
+
+        /* The default state should never be executed. */
+        default:
+        {
+            /* TODO: Handle error in application's state machine. */
+            break;
+        }
     }
 }
 

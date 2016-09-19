@@ -20,15 +20,15 @@
 /* Section: Included Files                                                    */
 /* ************************************************************************** */
 /* ************************************************************************** */
-#include "messages.h"
+#include "messagelayer.h"
 #include "debug.h"
 
 
-static STATES parserstate;
+static STATES parserstate = IDLE_STATE;
 static uint32_t internalBufferIndex = 0;
-static char internalCheckSum;
+static char internalCheckSum = 0;
 
-bool ParseMessage(char c, char data[], size_t* size, char* source) {
+bool ParseMessage(char c, char data[], size_t* size) {
 	switch (parserstate) {
 	case IDLE_STATE: {
 		internalBufferIndex = 0;
@@ -42,7 +42,7 @@ bool ParseMessage(char c, char data[], size_t* size, char* source) {
 	}
 	case CHECK_DESTINATION_CHAR: {
 		if (c == WHATPICAMI) {
-			parserstate = CHECK_SOURCE_CHAR;
+			parserstate = CHECK_MESSAGE_COUNT;
 		}
 		else {
 			parserstate = IDLE_STATE;
@@ -52,19 +52,15 @@ bool ParseMessage(char c, char data[], size_t* size, char* source) {
     case CHECK_SOURCE_CHAR: {
         switch(c) {
             case SEARCHERMOVER: {
-                *source = SEARCHERMOVER;
                 break;
             }
             case TARGETLOCATOR: {
-                *source = TARGETLOCATOR;
                 break;
             }
             case PATHFINDER: {
-                *source = PATHFINDER;
                 break;
             }
             case TARGETGRABBER: {
-                *source = TARGETGRABBER;
                 break;
             }
             default: {
@@ -72,7 +68,6 @@ bool ParseMessage(char c, char data[], size_t* size, char* source) {
                 break;
             }
         }
-        parserstate = CHECK_MESSAGE_COUNT;
     }
 	case CHECK_MESSAGE_COUNT: {
 		parserstate = GET_DATALENGTH_UPPER;

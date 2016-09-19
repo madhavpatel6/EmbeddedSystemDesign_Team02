@@ -59,6 +59,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 #include "communication/messages.h"
+
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
@@ -140,9 +141,8 @@ void TX_THREAD_Initialize ( void );
 void TX_THREAD_Tasks( void );
 
 void TX_THREAD_InitializeQueue();
-void TX_THREAD_ReadFromQueue(CommunicationObject* pvBuffer);
 
-void ConvertCommObjectToString(CommunicationObject obj, char messageData[]);
+void TX_THREAD_ReadFromQueue(char pvBuffer[]);
 
 #endif /* _TX_THREAD_H */
 

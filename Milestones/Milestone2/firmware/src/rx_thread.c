@@ -57,6 +57,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "rx_thread_public.h"
 #include "debug.h"
 #include "communication/messages.h"
+#include "message_controller_thread.h"
 
 static QueueHandle_t _queue;
 
@@ -94,11 +95,14 @@ void RX_THREAD_Tasks ( void )
 {
     dbgOutputLoc(UARTRXTHREAD_ENTER_TASK);
     dbgOutputLoc(UARTRXTHREAD_BEFORE_WHILELOOP);
+    MessageObj obj;
+    obj.Type = EXTERNAL_REQUEST_RESPONSE; 
+    char c;
     while(1){
-        char c;
         RX_THREAD_ReadFromQueue(&c);
-        if(ParseMessage(c, _internalMessageData, &_internalMessageSize)) {
+        if(ParseMessage(c, obj.External.Data, &_internalMessageSize, &obj.External.Source)) {
             /*Since we returned true we assume the message is valid*/
+            MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
         }
     }
 }

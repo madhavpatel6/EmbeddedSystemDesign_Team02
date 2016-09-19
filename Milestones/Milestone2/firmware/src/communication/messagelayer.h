@@ -32,6 +32,21 @@
 #define MAXMESSAGESIZE 512
 #define WHATPICAMI 'p'
 
+typedef enum CommunicationType_enum { 
+    INT,
+    FLOAT,
+    STRING,
+} CommunicationType;
+
+//typedef CommunicationType_enum CommunicationType;
+
+typedef struct CommunicationObject_struct {
+    CommunicationType type;
+    int intVal;
+    float floatVal;
+    char string[MAXMESSAGESIZE];
+} CommunicationObject;
+
 int CreateMessage(char buf[], char messageData[], char destination);
 
 void BuildJSON(char buf[]);
@@ -50,7 +65,8 @@ typedef enum {
     CHECK_ENDCHAR,
 } STATES;
 
-bool ParseMessage(char c, char data[], size_t *size, char* source);
+bool ParseMessage(char c, char data[], size_t *size);
+
 
 #endif /* _MESSAGELAYER_H */
 
