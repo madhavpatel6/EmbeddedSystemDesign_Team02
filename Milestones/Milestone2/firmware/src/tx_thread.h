@@ -5,7 +5,7 @@
     Microchip Technology Inc.
 
   File Name:
-    uartrxthread.h
+    tx_thread.h
 
   Summary:
     This header file provides prototypes and definitions for the application.
@@ -43,8 +43,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  *******************************************************************************/
 //DOM-IGNORE-END
 
-#ifndef _UARTRXTHREAD_H
-#define _UARTRXTHREAD_H
+#ifndef _TX_THREAD_H
+#define _TX_THREAD_H
 
 // *****************************************************************************
 // *****************************************************************************
@@ -58,7 +58,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdlib.h>
 #include "system_config.h"
 #include "system_definitions.h"
-
+#include "communication/messages.h"
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
@@ -67,9 +67,15 @@ extern "C" {
 #endif
 // DOM-IGNORE-END 
 
+// *****************************************************************************
+// *****************************************************************************
+// Section: Type Definitions
+// *****************************************************************************
+// *****************************************************************************
+
 /*******************************************************************************
   Function:
-    void UARTRXTHREAD_Initialize ( void )
+    void TX_THREAD_Initialize ( void )
 
   Summary:
      MPLAB Harmony application initialization routine.
@@ -91,19 +97,19 @@ extern "C" {
 
   Example:
     <code>
-    UARTRXTHREAD_Initialize();
+    TX_THREAD_Initialize();
     </code>
 
   Remarks:
     This routine must be called from the SYS_Initialize function.
 */
 
-void UARTRXTHREAD_Initialize ( void );
+void TX_THREAD_Initialize ( void );
 
 
 /*******************************************************************************
   Function:
-    void UARTRXTHREAD_Tasks ( void )
+    void TX_THREAD_Tasks ( void )
 
   Summary:
     MPLAB Harmony Demo application tasks function
@@ -124,20 +130,21 @@ void UARTRXTHREAD_Initialize ( void );
 
   Example:
     <code>
-    UARTRXTHREAD_Tasks();
+    TX_THREAD_Tasks();
     </code>
 
   Remarks:
     This routine must be called from SYS_Tasks() routine.
  */
 
-void UARTRXTHREAD_Tasks( void );
+void TX_THREAD_Tasks( void );
 
-void UARTRXTHREAD_InitializeQueue();
+void TX_THREAD_InitializeQueue();
+void TX_THREAD_ReadFromQueue(CommunicationObject* pvBuffer);
 
-void UARTRXTHREAD_ReadFromQueue(void* pvBuffer);
+void ConvertCommObjectToString(CommunicationObject obj, char messageData[]);
 
-#endif /* _UARTRXTHREAD_H */
+#endif /* _TX_THREAD_H */
 
 //DOM-IGNORE-BEGIN
 #ifdef __cplusplus

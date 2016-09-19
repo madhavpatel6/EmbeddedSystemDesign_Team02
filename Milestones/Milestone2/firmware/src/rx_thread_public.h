@@ -15,8 +15,8 @@
  */
 /* ************************************************************************** */
 
-#ifndef _UARTTXTHREAD_PUBLIC_H    /* Guard against multiple inclusion */
-#define _UARTTXTHREAD_PUBLIC_H
+#ifndef _UARTRXTHREAD_PUBLIC_H    /* Guard against multiple inclusion */
+#define _UARTRXTHREAD_PUBLIC_H
 
 
 /* ************************************************************************** */
@@ -24,16 +24,23 @@
 /* Section: Included Files                                                    */
 /* ************************************************************************** */
 /* ************************************************************************** */
-#include "communication/messagelayer.h"
+
+/* This section lists the other files that are included in this file.
+ */
+
+/* TODO:  Include other files here if needed. */
+
+
 /* Provide C++ Compatibility */
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
-void UARTTXTHREAD_SendToQueue(CommunicationObject buffer);
 
-void UARTTXTHREAD_SendToQueueISR(CommunicationObject buffer, BaseType_t *pxHigherPriorityTaskWoken);
-    
+void RX_THREAD_SendToQueue(char buffer);
+
+void RX_THREAD_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken);
+
+/* Provide C++ Compatibility */
 #ifdef __cplusplus
 }
 #endif

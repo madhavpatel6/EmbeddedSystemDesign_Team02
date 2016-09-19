@@ -20,7 +20,7 @@
 /* Section: Included Files                                                    */
 /* ************************************************************************** */
 /* ************************************************************************** */
-#include "messagelayer.h"
+#include "messages.h"
 #include "debug.h"
 
 
@@ -49,6 +49,26 @@ bool ParseMessage(char c, char data[], size_t* size) {
 		}
 		return false;
 	}
+    case CHECK_SOURCE_CHAR: {
+        switch(c) {
+            case SEARCHERMOVER: {
+                break;
+            }
+            case TARGETLOCATOR: {
+                break;
+            }
+            case PATHFINDER: {
+                break;
+            }
+            case TARGETGRABBER: {
+                break;
+            }
+            default: {
+                parserstate = IDLE_STATE;
+                break;
+            }
+        }
+    }
 	case CHECK_MESSAGE_COUNT: {
 		parserstate = GET_DATALENGTH_UPPER;
         //Fill here with check
@@ -96,25 +116,22 @@ bool ParseMessage(char c, char data[], size_t* size) {
  */
 int CreateMessage(char buf[], char messageData[], char destination) {
 	if (messageData == NULL) {
-		dbgOutputBlock(false);
+		//dbgOut/putBlock(false);
 	}
 	memset(buf, 0, MAXMESSAGESIZE);
 	// Pack message into string 'buf'
-	// Format: start byte, destination, message count, data length (upper 8 bits), data length (lower 8 bits), data, checksum
+	// Format: start byte, destination, source, message count, data length (upper 8 bits), data length (lower 8 bits), data, checksum
 	size_t len = strlen(messageData);
-	sprintf(buf, "%c%c%c%c%c%s",
+	return sprintf(buf, "%c%c%c%c%c%c%s%c%c",
 		STARTOFTEXT,
 		destination,
+		WHATPICAMI,
 		37, (len & 0xFF00) >> 8,
 		len & 0x00FF,
-		messageData);
-
-	int index = len + 5; //length of the string + start of text, destination, message count, data length
-	// Calculate checksum of message
-	buf[index] = checksum(messageData);
-	buf[index + 1] = ENDOFTEXT;
-    
-    return index + 2;
+		messageData,
+		checksum(messageData),
+		ENDOFTEXT
+		);
 }
 
 // Simple string checksum

@@ -54,9 +54,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include "system_config.h"
 #include "system_definitions.h"
-#include "uartrxthread.h"
-#include "uarttxthread.h"
-#include "adc_app.h"
+#include "rx_thread.h"
+#include "tx_thread.h"
+#include "adc_thread.h"
+#include "message_controller_thread.h"
 
 
 // *****************************************************************************
@@ -68,9 +69,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
  
 static void _SYS_Tasks ( void );
-static void _UARTRXTHREAD_Tasks(void);
-static void _UARTTXTHREAD_Tasks(void);
-static void _ADC_APP_Tasks(void);
+static void _RX_THREAD_Tasks(void);
+static void _TX_THREAD_Tasks(void);
+static void _ADC_THREAD_Tasks(void);
+static void _MESSAGE_CONTROLLER_THREAD_Tasks(void);
 
 
 // *****************************************************************************
@@ -94,19 +96,24 @@ void SYS_Tasks ( void )
                 "Sys Tasks",
                 1024, NULL, 0, NULL);
 
-    /* Create OS Thread for UARTRXTHREAD Tasks. */
-    xTaskCreate((TaskFunction_t) _UARTRXTHREAD_Tasks,
-                "UARTRXTHREAD Tasks",
+    /* Create OS Thread for RX_THREAD Tasks. */
+    xTaskCreate((TaskFunction_t) _RX_THREAD_Tasks,
+                "RX_THREAD Tasks",
                 1024, NULL, 1, NULL);
 
-    /* Create OS Thread for UARTTXTHREAD Tasks. */
-    xTaskCreate((TaskFunction_t) _UARTTXTHREAD_Tasks,
-                "UARTTXTHREAD Tasks",
+    /* Create OS Thread for TX_THREAD Tasks. */
+    xTaskCreate((TaskFunction_t) _TX_THREAD_Tasks,
+                "TX_THREAD Tasks",
                 1024, NULL, 1, NULL);
 
-    /* Create OS Thread for ADC_APP Tasks. */
-    xTaskCreate((TaskFunction_t) _ADC_APP_Tasks,
-                "ADC_APP Tasks",
+    /* Create OS Thread for ADC_THREAD Tasks. */
+    xTaskCreate((TaskFunction_t) _ADC_THREAD_Tasks,
+                "ADC_THREAD Tasks",
+                1024, NULL, 1, NULL);
+
+    /* Create OS Thread for MESSAGE_CONTROLLER_THREAD Tasks. */
+    xTaskCreate((TaskFunction_t) _MESSAGE_CONTROLLER_THREAD_Tasks,
+                "MESSAGE_CONTROLLER_THREAD Tasks",
                 1024, NULL, 1, NULL);
 
     /**************
@@ -141,51 +148,68 @@ static void _SYS_Tasks ( void)
 
 /*******************************************************************************
   Function:
-    void _UARTRXTHREAD_Tasks ( void )
+    void _RX_THREAD_Tasks ( void )
 
   Summary:
-    Maintains state machine of UARTRXTHREAD.
+    Maintains state machine of RX_THREAD.
 */
 
-static void _UARTRXTHREAD_Tasks(void)
+static void _RX_THREAD_Tasks(void)
 {
     while(1)
     {
-        UARTRXTHREAD_Tasks();
+        RX_THREAD_Tasks();
     }
 }
 
 
 /*******************************************************************************
   Function:
-    void _UARTTXTHREAD_Tasks ( void )
+    void _TX_THREAD_Tasks ( void )
 
   Summary:
-    Maintains state machine of UARTTXTHREAD.
+    Maintains state machine of TX_THREAD.
 */
 
-static void _UARTTXTHREAD_Tasks(void)
+static void _TX_THREAD_Tasks(void)
 {
     while(1)
     {
-        UARTTXTHREAD_Tasks();
+        TX_THREAD_Tasks();
     }
 }
 
 
 /*******************************************************************************
   Function:
-    void _ADC_APP_Tasks ( void )
+    void _ADC_THREAD_Tasks ( void )
 
   Summary:
-    Maintains state machine of ADC_APP.
+    Maintains state machine of ADC_THREAD.
 */
 
-static void _ADC_APP_Tasks(void)
+static void _ADC_THREAD_Tasks(void)
 {
     while(1)
     {
-        ADC_APP_Tasks();
+        ADC_THREAD_Tasks();
+    }
+}
+
+
+/*******************************************************************************
+  Function:
+    void _MESSAGE_CONTROLLER_THREAD_Tasks ( void )
+
+  Summary:
+    Maintains state machine of MESSAGE_CONTROLLER_THREAD.
+*/
+
+static void _MESSAGE_CONTROLLER_THREAD_Tasks(void)
+{
+    while(1)
+    {
+        MESSAGE_CONTROLLER_THREAD_Tasks();
     }
 }
 

@@ -5,7 +5,7 @@
     Microchip Technology Inc.
   
   File Name:
-    uartrxthread.c
+    rx_thread.c
 
   Summary:
     This file contains the source code for the MPLAB Harmony application.
@@ -53,31 +53,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-#include "uartrxthread.h"
-#include "uartrxthread_public.h"
+#include "rx_thread.h"
+#include "rx_thread_public.h"
 #include "debug.h"
-#include "communication/messagelayer.h"
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Global Data Definitions
-// *****************************************************************************
-// *****************************************************************************
-
-// *****************************************************************************
-/* Application Data
-
-  Summary:
-    Holds application data
-
-  Description:
-    This structure holds the application's data.
-
-  Remarks:
-    This structure should be initialized by the APP_Initialize function.
-    
-    Application strings and buffers are be defined outside this structure.
-*/
+#include "communication/messages.h"
 
 static QueueHandle_t _queue;
 
@@ -90,41 +69,41 @@ static size_t _internalMessageSize = 0;
 
 /*******************************************************************************
   Function:
-    void UARTRXTHREAD_Initialize ( void )
+    void RX_THREAD_Initialize ( void )
 
   Remarks:
-    See prototype in uartrxthread.h.
+    See prototype in rx_thread.h.
  */
 
-void UARTRXTHREAD_Initialize ( void )
+void RX_THREAD_Initialize ( void )
 {
-    UARTRXTHREAD_InitializeQueue();
+    RX_THREAD_InitializeQueue();
     SYS_INT_SourceEnable(INT_SOURCE_USART_1_RECEIVE);
 }
 
 
 /******************************************************************************
   Function:
-    void UARTRXTHREAD_Tasks ( void )
+    void RX_THREAD_Tasks ( void )
 
   Remarks:
-    See prototype in uartrxthread.h.
+    See prototype in rx_thread.h.
  */
 
-void UARTRXTHREAD_Tasks ( void )
+void RX_THREAD_Tasks ( void )
 {
     dbgOutputLoc(UARTRXTHREAD_ENTER_TASK);
     dbgOutputLoc(UARTRXTHREAD_BEFORE_WHILELOOP);
     while(1){
         char c;
-        UARTRXTHREAD_ReadFromQueue(&c);
+        RX_THREAD_ReadFromQueue(&c);
         if(ParseMessage(c, _internalMessageData, &_internalMessageSize)) {
             /*Since we returned true we assume the message is valid*/
         }
     }
 }
 
-void UARTRXTHREAD_InitializeQueue() {
+void RX_THREAD_InitializeQueue() {
     _queue = xQueueCreate(SIZEOFQUEUE, sizeof(TYPEOFQUEUE));
     if(_queue == 0) {
         /*Handle this Error*/
@@ -132,20 +111,20 @@ void UARTRXTHREAD_InitializeQueue() {
     }
 }
  
-void UARTRXTHREAD_ReadFromQueue(void* pvBuffer) {
+void RX_THREAD_ReadFromQueue(void* pvBuffer) {
     dbgOutputLoc(UARTRXTHREAD_BEFORE_RECEIVE_FR_QUEUE);
     xQueueReceive(_queue, pvBuffer, portMAX_DELAY);
     dbgOutputLoc(UARTRXTHREAD_AFTER_RECEIVE_FR_QUEUE);
 }
 
-void UARTRXTHREAD_SendToQueue(char buffer) {
+void RX_THREAD_SendToQueue(char buffer) {
     xQueueSendToBack(_queue, &buffer, portMAX_DELAY);
 }
 
-void UARTRXTHREAD_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken) {
+void RX_THREAD_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken) {
     xQueueSendToBackFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
 }
-
+ 
 
 /*******************************************************************************
  End of File

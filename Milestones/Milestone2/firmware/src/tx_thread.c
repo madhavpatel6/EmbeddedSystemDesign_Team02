@@ -5,7 +5,7 @@
     Microchip Technology Inc.
   
   File Name:
-    adc_app.c
+    tx_thread.c
 
   Summary:
     This file contains the source code for the MPLAB Harmony application.
@@ -53,7 +53,11 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-#include "adc_app.h"
+#include "tx_thread.h"
+#include "tx_thread_public.h"
+#include "system_interrupt_public.h"
+#include "debug.h"
+#include "communication/messages.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -61,84 +65,98 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-// *****************************************************************************
-/* Application Data
-
-  Summary:
-    Holds application data
-
-  Description:
-    This structure holds the application's data.
-
-  Remarks:
-    This structure should be initialized by the APP_Initialize function.
-    
-    Application strings and buffers are be defined outside this structure.
-*/
-
 static QueueHandle_t _queue;
 
 #define SIZEOFQUEUE 10
-#define TYPEOFQUEUE float
+#define TYPEOFQUEUE CommunicationObject
+
 
 /*******************************************************************************
   Function:
-    void ADC_APP_Initialize ( void )
+    void TX_THREAD_Initialize ( void )
 
   Remarks:
-    See prototype in adc_app.h.
+    See prototype in tx_thread.h.
  */
 
-void ADC_APP_Initialize ( void )
+void TX_THREAD_Initialize ( void )
 {
-    _queue = createAdcQ();
-    DRV_ADC_Open();
-    /* TODO: Initialize your application's state machine and other
-     * parameters.
-     */
+    TX_THREAD_InitializeQueue();
 }
 
 
 /******************************************************************************
   Function:
-    void ADC_APP_Tasks ( void )
+    void TX_THREAD_Tasks ( void )
 
   Remarks:
-    See prototype in adc_app.h.
+    See prototype in tx_thread.h.
  */
 
-/* Following functions are for milestone1 */
-QueueHandle_t createAdcQ(){
-    //8 b/c "team 2" //10 is size of Q
-    return xQueueCreate(SIZEOFQUEUE,sizeof(TYPEOFQUEUE)); 
-}
-
-/* Sends value from adc to adc_app Queue */
-int adc_app_SendValToMsgQ(float adcVal){
-    return xQueueSend(_queue, &adcVal, portMAX_DELAY);
-}
-
-/* Sends value from adc ISR to adc_app Queue */
-int adc_app_SendValToMsgQFromISR(float adcVal, BaseType_t *pxHigherPriorityTaskWoken){
-    return xQueueSendFromISR(_queue, &adcVal, pxHigherPriorityTaskWoken);
-}
-
-
-void ADC_APP_Tasks ( void )
+void TX_THREAD_Tasks ( void )
 {
-    dbgOutputLoc(ENTER_TASK_ADC_APP);
-    CommunicationObject com;
-    com.type = FLOAT;
-    com.floatVal = 0;
-    com.intVal = 0;
-    
-    dbgOutputLoc(BEFORE_WHILE_ADC_APP);
+    dbgOutputLoc(UARTRXTHREAD_ENTER_TASK);
+    CommunicationObject readObj;
+    char messageData[MAXMESSAGESIZE];
+    char packedMessage[MAXMESSAGESIZE];
+    dbgOutputLoc(UARTRXTHREAD_BEFORE_WHILELOOP);
     while(1){
-        dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_ADC_APP);
-        if(xQueueReceive(_queue, &com.floatVal, portMAX_DELAY)){
-            UARTTXTHREAD_SendToQueue(com); // Sending to Tx Thread Q
+        //receive from our local queue
+        TX_THREAD_ReadFromQueue(&readObj);
+        
+        ConvertCommObjectToString(readObj, messageData);
+        
+        int length = CreateMessage(packedMessage, messageData, PATHFINDER);
+        
+        int i = 0;
+        for(i = 0; i < length; i++) {
+            Usart0_SendToQueue(packedMessage[i]);
         }
-        dbgOutputLoc(AFTER_RECEIVE_FROM_Q_ADC_APP);
+        dbgOutputLoc(UARTRXTHREAD_BEFORE_SEND_TO_QUEUE);
+   
+        dbgOutputLoc(UARTRXTHREAD_AFTER_SEND_TO_QUEUE);
+        SYS_INT_SourceEnable(INT_SOURCE_USART_1_TRANSMIT);
+        //after we finish sending packet; disable tx isr
+    }
+}
+
+void TX_THREAD_InitializeQueue() {
+    _queue = xQueueCreate(SIZEOFQUEUE, sizeof(TYPEOFQUEUE));
+    if(_queue == 0) {
+        /*Handle this Error*/
+        dbgOutputBlock(pdFALSE);
+    }
+}
+
+void TX_THREAD_ReadFromQueue(CommunicationObject* pvBuffer) {
+    dbgOutputLoc(UARTTXTHREAD_BEFORE_RECEIVE_FR_QUEUE);
+    xQueueReceive(_queue, pvBuffer, portMAX_DELAY);
+    dbgOutputLoc(UARTTXTHREAD_AFTER_RECEIVE_FR_QUEUE);
+}
+
+void TX_THREAD_SendToQueue(CommunicationObject buffer) {
+    xQueueSendToBack(_queue, &buffer, portMAX_DELAY);
+}
+
+void TX_THREAD_SendToQueueISR(CommunicationObject buffer, BaseType_t *pxHigherPriorityTaskWoken) {
+    xQueueSendToBackFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
+}
+
+void ConvertCommObjectToString(CommunicationObject obj, char messageData[]) {
+    memset(messageData, 0, MAXMESSAGESIZE);
+    switch(obj.type) {
+        case INT: {
+            sprintf(messageData, "%d", obj.intVal);
+            break;
+        }
+        case FLOAT: {
+            sprintf(messageData, "%0.2f", obj.floatVal);
+            break;
+        }
+        case STRING: {
+            sprintf(messageData, "%s", obj.string);
+            break;
+        }
     }
 }
 

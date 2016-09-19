@@ -61,13 +61,14 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include <xc.h>
 #include <sys/attribs.h>
-#include "adc_app.h"
-#include "../../adc_app_public.h"
+#include "adc_thread.h"
+#include "adc_thread_public.h"
 #include "debug.h"
-#include "uartrxthread.h"
-#include "uarttxthread.h"
-#include "uarttxthread_public.h"
-#include "uartrxthread_public.h"
+#include "tx_thread.h"
+#include "rx_thread.h"
+#include "message_controller_thread.h"
+#include "tx_thread_public.h"
+#include "rx_thread_public.h"
 #include "system_definitions.h"
 #include "system_interrupt_public.h"
 // *****************************************************************************
@@ -135,7 +136,7 @@ void IntHandlerDrvUsartInstance0(void)
     if (SYS_INT_SourceStatusGet(INT_SOURCE_USART_1_RECEIVE) && !DRV_USART0_ReceiverBufferIsEmpty())
     {
         dbgOutputLoc(USART0_BEFORE_SEND_TO_QUEUE);
-        UARTRXTHREAD_SendToQueueISR(DRV_USART0_ReadByte(), &pxHigherPriorityTaskWoken); // read received byte
+        RX_THREAD_SendToQueueISR(DRV_USART0_ReadByte(), &pxHigherPriorityTaskWoken); // read received byte
         dbgOutputLoc(USART0_AFTER_SEND_TO_QUEUE);
     }
     if(SYS_INT_SourceStatusGet(INT_SOURCE_USART_1_TRANSMIT) && !(DRV_USART_TRANSFER_STATUS_TRANSMIT_FULL & DRV_USART0_TransferStatus()) )

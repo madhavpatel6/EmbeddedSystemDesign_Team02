@@ -187,9 +187,10 @@ void SYS_Initialize ( void* data )
     
 
     /* Initialize the Application */
-    UARTRXTHREAD_Initialize();
-    UARTTXTHREAD_Initialize();
-    ADC_APP_Initialize();
+    RX_THREAD_Initialize();
+    TX_THREAD_Initialize();
+    ADC_THREAD_Initialize();
+    MESSAGE_CONTROLLER_THREAD_Initialize();
 }
 
 

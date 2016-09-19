@@ -5,7 +5,7 @@
     Microchip Technology Inc.
 
   File Name:
-    uarttxthread.h
+    message_controller_thread.h
 
   Summary:
     This header file provides prototypes and definitions for the application.
@@ -43,8 +43,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  *******************************************************************************/
 //DOM-IGNORE-END
 
-#ifndef _UARTTXTHREAD_H
-#define _UARTTXTHREAD_H
+#ifndef _MESSAGE_CONTROLLER_THREAD_H
+#define _MESSAGE_CONTROLLER_THREAD_H
 
 // *****************************************************************************
 // *****************************************************************************
@@ -58,18 +58,18 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdlib.h>
 #include "system_config.h"
 #include "system_definitions.h"
-#include "communication/messagelayer.h"
+
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
 extern "C" {
 
 #endif
-// DOM-IGNORE-END 
+
 
 /*******************************************************************************
   Function:
-    void UARTTXTHREAD_Initialize ( void )
+    void MESSAGE_CONTROLLER_THREAD_Initialize ( void )
 
   Summary:
      MPLAB Harmony application initialization routine.
@@ -91,19 +91,19 @@ extern "C" {
 
   Example:
     <code>
-    UARTTXTHREAD_Initialize();
+    MESSAGE_CONTROLLER_THREAD_Initialize();
     </code>
 
   Remarks:
     This routine must be called from the SYS_Initialize function.
 */
 
-void UARTTXTHREAD_Initialize ( void );
+void MESSAGE_CONTROLLER_THREAD_Initialize ( void );
 
 
 /*******************************************************************************
   Function:
-    void UARTTXTHREAD_Tasks ( void )
+    void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
 
   Summary:
     MPLAB Harmony Demo application tasks function
@@ -124,22 +124,24 @@ void UARTTXTHREAD_Initialize ( void );
 
   Example:
     <code>
-    UARTTXTHREAD_Tasks();
+    MESSAGE_CONTROLLER_THREAD_Tasks();
     </code>
 
   Remarks:
     This routine must be called from SYS_Tasks() routine.
  */
 
-void UARTTXTHREAD_Tasks( void );
+void MESSAGE_CONTROLLER_THREAD_Tasks( void );
 
-void UARTTXTHREAD_InitializeQueue(); 
+void MESSAGE_CONTROLLER_THREAD_InitializeQueue();
 
-void UARTTXTHREAD_ReadFromQueue(CommunicationObject* pvBuffer);
-
-void ConvertCommObjectToString(CommunicationObject obj, char messageData[]);
-
-#endif /* _UARTTXTHREAD_H */
+typedef enum MessageItemType_enum {Request, Response, Update} MessageItemType;
+typedef struct {
+    MessageItemType Type;
+    char Source;
+    
+} QueueType;
+#endif /* _MESSAGE_CONTROLLER_THREAD_H */
 
 //DOM-IGNORE-BEGIN
 #ifdef __cplusplus
