@@ -22,11 +22,21 @@ class States(Enum):
 
 # Building parser object
 class Parser:
+    count = 0 # This represents the number of Parser Objects
     def __init__(self):
         self.currentState = States.IDLE_STATE
         self.message = str("")
         self.messagelength = 0
         self.messageindex = 0
+        Parser.count += 1
+
+    def __del__(self):
+        print("Deleted: ", self.message)
+        Parser.count -= 1
+        if Parser.count == 0:
+            print("Last Parser object deleted")
+        else:
+            print("Parser objects remaining: ", Parser.count)
 
     def parse(self, c):
         if self.currentState == States.IDLE_STATE:
@@ -73,6 +83,18 @@ class Parser:
             #print("End Char: ", c)
             self.currentState = States.IDLE_STATE
             return True
+
+#Function to broadcast chat messages to all connected clients
+def broadcast_data (sock, message):
+    #Do not send the message to master socket and the client who has send us the message
+    for socket in CONNECTION_LIST:
+        if socket != server_socket and socket != sock :
+            try :
+                socket.send(message)
+            except :
+                # broken socket connection may be, chat client pressed ctrl+c for example
+                socket.close()
+                CONNECTION_LIST.remove(socket)
 
   
 if __name__ == "__main__":
@@ -125,10 +147,11 @@ if __name__ == "__main__":
                  
                 # client disconnected, so remove from socket list
                 except:
-                    broadcast_data(sock, "Client (%s, %s) is offline" % addr)
+                    #broadcast_data(sock, "Client (%s, %s) is offline" % addr)
                     print ("Client is offline %s  %s ", sockfd, addr)
                     sock.close()
                     CONNECTION_LIST.remove(sock)
+                    del ps
                     continue
          
     server_socket.close()
