@@ -96,13 +96,14 @@ class Parser:
             self.currentState = States.IDLE_STATE
             return True
 
-#Function to broadcast chat messages to all connected clients
+# Function to broadcast messages to all connected clients (PICs)
 def broadcast_data (sock, message):
-    #Do not send the message to master socket and the client who has send us the message
+    # Do not send the message to master socket and the client who has send us the message
     for socket in CONNECTION_LIST:
         if socket != server_socket and socket != sock :
             try :
-                socket.send(message)
+                #socket.send(message)
+                socket.send(str(message).encode('utf-8'))
             except :
                 # broken socket connection may be, chat client pressed ctrl+c for example
                 socket.close()
@@ -155,7 +156,8 @@ if __name__ == "__main__":
                             if ps.parse(c):
                                 print("Message: ", str(ps.message))
                                 print("Packed Message: ", binascii.hexlify(str(ps.packedmessage).encode('utf-8')))
-                                sock.send(str(ps.packedmessage).encode('utf-8'))
+                                #sock.send(str(ps.packedmessage).encode('utf-8'))
+                        broadcast_data (sock, ps.packedmessage) # This calls to broadcast messages to all pics
 
 
                 # client disconnected, so remove from socket list
