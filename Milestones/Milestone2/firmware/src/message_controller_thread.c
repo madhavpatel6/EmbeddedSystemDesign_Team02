@@ -120,6 +120,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
             case SEND_REQUEST: {
                 switch(obj.Request) {
                     case REQUEST_LOCATION: {
+                        
                         break;
                     }
                     case REQUEST_ARE_WE_THERE_YET: {

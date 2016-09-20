@@ -75,7 +75,12 @@ enum LocationEnum {
     AFTER_SEND_TO_Q_ADC_APP,            // 44
     AFTER_RECEIVE_FROM_Q_ADC_APP,       // 45
     
-    CREATE_MESSAGE_DONE //46        
+    CREATE_MESSAGE_DONE, //46    
+    //RX Thread
+    RXTHREAD_BEFORE_READ_FR_QUEUE = 60,
+    RXTHREAD_AFTER_READ_FR_QUEUE,
+    RXTHREAD_ENTER_PARSER,
+    RXTHREAD_LEAVE_PARSER,
 };
 
 /**

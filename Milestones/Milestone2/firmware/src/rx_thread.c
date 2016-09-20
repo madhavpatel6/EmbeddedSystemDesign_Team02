@@ -64,10 +64,6 @@ static QueueHandle_t _queue;
 #define TYPEOFQUEUE char
 #define SIZEOFQUEUE 10
 
-static char _internalMessageData[MAXMESSAGESIZE];
-
-static size_t _internalMessageSize = 0;
-
 /*******************************************************************************
   Function:
     void RX_THREAD_Initialize ( void )
@@ -99,8 +95,10 @@ void RX_THREAD_Tasks ( void )
     obj.Type = EXTERNAL_REQUEST_RESPONSE; 
     char c;
     while(1){
+        dbgOutputLoc(RXTHREAD_BEFORE_READ_FR_QUEUE);
         RX_THREAD_ReadFromQueue(&c);
-        if(ParseMessage(c, obj.External.Data, &_internalMessageSize, &obj.External.Source, &obj.External.MessageCount)) {
+        dbgOutputLoc(RXTHREAD_AFTER_READ_FR_QUEUE);
+        if(ParseMessage(c, obj.External.Data, &obj.External.Source, &obj.External.MessageCount)) {
             /*Since we returned true we assume the message is valid*/
             MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
         }

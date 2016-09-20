@@ -30,7 +30,7 @@
 #define PATHFINDER 'p'
 #define TARGETGRABBER 'g'
 #define MAXMESSAGESIZE 512
-#define WHATPICAMI 'p'
+#define MYMODULE 'p'
 
 int CreateMessage(char buf[], char messageData[], char destination);
 
@@ -50,7 +50,7 @@ typedef enum {
     CHECK_ENDCHAR,
 } STATES;
 
-bool ParseMessage(char c, char data[], size_t *size, char* source, char* messageCount);
+bool ParseMessage(char c, char data[], char* source, char* messageCount);
 
 #endif /* _MESSAGELAYER_H */
 

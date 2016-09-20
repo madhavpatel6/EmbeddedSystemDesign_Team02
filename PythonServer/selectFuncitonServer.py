@@ -7,6 +7,7 @@
  
 import socket, select
 from enum import Enum
+import binascii
 
 # Defining States for state machine
 class States(Enum):
@@ -20,12 +21,14 @@ class States(Enum):
     GET_CHECK_SUM = 8
     CHECK_ENDCHAR = 9
 
+
 # Building parser object
 class Parser:
     count = 0 # This represents the number of Parser Objects
     def __init__(self):
         self.currentState = States.IDLE_STATE
         self.message = str("")
+        self.packedmessage = str("")
         self.messagelength = 0
         self.messageindex = 0
         Parser.count += 1
@@ -40,6 +43,7 @@ class Parser:
 
     def parse(self, c):
         if self.currentState == States.IDLE_STATE:
+            self.packedmessage = chr(0x02)
             self.message = str()
             self.messagelength = 0
             self.messageindex = 0
@@ -48,28 +52,34 @@ class Parser:
             return False
         elif self.currentState == States.CHECK_DESTINATION_CHAR:
             #print("Destination: ", chr(c))
+            self.packedmessage += chr(c)
             self.currentState = States.CHECK_SOURCE_CHAR
             return False
         elif self.currentState == States.CHECK_SOURCE_CHAR:
             #print("Source: ", chr(c))
+            self.packedmessage += chr(c)
             self.currentState = States.CHECK_MESSAGE_COUNT
             return False
         elif self.currentState == States.CHECK_MESSAGE_COUNT:
             #print("Message Count: ", c)
+            self.packedmessage += chr(c)
             self.currentState = States.GET_DATALENGTH_UPPER
             return False
         elif self.currentState == States.GET_DATALENGTH_UPPER:
             #print("Data Length Upper: ", c)
             self.messagelength = c << 8
+            self.packedmessage += chr(c)
             self.currentState = States.GET_DATALENGTH_LOWER
             return False
         elif self.currentState == States.GET_DATALENGTH_LOWER:
             #print("Data Length Lower: ", c)
+            self.packedmessage += chr(c)
             self.messagelength = c | self.messagelength
             #print("Total Data Length: ", self.messagelength)
             self.currentState = States.GET_DATA
             return False
         elif self.currentState == States.GET_DATA:
+            self.packedmessage += chr(c)
             self.message = self.message + chr(c)
             self.messageindex += 1
             if self.messagelength == self.messageindex:
@@ -77,10 +87,12 @@ class Parser:
             return False
         elif self.currentState == States.GET_CHECK_SUM:
             #print("Check Sum: ", c)
+            self.packedmessage += chr(c)
             self.currentState = States.CHECK_ENDCHAR
             return False
         elif self.currentState == States.CHECK_ENDCHAR:
             #print("End Char: ", c)
+            self.packedmessage += chr(c)
             self.currentState = States.IDLE_STATE
             return True
 
@@ -119,7 +131,8 @@ if __name__ == "__main__":
     while 1:
         # Get the list sockets which are ready to be read through select
         read_sockets,write_sockets,error_sockets = select.select(CONNECTION_LIST,[],[])
- 
+
+
         for sock in read_sockets:
              
             #New connection
@@ -141,10 +154,10 @@ if __name__ == "__main__":
                         for c in data:
                             if ps.parse(c):
                                 print("Message: ", str(ps.message))
-                                print("\n")
-                                
-                        #sock.send('OK ... ' + data)
-                 
+                                print("Packed Message: ", binascii.hexlify(str(ps.packedmessage).encode('utf-8')))
+                                sock.send(str(ps.packedmessage).encode('utf-8'))
+
+
                 # client disconnected, so remove from socket list
                 except:
                     #broadcast_data(sock, "Client (%s, %s) is offline" % addr)

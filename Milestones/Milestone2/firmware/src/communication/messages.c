@@ -24,16 +24,18 @@
 #include "debug.h"
 
 
-static STATES parserstate;
-static uint32_t internalBufferIndex = 0;
-static char internalCheckSum;
+static STATES parserstate = IDLE_STATE;
+static size_t internalBufferIndex = 0;
+static char internalCheckSum = 0;;
+static size_t size = 0;
 
-bool ParseMessage(char c, char data[], size_t* size, char* source, char* messageCount) {
+bool ParseMessage(char c, char data[], char* source, char* messageCount) {
+    dbgOutputLoc(RXTHREAD_ENTER_PARSER);
 	switch (parserstate) {
 	case IDLE_STATE: {
 		internalBufferIndex = 0;
 		internalCheckSum = NULL;
-		*size = 0;
+		size = 0;
 		memset(data, 0, MAXMESSAGESIZE);
 		if (c == STARTOFTEXT) {
 			parserstate = CHECK_DESTINATION_CHAR;
@@ -41,7 +43,7 @@ bool ParseMessage(char c, char data[], size_t* size, char* source, char* message
 		return false;
 	}
 	case CHECK_DESTINATION_CHAR: {
-		if (c == WHATPICAMI) {
+		if (c == MYMODULE) {
 			parserstate = CHECK_SOURCE_CHAR;
 		}
 		else {
@@ -69,10 +71,11 @@ bool ParseMessage(char c, char data[], size_t* size, char* source, char* message
             }
             default: {
                 parserstate = IDLE_STATE;
-                break;
+                return false;
             }
         }
         parserstate = CHECK_MESSAGE_COUNT;
+        return false;
     }
 	case CHECK_MESSAGE_COUNT: {
 		parserstate = GET_DATALENGTH_UPPER;
@@ -81,21 +84,32 @@ bool ParseMessage(char c, char data[], size_t* size, char* source, char* message
 		return false;
 	}
 	case GET_DATALENGTH_UPPER: {
-		*size = c << 8;
+		size = (c & 0xFF) << 8;
 		parserstate = GET_DATALENGTH_LOWER;
 		return false;
 	}
 	case GET_DATALENGTH_LOWER: {
-		*size = *size | c;
+		size = size | (c & 0x00FF);
+        if(size > (MAXMESSAGESIZE - 8)) {
+            parserstate = IDLE_STATE;
+            return false;
+        }
 		parserstate = GET_DATA;
 		return false;
 	}
 	case GET_DATA: {
 		data[internalBufferIndex] = c;
-		internalBufferIndex++;
-		if (internalBufferIndex == *size) {
+		internalBufferIndex = internalBufferIndex + 1;
+		if (internalBufferIndex >= size || internalBufferIndex >= MAXMESSAGESIZE) {
 			parserstate = GET_CHECK_SUM;
+            internalBufferIndex = 0;
 		}
+        else if(c == STARTOFTEXT) {
+            parserstate = CHECK_DESTINATION_CHAR;
+        }
+        else if(c == ENDOFTEXT) {
+            parserstate = IDLE_STATE;
+        }
 		return false;
 	}
 	case GET_CHECK_SUM: {
@@ -111,6 +125,7 @@ bool ParseMessage(char c, char data[], size_t* size, char* source, char* message
 		return c == ENDOFTEXT;
 	}
 	}
+    dbgOutputLoc(RXTHREAD_LEAVE_PARSER);
 }
 
 /**
@@ -131,7 +146,7 @@ int CreateMessage(char buf[], char messageData[], char destination) {
 	return sprintf(buf, "%c%c%c%c%c%c%s%c%c",
 		STARTOFTEXT,
 		destination,
-		WHATPICAMI,
+		MYMODULE,
 		37, (len & 0xFF00) >> 8,
 		len & 0x00FF,
 		messageData,
@@ -143,11 +158,12 @@ int CreateMessage(char buf[], char messageData[], char destination) {
 // Simple string checksum
 char checksum(char* s)
 {
+    char* temp = s;
 	signed char sum = -1;
-	while (*s != 0)
+	while (*temp != 0)
 	{
-		sum += *s;
-		s++;
+		sum += *temp;
+		temp++;
 	}
 	return sum;
 }

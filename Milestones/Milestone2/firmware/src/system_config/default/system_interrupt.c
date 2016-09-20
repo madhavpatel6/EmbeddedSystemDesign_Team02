@@ -67,6 +67,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "tx_thread.h"
 #include "rx_thread.h"
 #include "message_controller_thread.h"
+#include "message_controller_thread_public.h"
 #include "tx_thread_public.h"
 #include "rx_thread_public.h"
 #include "system_definitions.h"
@@ -122,6 +123,12 @@ void IntHandlerDrvTmrInstance0(void)
 /* This timer is for the TX to fire every 50ms */
 void IntHandlerDrvTmrInstance1(void)
 {
+    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
+    MessageObj obj;
+    obj.Type = SEND_REQUEST;
+    obj.Request = REQUEST_LOCATION;
+    MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
 }
 
