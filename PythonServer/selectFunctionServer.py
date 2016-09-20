@@ -6,6 +6,7 @@
 
  
 import socket, select
+from timeit import default_timer
 from enum import Enum
 import binascii
 
@@ -111,7 +112,7 @@ def broadcast_data (sock, message):
 
   
 if __name__ == "__main__":
-      
+    
     CONNECTION_LIST = []    # list of socket clients
     RECV_BUFFER = 512 # Advisable to keep it as an exponent of 2
     PORT = 2000
@@ -129,6 +130,7 @@ if __name__ == "__main__":
     print ("Server started on port ", PORT)
     print ("Server started on IP:  ", SERVER_ADDRESS)
     ps = Parser()
+    start = default_timer()
     while 1:
         # Get the list sockets which are ready to be read through select
         read_sockets,write_sockets,error_sockets = select.select(CONNECTION_LIST,[],[])
@@ -152,8 +154,14 @@ if __name__ == "__main__":
                     data = sock.recv(RECV_BUFFER)
                     # echo back the client message
                     if data:
+                        duration = default_timer() - start
+                        print("Time since last valid message: ", duration)
+                        start = default_timer()
                         for c in data:
                             if ps.parse(c):
+                                #duration = default_timer() - start
+                                #print("Time since last valid message: ", duration)
+                                #start = default_timer()
                                 print("Message: ", str(ps.message))
                                 print("Packed Message: ", binascii.hexlify(str(ps.packedmessage).encode('utf-8')))
                                 #sock.send(str(ps.packedmessage).encode('utf-8'))
@@ -166,7 +174,6 @@ if __name__ == "__main__":
                     print ("Client is offline %s  %s ", sockfd, addr)
                     sock.close()
                     CONNECTION_LIST.remove(sock)
-                    del ps
                     continue
          
     server_socket.close()
