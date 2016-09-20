@@ -1,5 +1,5 @@
-#ifndef _MESSAGETEST_H    /* Guard against multiple inclusion */
-#define _MESSAGETEST_H
+#ifndef _MESSAGELAYER_H    /* Guard against multiple inclusion */
+#define _MESSAGELAYER_H
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -12,25 +12,10 @@
 #define TARGETLOCATOR 'l'
 #define PATHFINDER 'p'
 #define TARGETGRABBER 'g'
+#define MYMODULE 'p'
 #define MAXMESSAGESIZE 512
-#define WHATPICAMI 'p'
 
-typedef enum CommunicationType_enum { 
-    INT,
-    FLOAT,
-    STRING,
-} CommunicationType;
-
-//typedef CommunicationType_enum CommunicationType;
-
-typedef struct CommunicationObject_struct {
-    CommunicationType type;
-    int intVal;
-    float floatVal;
-    char string[MAXMESSAGESIZE];
-} CommunicationObject;
-
-int CreateMessage(char buf[], char messageData[], char destination);
+int CreateMessage(char buf[], char messageData[], char destination, char messagecount);
 
 void BuildJSON(char buf[]);
 
@@ -48,7 +33,7 @@ typedef enum {
     CHECK_ENDCHAR,
 } STATES;
 
-bool ParseMessage(char c, char data[], size_t *size);
+bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *isError);
 
 #endif /* _MESSAGELAYER_H */
 
