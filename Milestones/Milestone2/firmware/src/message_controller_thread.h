@@ -67,7 +67,7 @@ extern "C" {
 #endif
 
 //Depending on what data you would need to send out you should create a member of this struct that can hold that data
-    
+
 typedef struct {
     float x;
     float y;
@@ -92,13 +92,14 @@ typedef enum InternalRequestType_enum { REQUEST_LOCATION, REQUEST_ARE_WE_THERE_Y
 typedef enum MessageItemType_enum {EXTERNAL_REQUEST_RESPONSE, SEND_REQUEST, UPDATE} MessageItemType;
 
 typedef struct {
-    //Set this to 
+    //Set this to
     UpdateType Type;
     InternalData Data;
 } UpdateObj;
 
 typedef struct {
     char Source;
+    bool Error;
     char Data[MAXMESSAGESIZE];
     char MessageCount;
 } ExternalObj;
@@ -116,11 +117,20 @@ typedef struct {
 } MessageObj;
 
 typedef struct {
-    uint8_t SearcherMover;
-    uint8_t TargetLocator;
-    uint8_t PathFinder;
-    uint8_t TargetGrabber;
-} SequenceCountObj;
+    uint8_t Req_SearcherMover;
+    uint8_t Req_TargetLocator;
+    uint8_t Req_PathFinder;
+    uint8_t Req_TargetGrabber;
+
+    uint8_t Res_SearcherMover;
+    uint8_t Res_TargetLocator;
+    uint8_t Res_PathFinder;
+    uint8_t Res_TargetGrabber;
+
+    int32_t PacketsDropped;
+    int32_t ErrorCount;
+    int32_t GoodCount;
+} StatObjectType;
 /*******************************************************************************
   Function:
     void MESSAGE_CONTROLLER_THREAD_Initialize ( void )
@@ -129,8 +139,8 @@ typedef struct {
      MPLAB Harmony application initialization routine.
 
   Description:
-    This function initializes the Harmony application.  It places the 
-    application in its initial state and prepares it to run so that its 
+    This function initializes the Harmony application.  It places the
+    application in its initial state and prepares it to run so that its
     APP_Tasks function can be called.
 
   Precondition:
@@ -202,4 +212,3 @@ void MESSAGE_CONTROLLER_THREAD_ReadFromQueue(MessageObj* pvBuffer);
 /*******************************************************************************
  End of File
  */
-

@@ -15,8 +15,8 @@
  */
 /* ************************************************************************** */
 
-#ifndef _UARTTXTHREAD_PUBLIC_H    /* Guard against multiple inclusion */
-#define _UARTTXTHREAD_PUBLIC_H
+#ifndef _TX_THREAD_PUBLIC_H    /* Guard against multiple inclusion */
+#define _TX_THREAD_PUBLIC_H
 
 
 /* ************************************************************************** */
@@ -29,11 +29,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
+
 void TX_THREAD_SendToQueue(char buffer[]);
 
 void TX_THREAD_SendToQueueISR(char buffer[], BaseType_t *pxHigherPriorityTaskWoken);
-    
+
 #ifdef __cplusplus
 }
 #endif

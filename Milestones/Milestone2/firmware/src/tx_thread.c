@@ -1,9 +1,9 @@
 /*******************************************************************************
   MPLAB Harmony Application Source File
-  
+
   Company:
     Microchip Technology Inc.
-  
+
   File Name:
     tx_thread.c
 
@@ -11,8 +11,8 @@
     This file contains the source code for the MPLAB Harmony application.
 
   Description:
-    This file contains the source code for the MPLAB Harmony application.  It 
-    implements the logic of the application's state machine and it may call 
+    This file contains the source code for the MPLAB Harmony application.  It
+    implements the logic of the application's state machine and it may call
     API routines of other MPLAB Harmony modules in the system, such as drivers,
     system services, and middleware.  However, it does not call any of the
     system interfaces (such as the "Initialize" and "Tasks" functions) of any of
@@ -49,7 +49,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 // *****************************************************************************
 // *****************************************************************************
-// Section: Included Files 
+// Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
 
@@ -68,7 +68,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 static QueueHandle_t _queue;
 
 #define SIZEOFQUEUE 10
-#define TYPEOFQUEUE char[MAXMESSAGESIZE]
+#define TYPEOFQUEUE Tx_Thead_Queue_DataType
 
 
 /*******************************************************************************
@@ -102,17 +102,16 @@ void TX_THREAD_Tasks ( void )
     while(1){
         //receive from our local queue
         TX_THREAD_ReadFromQueue(messageData);
-        
+
         //ConvertCommObjectToString(readObj, messageData);
-        
+
         int length = CreateMessage(packedMessage, messageData, PATHFINDER);
-        
+
+        dbgOutputLoc(BEFORE_SEND_TO_QUEUE_RXTHREAD);
         int i = 0;
         for(i = 0; i < length; i++) {
             Usart0_SendToQueue(packedMessage[i]);
         }
-        dbgOutputLoc(BEFORE_SEND_TO_QUEUE_RXTHREAD);
-   
         dbgOutputLoc(AFTER_SEND_TO_QUEUE_RXTHREAD);
         SYS_INT_SourceEnable(INT_SOURCE_USART_1_TRANSMIT);
         //after we finish sending packet; disable tx isr
@@ -141,7 +140,7 @@ void TX_THREAD_SendToQueueISR(char buffer[], BaseType_t *pxHigherPriorityTaskWok
     xQueueSendToBackFromISR(_queue, buffer, pxHigherPriorityTaskWoken);
 }
 
- 
+
 
 /*******************************************************************************
  End of File

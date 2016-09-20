@@ -1,9 +1,9 @@
 /*******************************************************************************
   MPLAB Harmony Application Source File
-  
+
   Company:
     Microchip Technology Inc.
-  
+
   File Name:
     adc_thread.c
 
@@ -11,8 +11,8 @@
     This file contains the source code for the MPLAB Harmony application.
 
   Description:
-    This file contains the source code for the MPLAB Harmony application.  It 
-    implements the logic of the application's state machine and it may call 
+    This file contains the source code for the MPLAB Harmony application.  It
+    implements the logic of the application's state machine and it may call
     API routines of other MPLAB Harmony modules in the system, such as drivers,
     system services, and middleware.  However, it does not call any of the
     system interfaces (such as the "Initialize" and "Tasks" functions) of any of
@@ -49,7 +49,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 // *****************************************************************************
 // *****************************************************************************
-// Section: Included Files 
+// Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
 
@@ -73,7 +73,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
   Remarks:
     This structure should be initialized by the APP_Initialize function.
-    
+
     Application strings and buffers are be defined outside this structure.
 */
 static QueueHandle_t _queue;
@@ -111,7 +111,7 @@ void ADC_THREAD_Initialize ( void )
 /* Following functions are for milestone1 */
 QueueHandle_t createAdcQ(){
     //8 b/c "team 2" //10 is size of Q
-    return xQueueCreate(SIZEOFQUEUE,sizeof(TYPEOFQUEUE)); 
+    return xQueueCreate(SIZEOFQUEUE,sizeof(TYPEOFQUEUE));
 }
 
 /* Sends value from adc to adc_app Queue */
@@ -129,7 +129,7 @@ void convertTocm(float *sensorDigitalVal){
     float tempAdcVal = 0.0;
     float tempAdcVoltageConv = 0.0;
     tempAdcVal = ((*sensorDigitalVal)/(1.0))*(1.0);
-    tempAdcVoltageConv = (tempAdcVal*5.0)/(1024.0); 
+    tempAdcVoltageConv = (tempAdcVal*5.0)/(1024.0);
     *sensorDigitalVal = (tempAdcVoltageConv / 0.009766) * (2.54);
 }
 
@@ -142,27 +142,27 @@ void convertTocm(float *sensorDigitalVal){
     See prototype in adc_thread.h.
  */
 
-void ADC_THREAD_Tasks ( void )
-{
-    dbgOutputLoc(ENTER_TASK_ADC_APP);
-    MessageObj obj;
-    obj.Type = UPDATE;
-    obj.Update.Type = SENSORDATA;
-    dbgOutputLoc(BEFORE_WHILE_ADC_APP);
-    float distance = 0.0;
-    while(1){
-        dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_ADC_APP);
-        if(xQueueReceive(_queue, &distance, portMAX_DELAY)){
-            convertTocm(&distance);
-             // Sending to Tx Thread Q
-            obj.Update.Data.sensordata = distance;
-            MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
-        }
-        dbgOutputLoc(AFTER_RECEIVE_FROM_Q_ADC_APP);
-    }
-}
+ void ADC_THREAD_Tasks ( void )
+ {
+     dbgOutputLoc(ENTER_TASK_ADC_APP);
+     MessageObj obj;
+     obj.Type = UPDATE;
+     obj.Update.Type = SENSORDATA;
+     dbgOutputLoc(BEFORE_WHILE_ADC_APP);
+     float distance = 0.0;
+     while(1){
+         dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_ADC_APP);
+         if(xQueueReceive(_queue, &distance, portMAX_DELAY)){
+             convertTocm(&distance);
+              // Sending to Tx Thread Q
+             obj.Update.Data.sensordata = distance;
+             MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
+         }
+         dbgOutputLoc(AFTER_RECEIVE_FROM_Q_ADC_APP);
+     }
+ }
 
- 
+
 
 /*******************************************************************************
  End of File

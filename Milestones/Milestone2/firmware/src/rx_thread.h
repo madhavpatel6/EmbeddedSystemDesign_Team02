@@ -65,7 +65,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 extern "C" {
 
 #endif
-// DOM-IGNORE-END 
+// DOM-IGNORE-END
 
 
 /*******************************************************************************
@@ -76,8 +76,8 @@ extern "C" {
      MPLAB Harmony application initialization routine.
 
   Description:
-    This function initializes the Harmony application.  It places the 
-    application in its initial state and prepares it to run so that its 
+    This function initializes the Harmony application.  It places the
+    application in its initial state and prepares it to run so that its
     APP_Tasks function can be called.
 
   Precondition:
@@ -148,4 +148,3 @@ void RX_THREAD_InitializeQueue();
 /*******************************************************************************
  End of File
  */
-

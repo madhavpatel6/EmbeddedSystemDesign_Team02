@@ -1,9 +1,9 @@
 /*******************************************************************************
   MPLAB Harmony Application Source File
-  
+
   Company:
     Microchip Technology Inc.
-  
+
   File Name:
     rx_thread.c
 
@@ -11,8 +11,8 @@
     This file contains the source code for the MPLAB Harmony application.
 
   Description:
-    This file contains the source code for the MPLAB Harmony application.  It 
-    implements the logic of the application's state machine and it may call 
+    This file contains the source code for the MPLAB Harmony application.  It
+    implements the logic of the application's state machine and it may call
     API routines of other MPLAB Harmony modules in the system, such as drivers,
     system services, and middleware.  However, it does not call any of the
     system interfaces (such as the "Initialize" and "Tasks" functions) of any of
@@ -49,7 +49,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 // *****************************************************************************
 // *****************************************************************************
-// Section: Included Files 
+// Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
 
@@ -58,7 +58,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "debug.h"
 #include "communication/messages.h"
 #include "message_controller_thread.h"
-
+#include <stdbool.h>
 static QueueHandle_t _queue;
 
 #define TYPEOFQUEUE char
@@ -92,14 +92,18 @@ void RX_THREAD_Tasks ( void )
     dbgOutputLoc(ENTER_RXTHREAD);
     dbgOutputLoc(BEFORE_WHILELOOP_RXTHREAD);
     MessageObj obj;
-    obj.Type = EXTERNAL_REQUEST_RESPONSE; 
+    obj.Type = EXTERNAL_REQUEST_RESPONSE;
     char c;
     while(1){
         dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_RXTHREAD);
         RX_THREAD_ReadFromQueue(&c);
         dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_RXTHREAD);
-        if(ParseMessage(c, obj.External.Data, &obj.External.Source, &obj.External.MessageCount)) {
+        bool isComplete = ParseMessage(c, obj.External.Data, &obj.External.Source, &obj.External.MessageCount, &obj.External.Error);
+        if(isComplete) {
             /*Since we returned true we assume the message is valid*/
+            MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
+        }
+        else if(obj.External.Error) {
             MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
         }
     }
@@ -113,7 +117,7 @@ void RX_THREAD_InitializeQueue() {
         dbgOutputBlock(pdFALSE);
     }
 }
- 
+
 void RX_THREAD_ReadFromQueue(void* pvBuffer) {
     dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_READFROMQUEUE_RXTHREAD);
     xQueueReceive(_queue, pvBuffer, portMAX_DELAY);
@@ -127,7 +131,7 @@ void RX_THREAD_SendToQueue(char buffer) {
 void RX_THREAD_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken) {
     xQueueSendToBackFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
 }
- 
+
 
 /*******************************************************************************
  End of File

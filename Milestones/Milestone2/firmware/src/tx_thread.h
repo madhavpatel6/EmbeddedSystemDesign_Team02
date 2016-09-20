@@ -66,7 +66,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 extern "C" {
 
 #endif
-// DOM-IGNORE-END 
+// DOM-IGNORE-END
 
 // *****************************************************************************
 // *****************************************************************************
@@ -74,6 +74,11 @@ extern "C" {
 // *****************************************************************************
 // *****************************************************************************
 
+typedef struct {
+    char Destination;
+    char MessageCount;
+    char Data[MAXMESSAGESIZE];
+} Tx_Thead_Queue_DataType;
 /*******************************************************************************
   Function:
     void TX_THREAD_Initialize ( void )
@@ -82,8 +87,8 @@ extern "C" {
      MPLAB Harmony application initialization routine.
 
   Description:
-    This function initializes the Harmony application.  It places the 
-    application in its initial state and prepares it to run so that its 
+    This function initializes the Harmony application.  It places the
+    application in its initial state and prepares it to run so that its
     APP_Tasks function can be called.
 
   Precondition:
@@ -155,4 +160,3 @@ void TX_THREAD_ReadFromQueue(char pvBuffer[]);
 /*******************************************************************************
  End of File
  */
-

@@ -1,9 +1,9 @@
 /*******************************************************************************
   MPLAB Harmony Application Source File
-  
+
   Company:
     Microchip Technology Inc.
-  
+
   File Name:
     message_controller_thread.c
 
@@ -11,8 +11,8 @@
     This file contains the source code for the MPLAB Harmony application.
 
   Description:
-    This file contains the source code for the MPLAB Harmony application.  It 
-    implements the logic of the application's state machine and it may call 
+    This file contains the source code for the MPLAB Harmony application.  It
+    implements the logic of the application's state machine and it may call
     API routines of other MPLAB Harmony modules in the system, such as drivers,
     system services, and middleware.  However, it does not call any of the
     system interfaces (such as the "Initialize" and "Tasks" functions) of any of
@@ -49,7 +49,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 // *****************************************************************************
 // *****************************************************************************
-// Section: Included Files 
+// Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
 
@@ -89,8 +89,8 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
     dbgOutputLoc(ENTER_MESSAGE_CONTROLLER_THREAD);
     InternalData _internalData;
     memset(&_internalData, 0, sizeof(InternalData));
-    SequenceCountObj _internalMessageCount;
-    memset(&_internalMessageCount, 0, sizeof(SequenceCountObj));
+    StatObjectType statObject;
+    memset(&statObject, 0, sizeof(StatObjectType));
     while(1) {
         MessageObj obj;
         memset(&obj, 0, sizeof(MessageObj));
@@ -102,14 +102,28 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
         switch(obj.Type) {
             case EXTERNAL_REQUEST_RESPONSE: {
                 dbgOutputLoc(CASE_EXTERNAL_REQUEST_RESPONSE_MESSAGE_CONTROLLER_THREAD);
+                if(obj.External.Error) {
+                    statObject.ErrorCount++;
+                    continue;
+                }
+                statObject.GoodCount++;
+
                 switch(obj.External.Source) {
-                    case SEARCHERMOVER: _internalMessageCount.SearcherMover++;
+                    case SEARCHERMOVER:
+                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_SearcherMover);
+                        statObject.Req_SearcherMover++;
                         break;
-                    case TARGETLOCATOR: _internalMessageCount.TargetLocator++;
+                    case TARGETLOCATOR:
+                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_TargetLocator);
+                        statObject.Req_TargetLocator++;
                         break;
-                    case PATHFINDER: _internalMessageCount.PathFinder++;
+                    case PATHFINDER:
+                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_PathFinder);
+                        statObject.Req_PathFinder++;
                         break;
-                    case TARGETGRABBER: _internalMessageCount.TargetGrabber++;
+                    case TARGETGRABBER:
+                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_TargetGrabber);
+                        statObject.Req_TargetGrabber++;
                         break;
                 }
                 //Parse JSON request or response
@@ -118,14 +132,14 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                     //Create JSON response from local crap
                     //Send to TX
                 //if it is a response
-                    //convert the string to the proper 
+                    //convert the string to the proper
                 break;
             }
             case SEND_REQUEST: {
                 dbgOutputLoc(CASE_SEND_REQUEST_MESSAGE_CONTROLLER_THREAD);
                 switch(obj.Request) {
                     case REQUEST_LOCATION: {
-                        
+
                         break;
                     }
                     case REQUEST_ARE_WE_THERE_YET: {
@@ -167,7 +181,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
 void MESSAGE_CONTROLLER_THREAD_InitializeQueue() {
     _queue = xQueueCreate(SIZEOFQUEUE, sizeof(TYPEOFQUEUE));
 }
- 
+
 void MESSAGE_CONTROLLER_THREAD_ReadFromQueue(MessageObj* pvBuffer) {
     xQueueReceive(_queue, pvBuffer, portMAX_DELAY);
 }
