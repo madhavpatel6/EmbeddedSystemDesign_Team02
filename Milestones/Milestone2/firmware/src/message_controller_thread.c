@@ -73,6 +73,7 @@ static QueueHandle_t _queue;
 void MESSAGE_CONTROLLER_THREAD_Initialize ( void )
 {
     MESSAGE_CONTROLLER_THREAD_InitializeQueue();
+    initParser();
 }
 
 
@@ -91,6 +92,9 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
     memset(&_internalData, 0, sizeof(InternalData));
     StatObjectType statObject;
     memset(&statObject, 0, sizeof(StatObjectType));
+    type_t type = unknown;
+    items_t items[12];
+    int numItems;
     while(1) {
         MessageObj obj;
         memset(&obj, 0, sizeof(MessageObj));
@@ -126,6 +130,14 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         statObject.Req_TargetGrabber++;
                         break;
                 }
+                parseJSON(obj.External.Data, &type, items,  &numItems);
+                if(type == request){
+                    int i;
+                    for(i = 0; i < numItems; i++){
+                        items[i];
+                    }
+                }
+                
                 //Parse JSON request or response
                 //switch on response of request
                 //if it is a request

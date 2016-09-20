@@ -143,8 +143,8 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
 	case CHECK_ENDCHAR: {
         dbgOutputLoc(CASE_CHECK_ENDCHAR_PARSEMESSAGE_MESSAGE_C);
         parserstate = IDLE_STATE;
-        *isError = c == ENDOFTEXT;
-		return *isError;
+        *isError = c != ENDOFTEXT;
+		return !(*isError);
 	}
 	}
     dbgOutputLoc(LEAVE_PARSEMESSAGE_MESSAGE_C);
