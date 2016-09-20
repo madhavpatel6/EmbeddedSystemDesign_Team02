@@ -119,11 +119,11 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
 			parserstate = GET_CHECK_SUM;
             internalBufferIndex = 0;
 		}
-        else if(c == STARTOFTEXT) {
+        if(c == STARTOFTEXT) {
             *isError = true;
             parserstate = CHECK_DESTINATION_CHAR;
         }
-        else if(c == ENDOFTEXT) {
+        if(c == ENDOFTEXT) {
             *isError = true;
             parserstate = IDLE_STATE;
         }
@@ -137,7 +137,9 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
             *isError = true;
 			parserstate = IDLE_STATE;
 		}
-		parserstate = CHECK_ENDCHAR;
+		else {
+            parserstate = CHECK_ENDCHAR;
+        }
 		return false;
 	}
 	case CHECK_ENDCHAR: {

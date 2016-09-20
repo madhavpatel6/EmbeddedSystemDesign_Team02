@@ -86,7 +86,7 @@ typedef struct {
 typedef enum UpdateType_enum { LOCATION, ORIENTATION, SENSORDATA } UpdateType;
 
 //This is any request that you would want to ... well ... request
-typedef enum InternalRequestType_enum { REQUEST_LOCATION, REQUEST_ARE_WE_THERE_YET, REQUEST_DO_YOU_HAVE_IT } InternalRequestType;
+typedef enum InternalRequestType_enum { RV1_REQUEST_LOCATION_ORIENTATION, RV1_REQUEST_SENSOR_DATA } InternalRequestType;
 
 //------------------------------------------------------------------------------
 //You should not need to change anything beyond this point
@@ -119,16 +119,26 @@ typedef struct {
 } MessageObj;
 
 typedef struct {
-    uint8_t Req_SearcherMover;
-    uint8_t Req_TargetLocator;
-    uint8_t Req_PathFinder;
-    uint8_t Req_TargetGrabber;
+    uint8_t Req_From_SearcherMover;
+    uint8_t Req_From_TargetLocator;
+    uint8_t Req_From_PathFinder;
+    uint8_t Req_From_TargetGrabber;
+    
+    uint8_t Req_To_SearcherMover;
+    uint8_t Req_To_TargetLocator;
+    uint8_t Req_To_PathFinder;
+    uint8_t Req_To_TargetGrabber;
 
-    uint8_t Res_SearcherMover;
-    uint8_t Res_TargetLocator;
-    uint8_t Res_PathFinder;
-    uint8_t Res_TargetGrabber;
+    uint8_t Res_From_SearcherMover;
+    uint8_t Res_From_TargetLocator;
+    uint8_t Res_From_PathFinder;
+    uint8_t Res_From_TargetGrabber;
 
+    uint8_t Res_To_SearcherMover;
+    uint8_t Res_To_TargetLocator;
+    uint8_t Res_To_PathFinder;
+    uint8_t Res_To_TargetGrabber;
+    
     int32_t PacketsDropped;
     int32_t ErrorCount;
     int32_t GoodCount;

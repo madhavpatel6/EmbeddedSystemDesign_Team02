@@ -73,6 +73,7 @@ static QueueHandle_t _queue;
 void MESSAGE_CONTROLLER_THREAD_Initialize ( void )
 {
     MESSAGE_CONTROLLER_THREAD_InitializeQueue();
+    DRV_TMR1_Start();
     initParser();
 }
 
@@ -88,8 +89,8 @@ void MESSAGE_CONTROLLER_THREAD_Initialize ( void )
 void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
 {
     dbgOutputLoc(ENTER_MESSAGE_CONTROLLER_THREAD);
-    InternalData _internalData;
-    memset(&_internalData, 0, sizeof(InternalData));
+    InternalData internalData;
+    memset(&internalData, 0, sizeof(InternalData));
     StatObjectType statObject;
     memset(&statObject, 0, sizeof(StatObjectType));
     type_t type = unknown;
@@ -98,8 +99,10 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
     while(1) {
         MessageObj obj;
         memset(&obj, 0, sizeof(MessageObj));
-        char jsonmessage[MAXMESSAGESIZE];
-        memset(jsonmessage, 0, MAXMESSAGESIZE);
+
+        Tx_Thead_Queue_DataType tx_thread_obj;
+        memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
+
         dbgOutputLoc(BEFORE_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD);
         MESSAGE_CONTROLLER_THREAD_ReadFromQueue(&obj);
         dbgOutputLoc(AFTER_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD);
@@ -111,33 +114,72 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                     continue;
                 }
                 statObject.GoodCount++;
-
                 switch(obj.External.Source) {
                     case SEARCHERMOVER:
-                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_SearcherMover);
-                        statObject.Req_SearcherMover++;
+                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_SearcherMover);
+                        statObject.Req_From_SearcherMover++;
                         break;
                     case TARGETLOCATOR:
-                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_TargetLocator);
-                        statObject.Req_TargetLocator++;
+                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_TargetLocator);
+                        statObject.Req_From_TargetLocator++;
                         break;
                     case PATHFINDER:
-                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_PathFinder);
-                        statObject.Req_PathFinder++;
+                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_PathFinder);
+                        statObject.Req_From_PathFinder++;
                         break;
                     case TARGETGRABBER:
-                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_TargetGrabber);
-                        statObject.Req_TargetGrabber++;
+                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_TargetGrabber);
+                        statObject.Req_From_TargetGrabber++;
                         break;
                 }
                 parseJSON(obj.External.Data, &type, items,  &numItems);
                 if(type == request){
-                    int i;
-                    for(i = 0; i < numItems; i++){
-                        items[i];
+                    int i = 0;
+                    for(i = 0; i < numItems; i++) {
+                        switch(items[i]) {
+                            case commStats: {
+                                sprintf(tx_thread_obj.Data, "{\"type\":\"Response\",\"myName\": \"%s\",\"numGoodMessagesRecved\": \"%d\", \"numCommErrors\": \"%d\",\"numJSONRequestsRecved\": \"%d\",\"numJSONResponsesRecved\": \"%d\",\"numJSONRequestsSent\": \"%d\",\"numJSONResponsesSent\": \"%d\"}",
+                                "MYFUCKINGPMODULE",
+                                statObject.GoodCount,
+                                statObject.ErrorCount,
+                                statObject.Req_From_PathFinder + statObject.Req_From_SearcherMover + statObject.Req_From_TargetGrabber + statObject.Req_From_TargetLocator,
+                                statObject.Res_From_PathFinder + statObject.Res_From_SearcherMover + statObject.Res_From_TargetGrabber + statObject.Res_From_TargetLocator,
+                                statObject.Req_To_PathFinder + statObject.Req_To_SearcherMover + statObject.Req_To_TargetGrabber + statObject.Req_To_TargetLocator,
+                                statObject.Res_To_PathFinder + statObject.Res_To_SearcherMover + statObject.Res_To_TargetGrabber + statObject.Res_To_TargetLocator
+                                );
+                                tx_thread_obj.Destination = SERVER;
+                                tx_thread_obj.MessageCount = 0;
+                                TX_THREAD_SendToQueue(tx_thread_obj);
+                                break;
+                            }
+                            case sensorData: {
+                                sprintf(tx_thread_obj.Data, "{\"type\":\"Response\",\"SensorData\": \"%0.02f\"}", internalData.sensordata);
+                                tx_thread_obj.Destination = obj.External.Source;
+                                switch(obj.External.Source) {
+                                    case TARGETLOCATOR: {
+                                        tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
+                                        statObject.Req_To_TargetLocator++;
+                                    }
+                                    case PATHFINDER: {
+                                        tx_thread_obj.MessageCount = statObject.Req_To_PathFinder;
+                                        statObject.Req_To_PathFinder++;
+                                    }
+                                    case SEARCHERMOVER: {
+                                        tx_thread_obj.MessageCount = statObject.Req_To_SearcherMover;
+                                        statObject.Req_To_SearcherMover++;
+                                    }
+                                    case TARGETGRABBER: {
+                                        tx_thread_obj.MessageCount = statObject.Req_To_TargetGrabber;
+                                        statObject.Req_To_TargetGrabber++;
+                                    }
+                                }
+                                TX_THREAD_SendToQueue(tx_thread_obj);
+                                break;
+                            }
+                        }
                     }
                 }
-                
+
                 //Parse JSON request or response
                 //switch on response of request
                 //if it is a request
@@ -149,47 +191,58 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
             }
             case SEND_REQUEST: {
                 dbgOutputLoc(CASE_SEND_REQUEST_MESSAGE_CONTROLLER_THREAD);
+                // We will only need to have a new case for something we are requesting from another PIC
                 switch(obj.Request) {
-                    case REQUEST_LOCATION: {
-
+                    case RV1_REQUEST_LOCATION_ORIENTATION: {
+                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"RV1_Location\",\"RV1_Orientation\"]}");
+                        tx_thread_obj.Destination = SEARCHERMOVER;
+                        tx_thread_obj.MessageCount = statObject.Req_To_SearcherMover;
+                        statObject.Req_To_SearcherMover++;
+                        TX_THREAD_SendToQueue(tx_thread_obj);
                         break;
                     }
-                    case REQUEST_ARE_WE_THERE_YET: {
+                    case RV1_REQUEST_SENSOR_DATA: {
+                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"SensorData\"]}");
+                        tx_thread_obj.Destination = TARGETLOCATOR;
+                        tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
+                        statObject.Req_To_TargetLocator++;
+                        TX_THREAD_SendToQueue(tx_thread_obj);
                         break;
                     }
-                    case REQUEST_DO_YOU_HAVE_IT: {
-                        break;
+                    default: {
+                        continue;
                     }
                 }
+
             }
             case UPDATE: {
                 dbgOutputLoc(CASE_UPDATE_MESSAGE_CONTROLLER_THREAD);
                 switch(obj.Update.Type) {
                     case LOCATION:{
-                        _internalData.location = obj.Update.Data.location;
+                        internalData.location = obj.Update.Data.location;
                         break;
                     }
                     case ORIENTATION: {
-                        _internalData.orientation = obj.Update.Data.orientation;
+                        internalData.orientation = obj.Update.Data.orientation;
                         break;
                     }
                     case SENSORDATA: {
-                        _internalData.sensordata = obj.Update.Data.sensordata;
+                        internalData.sensordata = obj.Update.Data.sensordata;
                         // This is for debugging purposes
-                        Tx_Thead_Queue_DataType obj;
-                        memset(&obj, 0, sizeof(Tx_Thead_Queue_DataType));
-                        sprintf(obj.Data, "%0.2f", _internalData.sensordata);
-                        obj.Destination = PATHFINDER;
-                        obj.MessageCount = statObject.Res_PathFinder;
-                        TX_THREAD_SendToQueue(obj);
+//                        Tx_Thead_Queue_DataType obj;
+//                        memset(&obj, 0, sizeof(Tx_Thead_Queue_DataType));
+//                        sprintf(obj.Data, "%0.2f", _internalData.sensordata);
+//                        obj.Destination = PATHFINDER;
+//                        obj.MessageCount = statObject.Res_PathFinder;
+//                        TX_THREAD_SendToQueue(obj);
                         break;
                     }
                 }
                 break;
             }
-        }
     }
     dbgOutputLoc(LEAVE_MESSAGE_CONTROLLER_THREAD);
+}
 }
 
 void MESSAGE_CONTROLLER_THREAD_InitializeQueue() {

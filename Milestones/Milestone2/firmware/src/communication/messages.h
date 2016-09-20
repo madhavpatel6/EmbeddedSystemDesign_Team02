@@ -29,8 +29,9 @@
 #define TARGETLOCATOR 'l'
 #define PATHFINDER 'p'
 #define TARGETGRABBER 'g'
+#define SERVER 'h'
 #define MAXMESSAGESIZE 512
-#define MYMODULE 'p'
+#define MYMODULE 'l'
 
 int CreateMessage(char buf[], char messageData[], char destination, char messagecount);
 

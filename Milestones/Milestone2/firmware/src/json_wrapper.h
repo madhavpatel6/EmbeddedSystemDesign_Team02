@@ -15,8 +15,8 @@
  */
 /* ************************************************************************** */
 
-#ifndef _EXAMPLE_FILE_NAME_H    /* Guard against multiple inclusion */
-#define _EXAMPLE_FILE_NAME_H
+#ifndef _JSON_WRAPPER_H    /* Guard against multiple inclusion */
+#define _JSON_WRAPPER_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -27,7 +27,7 @@
 #include "communication/jsmn.h"
 
 typedef enum {request, response, unknown} type_t;
-typedef enum {commStats, targetLocations} items_t;
+typedef enum {commStats, sensorData} items_t;
 
 static jsmn_parser p;
 static jsmntok_t t[128]; /* We expect no more than 128 tokens */

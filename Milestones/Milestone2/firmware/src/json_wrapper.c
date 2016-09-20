@@ -48,9 +48,9 @@ void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numI
             sprintf(buf, "%.*s\0", t[i+1].end-t[i+1].start,
                     JSON_STRING + t[i+1].start);
             i++;
-            if(strcmp(buf, "req") == 0){
+            if(strcmp(buf, "Request") == 0){
                 *type = request;
-            }else if(strcmp(buf, "res") == 0){
+            }else if(strcmp(buf, "Response") == 0){
                 *type = response;
             }else{
                 *type = unknown;
@@ -67,8 +67,8 @@ void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numI
                 if(strcmp(buf, "commStats") == 0){
                     items[k] = commStats;
                     k++;
-                }else if(strcmp(buf, "targetLocations") == 0){
-                    items[k] = targetLocations;
+                }else if(strcmp(buf, "SensorData") == 0){
+                    items[k] = sensorData;
                     k++;
                 }
                 *numItems = k;
