@@ -77,6 +77,9 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
                 *source = TARGETGRABBER;
                 break;
             }
+            case SERVER: {
+                *source = SERVER;
+            }
             default: {
                 *isError = true;
                 parserstate = IDLE_STATE;
