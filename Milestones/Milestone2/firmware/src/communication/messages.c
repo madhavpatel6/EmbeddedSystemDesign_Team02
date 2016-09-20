@@ -157,7 +157,7 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
  * @param destination character for who message is sent to
  * @return length of the message
  */
-int CreateMessage(char buf[], char messageData[], char destination) {
+int CreateMessage(char buf[], char messageData[], char destination, char messagecount) {
     dbgOutputLoc(ENTER_CREATEMESSAGE_MESSAGE_C);
     if (messageData == NULL) {
 		//dbgOutputBlock(false);
@@ -170,7 +170,8 @@ int CreateMessage(char buf[], char messageData[], char destination) {
 		STARTOFTEXT,
 		destination,
 		MYMODULE,
-		37, (len & 0xFF00) >> 8,
+		messagecount,
+        (len & 0xFF00) >> 8,
 		len & 0x00FF,
 		messageData,
 		checksum(messageData),

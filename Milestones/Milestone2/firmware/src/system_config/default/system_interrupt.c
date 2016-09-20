@@ -107,6 +107,7 @@ void IntHandlerDrvAdc(void)
     //PLIB_ADC_SampleAutoStartEnable(ADC_ID_1);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
     /* Clear ADC Interrupt Flag */
+    PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_ADC_1);
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
 }
 
@@ -117,7 +118,8 @@ void IntHandlerDrvTmrInstance0(void)
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     DRV_ADC_Start();
     dbgOutputLoc(SET_ADC_FLAG_TMR_INSTANCE_0_ISR);
-    PLIB_INT_SourceFlagSet(INT_ID_0, INT_SOURCE_ADC_1);
+    //PLIB_INT_SourceFlagSet(INT_ID_0, INT_SOURCE_ADC_1);
+    PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
     dbgOutputLoc(LEAVE_TMR_INSTANCE_0_ISR);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);

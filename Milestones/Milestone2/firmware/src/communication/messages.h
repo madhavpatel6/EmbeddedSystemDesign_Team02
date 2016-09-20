@@ -32,7 +32,7 @@
 #define MAXMESSAGESIZE 512
 #define MYMODULE 'p'
 
-int CreateMessage(char buf[], char messageData[], char destination);
+int CreateMessage(char buf[], char messageData[], char destination, char messagecount);
 
 void BuildJSON(char buf[]);
 

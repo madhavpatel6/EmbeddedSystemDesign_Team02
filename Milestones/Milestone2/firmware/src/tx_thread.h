@@ -147,7 +147,7 @@ void TX_THREAD_Tasks( void );
 
 void TX_THREAD_InitializeQueue();
 
-void TX_THREAD_ReadFromQueue(char pvBuffer[]);
+void TX_THREAD_ReadFromQueue(Tx_Thead_Queue_DataType pvBuffer[]);
 
 #endif /* _TX_THREAD_H */
 

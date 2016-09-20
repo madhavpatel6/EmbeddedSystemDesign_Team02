@@ -88,7 +88,7 @@ void DRV_ADC_Initialize(void)
  
     /* Initialize ADC Interrupt */
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
-    PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
+//    PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
     PLIB_INT_VectorPrioritySet(INT_ID_0, INT_VECTOR_AD1, INT_PRIORITY_LEVEL3);
     PLIB_INT_VectorSubPrioritySet(INT_ID_0, INT_VECTOR_AD1, INT_SUBPRIORITY_LEVEL0);	
 }

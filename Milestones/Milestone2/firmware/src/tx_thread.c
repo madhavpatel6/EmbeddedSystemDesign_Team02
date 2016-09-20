@@ -96,16 +96,14 @@ void TX_THREAD_Initialize ( void )
 void TX_THREAD_Tasks ( void )
 {
     dbgOutputLoc(ENTER_TXTHREAD);
-    char messageData[MAXMESSAGESIZE];
+    Tx_Thead_Queue_DataType obj;
     char packedMessage[MAXMESSAGESIZE];
     dbgOutputLoc(BEFORE_WHILELOOP_RXTHREAD);
     while(1){
         //receive from our local queue
-        TX_THREAD_ReadFromQueue(messageData);
+        TX_THREAD_ReadFromQueue(&obj);
 
-        //ConvertCommObjectToString(readObj, messageData);
-
-        int length = CreateMessage(packedMessage, messageData, PATHFINDER);
+        int length = CreateMessage(packedMessage, obj.Data, obj.Destination, obj.MessageCount);
 
         dbgOutputLoc(BEFORE_SEND_TO_QUEUE_RXTHREAD);
         int i = 0;
@@ -126,18 +124,18 @@ void TX_THREAD_InitializeQueue() {
     }
 }
 
-void TX_THREAD_ReadFromQueue(char pvBuffer[]) {
+void TX_THREAD_ReadFromQueue(Tx_Thead_Queue_DataType *pvBuffer) {
     dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_TXTHREAD);
     xQueueReceive(_queue, pvBuffer, portMAX_DELAY);
     dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_TXTHREAD);
 }
 
-void TX_THREAD_SendToQueue(char buffer[]) {
-    xQueueSendToBack(_queue, buffer, portMAX_DELAY);
+void TX_THREAD_SendToQueue(Tx_Thead_Queue_DataType buffer) {
+    xQueueSend(_queue, &buffer, portMAX_DELAY);
 }
 
-void TX_THREAD_SendToQueueISR(char buffer[], BaseType_t *pxHigherPriorityTaskWoken) {
-    xQueueSendToBackFromISR(_queue, buffer, pxHigherPriorityTaskWoken);
+void TX_THREAD_SendToQueueISR(Tx_Thead_Queue_DataType buffer, BaseType_t *pxHigherPriorityTaskWoken) {
+    xQueueSendFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
 }
 
 

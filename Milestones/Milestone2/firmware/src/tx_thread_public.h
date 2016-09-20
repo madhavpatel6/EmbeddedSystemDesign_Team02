@@ -30,9 +30,9 @@
 extern "C" {
 #endif
 
-void TX_THREAD_SendToQueue(char buffer[]);
+void TX_THREAD_SendToQueue(Tx_Thead_Queue_DataType buffer);
 
-void TX_THREAD_SendToQueueISR(char buffer[], BaseType_t *pxHigherPriorityTaskWoken);
+void TX_THREAD_SendToQueueISR(Tx_Thead_Queue_DataType buffer, BaseType_t *pxHigherPriorityTaskWoken);
 
 #ifdef __cplusplus
 }

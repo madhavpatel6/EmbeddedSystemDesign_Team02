@@ -164,10 +164,12 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                     case SENSORDATA: {
                         _internalData.sensordata = obj.Update.Data.sensordata;
                         // This is for debugging purposes
-                        char buf[512];
-                        memset(buf, 0, 512);
-                        sprintf(buf, "%0.2f", _internalData.sensordata);
-                        TX_THREAD_SendToQueue(buf);
+                        Tx_Thead_Queue_DataType obj;
+                        memset(&obj, 0, sizeof(Tx_Thead_Queue_DataType));
+                        sprintf(obj.Data, "%0.2f", _internalData.sensordata);
+                        obj.Destination = PATHFINDER;
+                        obj.MessageCount = statObject.Res_PathFinder;
+                        TX_THREAD_SendToQueue(obj);
                         break;
                     }
                 }
