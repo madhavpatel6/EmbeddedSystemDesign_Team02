@@ -113,9 +113,12 @@ void IntHandlerDrvAdc(void)
 /* This timer is for the ADC to fire every 10ms */
 void IntHandlerDrvTmrInstance0(void)
 {
+    dbgOutputLoc(ENTER_TMR_INSTANCE_0_ISR);
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     DRV_ADC_Start();
+    dbgOutputLoc(SET_ADC_FLAG_TMR_INSTANCE_0_ISR);
     PLIB_INT_SourceFlagSet(INT_ID_0, INT_SOURCE_ADC_1);
+    dbgOutputLoc(LEAVE_TMR_INSTANCE_0_ISR);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
 }
@@ -123,11 +126,15 @@ void IntHandlerDrvTmrInstance0(void)
 /* This timer is for the TX to fire every 50ms */
 void IntHandlerDrvTmrInstance1(void)
 {
+    dbgOutputLoc(ENTER_TMR_INSTANCE_1_ISR);
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     MessageObj obj;
     obj.Type = SEND_REQUEST;
     obj.Request = REQUEST_LOCATION;
+    dbgOutputLoc(BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR);
     MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+    dbgOutputLoc(AFTER_SEND_TO_Q_TMR_INSTANCE_1_ISR);
+    dbgOutputLoc(LEAVE_TMR_INSTANCE_1_ISR);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
 }
@@ -141,9 +148,9 @@ void Usart0_InitializeQueue() {
 }
 
 int Usart0_ReadFromQueue(void* pvBuffer, BaseType_t *pxHigherPriorityTaskWoken) {
-    dbgOutputLoc(USART0_BEFORE_RECEIVE_FR_QUEUE);
+    dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_USART0_ISR);
     int ret = xQueueReceiveFromISR(_usartqueue, pvBuffer, pxHigherPriorityTaskWoken);
-    dbgOutputLoc(USART0_AFTER_RECEIVE_FR_QUEUE);
+    dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_USART0_ISR);
     return ret;
 }
 
@@ -157,30 +164,30 @@ void Usart0_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken) {
 
 void IntHandlerDrvUsartInstance0(void)
 {
-    dbgOutputLoc(USART0_ENTER_ISR);
+    dbgOutputLoc(ENTER_USART0_ISR);
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     if (SYS_INT_SourceStatusGet(INT_SOURCE_USART_1_RECEIVE) && !DRV_USART0_ReceiverBufferIsEmpty())
     {
-        dbgOutputLoc(USART0_BEFORE_SEND_TO_QUEUE);
+        dbgOutputLoc(BEFORE_SEND_TO_QUEUE_USART0_ISR);
         RX_THREAD_SendToQueueISR(DRV_USART0_ReadByte(), &pxHigherPriorityTaskWoken); // read received byte
-        dbgOutputLoc(USART0_AFTER_SEND_TO_QUEUE);
+        dbgOutputLoc(AFTER_SEND_TO_QUEUE_USART0_ISR);
     }
     if(SYS_INT_SourceStatusGet(INT_SOURCE_USART_1_TRANSMIT) && !(DRV_USART_TRANSFER_STATUS_TRANSMIT_FULL & DRV_USART0_TransferStatus()) )
     {
         char buf;
-        dbgOutputLoc(USART0_BEFORE_RECEIVE_FR_QUEUE);
+        dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_USART0_ISR);
         if(Usart0_ReadFromQueue(&buf, &pxHigherPriorityTaskWoken)) {
             DRV_USART0_WriteByte(buf);
         }
         else {
             SYS_INT_SourceDisable(INT_SOURCE_USART_1_TRANSMIT);
         }
-        dbgOutputLoc(USART0_AFTER_RECEIVE_FR_QUEUE);
+        dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_USART0_ISR);
     }
     //DRV_USART_TasksTransmit(sysObj.drvUsart0);
     DRV_USART_TasksReceive(sysObj.drvUsart0);
     DRV_USART_TasksError(sysObj.drvUsart0);
-    dbgOutputLoc(USART0_LEAVE_ISR);
+    dbgOutputLoc(LEAVE_USART0_ISR);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
 }
 

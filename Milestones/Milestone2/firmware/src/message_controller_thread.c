@@ -86,6 +86,7 @@ void MESSAGE_CONTROLLER_THREAD_Initialize ( void )
 
 void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
 {
+    dbgOutputLoc(ENTER_MESSAGE_CONTROLLER_THREAD);
     InternalData _internalData;
     memset(&_internalData, 0, sizeof(InternalData));
     SequenceCountObj _internalMessageCount;
@@ -95,9 +96,12 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
         memset(&obj, 0, sizeof(MessageObj));
         char jsonmessage[MAXMESSAGESIZE];
         memset(jsonmessage, 0, MAXMESSAGESIZE);
+        dbgOutputLoc(BEFORE_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD);
         MESSAGE_CONTROLLER_THREAD_ReadFromQueue(&obj);
+        dbgOutputLoc(AFTER_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD);
         switch(obj.Type) {
             case EXTERNAL_REQUEST_RESPONSE: {
+                dbgOutputLoc(CASE_EXTERNAL_REQUEST_RESPONSE_MESSAGE_CONTROLLER_THREAD);
                 switch(obj.External.Source) {
                     case SEARCHERMOVER: _internalMessageCount.SearcherMover++;
                         break;
@@ -118,6 +122,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                 break;
             }
             case SEND_REQUEST: {
+                dbgOutputLoc(CASE_SEND_REQUEST_MESSAGE_CONTROLLER_THREAD);
                 switch(obj.Request) {
                     case REQUEST_LOCATION: {
                         
@@ -132,6 +137,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                 }
             }
             case UPDATE: {
+                dbgOutputLoc(CASE_UPDATE_MESSAGE_CONTROLLER_THREAD);
                 switch(obj.Update.Type) {
                     case LOCATION:{
                         _internalData.location = obj.Update.Data.location;
@@ -155,6 +161,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
             }
         }
     }
+    dbgOutputLoc(LEAVE_MESSAGE_CONTROLLER_THREAD);
 }
 
 void MESSAGE_CONTROLLER_THREAD_InitializeQueue() {

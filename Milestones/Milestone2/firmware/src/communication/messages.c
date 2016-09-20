@@ -30,9 +30,10 @@ static char internalCheckSum = 0;;
 static size_t size = 0;
 
 bool ParseMessage(char c, char data[], char* source, char* messageCount) {
-    dbgOutputLoc(RXTHREAD_ENTER_PARSER);
+    dbgOutputLoc(ENTER_PARSEMESSAGE_MESSAGE_C);
 	switch (parserstate) {
 	case IDLE_STATE: {
+        dbgOutputLoc(CASE_IDLE_STATE_PARSEMESSAGE_MESSAGE_C);
 		internalBufferIndex = 0;
 		internalCheckSum = NULL;
 		size = 0;
@@ -43,6 +44,7 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount) {
 		return false;
 	}
 	case CHECK_DESTINATION_CHAR: {
+        dbgOutputLoc(CASE_CHECK_DESTINATION_CHAR_PARSEMESSAGE_MESSAGE_C);
 		if (c == MYMODULE) {
 			parserstate = CHECK_SOURCE_CHAR;
 		}
@@ -52,6 +54,7 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount) {
 		return false;
 	}
     case CHECK_SOURCE_CHAR: {
+        dbgOutputLoc(CASE_CHECK_SOURCE_CHAR_PARSEMESSAGE_MESSAGE_C);
         switch(c) {
             case SEARCHERMOVER: {
                 *source = SEARCHERMOVER;
@@ -78,17 +81,20 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount) {
         return false;
     }
 	case CHECK_MESSAGE_COUNT: {
+        dbgOutputLoc(CASE_CHECK_MESSAGE_COUNT_PARSEMESSAGE_MESSAGE_C);
 		parserstate = GET_DATALENGTH_UPPER;
         //Pass the message count back
         *messageCount = c;
 		return false;
 	}
 	case GET_DATALENGTH_UPPER: {
+        dbgOutputLoc(CASE_GET_DATALENGTH_UPPER_PARSEMESSAGE_MESSAGE_C);
 		size = (c & 0xFF) << 8;
 		parserstate = GET_DATALENGTH_LOWER;
 		return false;
 	}
 	case GET_DATALENGTH_LOWER: {
+        dbgOutputLoc(CASE_GET_DATALENGTH_LOWER_PARSEMESSAGE_MESSAGE_C);
 		size = size | (c & 0x00FF);
         if(size > (MAXMESSAGESIZE - 8)) {
             parserstate = IDLE_STATE;
@@ -98,21 +104,28 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount) {
 		return false;
 	}
 	case GET_DATA: {
+        dbgOutputLoc(CASE_GET_DATA_PARSEMESSAGE_MESSAGE_C);
 		data[internalBufferIndex] = c;
 		internalBufferIndex = internalBufferIndex + 1;
+        dbgOutputLoc(BEFORE_FIRST_IF_GET_DATA_PARSEMESSAGE_MESSAGE_C);
 		if (internalBufferIndex >= size || internalBufferIndex >= MAXMESSAGESIZE) {
+            dbgOutputLoc(IN_FIRST_IF_GET_DATA_PARSEMESSAGE_MESSAGE_C);
 			parserstate = GET_CHECK_SUM;
             internalBufferIndex = 0;
 		}
         else if(c == STARTOFTEXT) {
+            dbgOutputLoc(IN_SECOND_IF_GET_DATA_PARSEMESSAGE_MESSAGE_C);
             parserstate = CHECK_DESTINATION_CHAR;
         }
         else if(c == ENDOFTEXT) {
+            dbgOutputLoc(IN_THIRD_IF_GET_DATA_PARSEMESSAGE_MESSAGE_C);
             parserstate = IDLE_STATE;
         }
+        dbgOutputLoc(AFTER_THIRD_IF_GET_DATA_PARSEMESSAGE_MESSAGE_C);
 		return false;
 	}
 	case GET_CHECK_SUM: {
+        dbgOutputLoc(CASE_GET_CHECK_SUM_PARSEMESSAGE_MESSAGE_C);
 		internalCheckSum = c;
 		if (internalCheckSum != checksum(data)) {
 			parserstate = IDLE_STATE;
@@ -121,11 +134,12 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount) {
 		return false;
 	}
 	case CHECK_ENDCHAR: {
+        dbgOutputLoc(CASE_CHECK_ENDCHAR_PARSEMESSAGE_MESSAGE_C);
 		parserstate = IDLE_STATE;
 		return c == ENDOFTEXT;
 	}
 	}
-    dbgOutputLoc(RXTHREAD_LEAVE_PARSER);
+    dbgOutputLoc(LEAVE_PARSEMESSAGE_MESSAGE_C);
 }
 
 /**
@@ -136,6 +150,7 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount) {
  * @return length of the message
  */
 int CreateMessage(char buf[], char messageData[], char destination) {
+    dbgOutputLoc(ENTER_CREATEMESSAGE_MESSAGE_C);
 	if (messageData == NULL) {
 		//dbgOut/putBlock(false);
 	}
@@ -153,11 +168,13 @@ int CreateMessage(char buf[], char messageData[], char destination) {
 		checksum(messageData),
 		ENDOFTEXT
 		);
+    dbgOutputLoc(LEAVE_CREATEMESSAGE_MESSAGE_C);
 }
 
 // Simple string checksum
 char checksum(char* s)
 {
+    dbgOutputLoc(ENTER_CHECKSUM_MESSAGE_C);
     char* temp = s;
 	signed char sum = -1;
 	while (*temp != 0)
@@ -165,6 +182,7 @@ char checksum(char* s)
 		sum += *temp;
 		temp++;
 	}
+    dbgOutputLoc(LEAVE_CHECKSUM_MESSAGE_C);
 	return sum;
 }
 

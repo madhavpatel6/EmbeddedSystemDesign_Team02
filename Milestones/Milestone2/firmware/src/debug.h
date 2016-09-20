@@ -36,12 +36,12 @@
  */
 enum LocationEnum {
     // USART ISR
-    USART0_ENTER_ISR = 1,           // 1
-    USART0_LEAVE_ISR,               // 2
-    USART0_BEFORE_SEND_TO_QUEUE,    // 3
-    USART0_AFTER_SEND_TO_QUEUE,     // 4
-    USART0_BEFORE_RECEIVE_FR_QUEUE, // 5
-    USART0_AFTER_RECEIVE_FR_QUEUE,  // 6
+    ENTER_USART0_ISR = 1,                // 1
+    LEAVE_USART0_ISR,                    // 2
+    BEFORE_SEND_TO_QUEUE_USART0_ISR,     // 3
+    AFTER_SEND_TO_QUEUE_USART0_ISR,      // 4
+    BEFORE_RECEIVE_FR_QUEUE_USART0_ISR,  // 5
+    AFTER_RECEIVE_FR_QUEUE_USART0_ISR,   // 6
     
     // ADC ISR
     ENTER_ADC_ISR = 10,         // 10
@@ -52,20 +52,16 @@ enum LocationEnum {
     AFTER_RECEIVE_FROM_Q_ISR,   // 15
     ADDING_ADC_VAL_ISR,         // 16
 
-    //Task Specific
-    UARTTXTHREAD_ENTER_TASK = 20,           // 20
-    UARTTXTHREAD_BEFORE_WHILELOOP,          // 21
-    UARTTXTHREAD_BEFORE_SEND_TO_QUEUE,      // 22
-    UARTTXTHREAD_AFTER_SEND_TO_QUEUE,       // 23
-    UARTTXTHREAD_BEFORE_RECEIVE_FR_QUEUE,   // 24
-    UARTTXTHREAD_AFTER_RECEIVE_FR_QUEUE,    // 25
-
-    UARTRXTHREAD_ENTER_TASK,                // 26
-    UARTRXTHREAD_BEFORE_WHILELOOP,          // 27
-    UARTRXTHREAD_BEFORE_SEND_TO_QUEUE,      // 28
-    UARTRXTHREAD_AFTER_SEND_TO_QUEUE,       // 29
-    UARTRXTHREAD_BEFORE_RECEIVE_FR_QUEUE,   // 30
-    UARTRXTHREAD_AFTER_RECEIVE_FR_QUEUE,    // 31
+    // RX THREAD Debug
+    ENTER_RXTHREAD = 26,                              // 26
+    LEAVE_RXTHREAD,                                   // 27
+    BEFORE_WHILELOOP_RXTHREAD,                        // 28
+    BEFORE_SEND_TO_QUEUE_RXTHREAD,                    // 29
+    AFTER_SEND_TO_QUEUE_RXTHREAD,                     // 30
+    BEFORE_RECEIVE_FR_QUEUE_RXTHREAD,                 // 31
+    AFTER_RECEIVE_FR_QUEUE_RXTHREAD,                  // 32
+    BEFORE_RECEIVE_FR_QUEUE_READFROMQUEUE_RXTHREAD,   // 33
+    AFTER_RECEIVE_FR_QUEUE_READFROMQUEUE_RXTHREAD,    // 34
     
     // ADC APP DEBUG
     ENTER_TASK_ADC_APP = 40,            // 40
@@ -74,13 +70,64 @@ enum LocationEnum {
     BEFORE_RECEIVE_FROM_Q_ADC_APP,      // 43
     AFTER_SEND_TO_Q_ADC_APP,            // 44
     AFTER_RECEIVE_FROM_Q_ADC_APP,       // 45
+    ENTER_CONVERTTOCM_ADC_APP,          // 46
+    LEAVE_CONVERTTOCM_ADC_APP,          // 47
+           
+     
+    //Messages.c Debug
+    ENTER_CHECKSUM_MESSAGE_C = 60,                              // 60
+    LEAVE_CHECKSUM_MESSAGE_C,                                   // 61
+    ENTER_CREATEMESSAGE_MESSAGE_C,                              // 62
+    LEAVE_CREATEMESSAGE_MESSAGE_C,                              // 63
+    ENTER_PARSEMESSAGE_MESSAGE_C,                               // 64
+    LEAVE_PARSEMESSAGE_MESSAGE_C,                               // 65
+    CASE_IDLE_STATE_PARSEMESSAGE_MESSAGE_C,                     // 66
+    CASE_CHECK_DESTINATION_CHAR_PARSEMESSAGE_MESSAGE_C,         // 67
+    CASE_CHECK_SOURCE_CHAR_PARSEMESSAGE_MESSAGE_C,              // 68
+    CASE_CHECK_MESSAGE_COUNT_PARSEMESSAGE_MESSAGE_C,            // 69
+    CASE_GET_DATALENGTH_UPPER_PARSEMESSAGE_MESSAGE_C,           // 70
+    CASE_GET_DATALENGTH_LOWER_PARSEMESSAGE_MESSAGE_C,           // 71
+    CASE_GET_DATA_PARSEMESSAGE_MESSAGE_C,                       // 72
+    CASE_GET_CHECK_SUM_PARSEMESSAGE_MESSAGE_C,                  // 73
+    CASE_CHECK_ENDCHAR_PARSEMESSAGE_MESSAGE_C,                  // 74
+    BEFORE_FIRST_IF_GET_DATA_PARSEMESSAGE_MESSAGE_C,            // 75
+    IN_FIRST_IF_GET_DATA_PARSEMESSAGE_MESSAGE_C,                // 76
+    IN_SECOND_IF_GET_DATA_PARSEMESSAGE_MESSAGE_C,               // 77
+    IN_THIRD_IF_GET_DATA_PARSEMESSAGE_MESSAGE_C,                // 78
+    AFTER_THIRD_IF_GET_DATA_PARSEMESSAGE_MESSAGE_C,             // 79
     
-    CREATE_MESSAGE_DONE, //46    
-    //RX Thread
-    RXTHREAD_BEFORE_READ_FR_QUEUE = 60,
-    RXTHREAD_AFTER_READ_FR_QUEUE,
-    RXTHREAD_ENTER_PARSER,
-    RXTHREAD_LEAVE_PARSER,
+    // MESSAGE CONTROLLER THREAD Debug
+    ENTER_MESSAGE_CONTROLLER_THREAD = 90,                       // 90
+    LEAVE_MESSAGE_CONTROLLER_THREAD,                            // 91
+    CASE_EXTERNAL_REQUEST_RESPONSE_MESSAGE_CONTROLLER_THREAD,   // 92
+    CASE_SEND_REQUEST_MESSAGE_CONTROLLER_THREAD,                // 93
+    CASE_UPDATE_MESSAGE_CONTROLLER_THREAD,                      // 94
+    BEFORE_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD,               // 95
+    AFTER_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD,                // 96
+    
+    // TIMER INSTANCE 0 ISR Debug
+    ENTER_TMR_INSTANCE_0_ISR = 130,       // 130
+    LEAVE_TMR_INSTANCE_0_ISR,             // 131
+    SET_ADC_FLAG_TMR_INSTANCE_0_ISR,      // 132
+    
+    // TIMER INSTANCE 1 ISR Debug
+    ENTER_TMR_INSTANCE_1_ISR = 140,       // 140
+    LEAVE_TMR_INSTANCE_1_ISR,             // 141
+    BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR,  // 142
+    AFTER_SEND_TO_Q_TMR_INSTANCE_1_ISR,   // 143
+    
+    
+    // TX THREAD Debug
+    ENTER_TXTHREAD = 160,                 // 160
+    BEFORE_WHILELOOP_TXTHREAD,            // 161
+    BEFORE_SEND_TO_QUEUE_TXTHREAD,        // 162
+    AFTER_SEND_TO_QUEUE_TXTHREAD,         // 163
+    BEFORE_RECEIVE_FR_QUEUE_TXTHREAD,     // 164
+    AFTER_RECEIVE_FR_QUEUE_TXTHREAD,      // 165
+    
+    
+    
+    CREATE_MESSAGE_DONE = 255,                // 255
 };
 
 /**

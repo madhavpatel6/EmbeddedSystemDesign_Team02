@@ -95,10 +95,10 @@ void TX_THREAD_Initialize ( void )
 
 void TX_THREAD_Tasks ( void )
 {
-    dbgOutputLoc(UARTRXTHREAD_ENTER_TASK);
+    dbgOutputLoc(ENTER_TXTHREAD);
     char messageData[MAXMESSAGESIZE];
     char packedMessage[MAXMESSAGESIZE];
-    dbgOutputLoc(UARTRXTHREAD_BEFORE_WHILELOOP);
+    dbgOutputLoc(BEFORE_WHILELOOP_RXTHREAD);
     while(1){
         //receive from our local queue
         TX_THREAD_ReadFromQueue(messageData);
@@ -111,9 +111,9 @@ void TX_THREAD_Tasks ( void )
         for(i = 0; i < length; i++) {
             Usart0_SendToQueue(packedMessage[i]);
         }
-        dbgOutputLoc(UARTRXTHREAD_BEFORE_SEND_TO_QUEUE);
+        dbgOutputLoc(BEFORE_SEND_TO_QUEUE_RXTHREAD);
    
-        dbgOutputLoc(UARTRXTHREAD_AFTER_SEND_TO_QUEUE);
+        dbgOutputLoc(AFTER_SEND_TO_QUEUE_RXTHREAD);
         SYS_INT_SourceEnable(INT_SOURCE_USART_1_TRANSMIT);
         //after we finish sending packet; disable tx isr
     }
@@ -128,9 +128,9 @@ void TX_THREAD_InitializeQueue() {
 }
 
 void TX_THREAD_ReadFromQueue(char pvBuffer[]) {
-    dbgOutputLoc(UARTTXTHREAD_BEFORE_RECEIVE_FR_QUEUE);
+    dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_TXTHREAD);
     xQueueReceive(_queue, pvBuffer, portMAX_DELAY);
-    dbgOutputLoc(UARTTXTHREAD_AFTER_RECEIVE_FR_QUEUE);
+    dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_TXTHREAD);
 }
 
 void TX_THREAD_SendToQueue(char buffer[]) {

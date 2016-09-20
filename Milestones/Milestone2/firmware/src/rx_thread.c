@@ -89,20 +89,21 @@ void RX_THREAD_Initialize ( void )
 
 void RX_THREAD_Tasks ( void )
 {
-    dbgOutputLoc(UARTRXTHREAD_ENTER_TASK);
-    dbgOutputLoc(UARTRXTHREAD_BEFORE_WHILELOOP);
+    dbgOutputLoc(ENTER_RXTHREAD);
+    dbgOutputLoc(BEFORE_WHILELOOP_RXTHREAD);
     MessageObj obj;
     obj.Type = EXTERNAL_REQUEST_RESPONSE; 
     char c;
     while(1){
-        dbgOutputLoc(RXTHREAD_BEFORE_READ_FR_QUEUE);
+        dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_RXTHREAD);
         RX_THREAD_ReadFromQueue(&c);
-        dbgOutputLoc(RXTHREAD_AFTER_READ_FR_QUEUE);
+        dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_RXTHREAD);
         if(ParseMessage(c, obj.External.Data, &obj.External.Source, &obj.External.MessageCount)) {
             /*Since we returned true we assume the message is valid*/
             MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
         }
     }
+    dbgOutputLoc(LEAVE_RXTHREAD);
 }
 
 void RX_THREAD_InitializeQueue() {
@@ -114,9 +115,9 @@ void RX_THREAD_InitializeQueue() {
 }
  
 void RX_THREAD_ReadFromQueue(void* pvBuffer) {
-    dbgOutputLoc(UARTRXTHREAD_BEFORE_RECEIVE_FR_QUEUE);
+    dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_READFROMQUEUE_RXTHREAD);
     xQueueReceive(_queue, pvBuffer, portMAX_DELAY);
-    dbgOutputLoc(UARTRXTHREAD_AFTER_RECEIVE_FR_QUEUE);
+    dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_READFROMQUEUE_RXTHREAD);
 }
 
 void RX_THREAD_SendToQueue(char buffer) {
