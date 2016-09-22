@@ -31,7 +31,7 @@
 #define TARGETGRABBER 'g'
 #define SERVER 'h'
 #define MAXMESSAGESIZE 512
-#define MYMODULE 'p'
+#define MYMODULE 'h'
 
 #ifdef __cplusplus
 extern "C" {
