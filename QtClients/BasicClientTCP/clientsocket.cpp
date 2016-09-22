@@ -28,8 +28,8 @@ void ClientSocket::disconnected()
     qDebug() << "Client disconnected";
 }
 
-int  ClientSocket::send(QString words){
-    return socket->write(words.toLatin1());
+int  ClientSocket::send(QByteArray words){
+    return socket->write(words);
 }
 
 // Our main thread of execution

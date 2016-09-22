@@ -12,8 +12,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     clientsocket.cpp \
-    initialization.cpp
+    initialization.cpp \
+    picCode/debug.c \
+    picCode/communication/messages.c
 
 HEADERS += \
     clientsocket.h \
-    initialization.h
+    initialization.h \
+    picCode/debug.h \
+    picCode/communication/messages.h

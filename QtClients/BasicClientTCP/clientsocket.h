@@ -13,7 +13,7 @@ public:
     explicit ClientSocket(QObject *parent = 0);
 
     void connectToHost(QString ip,int port);
-    int  send(QString words);
+    int  send(QByteArray words);
 
 signals:
 

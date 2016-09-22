@@ -4,6 +4,7 @@
 
 #include "clientsocket.h"
 #include "initialization.h"
+#include "picCode/communication/messages.h"
 
 int main(int argc, char *argv[])
 {
@@ -17,7 +18,16 @@ int main(int argc, char *argv[])
     ClientSocket *client = new ClientSocket();
 
     client->connectToHost(serverIp,serverPort);
-    client->send(QString("Hello"));
+
+    QString request = "{\"type\", \"Request\"}, \"list\": [\"commStats\"]}" ;
+
+    char message[512];
+    int len = CreateMessage(message, request.toLatin1().data(), 'l', 44);
+
+    QByteArray txMessage;
+    txMessage.setRawData(message, len);
+
+    client->send(txMessage);
 
     return a.exec();
 }
