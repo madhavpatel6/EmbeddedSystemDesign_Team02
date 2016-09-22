@@ -2,15 +2,22 @@
 #include <QDebug>
 #include <QTcpSocket>
 
+#include "clientsocket.h"
+#include "initialization.h"
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QTcpSocket socket;
+    QJsonObject config = initialization::getConfig();
 
-    socket.connectToHost("172.31.113.140",2000);
+    QString serverIp = config.value("serverIp").toString();
+    int serverPort = config.value("serverPort").toInt();
 
-    socket.write(QString("Hello Server!").toLatin1());
-    return 0;
-    // return a.exec();
+    ClientSocket *client = new ClientSocket();
+
+    client->connectToHost(serverIp,serverPort);
+    client->send(QString("Hello"));
+
+    return a.exec();
 }

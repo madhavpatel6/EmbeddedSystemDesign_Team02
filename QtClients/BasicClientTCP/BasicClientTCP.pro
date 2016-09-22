@@ -10,4 +10,10 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    clientsocket.cpp \
+    initialization.cpp
+
+HEADERS += \
+    clientsocket.h \
+    initialization.h
