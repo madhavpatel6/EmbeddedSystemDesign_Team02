@@ -25,11 +25,16 @@
 /* ************************************************************************** */
 /* ************************************************************************** */
 #include "communication/messages.h"
+#include "tx_thread.h"
+#include "system_config.h"
+#include "system_definitions.h"
 /* Provide C++ Compatibility */
 #ifdef __cplusplus
 extern "C" {
 #endif
+    
 
+    
 void TX_THREAD_SendToQueue(Tx_Thead_Queue_DataType buffer);
 
 void TX_THREAD_SendToQueueISR(Tx_Thead_Queue_DataType buffer, BaseType_t *pxHigherPriorityTaskWoken);

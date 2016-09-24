@@ -53,6 +53,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
+#include "system_config.h"
+#include "system_definitions.h"
 #include "message_controller_thread.h"
 #include "message_controller_thread_public.h"
 #include "tx_thread_public.h"
@@ -93,13 +95,14 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
     memset(&internalData, 0, sizeof(InternalData));
     StatObjectType statObject;
     memset(&statObject, 0, sizeof(StatObjectType));
-    type_t type = unknown;
-    items_t items[12];
-    int numItems;
     while(1) {
         MessageObj obj;
         memset(&obj, 0, sizeof(MessageObj));
 
+        JSONObjType parsedJSONInfo;
+        memset(&parsedJSONInfo, 0, sizeof(JSONObjType));
+        parsedJSONInfo.type = unknown;
+        
         Tx_Thead_Queue_DataType tx_thread_obj;
         memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
 
@@ -114,135 +117,192 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                     continue;
                 }
                 statObject.GoodCount++;
-                switch(obj.External.Source) {
-                    case SEARCHERMOVER:
-                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_SearcherMover);
-                        statObject.Req_From_SearcherMover++;
+                parseJSON(obj.External.Data, &parsedJSONInfo.type, parsedJSONInfo.items,  &parsedJSONInfo.numItems);
+                ComputeAndUpdatePacketsDropped(parsedJSONInfo.type, obj.External.Source, obj.External.MessageCount, &statObject);
+                switch(parsedJSONInfo.type) {
+                    case request: {
+                        ConstructResponse(tx_thread_obj.Data, internalData, statObject, parsedJSONInfo);
+                        tx_thread_obj.Destination = obj.External.Source;
+                        GetResponseMessageCountAndIncrement(&tx_thread_obj.MessageCount, obj.External.Source, &statObject);
+                        TX_THREAD_SendToQueue(tx_thread_obj);
                         break;
-                    case TARGETLOCATOR:
-                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_TargetLocator);
-                        statObject.Req_From_TargetLocator++;
+                    }
+                    case response: {
                         break;
-                    case PATHFINDER:
-                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_PathFinder);
-                        statObject.Req_From_PathFinder++;
+                    }
+                    default: {
                         break;
-                    case TARGETGRABBER:
-                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_TargetGrabber);
-                        statObject.Req_From_TargetGrabber++;
-                        break;
-                }
-                parseJSON(obj.External.Data, &type, items,  &numItems);
-                if(type == request){
-                    int i = 0;
-                    for(i = 0; i < numItems; i++) {
-                        switch(items[i]) {
-                            case commStats: {
-                                sprintf(tx_thread_obj.Data, "{\"type\":\"Response\",\"myName\": \"%s\",\"numGoodMessagesRecved\": \"%d\", \"numCommErrors\": \"%d\",\"numJSONRequestsRecved\": \"%d\",\"numJSONResponsesRecved\": \"%d\",\"numJSONRequestsSent\": \"%d\",\"numJSONResponsesSent\": \"%d\"}",
-                                "MYFUCKINGPMODULE",
-                                statObject.GoodCount,
-                                statObject.ErrorCount,
-                                statObject.Req_From_PathFinder + statObject.Req_From_SearcherMover + statObject.Req_From_TargetGrabber + statObject.Req_From_TargetLocator,
-                                statObject.Res_From_PathFinder + statObject.Res_From_SearcherMover + statObject.Res_From_TargetGrabber + statObject.Res_From_TargetLocator,
-                                statObject.Req_To_PathFinder + statObject.Req_To_SearcherMover + statObject.Req_To_TargetGrabber + statObject.Req_To_TargetLocator,
-                                statObject.Res_To_PathFinder + statObject.Res_To_SearcherMover + statObject.Res_To_TargetGrabber + statObject.Res_To_TargetLocator
-                                );
-                                tx_thread_obj.Destination = SERVER;
-                                tx_thread_obj.MessageCount = 0;
-                                TX_THREAD_SendToQueue(tx_thread_obj);
-                                break;
-                            }
-                            case sensorData: {
-                                sprintf(tx_thread_obj.Data, "{\"type\":\"Response\",\"SensorData\": \"%0.02f\"}", internalData.sensordata);
-                                tx_thread_obj.Destination = obj.External.Source;
-                                switch(obj.External.Source) {
-                                    case TARGETLOCATOR: {
-                                        tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
-                                        statObject.Req_To_TargetLocator++;
-                                    }
-                                    case PATHFINDER: {
-                                        tx_thread_obj.MessageCount = statObject.Req_To_PathFinder;
-                                        statObject.Req_To_PathFinder++;
-                                    }
-                                    case SEARCHERMOVER: {
-                                        tx_thread_obj.MessageCount = statObject.Req_To_SearcherMover;
-                                        statObject.Req_To_SearcherMover++;
-                                    }
-                                    case TARGETGRABBER: {
-                                        tx_thread_obj.MessageCount = statObject.Req_To_TargetGrabber;
-                                        statObject.Req_To_TargetGrabber++;
-                                    }
-                                }
-                                TX_THREAD_SendToQueue(tx_thread_obj);
-                                break;
-                            }
-                        }
                     }
                 }
-
-                //Parse JSON request or response
-                //switch on response of request
-                //if it is a request
-                    //Create JSON response from local crap
-                    //Send to TX
-                //if it is a response
-                    //convert the string to the proper
                 break;
             }
             case SEND_REQUEST: {
                 dbgOutputLoc(CASE_SEND_REQUEST_MESSAGE_CONTROLLER_THREAD);
                 // We will only need to have a new case for something we are requesting from another PIC
-                switch(obj.Request) {
-                    case RV1_REQUEST_LOCATION_ORIENTATION: {
-                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"RV1_Location\",\"RV1_Orientation\"]}");
-                        tx_thread_obj.Destination = SEARCHERMOVER;
-                        tx_thread_obj.MessageCount = statObject.Req_To_SearcherMover;
-                        statObject.Req_To_SearcherMover++;
-                        TX_THREAD_SendToQueue(tx_thread_obj);
-                        break;
-                    }
-                    case RV1_REQUEST_SENSOR_DATA: {
-                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"SensorData\"]}");
-                        tx_thread_obj.Destination = TARGETLOCATOR;
-                        tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
-                        statObject.Req_To_TargetLocator++;
-                        TX_THREAD_SendToQueue(tx_thread_obj);
-                        break;
-                    }
-                    default: {
-                        continue;
-                    }
+                if(CreateRequestObject(&tx_thread_obj, obj.Request, &statObject)) {
+                    TX_THREAD_SendToQueue(tx_thread_obj);
                 }
-
+                break;
             }
             case UPDATE: {
                 dbgOutputLoc(CASE_UPDATE_MESSAGE_CONTROLLER_THREAD);
-                switch(obj.Update.Type) {
-                    case LOCATION:{
-                        internalData.location = obj.Update.Data.location;
-                        break;
-                    }
-                    case ORIENTATION: {
-                        internalData.orientation = obj.Update.Data.orientation;
-                        break;
-                    }
-                    case SENSORDATA: {
-                        internalData.sensordata = obj.Update.Data.sensordata;
-                        // This is for debugging purposes
-//                        Tx_Thead_Queue_DataType obj;
-//                        memset(&obj, 0, sizeof(Tx_Thead_Queue_DataType));
-//                        sprintf(obj.Data, "%0.2f", _internalData.sensordata);
-//                        obj.Destination = PATHFINDER;
-//                        obj.MessageCount = statObject.Res_PathFinder;
-//                        TX_THREAD_SendToQueue(obj);
-                        break;
-                    }
-                }
+                UpdateInternalData(obj.Update, &internalData);
                 break;
             }
     }
     dbgOutputLoc(LEAVE_MESSAGE_CONTROLLER_THREAD);
 }
+}
+
+bool CreateRequestObject(Tx_Thead_Queue_DataType* requestObject, InternalRequestType typeOfRequest, StatObjectType* statObject) {
+    switch(typeOfRequest) {
+        case RV1_REQUEST_LOCATION_ORIENTATION: {
+            sprintf(requestObject->Data, "{\"type\":\"Request\",\"items\":[\"RV1_Location\",\"RV1_Orientation\"]}");
+            requestObject->Destination = SEARCHERMOVER;
+            requestObject->MessageCount = statObject->Req_To_SearcherMover;
+            statObject->Req_To_SearcherMover++;
+            return true;
+            break;
+        }
+        case RV1_REQUEST_SENSOR_DATA: {
+            sprintf(requestObject->Data, "{\"type\":\"Request\",\"items\":[\"SensorData\"]}");
+            requestObject->Destination = TARGETLOCATOR;
+            requestObject->MessageCount = statObject->Req_To_TargetLocator;
+            statObject->Req_To_TargetLocator++;
+            return true;
+            break;
+        }
+        default: {
+            return false;
+            break;
+        }
+    }
+    return false;
+}
+
+void UpdateInternalData(UpdateObj update, InternalData *internalData) {
+    switch(update.Type) {
+        case LOCATION:{
+            internalData->location = update.Data.location;
+            break;
+        }
+        case ORIENTATION: {
+            internalData->orientation = update.Data.orientation;
+            break;
+        }
+        case SENSORDATA: {
+            internalData->sensordata = update.Data.sensordata;
+            break;
+        }
+    }
+}
+
+void ConstructResponse(char response[], InternalData internalData, StatObjectType statObject, JSONObjType parsedJSONInfo) {
+    int i = 0;
+    sprintf(response, "{\"type\":\"Response\",");
+    for(i = 0; i < parsedJSONInfo.numItems; i++) {
+        switch(parsedJSONInfo.items[i]) {
+            case commStats: {
+                sprintf(response + strlen(response), "\"myName\": \"%s\",\"numGoodMessagesRecved\": \"%d\", \"numCommErrors\": \"%d\",\"numJSONRequestsRecved\": \"%d\",\"numJSONResponsesRecved\": \"%d\",\"numJSONRequestsSent\": \"%d\",\"numJSONResponsesSent\": \"%d",
+                "MYFUCKINGPMODULE",
+                statObject.GoodCount,
+                statObject.ErrorCount,
+                statObject.Req_From_PathFinder + statObject.Req_From_SearcherMover + statObject.Req_From_TargetGrabber + statObject.Req_From_TargetLocator,
+                statObject.Res_From_PathFinder + statObject.Res_From_SearcherMover + statObject.Res_From_TargetGrabber + statObject.Res_From_TargetLocator,
+                statObject.Req_To_PathFinder + statObject.Req_To_SearcherMover + statObject.Req_To_TargetGrabber + statObject.Req_To_TargetLocator,
+                statObject.Res_To_PathFinder + statObject.Res_To_SearcherMover + statObject.Res_To_TargetGrabber + statObject.Res_To_TargetLocator
+                );
+                break;
+            }
+            case sensorData: {
+                sprintf(response + strlen(response), "\"SensorData\": \"%0.02f", internalData.sensordata);
+                break;
+            }
+        }
+    }
+    sprintf(response + strlen(response),"}");
+}
+
+void GetResponseMessageCountAndIncrement(char* messageCount, char source, StatObjectType* statObject) {
+    switch(source) {
+        case TARGETLOCATOR: {
+            *messageCount = statObject->Res_To_TargetLocator;
+            statObject->Res_To_TargetLocator++;
+            break;
+        }
+        case PATHFINDER: {
+            *messageCount = statObject->Res_To_PathFinder;
+            statObject->Res_To_PathFinder++;
+            break;
+        }
+        case SEARCHERMOVER: {
+            *messageCount = statObject->Res_To_SearcherMover;
+            statObject->Res_To_SearcherMover++;
+            break;
+        }
+        case TARGETGRABBER: {
+            *messageCount = statObject->Res_To_TargetGrabber;
+            statObject->Res_To_TargetGrabber++;
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+}
+
+void ComputeAndUpdatePacketsDropped(type_t type, char source, char messageCount, StatObjectType* statObject) {
+    switch(type) {
+        case request: {
+            switch(source) {
+            case SEARCHERMOVER:
+                statObject->PacketsDropped += (messageCount - statObject->Req_From_SearcherMover);
+                statObject->Req_From_SearcherMover++;
+                break;
+            case TARGETLOCATOR:
+                statObject->PacketsDropped += (messageCount - statObject->Req_From_TargetLocator);
+                statObject->Req_From_TargetLocator++;
+                break;
+            case PATHFINDER:
+                statObject->PacketsDropped += (messageCount - statObject->Req_From_PathFinder);
+                statObject->Req_From_PathFinder++;
+                break;
+            case TARGETGRABBER:
+                statObject->PacketsDropped += (messageCount - statObject->Req_From_TargetGrabber);
+                statObject->Req_From_TargetGrabber++;
+                break;
+            default:
+                break;
+            }
+            break;
+        }
+        case response: {
+            switch(source) {
+            case SEARCHERMOVER:
+                statObject->PacketsDropped += (messageCount - statObject->Res_From_SearcherMover);
+                statObject->Res_From_SearcherMover++;
+                break;
+            case TARGETLOCATOR:
+                statObject->PacketsDropped += (messageCount - statObject->Res_From_TargetLocator);
+                statObject->Res_From_TargetLocator++;
+                break;
+            case PATHFINDER:
+                statObject->PacketsDropped += (messageCount - statObject->Res_From_PathFinder);
+                statObject->Res_From_PathFinder++;
+                break;
+            case TARGETGRABBER:
+                statObject->PacketsDropped += (messageCount - statObject->Res_From_TargetGrabber);
+                statObject->Res_From_TargetGrabber++;
+                break;
+            default:
+                break;
+            }
+            break;
+        }
+        default: {
+            break;
+        }
+    }
 }
 
 void MESSAGE_CONTROLLER_THREAD_InitializeQueue() {

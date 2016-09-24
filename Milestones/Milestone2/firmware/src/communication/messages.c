@@ -22,6 +22,7 @@
 /* ************************************************************************** */
 #include "messages.h"
 #include "debug.h"
+#include <string.h>
 
 
 static STATES parserstate = IDLE_STATE;
@@ -38,7 +39,7 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
 		internalBufferIndex = 0;
 		internalCheckSum = NULL;
 		size = 0;
-		memset(data, 0, MAXMESSAGESIZE);
+		memset(&data, 0, MAXMESSAGESIZE);
 		if (c == STARTOFTEXT) {
 			parserstate = CHECK_DESTINATION_CHAR;
 		}
