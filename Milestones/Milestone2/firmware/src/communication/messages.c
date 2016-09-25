@@ -49,7 +49,7 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
         if (c == MYMODULE) {
 			parserstate = CHECK_SOURCE_CHAR;
 		}
-		else if(c == SEARCHERMOVER || c == PATHFINDER || c == TARGETLOCATOR || c == TARGETGRABBER) {
+		else if(c == SEARCHERMOVER || c == PATHFINDER || c == TARGETLOCATOR || c == TARGETGRABBER || c == SERVER) {
 			parserstate = IDLE_STATE;
 		}
         else {
@@ -79,6 +79,7 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
             }
             case SERVER: {
                 *source = SERVER;
+                break;
             }
             default: {
                 *isError = true;

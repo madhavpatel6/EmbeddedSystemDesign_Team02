@@ -158,7 +158,8 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     statObject.Res_To_PathFinder + statObject.Res_To_SearcherMover + statObject.Res_To_TargetGrabber + statObject.Res_To_TargetLocator
                                     );
                                     tx_thread_obj.Destination = SERVER;
-                                    tx_thread_obj.MessageCount = 0;
+                                    tx_thread_obj.MessageCount = statObject.Res_To_TargetLocator;
+                                    statObject.Res_To_TargetLocator++;
                                     break;
                                 }
                                 case sensorData: {
@@ -220,6 +221,14 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         tx_thread_obj.Destination = TARGETLOCATOR;
                         tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
                         statObject.Req_To_TargetLocator++;
+                        TX_THREAD_SendToQueue(tx_thread_obj);
+                        break;
+                    }
+                    case RV1_REQUEST_COMM_STATS: {
+                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"CommStatsTargetLocator\"]}");
+                        tx_thread_obj.Destination = SEARCHERMOVER;
+                        tx_thread_obj.MessageCount = statObject.Req_To_SearcherMover;
+                        statObject.Req_To_SearcherMover++;
                         TX_THREAD_SendToQueue(tx_thread_obj);
                         break;
                     }
