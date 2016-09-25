@@ -113,81 +113,95 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                     statObject.ErrorCount++;
                     continue;
                 }
+                
                 statObject.GoodCount++;
-                switch(obj.External.Source) {
-                    case SEARCHERMOVER:
-                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_SearcherMover);
-                        statObject.Req_From_SearcherMover++;
-                        break;
-                    case TARGETLOCATOR:
-                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_TargetLocator);
-                        statObject.Req_From_TargetLocator++;
-                        break;
-                    case PATHFINDER:
-                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_PathFinder);
-                        statObject.Req_From_PathFinder++;
-                        break;
-                    case TARGETGRABBER:
-                        statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_TargetGrabber);
-                        statObject.Req_From_TargetGrabber++;
-                        break;
-                }
+                
                 parseJSON(obj.External.Data, &type, items,  &numItems);
-                if(type == request){
-                    int i = 0;
-                    for(i = 0; i < numItems; i++) {
-                        switch(items[i]) {
-                            case commStats: {
-                                sprintf(tx_thread_obj.Data, "{\"type\":\"Response\",\"myName\": \"%s\",\"numGoodMessagesRecved\": \"%d\", \"numCommErrors\": \"%d\",\"numJSONRequestsRecved\": \"%d\",\"numJSONResponsesRecved\": \"%d\",\"numJSONRequestsSent\": \"%d\",\"numJSONResponsesSent\": \"%d\"}",
-                                "MYFUCKINGPMODULE",
-                                statObject.GoodCount,
-                                statObject.ErrorCount,
-                                statObject.Req_From_PathFinder + statObject.Req_From_SearcherMover + statObject.Req_From_TargetGrabber + statObject.Req_From_TargetLocator,
-                                statObject.Res_From_PathFinder + statObject.Res_From_SearcherMover + statObject.Res_From_TargetGrabber + statObject.Res_From_TargetLocator,
-                                statObject.Req_To_PathFinder + statObject.Req_To_SearcherMover + statObject.Req_To_TargetGrabber + statObject.Req_To_TargetLocator,
-                                statObject.Res_To_PathFinder + statObject.Res_To_SearcherMover + statObject.Res_To_TargetGrabber + statObject.Res_To_TargetLocator
-                                );
-                                tx_thread_obj.Destination = SERVER;
-                                tx_thread_obj.MessageCount = 0;
-                                TX_THREAD_SendToQueue(tx_thread_obj);
+                
+                switch(type) {
+                    case request: {
+                        switch(obj.External.Source) {
+                            case SEARCHERMOVER:
+                                statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_SearcherMover);
+                                statObject.Req_From_SearcherMover++;
                                 break;
-                            }
-                            case sensorData: {
-                                sprintf(tx_thread_obj.Data, "{\"type\":\"Response\",\"SensorData\": \"%0.02f\"}", internalData.sensordata);
-                                tx_thread_obj.Destination = obj.External.Source;
-                                switch(obj.External.Source) {
-                                    case TARGETLOCATOR: {
-                                        tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
-                                        statObject.Req_To_TargetLocator++;
-                                    }
-                                    case PATHFINDER: {
-                                        tx_thread_obj.MessageCount = statObject.Req_To_PathFinder;
-                                        statObject.Req_To_PathFinder++;
-                                    }
-                                    case SEARCHERMOVER: {
-                                        tx_thread_obj.MessageCount = statObject.Req_To_SearcherMover;
-                                        statObject.Req_To_SearcherMover++;
-                                    }
-                                    case TARGETGRABBER: {
-                                        tx_thread_obj.MessageCount = statObject.Req_To_TargetGrabber;
-                                        statObject.Req_To_TargetGrabber++;
-                                    }
+                            case TARGETLOCATOR:
+                                statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_TargetLocator);
+                                statObject.Req_From_TargetLocator++;
+                                break;
+                            case PATHFINDER:
+                                statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_PathFinder);
+                                statObject.Req_From_PathFinder++;
+                                break;
+                            case TARGETGRABBER:
+                                statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_TargetGrabber);
+                                statObject.Req_From_TargetGrabber++;
+                                break;
+                            case SERVER:
+                                break;
+                            default:
+                                continue;
+                        }
+
+                        int i = 0;
+                        sprintf(tx_thread_obj.Data, "{\"type\":\"Response\"");
+                        for(i = 0; i < numItems; i++) {
+                            switch(items[i]) {
+                                case commStats: {
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"myName\":\"%s\",\"numGoodMessagesRecved\":\"%d\",\"numCommErrors\":\"%d\",\"numJSONRequestsRecved\":\"%d\",\"numJSONResponsesRecved\":\"%d\",\"numJSONRequestsSent\":\"%d\",\"numJSONResponsesSent\":ONRequestsRecved\":\"%d\",\"numJSONResponsesRecved\":\"%d\",\"numJSONRequestsSent\":\"%d\",\"num \"%d\"",
+                                    "TARGET_LOCATOR",
+                                    statObject.GoodCount,
+                                    statObject.ErrorCount,
+                                    statObject.Req_From_PathFinder + statObject.Req_From_SearcherMover + statObject.Req_From_TargetGrabber + statObject.Req_From_TargetLocator,
+                                    statObject.Res_From_PathFinder + statObject.Res_From_SearcherMover + statObject.Res_From_TargetGrabber + statObject.Res_From_TargetLocator,
+                                    statObject.Req_To_PathFinder + statObject.Req_To_SearcherMover + statObject.Req_To_TargetGrabber + statObject.Req_To_TargetLocator,
+                                    statObject.Res_To_PathFinder + statObject.Res_To_SearcherMover + statObject.Res_To_TargetGrabber + statObject.Res_To_TargetLocator
+                                    );
+                                    tx_thread_obj.Destination = SERVER;
+                                    tx_thread_obj.MessageCount = 0;
+                                    break;
                                 }
-                                TX_THREAD_SendToQueue(tx_thread_obj);
-                                break;
+                                case sensorData: {
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"SensorData\":\"%0.02f\"", internalData.sensordata);
+                                    tx_thread_obj.Destination = obj.External.Source;
+                                    switch(obj.External.Source) {
+                                        case TARGETLOCATOR: {
+                                            tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
+                                            statObject.Req_To_TargetLocator++;
+                                        }
+                                        case PATHFINDER: {
+                                            tx_thread_obj.MessageCount = statObject.Req_To_PathFinder;
+                                            statObject.Req_To_PathFinder++;
+                                        }
+                                        case SEARCHERMOVER: {
+                                            tx_thread_obj.MessageCount = statObject.Req_To_SearcherMover;
+                                            statObject.Req_To_SearcherMover++;
+                                        }
+                                        case TARGETGRABBER: {
+                                            tx_thread_obj.MessageCount = statObject.Req_To_TargetGrabber;
+                                            statObject.Req_To_TargetGrabber++;
+                                        }
+                                    }
+                                    break;
+                                }
+                                default:
+                                    break;
                             }
                         }
+                        sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),"}");
+                        TX_THREAD_SendToQueue(tx_thread_obj);
+                        break;
+                    }
+                    case response: {
+                        break;
+                    }
+                    case unknown: {
+                        break;
+                    }
+                    default: {
+                        break;
                     }
                 }
-
-                //Parse JSON request or response
-                //switch on response of request
-                //if it is a request
-                    //Create JSON response from local crap
-                    //Send to TX
-                //if it is a response
-                    //convert the string to the proper
-                break;
             }
             case SEND_REQUEST: {
                 dbgOutputLoc(CASE_SEND_REQUEST_MESSAGE_CONTROLLER_THREAD);
