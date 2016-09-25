@@ -203,6 +203,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         break;
                     }
                 }
+                break;
             }
             case SEND_REQUEST: {
                 dbgOutputLoc(CASE_SEND_REQUEST_MESSAGE_CONTROLLER_THREAD);
@@ -236,7 +237,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         continue;
                     }
                 }
-
+                break;
             }
             case UPDATE: {
                 dbgOutputLoc(CASE_UPDATE_MESSAGE_CONTROLLER_THREAD);
@@ -251,16 +252,15 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                     }
                     case SENSORDATA: {
                         internalData.sensordata = obj.Update.Data.sensordata;
-                        // This is for debugging purposes
-//                        Tx_Thead_Queue_DataType obj;
-//                        memset(&obj, 0, sizeof(Tx_Thead_Queue_DataType));
-//                        sprintf(obj.Data, "%0.2f", _internalData.sensordata);
-//                        obj.Destination = PATHFINDER;
-//                        obj.MessageCount = statObject.Res_PathFinder;
-//                        TX_THREAD_SendToQueue(obj);
+                        break;
+                    }
+                    default: {
                         break;
                     }
                 }
+                break;
+            }
+            default: {
                 break;
             }
     }

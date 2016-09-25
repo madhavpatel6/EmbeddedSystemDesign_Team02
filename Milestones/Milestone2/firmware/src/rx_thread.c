@@ -99,6 +99,7 @@ void RX_THREAD_Tasks ( void )
         RX_THREAD_ReadFromQueue(&c);
         dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_RXTHREAD);
         bool isComplete = ParseMessage(c, obj.External.Data, &obj.External.Source, &obj.External.MessageCount, &obj.External.Error);
+        dbgOutputVal(isComplete);
         if(isComplete) {
             /*Since we returned true we assume the message is valid*/
             MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
