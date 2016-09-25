@@ -27,7 +27,7 @@
 #include "communication/jsmn.h"
 
 typedef enum {request, response, unknown} type_t;
-typedef enum {commStats, sensorData} items_t;
+typedef enum {commStatsTargetLocator, sensorData} items_t;
 
 static jsmn_parser p;
 static jsmntok_t t[128]; /* We expect no more than 128 tokens */

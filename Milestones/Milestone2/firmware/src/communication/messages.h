@@ -31,7 +31,7 @@
 #define TARGETGRABBER 'g'
 #define SERVER 'h'
 #define MAXMESSAGESIZE 512
-#define MYMODULE 'l'
+#define MYMODULE 's'
 
 int CreateMessage(char buf[], char messageData[], char destination, char messagecount);
 

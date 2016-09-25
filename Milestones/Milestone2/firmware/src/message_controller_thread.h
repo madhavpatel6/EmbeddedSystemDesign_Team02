@@ -86,7 +86,7 @@ typedef struct {
 typedef enum UpdateType_enum { LOCATION, ORIENTATION, SENSORDATA } UpdateType;
 
 //This is any request that you would want to ... well ... request
-typedef enum InternalRequestType_enum { RV1_REQUEST_LOCATION_ORIENTATION, RV1_REQUEST_SENSOR_DATA } InternalRequestType;
+typedef enum InternalRequestType_enum { RV1_REQUEST_LOCATION_ORIENTATION, RV1_REQUEST_SENSOR_DATA, RV1_REQUEST_COMM_STATS } InternalRequestType;
 
 //------------------------------------------------------------------------------
 //You should not need to change anything beyond this point

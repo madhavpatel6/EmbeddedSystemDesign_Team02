@@ -132,7 +132,7 @@ void IntHandlerDrvTmrInstance1(void)
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     MessageObj obj;
     obj.Type = SEND_REQUEST;
-    obj.Request = RV1_REQUEST_SENSOR_DATA;
+    obj.Request = RV1_REQUEST_COMM_STATS;
     dbgOutputLoc(BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR);
     MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
     dbgOutputLoc(AFTER_SEND_TO_Q_TMR_INSTANCE_1_ISR);

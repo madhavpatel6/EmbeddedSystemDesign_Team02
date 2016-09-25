@@ -64,8 +64,8 @@ void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numI
             for (j = 0; j < t[i+1].size; j++) {
                 jsmntok_t *g = &t[i+j+2];
                 sprintf(buf, "%.*s\0", g->end - g->start, JSON_STRING + g->start);
-                if(strcmp(buf, "commStats") == 0){
-                    items[k] = commStats;
+                if(strcmp(buf, "CommStatsTargetLocator") == 0){
+                    items[k] = commStatsTargetLocator;
                     k++;
                 }else if(strcmp(buf, "SensorData") == 0){
                     items[k] = sensorData;
