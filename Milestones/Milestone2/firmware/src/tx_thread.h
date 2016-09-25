@@ -56,6 +56,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include "system_config.h"
+#include "system_definitions.h"
 #include "communication/messages.h"
 
 // DOM-IGNORE-BEGIN
@@ -77,7 +79,6 @@ typedef struct {
     char MessageCount;
     char Data[MAXMESSAGESIZE];
 } Tx_Thead_Queue_DataType;
-
 /*******************************************************************************
   Function:
     void TX_THREAD_Initialize ( void )
@@ -146,7 +147,7 @@ void TX_THREAD_Tasks( void );
 
 void TX_THREAD_InitializeQueue();
 
-void TX_THREAD_ReadFromQueue(Tx_Thead_Queue_DataType *pvBuffer);
+void TX_THREAD_ReadFromQueue(Tx_Thead_Queue_DataType pvBuffer[]);
 
 #endif /* _TX_THREAD_H */
 

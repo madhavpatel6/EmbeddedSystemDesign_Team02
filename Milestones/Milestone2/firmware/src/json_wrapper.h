@@ -26,14 +26,8 @@
 #include <stdio.h>
 #include "communication/jsmn.h"
 
-typedef enum {unknown, request, response} type_t;
+typedef enum {request, response, unknown} type_t;
 typedef enum {commStats, sensorData} items_t;
-
-typedef struct {
-    type_t type;
-    items_t items[12];
-    int numItems;
-} JSONObjType;
 
 static jsmn_parser p;
 static jsmntok_t t[128]; /* We expect no more than 128 tokens */

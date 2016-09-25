@@ -56,9 +56,11 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include "system_config.h"
+#include "system_definitions.h"
 #include "communication/messages.h"
+#include "communication/jsmn.h"
 #include "json_wrapper.h"
-
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
@@ -78,7 +80,7 @@ typedef struct {
     Coordinates location;
     float orientation;
     float sensordata;
-} InternalData;
+}InternalData;
 
 //This should include a new enum for anything in the InternalData
 typedef enum UpdateType_enum { LOCATION, ORIENTATION, SENSORDATA } UpdateType;
@@ -121,7 +123,7 @@ typedef struct {
     uint8_t Req_From_TargetLocator;
     uint8_t Req_From_PathFinder;
     uint8_t Req_From_TargetGrabber;
-
+    
     uint8_t Req_To_SearcherMover;
     uint8_t Req_To_TargetLocator;
     uint8_t Req_To_PathFinder;
@@ -136,12 +138,11 @@ typedef struct {
     uint8_t Res_To_TargetLocator;
     uint8_t Res_To_PathFinder;
     uint8_t Res_To_TargetGrabber;
-
+    
     int32_t PacketsDropped;
     int32_t ErrorCount;
     int32_t GoodCount;
 } StatObjectType;
-
 /*******************************************************************************
   Function:
     void MESSAGE_CONTROLLER_THREAD_Initialize ( void )
@@ -211,16 +212,6 @@ void MESSAGE_CONTROLLER_THREAD_Tasks( void );
 void MESSAGE_CONTROLLER_THREAD_InitializeQueue();
 
 void MESSAGE_CONTROLLER_THREAD_ReadFromQueue(MessageObj* pvBuffer);
-
-void ConstructResponse(char response[], InternalData internalData, StatObjectType statObject, JSONObjType parsedJSONInfo);
-
-void ComputeAndUpdatePacketsDropped(type_t type, char source, char messageCount, StatObjectType* statObject);
-
-bool CreateRequestObject(Tx_Thead_Queue_DataType* requestObject, InternalRequestType typeOfRequest, StatObjectType* statObject);
-
-void GetResponseMessageCountAndIncrement(char* messageCount, char source, StatObjectType* statObject);
-
-void UpdateInternalData(UpdateObj update, InternalData *internalData);
 
 #endif /* _MESSAGE_CONTROLLER_THREAD_H */
 

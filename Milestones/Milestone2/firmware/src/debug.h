@@ -24,6 +24,8 @@
 /* Section: Included Files                                                    */
 /* ************************************************************************** */
 /* ************************************************************************** */
+#include "system_config.h"
+#include "system_definitions.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>

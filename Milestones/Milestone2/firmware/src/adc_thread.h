@@ -56,6 +56,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include "system_config.h"
+#include "system_definitions.h"
 #include "adc_thread_public.h"
 #include "debug.h"
 

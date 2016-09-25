@@ -55,8 +55,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include "adc_thread.h"
 #include "message_controller_thread.h"
-#include "system_config.h"
-#include "system_definitions.h"
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Global Data Definitions

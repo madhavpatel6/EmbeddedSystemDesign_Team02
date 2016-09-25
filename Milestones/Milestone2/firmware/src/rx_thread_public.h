@@ -15,8 +15,8 @@
  */
 /* ************************************************************************** */
 
-#ifndef _RX_THREAD_PUBLIC_H    /* Guard against multiple inclusion */
-#define _RX_THREAD_PUBLIC_H
+#ifndef _UARTRXTHREAD_PUBLIC_H    /* Guard against multiple inclusion */
+#define _UARTRXTHREAD_PUBLIC_H
 
 
 /* ************************************************************************** */
@@ -29,8 +29,7 @@
  */
 
 /* TODO:  Include other files here if needed. */
-#include "system_config.h"
-#include "system_definitions.h"
+
 
 /* Provide C++ Compatibility */
 #ifdef __cplusplus

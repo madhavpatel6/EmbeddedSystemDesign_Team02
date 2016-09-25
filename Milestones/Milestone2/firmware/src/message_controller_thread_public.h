@@ -43,8 +43,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  *******************************************************************************/
 //DOM-IGNORE-END
 
-#ifndef _MESSAGE_CONTROLLER_PUBLIC_THREAD_H
-#define _MESSAGE_CONTROLLER_PUBLIC_THREAD_H
+#ifndef _MESSAGE_CONTROLLER_THREAD_H
+#define _MESSAGE_CONTROLLER_THREAD_H
 
 // *****************************************************************************
 // *****************************************************************************
@@ -56,6 +56,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include "system_config.h"
+#include "system_definitions.h"
 #include "communication/messages.h"
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -64,6 +66,140 @@ extern "C" {
 
 #endif
 
+//Depending on what data you would need to send out you should create a member of this struct that can hold that data
+
+typedef struct {
+    float x;
+    float y;
+} Coordinates;
+
+//This is any data that someone else might request for
+typedef struct {
+    Coordinates location;
+    float orientation;
+    float sensordata;
+}InternalData;
+
+//This should include a new enum for anything in the InternalData
+typedef enum UpdateType_enum { LOCATION, ORIENTATION, SENSORDATA } UpdateType;
+
+//This is any request that you would want to ... well ... request
+typedef enum InternalRequestType_enum { REQUEST_LOCATION, REQUEST_ARE_WE_THERE_YET, REQUEST_DO_YOU_HAVE_IT } InternalRequestType;
+
+//------------------------------------------------------------------------------
+//You should not need to change anything beyond this point
+//------------------------------------------------------------------------------
+typedef enum MessageItemType_enum {EXTERNAL_REQUEST_RESPONSE, SEND_REQUEST, UPDATE} MessageItemType;
+
+typedef struct {
+    //Set this to
+    UpdateType Type;
+    InternalData Data;
+} UpdateObj;
+
+typedef struct {
+    char Source;
+    bool Error;
+    char Data[MAXMESSAGESIZE];
+    char MessageCount;
+} ExternalObj;
+
+typedef struct {
+    //This is set to update when we are updating internal information
+    //It should be set to Request_response when we get an external message
+    MessageItemType Type;
+    //This source is set when we get a request or response from an external source
+    ExternalObj External;
+    //If this object is a SENDOUT_REQUEST
+    InternalRequestType Request;
+    //If if the MessageItemType is set to update then we will access the Update object and see what the update is from
+    UpdateObj Update;
+} MessageObj;
+
+typedef struct {
+    uint8_t Req_SearcherMover;
+    uint8_t Req_TargetLocator;
+    uint8_t Req_PathFinder;
+    uint8_t Req_TargetGrabber;
+
+    uint8_t Res_SearcherMover;
+    uint8_t Res_TargetLocator;
+    uint8_t Res_PathFinder;
+    uint8_t Res_TargetGrabber;
+
+    int32_t PacketsDropped;
+    int32_t ErrorCount;
+    int32_t GoodCount;
+} StatObjectType;
+/*******************************************************************************
+  Function:
+    void MESSAGE_CONTROLLER_THREAD_Initialize ( void )
+
+  Summary:
+     MPLAB Harmony application initialization routine.
+
+  Description:
+    This function initializes the Harmony application.  It places the
+    application in its initial state and prepares it to run so that its
+    APP_Tasks function can be called.
+
+  Precondition:
+    All other system initialization routines should be called before calling
+    this routine (in "SYS_Initialize").
+
+  Parameters:
+    None.
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    MESSAGE_CONTROLLER_THREAD_Initialize();
+    </code>
+
+  Remarks:
+    This routine must be called from the SYS_Initialize function.
+*/
+
+void MESSAGE_CONTROLLER_THREAD_Initialize ( void );
+
+
+/*******************************************************************************
+  Function:
+    void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
+
+  Summary:
+    MPLAB Harmony Demo application tasks function
+
+  Description:
+    This routine is the Harmony Demo application's tasks function.  It
+    defines the application's state machine and core logic.
+
+  Precondition:
+    The system and application initialization ("SYS_Initialize") should be
+    called before calling this.
+
+  Parameters:
+    None.
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    MESSAGE_CONTROLLER_THREAD_Tasks();
+    </code>
+
+  Remarks:
+    This routine must be called from SYS_Tasks() routine.
+ */
+
+void MESSAGE_CONTROLLER_THREAD_Tasks( void );
+
+void MESSAGE_CONTROLLER_THREAD_InitializeQueue();
+
+void MESSAGE_CONTROLLER_THREAD_ReadFromQueue(MessageObj* pvBuffer);
 
 #endif /* _MESSAGE_CONTROLLER_THREAD_H */
 

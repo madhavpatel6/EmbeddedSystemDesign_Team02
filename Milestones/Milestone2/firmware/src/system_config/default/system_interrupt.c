@@ -61,11 +61,15 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include <xc.h>
 #include <sys/attribs.h>
-#include "tx_thread_public.h"
-#include "rx_thread_public.h"
-#include "message_controller_thread_public.h"
+#include "adc_thread.h"
 #include "adc_thread_public.h"
 #include "debug.h"
+#include "tx_thread.h"
+#include "rx_thread.h"
+#include "message_controller_thread.h"
+#include "message_controller_thread_public.h"
+#include "tx_thread_public.h"
+#include "rx_thread_public.h"
 #include "system_definitions.h"
 #include "system_interrupt_public.h"
 // *****************************************************************************

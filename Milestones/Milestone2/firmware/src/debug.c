@@ -21,8 +21,7 @@
 /* ************************************************************************** */
 /* ************************************************************************** */
 #include "debug.h"
-#include "system_config.h"
-#include "system_definitions.h"
+
 /**
  * [dbgOutputVal Debug function that is utilized to output an 8 bit value to
  *               PORT E; ChipKIT pins 37-30 with the MSB at Pin 30 and LSB at Pin 37]

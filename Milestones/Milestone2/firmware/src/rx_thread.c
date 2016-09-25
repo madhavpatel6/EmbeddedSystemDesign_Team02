@@ -54,11 +54,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 
 #include "rx_thread.h"
+#include "rx_thread_public.h"
 #include "debug.h"
 #include "communication/messages.h"
-#include "rx_thread_public.h"
-#include "system_config.h"
-#include "system_definitions.h"
+#include "message_controller_thread.h"
 #include <stdbool.h>
 static QueueHandle_t _queue;
 
