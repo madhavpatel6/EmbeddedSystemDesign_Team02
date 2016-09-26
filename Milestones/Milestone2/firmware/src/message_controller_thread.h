@@ -119,25 +119,25 @@ typedef struct {
 } MessageObj;
 
 typedef struct {
-    uint8_t Req_From_SearcherMover;
-    uint8_t Req_From_TargetLocator;
-    uint8_t Req_From_PathFinder;
-    uint8_t Req_From_TargetGrabber;
+    char Req_From_SearcherMover;
+    char Req_From_TargetLocator;
+    char Req_From_PathFinder;
+    char Req_From_TargetGrabber;
     
-    uint8_t Req_To_SearcherMover;
-    uint8_t Req_To_TargetLocator;
-    uint8_t Req_To_PathFinder;
-    uint8_t Req_To_TargetGrabber;
+    char Req_To_SearcherMover;
+    char Req_To_TargetLocator;
+    char Req_To_PathFinder;
+    char Req_To_TargetGrabber;
 
-    uint8_t Res_From_SearcherMover;
-    uint8_t Res_From_TargetLocator;
-    uint8_t Res_From_PathFinder;
-    uint8_t Res_From_TargetGrabber;
+    char Res_From_SearcherMover;
+    char Res_From_TargetLocator;
+    char Res_From_PathFinder;
+    char Res_From_TargetGrabber;
 
-    uint8_t Res_To_SearcherMover;
-    uint8_t Res_To_TargetLocator;
-    uint8_t Res_To_PathFinder;
-    uint8_t Res_To_TargetGrabber;
+    char Res_To_SearcherMover;
+    char Res_To_TargetLocator;
+    char Res_To_PathFinder;
+    char Res_To_TargetGrabber;
     
     int32_t PacketsDropped;
     int32_t ErrorCount;

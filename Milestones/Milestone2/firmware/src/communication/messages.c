@@ -45,7 +45,7 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
 		return false;
 	}
 	case CHECK_DESTINATION_CHAR: {
-        // *isError = false;
+        *isError = false;
         dbgOutputLoc(CASE_CHECK_DESTINATION_CHAR_PARSEMESSAGE_MESSAGE_C);
         if (c == MYMODULE) {
 			parserstate = CHECK_SOURCE_CHAR;
@@ -54,7 +54,7 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
 			parserstate = IDLE_STATE;
 		}
         else {
-            // *isError = true;
+            *isError = true;
             parserstate = IDLE_STATE;
         }
 		return false;
@@ -83,7 +83,7 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
                 break;
             }
             default: {
-                // *isError = true;
+                *isError = true;
                 parserstate = IDLE_STATE;
                 return false;
             }
@@ -109,7 +109,7 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
         size = size | (c & 0x00FF);
         if(size > (MAXMESSAGESIZE - 8)) {
             parserstate = IDLE_STATE;
-            // *isError = true;
+            *isError = true;
             return false;
         }
 		parserstate = GET_DATA;
@@ -124,14 +124,14 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
 			parserstate = GET_CHECK_SUM;
             internalBufferIndex = 0;
 		}
-        if(c == STARTOFTEXT) {
-            // *isError = true;
-            parserstate = CHECK_DESTINATION_CHAR;
-        }
-        if(c == ENDOFTEXT) {
-            // *isError = true;
-            parserstate = IDLE_STATE;
-        }
+//        if(c == STARTOFTEXT) {
+//            *isError = true;
+//            parserstate = CHECK_DESTINATION_CHAR;
+//        }
+//        if(c == ENDOFTEXT) {
+//            *isError = true;
+//            parserstate = IDLE_STATE;
+//        }
         dbgOutputLoc(AFTER_THIRD_IF_GET_DATA_PARSEMESSAGE_MESSAGE_C);
 		return false;
 	}
@@ -139,7 +139,7 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
         dbgOutputLoc(CASE_GET_CHECK_SUM_PARSEMESSAGE_MESSAGE_C);
         internalCheckSum = c;
 		if (internalCheckSum != checksum(data)) {
-            // *isError = true;
+            *isError = true;
 			parserstate = IDLE_STATE;
 		}
 		else {
@@ -150,7 +150,7 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
 	case CHECK_ENDCHAR: {
         dbgOutputLoc(CASE_CHECK_ENDCHAR_PARSEMESSAGE_MESSAGE_C);
         parserstate = IDLE_STATE;
-        // *isError = c != ENDOFTEXT;
+        *isError = c != ENDOFTEXT;
 		return !(*isError);
 	}
 	}
@@ -177,7 +177,7 @@ int CreateMessage(char buf[], char messageData[], char destination, char message
 		STARTOFTEXT,
 		destination,
 		MYMODULE,
-		messagecount,
+		messagecount && 0xFF,
         (len & 0xFF00) >> 8,
 		len & 0x00FF,
 		messageData,

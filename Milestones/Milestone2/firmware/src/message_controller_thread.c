@@ -60,7 +60,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 static QueueHandle_t _queue;
 
 #define TYPEOFQUEUE MessageObj
-#define SIZEOFQUEUE 20
+#define SIZEOFQUEUE 128
 
 /*******************************************************************************
   Function:
