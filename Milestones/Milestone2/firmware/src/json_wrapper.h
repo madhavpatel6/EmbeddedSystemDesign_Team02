@@ -27,7 +27,17 @@
 #include "communication/jsmn.h"
 
 typedef enum {request, response, unknown} type_t;
-typedef enum {commStatsTargetLocator, sensorData} items_t;
+typedef enum {CommStatsTargetLocator, SensorData} items_t;
+
+typedef struct {
+	char stringValue[512];
+	items_t enumValue;
+} DictionaryType;
+
+static const DictionaryType Dictionary[] = {
+	{"SensorData", SensorData },
+	{"CommStatsTargetLocator", CommStatsTargetLocator }
+};
 
 static jsmn_parser p;
 static jsmntok_t t[128]; /* We expect no more than 128 tokens */

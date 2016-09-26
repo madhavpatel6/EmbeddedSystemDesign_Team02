@@ -64,12 +64,13 @@ void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numI
             for (j = 0; j < t[i+1].size; j++) {
                 jsmntok_t *g = &t[i+j+2];
                 sprintf(buf, "%.*s\0", g->end - g->start, JSON_STRING + g->start);
-                if(strcmp(buf, "CommStatsTargetLocator") == 0){
-                    items[k] = commStatsTargetLocator;
-                    k++;
-                }else if(strcmp(buf, "SensorData") == 0){
-                    items[k] = sensorData;
-                    k++;
+                int l = 0;
+                for (l = 0; l < sizeof(Dictionary) / sizeof(*Dictionary); l++) {
+                    if (strcmp(buf, Dictionary[l].stringValue) == 0) {
+                        items[k] = Dictionary[l].enumValue;
+                        k++;
+                        break;
+                    }
                 }
                 *numItems = k;
             }

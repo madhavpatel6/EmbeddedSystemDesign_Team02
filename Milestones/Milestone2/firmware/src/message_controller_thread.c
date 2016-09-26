@@ -147,7 +147,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         sprintf(tx_thread_obj.Data, "{\"type\":\"Response\"");
                         for(i = 0; i < numItems; i++) {
                             switch(items[i]) {
-                                case commStatsTargetLocator: {
+                                case CommStatsTargetLocator: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"myName\":\"%s\",\"numGoodMessagesRecved\":\"%d\",\"numCommErrors\":\"%d\",\"numJSONRequestsRecved\":\"%d\",\"numJSONResponsesRecved\":\"%d\",\"numJSONRequestsSent\":\"%d\",\"numJSONResponsesSent\":ONRequestsRecved\":\"%d\",\"numJSONResponsesRecved\":\"%d\",\"numJSONRequestsSent\":\"%d\",\"num \"%d\"",
                                     "TARGET_LOCATOR",
                                     statObject.GoodCount,
@@ -157,12 +157,12 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     statObject.Req_To_PathFinder + statObject.Req_To_SearcherMover + statObject.Req_To_TargetGrabber + statObject.Req_To_TargetLocator,
                                     statObject.Res_To_PathFinder + statObject.Res_To_SearcherMover + statObject.Res_To_TargetGrabber + statObject.Res_To_TargetLocator
                                     );
-                                    tx_thread_obj.Destination = SERVER;
+                                    tx_thread_obj.Destination = SEARCHERMOVER;
                                     tx_thread_obj.MessageCount = statObject.Res_To_TargetLocator;
                                     statObject.Res_To_TargetLocator++;
                                     break;
                                 }
-                                case sensorData: {
+                                case SensorData: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"SensorData\":\"%0.02f\"", internalData.sensordata);
                                     tx_thread_obj.Destination = obj.External.Source;
                                     switch(obj.External.Source) {
