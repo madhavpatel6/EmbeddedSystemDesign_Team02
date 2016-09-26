@@ -32,6 +32,7 @@
 #define SERVER 'H'
 #define MAXMESSAGESIZE 512
 #define MYMODULE TARGETLOCATOR
+#define MYMODULESTRING "TargetLocator"
 
 int CreateMessage(char buf[], char messageData[], char destination, char messagecount);
 

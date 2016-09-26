@@ -58,6 +58,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "tx_thread_public.h"
 
 static QueueHandle_t _queue;
+static int systemClock;
 
 #define TYPEOFQUEUE MessageObj
 #define SIZEOFQUEUE 128
@@ -75,6 +76,7 @@ void MESSAGE_CONTROLLER_THREAD_Initialize ( void )
     MESSAGE_CONTROLLER_THREAD_InitializeQueue();
     DRV_TMR1_Start();
     initParser();
+    resetSystemClock();
 }
 
 
@@ -122,19 +124,35 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                     case request: {
                         switch(obj.External.Source) {
                             case SEARCHERMOVER:
-                                statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_SearcherMover);
+                                if ((obj.External.MessageCount - statObject.Req_From_SearcherMover) < 0) {
+                                    statObject.PacketsDropped = (256 - statObject.Req_From_SearcherMover) + obj.External.MessageCount;
+                                } else {
+                                    statObject.PacketsDropped = (obj.External.MessageCount - statObject.Req_From_SearcherMover);
+                                }
                                 statObject.Req_From_SearcherMover++;
                                 break;
                             case TARGETLOCATOR:
-                                statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_TargetLocator);
+                                if ((obj.External.MessageCount - statObject.Req_From_TargetLocator) < 0) {
+                                    statObject.PacketsDropped = (256 - statObject.Req_From_TargetLocator) + obj.External.MessageCount;
+                                } else {
+                                    statObject.PacketsDropped = (obj.External.MessageCount - statObject.Req_From_TargetLocator);
+                                }
                                 statObject.Req_From_TargetLocator++;
                                 break;
                             case PATHFINDER:
-                                statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_PathFinder);
+                                if ((obj.External.MessageCount - statObject.Req_From_PathFinder) < 0) {
+                                    statObject.PacketsDropped = (256 - statObject.Req_From_PathFinder) + obj.External.MessageCount;
+                                } else {
+                                    statObject.PacketsDropped = (obj.External.MessageCount - statObject.Req_From_PathFinder);
+                                }
                                 statObject.Req_From_PathFinder++;
                                 break;
                             case TARGETGRABBER:
-                                statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_TargetGrabber);
+                                if ((obj.External.MessageCount - statObject.Req_From_TargetGrabber) < 0) {
+                                    statObject.PacketsDropped = (256 - statObject.Req_From_TargetGrabber) + obj.External.MessageCount;
+                                } else {
+                                    statObject.PacketsDropped = (obj.External.MessageCount - statObject.Req_From_TargetGrabber);
+                                }
                                 statObject.Req_From_TargetGrabber++;
                                 break;
                             case SERVER:
@@ -147,28 +165,69 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         sprintf(tx_thread_obj.Data, "{\"type\":\"Response\"");
                         for(i = 0; i < numItems; i++) {
                             switch(items[i]) {
-                                case CommStatsTargetLocator: {
+                                case CommStatsSearcherMover: case CommStatsTargetLocator: case CommStatsPathFinder: case CommStatsTargetGrabber: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), 
-                                            ",\"CommStatsTargetLocator\":{"
-                                            "\"myName\":\"%s\","
-                                            "\"numGoodMessagesRecved\":\"%d\","
-                                            "\"numCommErrors\":\"%d\","
-                                            "\"numJSONRequestsRecved\":\"%d\","
-                                            "\"numJSONResponsesRecved\":\"%d\","
-                                            "\"numJSONRequestsSent\":\"%d\","
-                                            "\"numJSONResponsesSent\":\"%d\""
-                                            "}",
-                                    "TARGET_LOCATOR",
-                                    statObject.GoodCount,
-                                    statObject.ErrorCount,
-                                    statObject.Req_From_PathFinder + statObject.Req_From_SearcherMover + statObject.Req_From_TargetGrabber + statObject.Req_From_TargetLocator,
-                                    statObject.Res_From_PathFinder + statObject.Res_From_SearcherMover + statObject.Res_From_TargetGrabber + statObject.Res_From_TargetLocator,
-                                    statObject.Req_To_PathFinder + statObject.Req_To_SearcherMover + statObject.Req_To_TargetGrabber + statObject.Req_To_TargetLocator,
-                                    statObject.Res_To_PathFinder + statObject.Res_To_SearcherMover + statObject.Res_To_TargetGrabber + statObject.Res_To_TargetLocator
+                                        ",\"CommStats%s\":{"
+                                        "\"myName\":\"%s\","
+                                        "\"numGoodMessagesRecved\":\"%d\","
+                                        "\"numCommErrors\":\"%d\","
+                                        "\"numJSONRequestsRecved\":\"%d\","
+                                        "\"numJSONResponsesRecved\":\"%d\","
+                                        "\"numJSONRequestsSent\":\"%d\","
+                                        "\"numJSONResponsesSent\":\"%d\"}",
+                                        MYMODULESTRING,
+                                        MYMODULESTRING,
+                                        statObject.GoodCount,
+                                        statObject.ErrorCount,
+                                        statObject.Req_From_PathFinder + statObject.Req_From_SearcherMover + statObject.Req_From_TargetGrabber + statObject.Req_From_TargetLocator,
+                                        statObject.Res_From_PathFinder + statObject.Res_From_SearcherMover + statObject.Res_From_TargetGrabber + statObject.Res_From_TargetLocator,
+                                        statObject.Req_To_PathFinder + statObject.Req_To_SearcherMover + statObject.Req_To_TargetGrabber + statObject.Req_To_TargetLocator,
+                                        statObject.Res_To_PathFinder + statObject.Res_To_SearcherMover + statObject.Res_To_TargetGrabber + statObject.Res_To_TargetLocator
+                                        );
+                                    tx_thread_obj.Destination = SERVER;
+                                    break;
+                                }
+                                case DetailedCommStatsSearcherMover: case DetailedCommStatsTargetLocator: case DetailedCommStatsPathFinder: case DetailedCommStatsTargetGrabber: {
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),
+                                        ",\"DetailedStats%s\":{"
+                                        "\"RequestTo\":{"
+                                        "\"SM\":\"%d\","
+                                        "\"TL\":\"%d\","
+                                        "\"PF\":\"%d\","
+                                        "\"TG\":\"%d\"},"
+                                        "\"ResponseTo\":{"
+                                        "\"SM\":\"%d\","
+                                        "\"TL\":\"%d\","
+                                        "\"PF\":\"%d\","
+                                        "\"TG\":\"%d\"},"
+                                        "\"ResponseFrom\":{"
+                                        "\"SM\":\"%d\","
+                                        "\"TL\":\"%d\","
+                                        "\"PF\":\"%d\","
+                                        "\"TG\":\"%d\"},"
+                                        "\"ResponseFrom\":{"
+                                        "\"SM\":\"%d\","
+                                        "\"TL\":\"%d\","
+                                        "\"PF\":\"%d\","
+                                        "\"TG\":\"%d\"}}",
+                                        MYMODULESTRING,
+                                        statObject.Req_To_SearcherMover,
+                                        statObject.Req_To_TargetLocator,
+                                        statObject.Req_To_PathFinder,
+                                        statObject.Req_To_TargetGrabber,
+                                        statObject.Res_To_SearcherMover,
+                                        statObject.Res_To_TargetLocator,
+                                        statObject.Res_To_PathFinder,
+                                        statObject.Res_To_TargetGrabber,
+                                        statObject.Req_From_SearcherMover,
+                                        statObject.Req_From_TargetLocator,
+                                        statObject.Req_From_PathFinder,
+                                        statObject.Req_From_TargetGrabber,
+                                        statObject.Res_From_SearcherMover,
+                                        statObject.Res_From_TargetLocator,
+                                        statObject.Res_From_PathFinder,
+                                        statObject.Res_From_TargetGrabber
                                     );
-                                    tx_thread_obj.Destination = SEARCHERMOVER;
-                                    tx_thread_obj.MessageCount = statObject.Res_To_TargetLocator;
-                                    statObject.Res_To_TargetLocator++;
                                     break;
                                 }
                                 case SensorData: {
@@ -176,46 +235,10 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     tx_thread_obj.Destination = obj.External.Source;
                                     break;
                                 }
-                                case DetailedCommStatsTargetLocator: {
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),
-                                    ",\"DetailedStatsTargetLocator\":{"
-                                    "\"RequestTo\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"},"
-                                    "\"ResponseTo\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"},"
-                                    "\"ResponseFrom\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"},"
-                                    "\"ResponseFrom\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"}}",
-                                    statObject.Req_To_SearcherMover,
-                                    statObject.Req_To_TargetLocator,
-                                    statObject.Req_To_PathFinder,
-                                    statObject.Req_To_TargetGrabber,
-                                    statObject.Res_To_SearcherMover,
-                                    statObject.Res_To_TargetLocator,
-                                    statObject.Res_To_PathFinder,
-                                    statObject.Res_To_TargetGrabber,
-                                    statObject.Req_From_SearcherMover,
-                                    statObject.Req_From_TargetLocator,
-                                    statObject.Req_From_PathFinder,
-                                    statObject.Req_From_TargetGrabber,
-                                    statObject.Res_From_SearcherMover,
-                                    statObject.Res_From_TargetLocator,
-                                    statObject.Res_From_PathFinder,
-                                    statObject.Res_From_TargetGrabber
-                                    );
+                                case msLocalTime:{
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"msLocalTime\":\"%d\"", getSystemClock() * 200);
+                                    tx_thread_obj.Destination = obj.External.Source;
+                                    break;
                                 }
                                 default:
                                     break;
@@ -354,6 +377,18 @@ void MESSAGE_CONTROLLER_THREAD_SendToQueue(MessageObj buffer) {
 
 void MESSAGE_CONTROLLER_THREAD_SendToQueueISR(MessageObj buffer, BaseType_t *pxHigherPriorityTaskWoken) {
     xQueueSendFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
+}
+
+void resetSystemClock(){
+    systemClock = 0;
+}
+
+void incrementSystemClock(){
+    systemClock++;
+}
+
+int getSystemClock(){
+    return systemClock;
 }
 
 /*******************************************************************************

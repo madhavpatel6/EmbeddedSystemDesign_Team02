@@ -220,6 +220,12 @@ void MESSAGE_CONTROLLER_THREAD_InitializeQueue();
 
 void MESSAGE_CONTROLLER_THREAD_ReadFromQueue(MessageObj* pvBuffer);
 
+void resetSystemClock();
+
+void incrementSystemClock();
+
+int getSystemClock();
+
 #endif /* _MESSAGE_CONTROLLER_THREAD_H */
 
 //DOM-IGNORE-BEGIN
