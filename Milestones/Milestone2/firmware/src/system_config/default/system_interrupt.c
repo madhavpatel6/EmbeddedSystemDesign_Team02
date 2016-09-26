@@ -133,28 +133,28 @@ void IntHandlerDrvTmrInstance1(void)
     MessageObj obj;
     obj.Type = SEND_REQUEST;
     dbgOutputLoc(BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR);
-    switch(MYMODULE){
-        case SEARCHERMOVER:
-            obj.Request = SMtoTL;
+//    switch(MYMODULE){
+//        case SEARCHERMOVER:
+//            obj.Request = SMtoTL;
 //            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            break;
-        case TARGETLOCATOR:
-            obj.Request = TLtoSM;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            obj.Request = TLtoPF;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            break;
-        case PATHFINDER:
-            obj.Request = PFtoTL;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            obj.Request = PFtoTG;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            break;
-        case TARGETGRABBER:
-            obj.Request = TGtoPF;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            break;
-    }
+//            break;
+//        case TARGETLOCATOR:
+//            obj.Request = TLtoSM;
+//            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+//            obj.Request = TLtoPF;
+//            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+//            break;
+//        case PATHFINDER:
+//            obj.Request = PFtoTL;
+//            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+//            obj.Request = PFtoTG;
+//            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+//            break;
+//        case TARGETGRABBER:
+//            obj.Request = TGtoPF;
+//            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+//            break;
+//    }
     dbgOutputLoc(AFTER_SEND_TO_Q_TMR_INSTANCE_1_ISR);
     incrementSystemClock();
     dbgOutputLoc(LEAVE_TMR_INSTANCE_1_ISR);

@@ -165,9 +165,9 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         sprintf(tx_thread_obj.Data, "{\"type\":\"Response\"");
                         for(i = 0; i < numItems; i++) {
                             switch(items[i]) {
-                                case CommStatsSearcherMover: {
+                                case CommStatsSearcherMover: case CommStatsTargetLocator: case CommStatsPathFinder: case CommStatsTargetGrabber: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), 
-                                        ",\"CommStatsSearcherMover\":{"
+                                        ",\"CommStats%s\":{"
                                         "\"myName\":\"%s\","
                                         "\"numGoodMessagesRecved\":\"%d\","
                                         "\"numCommErrors\":\"%d\","
@@ -175,6 +175,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                         "\"numJSONResponsesRecved\":\"%d\","
                                         "\"numJSONRequestsSent\":\"%d\","
                                         "\"numJSONResponsesSent\":\"%d\"}",
+                                        MYMODULESTRING,
                                         MYMODULESTRING,
                                         statObject.GoodCount,
                                         statObject.ErrorCount,
@@ -186,232 +187,48 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     tx_thread_obj.Destination = SERVER;
                                     break;
                                 }
-                                case CommStatsTargetLocator: {
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), 
-                                        ",\"CommStatsTargetLocator\":{"
-                                        "\"myName\":\"%s\","
-                                        "\"numGoodMessagesRecved\":\"%d\","
-                                        "\"numCommErrors\":\"%d\","
-                                        "\"numJSONRequestsRecved\":\"%d\","
-                                        "\"numJSONResponsesRecved\":\"%d\","
-                                        "\"numJSONRequestsSent\":\"%d\","
-                                        "\"numJSONResponsesSent\":\"%d\"}",
+                                case DetailedCommStatsSearcherMover: case DetailedCommStatsTargetLocator: case DetailedCommStatsPathFinder: case DetailedCommStatsTargetGrabber: {
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),
+                                        ",\"DetailedStats%s\":{"
+                                        "\"RequestTo\":{"
+                                        "\"SM\":\"%d\","
+                                        "\"TL\":\"%d\","
+                                        "\"PF\":\"%d\","
+                                        "\"TG\":\"%d\"},"
+                                        "\"ResponseTo\":{"
+                                        "\"SM\":\"%d\","
+                                        "\"TL\":\"%d\","
+                                        "\"PF\":\"%d\","
+                                        "\"TG\":\"%d\"},"
+                                        "\"ResponseFrom\":{"
+                                        "\"SM\":\"%d\","
+                                        "\"TL\":\"%d\","
+                                        "\"PF\":\"%d\","
+                                        "\"TG\":\"%d\"},"
+                                        "\"ResponseFrom\":{"
+                                        "\"SM\":\"%d\","
+                                        "\"TL\":\"%d\","
+                                        "\"PF\":\"%d\","
+                                        "\"TG\":\"%d\"}}",
                                         MYMODULESTRING,
-                                        statObject.GoodCount,
-                                        statObject.ErrorCount,
-                                        statObject.Req_From_PathFinder + statObject.Req_From_SearcherMover + statObject.Req_From_TargetGrabber + statObject.Req_From_TargetLocator,
-                                        statObject.Res_From_PathFinder + statObject.Res_From_SearcherMover + statObject.Res_From_TargetGrabber + statObject.Res_From_TargetLocator,
-                                        statObject.Req_To_PathFinder + statObject.Req_To_SearcherMover + statObject.Req_To_TargetGrabber + statObject.Req_To_TargetLocator,
-                                        statObject.Res_To_PathFinder + statObject.Res_To_SearcherMover + statObject.Res_To_TargetGrabber + statObject.Res_To_TargetLocator
-                                        );
-                                    tx_thread_obj.Destination = SERVER;
+                                        statObject.Req_To_SearcherMover,
+                                        statObject.Req_To_TargetLocator,
+                                        statObject.Req_To_PathFinder,
+                                        statObject.Req_To_TargetGrabber,
+                                        statObject.Res_To_SearcherMover,
+                                        statObject.Res_To_TargetLocator,
+                                        statObject.Res_To_PathFinder,
+                                        statObject.Res_To_TargetGrabber,
+                                        statObject.Req_From_SearcherMover,
+                                        statObject.Req_From_TargetLocator,
+                                        statObject.Req_From_PathFinder,
+                                        statObject.Req_From_TargetGrabber,
+                                        statObject.Res_From_SearcherMover,
+                                        statObject.Res_From_TargetLocator,
+                                        statObject.Res_From_PathFinder,
+                                        statObject.Res_From_TargetGrabber
+                                    );
                                     break;
-                                }
-                                case CommStatsPathFinder: {
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), 
-                                        ",\"CommStatsPathFinder\":{"
-                                        "\"myName\":\"%s\","
-                                        "\"numGoodMessagesRecved\":\"%d\","
-                                        "\"numCommErrors\":\"%d\","
-                                        "\"numJSONRequestsRecved\":\"%d\","
-                                        "\"numJSONResponsesRecved\":\"%d\","
-                                        "\"numJSONRequestsSent\":\"%d\","
-                                        "\"numJSONResponsesSent\":\"%d\"}",
-                                        MYMODULESTRING,
-                                        statObject.GoodCount,
-                                        statObject.ErrorCount,
-                                        statObject.Req_From_PathFinder + statObject.Req_From_SearcherMover + statObject.Req_From_TargetGrabber + statObject.Req_From_TargetLocator,
-                                        statObject.Res_From_PathFinder + statObject.Res_From_SearcherMover + statObject.Res_From_TargetGrabber + statObject.Res_From_TargetLocator,
-                                        statObject.Req_To_PathFinder + statObject.Req_To_SearcherMover + statObject.Req_To_TargetGrabber + statObject.Req_To_TargetLocator,
-                                        statObject.Res_To_PathFinder + statObject.Res_To_SearcherMover + statObject.Res_To_TargetGrabber + statObject.Res_To_TargetLocator
-                                        );
-                                    tx_thread_obj.Destination = SERVER;
-                                    break;
-                                }
-                                case CommStatsTargetGrabber: {
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), 
-                                        ",\"CommStatsTargetGrabber\":{"
-                                        "\"myName\":\"%s\","
-                                        "\"numGoodMessagesRecved\":\"%d\","
-                                        "\"numCommErrors\":\"%d\","
-                                        "\"numJSONRequestsRecved\":\"%d\","
-                                        "\"numJSONResponsesRecved\":\"%d\","
-                                        "\"numJSONRequestsSent\":\"%d\","
-                                        "\"numJSONResponsesSent\":\"%d\"}",
-                                        MYMODULESTRING,
-                                        statObject.GoodCount,
-                                        statObject.ErrorCount,
-                                        statObject.Req_From_PathFinder + statObject.Req_From_SearcherMover + statObject.Req_From_TargetGrabber + statObject.Req_From_TargetLocator,
-                                        statObject.Res_From_PathFinder + statObject.Res_From_SearcherMover + statObject.Res_From_TargetGrabber + statObject.Res_From_TargetLocator,
-                                        statObject.Req_To_PathFinder + statObject.Req_To_SearcherMover + statObject.Req_To_TargetGrabber + statObject.Req_To_TargetLocator,
-                                        statObject.Res_To_PathFinder + statObject.Res_To_SearcherMover + statObject.Res_To_TargetGrabber + statObject.Res_To_TargetLocator
-                                        );
-                                    tx_thread_obj.Destination = SERVER;
-                                    break;
-                                }
-                                case DetailedCommStatsSearcherMover: {
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),
-                                    ",\"DetailedStatsSearcherMover\":{"
-                                    "\"RequestTo\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"},"
-                                    "\"ResponseTo\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"},"
-                                    "\"ResponseFrom\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"},"
-                                    "\"ResponseFrom\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"}}",
-                                    statObject.Req_To_SearcherMover,
-                                    statObject.Req_To_TargetLocator,
-                                    statObject.Req_To_PathFinder,
-                                    statObject.Req_To_TargetGrabber,
-                                    statObject.Res_To_SearcherMover,
-                                    statObject.Res_To_TargetLocator,
-                                    statObject.Res_To_PathFinder,
-                                    statObject.Res_To_TargetGrabber,
-                                    statObject.Req_From_SearcherMover,
-                                    statObject.Req_From_TargetLocator,
-                                    statObject.Req_From_PathFinder,
-                                    statObject.Req_From_TargetGrabber,
-                                    statObject.Res_From_SearcherMover,
-                                    statObject.Res_From_TargetLocator,
-                                    statObject.Res_From_PathFinder,
-                                    statObject.Res_From_TargetGrabber
-                                    );
-                                }
-                                case DetailedCommStatsTargetLocator: {
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),
-                                    ",\"DetailedStatsTargetLocator\":{"
-                                    "\"RequestTo\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"},"
-                                    "\"ResponseTo\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"},"
-                                    "\"ResponseFrom\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"},"
-                                    "\"ResponseFrom\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"}}",
-                                    statObject.Req_To_SearcherMover,
-                                    statObject.Req_To_TargetLocator,
-                                    statObject.Req_To_PathFinder,
-                                    statObject.Req_To_TargetGrabber,
-                                    statObject.Res_To_SearcherMover,
-                                    statObject.Res_To_TargetLocator,
-                                    statObject.Res_To_PathFinder,
-                                    statObject.Res_To_TargetGrabber,
-                                    statObject.Req_From_SearcherMover,
-                                    statObject.Req_From_TargetLocator,
-                                    statObject.Req_From_PathFinder,
-                                    statObject.Req_From_TargetGrabber,
-                                    statObject.Res_From_SearcherMover,
-                                    statObject.Res_From_TargetLocator,
-                                    statObject.Res_From_PathFinder,
-                                    statObject.Res_From_TargetGrabber
-                                    );
-                                }
-                                case DetailedCommStatsPathFinder: {
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),
-                                    ",\"DetailedStatsPathFinder\":{"
-                                    "\"RequestTo\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"},"
-                                    "\"ResponseTo\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"},"
-                                    "\"ResponseFrom\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"},"
-                                    "\"ResponseFrom\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"}}",
-                                    statObject.Req_To_SearcherMover,
-                                    statObject.Req_To_TargetLocator,
-                                    statObject.Req_To_PathFinder,
-                                    statObject.Req_To_TargetGrabber,
-                                    statObject.Res_To_SearcherMover,
-                                    statObject.Res_To_TargetLocator,
-                                    statObject.Res_To_PathFinder,
-                                    statObject.Res_To_TargetGrabber,
-                                    statObject.Req_From_SearcherMover,
-                                    statObject.Req_From_TargetLocator,
-                                    statObject.Req_From_PathFinder,
-                                    statObject.Req_From_TargetGrabber,
-                                    statObject.Res_From_SearcherMover,
-                                    statObject.Res_From_TargetLocator,
-                                    statObject.Res_From_PathFinder,
-                                    statObject.Res_From_TargetGrabber
-                                    );
-                                }
-                                case DetailedCommStatsTargetGrabber: {
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),
-                                    ",\"DetailedStatsTargetGrabber\":{"
-                                    "\"RequestTo\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"},"
-                                    "\"ResponseTo\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"},"
-                                    "\"ResponseFrom\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"},"
-                                    "\"ResponseFrom\":{"
-                                    "\"SM\":\"%d\","
-                                    "\"TL\":\"%d\","
-                                    "\"PF\":\"%d\","
-                                    "\"TG\":\"%d\"}}",
-                                    statObject.Req_To_SearcherMover,
-                                    statObject.Req_To_TargetLocator,
-                                    statObject.Req_To_PathFinder,
-                                    statObject.Req_To_TargetGrabber,
-                                    statObject.Res_To_SearcherMover,
-                                    statObject.Res_To_TargetLocator,
-                                    statObject.Res_To_PathFinder,
-                                    statObject.Res_To_TargetGrabber,
-                                    statObject.Req_From_SearcherMover,
-                                    statObject.Req_From_TargetLocator,
-                                    statObject.Req_From_PathFinder,
-                                    statObject.Req_From_TargetGrabber,
-                                    statObject.Res_From_SearcherMover,
-                                    statObject.Res_From_TargetLocator,
-                                    statObject.Res_From_PathFinder,
-                                    statObject.Res_From_TargetGrabber
-                                    );
                                 }
                                 case SensorData: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"SensorData\":\"%0.02f\"", internalData.sensordata);
