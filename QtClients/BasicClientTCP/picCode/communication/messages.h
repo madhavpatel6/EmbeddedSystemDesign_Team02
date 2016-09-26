@@ -25,13 +25,13 @@
 
 #define STARTOFTEXT 0x02
 #define ENDOFTEXT 0x03
-#define SEARCHERMOVER 's'
-#define TARGETLOCATOR 'l'
-#define PATHFINDER 'p'
-#define TARGETGRABBER 'g'
-#define SERVER 'h'
+#define SEARCHERMOVER 'S'
+#define TARGETLOCATOR 'L'
+#define PATHFINDER 'P'
+#define TARGETGRABBER 'G'
+#define SERVER 'H'
 #define MAXMESSAGESIZE 512
-#define MYMODULE 'h'
+#define MYMODULE SERVER
 
 #ifdef __cplusplus
 extern "C" {

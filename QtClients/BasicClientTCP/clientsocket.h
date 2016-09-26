@@ -5,6 +5,7 @@
 #include <QTcpSocket>
 #include <QDebug>
 #include <QThreadPool>
+#include "picCode/communication/messages.h"
 
 class ClientSocket : public QObject
 {
@@ -14,6 +15,9 @@ public:
 
     void connectToHost(QString ip,int port);
     int  send(QByteArray words);
+    QTcpSocket* getClient();
+
+    bool isConnected;
 
 signals:
 
@@ -21,10 +25,6 @@ public slots:
     void connected();
     void disconnected();
     void readyRead();
-
-    // make the server fully ascynchronous
-    // by doing time consuming task
-    void TaskResult(int Number);
 
 private:
     QTcpSocket *socket;
