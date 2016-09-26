@@ -27,7 +27,9 @@
 #include "communication/jsmn.h"
 
 typedef enum {request, response, unknown} type_t;
-typedef enum {CommStatsTargetLocator, DetailedCommStatsTargetLocator, SensorData} items_t;
+typedef enum {CommStatsSearcherMover, CommStatsTargetLocator, CommStatsPathFinder, CommStatsTargetGrabber,
+       DetailedCommStatsSearcherMover, DetailedCommStatsTargetLocator, DetailedCommStatsPathFinder,
+       DetailedCommStatsTargetGrabber, SensorData,msLocalTime} items_t;
 
 typedef struct {
 	char stringValue[512];
@@ -35,9 +37,17 @@ typedef struct {
 } DictionaryType;
 
 static const DictionaryType Dictionary[] = {
-	{"SensorData", SensorData },
-	{"CommStatsTargetLocator", CommStatsTargetLocator },
-    {"DetailedCommStatsTargetLocator", DetailedCommStatsTargetLocator }
+    {"SensorData", SensorData},
+   {"CommStatsSearcherMover", CommStatsSearcherMover},
+    {"CommStatsTargetLocator", CommStatsTargetLocator},
+   {"CommStatsPathFinder", CommStatsPathFinder},
+    {"CommStatsTargetGrabber",CommStatsTargetGrabber},
+   {"DetailedCommStatsSearcherMover", DetailedCommStatsSearcherMover},
+    {"DetailedCommStatsTargetLocator", DetailedCommStatsTargetLocator},
+   {"DetailedCommStatsPathFinder", DetailedCommStatsPathFinder},
+    {"DetailedCommStatsTargetGrabber", DetailedCommStatsTargetGrabber},
+   {"DetailedCommStatsTargetLocator", DetailedCommStatsTargetLocator}, 
+    {"msLocalTime", msLocalTime}
 };
 
 static jsmn_parser p;

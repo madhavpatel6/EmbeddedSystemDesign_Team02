@@ -58,6 +58,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "tx_thread_public.h"
 
 static QueueHandle_t _queue;
+static int systemClock;
 
 #define TYPEOFQUEUE MessageObj
 #define SIZEOFQUEUE 128
@@ -75,6 +76,7 @@ void MESSAGE_CONTROLLER_THREAD_Initialize ( void )
     MESSAGE_CONTROLLER_THREAD_InitializeQueue();
     DRV_TMR1_Start();
     initParser();
+    resetSystemClock();
 }
 
 
@@ -233,6 +235,11 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     statObject.Res_From_TargetGrabber
                                     );
                                 }
+                                case msLocalTime:{
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"msLocalTime\":\"%d\"", getSystemClock() * 200);
+                                    tx_thread_obj.Destination = obj.External.Source;
+                                    break;
+                                }
                                 default:
                                     break;
                             }
@@ -370,6 +377,18 @@ void MESSAGE_CONTROLLER_THREAD_SendToQueue(MessageObj buffer) {
 
 void MESSAGE_CONTROLLER_THREAD_SendToQueueISR(MessageObj buffer, BaseType_t *pxHigherPriorityTaskWoken) {
     xQueueSendFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
+}
+
+void resetSystemClock(){
+    systemClock = 0;
+}
+
+void incrementSystemClock(){
+    systemClock++;
+}
+
+int getSystemClock(){
+    return systemClock;
 }
 
 /*******************************************************************************
