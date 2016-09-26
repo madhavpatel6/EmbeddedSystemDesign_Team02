@@ -32,8 +32,8 @@ typedef enum {CommStatsSearcherMover, CommStatsTargetLocator, CommStatsPathFinde
        DetailedCommStatsTargetGrabber, SensorData,msLocalTime} items_t;
 
 typedef struct {
-	char stringValue[512];
-	items_t enumValue;
+  char stringValue[512];
+  items_t enumValue;
 } DictionaryType;
 
 static const DictionaryType Dictionary[] = {
