@@ -218,34 +218,53 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                 dbgOutputLoc(CASE_SEND_REQUEST_MESSAGE_CONTROLLER_THREAD);
                 // We will only need to have a new case for something we are requesting from another PIC
                 switch(obj.Request) {
-                    case RV1_REQUEST_LOCATION_ORIENTATION: {
-                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"RV1_Location\",\"RV1_Orientation\"]}");
-                        tx_thread_obj.Destination = SEARCHERMOVER;
-                        tx_thread_obj.MessageCount = statObject.Req_To_SearcherMover;
-                        statObject.Req_To_SearcherMover++;
-                        TX_THREAD_SendToQueue(tx_thread_obj);
-                        break;
-                    }
-                    case RV1_REQUEST_SENSOR_DATA: {
-                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"SensorData\"]}");
+                    case SMtoTL: {
+                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"Obstacles\",\"RV1_Location\",\"RV1_Orientation\"]}");
                         tx_thread_obj.Destination = TARGETLOCATOR;
                         tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
                         statObject.Req_To_TargetLocator++;
-                        TX_THREAD_SendToQueue(tx_thread_obj);
                         break;
                     }
-                    case RV1_REQUEST_COMM_STATS: {
-                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"CommStatsTargetLocator\"]}");
+                    case TLtoSM: {
+                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"TLtoSM\"]}");
                         tx_thread_obj.Destination = SEARCHERMOVER;
                         tx_thread_obj.MessageCount = statObject.Req_To_SearcherMover;
                         statObject.Req_To_SearcherMover++;
-                        TX_THREAD_SendToQueue(tx_thread_obj);
+                        break;
+                    }
+                    case TLtoPF: {
+                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"TLtoPF\"]}");
+                        tx_thread_obj.Destination = PATHFINDER;
+                        tx_thread_obj.MessageCount = statObject.Req_To_PathFinder;
+                        statObject.Req_To_PathFinder++;
+                        break;
+                    }
+                    case PFtoTL: {
+                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"PFtoTL\"]}");
+                        tx_thread_obj.Destination = TARGETLOCATOR;
+                        tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
+                        statObject.Req_To_TargetLocator++;
+                        break;
+                    }
+                    case PFtoTG: {
+                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"PFtoTG\"]}");
+                        tx_thread_obj.Destination = TARGETGRABBER;
+                        tx_thread_obj.MessageCount = statObject.Req_To_TargetGrabber;
+                        statObject.Req_To_TargetGrabber++;
+                        break;
+                    }
+                    case TGtoPF: {
+                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"TGtoPF\"]}");
+                        tx_thread_obj.Destination = PATHFINDER;
+                        tx_thread_obj.MessageCount = statObject.Req_To_PathFinder;
+                        statObject.Req_To_PathFinder++;
                         break;
                     }
                     default: {
                         continue;
                     }
                 }
+                TX_THREAD_SendToQueue(tx_thread_obj);
                 break;
             }
             case UPDATE: {

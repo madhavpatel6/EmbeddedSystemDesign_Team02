@@ -86,7 +86,14 @@ typedef struct {
 typedef enum UpdateType_enum { LOCATION, ORIENTATION, SENSORDATA } UpdateType;
 
 //This is any request that you would want to ... well ... request
-typedef enum InternalRequestType_enum { RV1_REQUEST_LOCATION_ORIENTATION, RV1_REQUEST_SENSOR_DATA, RV1_REQUEST_COMM_STATS } InternalRequestType;
+// these are really the categories of requests. the specific objects in them is added later
+typedef enum InternalRequestType_enum { SMtoTL,
+                                        TLtoSM, 
+                                        TLtoPF, 
+                                        PFtoTL, 
+                                        PFtoTG, 
+                                        TGtoPF                                       
+ } InternalRequestType;
 
 //------------------------------------------------------------------------------
 //You should not need to change anything beyond this point
