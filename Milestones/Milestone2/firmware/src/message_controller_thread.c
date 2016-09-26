@@ -148,7 +148,16 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         for(i = 0; i < numItems; i++) {
                             switch(items[i]) {
                                 case CommStatsTargetLocator: {
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"myName\":\"%s\",\"numGoodMessagesRecved\":\"%d\",\"numCommErrors\":\"%d\",\"numJSONRequestsRecved\":\"%d\",\"numJSONResponsesRecved\":\"%d\",\"numJSONRequestsSent\":\"%d\",\"numJSONResponsesSent\":ONRequestsRecved\":\"%d\",\"numJSONResponsesRecved\":\"%d\",\"numJSONRequestsSent\":\"%d\",\"num \"%d\"",
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), 
+                                            ",\"CommStatsTargetLocator\":{"
+                                            "\"myName\":\"%s\","
+                                            "\"numGoodMessagesRecved\":\"%d\","
+                                            "\"numCommErrors\":\"%d\","
+                                            "\"numJSONRequestsRecved\":\"%d\","
+                                            "\"numJSONResponsesRecved\":\"%d\","
+                                            "\"numJSONRequestsSent\":\"%d\","
+                                            "\"numJSONResponsesSent\":\"%d\""
+                                            "}",
                                     "TARGET_LOCATOR",
                                     statObject.GoodCount,
                                     statObject.ErrorCount,
