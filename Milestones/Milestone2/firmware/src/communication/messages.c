@@ -168,18 +168,47 @@ int CreateMessage(char buf[], char messageData[], char destination, char message
 	memset(buf, 0, MAXMESSAGESIZE);
 	// Pack message into string 'buf'
 	// Format: start byte, destination, source, message count, data length (upper 8 bits), data length (lower 8 bits), data, checksum
-	size_t len = strlen(messageData);
-	return sprintf(buf, "%c%c%c%c%c%c%s%c%c",
-		STARTOFTEXT,
-		destination,
-		MYMODULE,
-		messagecount && 0xFF,
-        (len & 0xFF00) >> 8,
-		len & 0x00FF,
-		messageData,
-		checksum(messageData),
-		ENDOFTEXT
-		);
+	
+	if (!INJECTERRORS) {
+		size_t len = strlen(messageData);
+		return sprintf(buf, "%c%c%c%c%c%c%s%c%c",
+			STARTOFTEXT,
+			destination,
+			MYMODULE,
+			messagecount && 0xFF,
+	        (len & 0xFF00) >> 8,
+			len & 0x00FF,
+			messageData,
+			checksum(messageData),
+			ENDOFTEXT
+			);
+	} else {
+		char badMessage[256];
+        int i;
+        int len = strlen(messageData);
+
+        /* remove bytes from message */
+        for (i = 0; i < len - 1; i++) {
+            badMessage[i] = messageData[i + 5];
+        }
+
+	    if(i < len) {
+            badMessage[i] = '\0';
+        }
+
+        return sprintf(buf, "%c%c%c%c%c%c%s%c%c",
+            STARTOFTEXT,
+            destination,
+            MYMODULE,
+            messagecount && 0xFF,
+    		(len & 0xFF00) >> 8,
+            len & 0x00FF,
+            badMessage,
+            checksum(messageData),
+            ENDOFTEXT
+            );
+	}
+	
     dbgOutputLoc(LEAVE_CREATEMESSAGE_MESSAGE_C);
 }
 

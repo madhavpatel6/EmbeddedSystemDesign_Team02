@@ -171,6 +171,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                         "\"myName\":\"%s\","
                                         "\"numGoodMessagesRecved\":\"%d\","
                                         "\"numCommErrors\":\"%d\","
+                                        "\"numMessagesDropped\":\"%d\","    
                                         "\"numJSONRequestsRecved\":\"%d\","
                                         "\"numJSONResponsesRecved\":\"%d\","
                                         "\"numJSONRequestsSent\":\"%d\","
@@ -179,6 +180,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                         MYMODULESTRING,
                                         statObject.GoodCount,
                                         statObject.ErrorCount,
+                                        statObject.PacketsDropped,
                                         statObject.Req_From_PathFinder + statObject.Req_From_SearcherMover + statObject.Req_From_TargetGrabber + statObject.Req_From_TargetLocator,
                                         statObject.Res_From_PathFinder + statObject.Res_From_SearcherMover + statObject.Res_From_TargetGrabber + statObject.Res_From_TargetLocator,
                                         statObject.Req_To_PathFinder + statObject.Req_To_SearcherMover + statObject.Req_To_TargetGrabber + statObject.Req_To_TargetLocator,
@@ -190,6 +192,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 case DetailedCommStatsSearcherMover: case DetailedCommStatsTargetLocator: case DetailedCommStatsPathFinder: case DetailedCommStatsTargetGrabber: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),
                                         ",\"DetailedStats%s\":{"
+                                        "\"numMessagesDropped\":\"%d\","
                                         "\"RequestTo\":{"
                                         "\"SM\":\"%d\","
                                         "\"TL\":\"%d\","
@@ -200,7 +203,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                         "\"TL\":\"%d\","
                                         "\"PF\":\"%d\","
                                         "\"TG\":\"%d\"},"
-                                        "\"ResponseFrom\":{"
+                                        "\"RequestFrom\":{"
                                         "\"SM\":\"%d\","
                                         "\"TL\":\"%d\","
                                         "\"PF\":\"%d\","
@@ -211,6 +214,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                         "\"PF\":\"%d\","
                                         "\"TG\":\"%d\"}}",
                                         MYMODULESTRING,
+                                        statObject.PacketsDropped,
                                         statObject.Req_To_SearcherMover,
                                         statObject.Req_To_TargetLocator,
                                         statObject.Req_To_PathFinder,
@@ -325,6 +329,13 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         tx_thread_obj.Destination = PATHFINDER;
                         tx_thread_obj.MessageCount = statObject.Req_To_PathFinder;
                         statObject.Req_To_PathFinder++;
+                        break;
+                    }
+                    case SensorData: {
+                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"SensorData\"]}");
+                        tx_thread_obj.Destination = TARGETLOCATOR;
+                        tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
+                        statObject.Req_To_TargetLocator++;
                         break;
                     }
                     default: {

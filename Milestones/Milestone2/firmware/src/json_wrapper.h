@@ -29,7 +29,7 @@
 typedef enum {request, response, unknown} type_t;
 typedef enum {CommStatsSearcherMover, CommStatsTargetLocator, CommStatsPathFinder, CommStatsTargetGrabber,
        DetailedCommStatsSearcherMover, DetailedCommStatsTargetLocator, DetailedCommStatsPathFinder,
-       DetailedCommStatsTargetGrabber, SensorData,msLocalTime} items_t;
+       DetailedCommStatsTargetGrabber, SensorData, msLocalTime} items_t;
 
 typedef struct {
   char stringValue[512];
@@ -38,15 +38,16 @@ typedef struct {
 
 static const DictionaryType Dictionary[] = {
     {"SensorData", SensorData},
-   {"CommStatsSearcherMover", CommStatsSearcherMover},
+    {"CommStatsSearcherMover", CommStatsSearcherMover},
     {"CommStatsTargetLocator", CommStatsTargetLocator},
-   {"CommStatsPathFinder", CommStatsPathFinder},
+    {"CommStatsPathFinder", CommStatsPathFinder},
     {"CommStatsTargetGrabber",CommStatsTargetGrabber},
-   {"DetailedCommStatsSearcherMover", DetailedCommStatsSearcherMover},
+    {"DetailedCommStatsSearcherMover", DetailedCommStatsSearcherMover},
     {"DetailedCommStatsTargetLocator", DetailedCommStatsTargetLocator},
-   {"DetailedCommStatsPathFinder", DetailedCommStatsPathFinder},
+    {"DetailedCommStatsPathFinder", DetailedCommStatsPathFinder},
     {"DetailedCommStatsTargetGrabber", DetailedCommStatsTargetGrabber},
-   {"DetailedCommStatsTargetLocator", DetailedCommStatsTargetLocator}, 
+    {"DetailedCommStatsTargetLocator", DetailedCommStatsTargetLocator},
+    {"SensorData", SensorData},
     {"msLocalTime", msLocalTime}
 };
 

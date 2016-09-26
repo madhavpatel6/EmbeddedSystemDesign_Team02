@@ -31,8 +31,10 @@
 #define TARGETGRABBER 'G'
 #define SERVER 'H'
 #define MAXMESSAGESIZE 512
-#define MYMODULE TARGETLOCATOR
-#define MYMODULESTRING "TargetLocator"
+#define MYMODULE SEARCHERMOVER
+#define MYMODULESTRING "SearcherMover"
+
+#define INJECTERRORS 0
 
 int CreateMessage(char buf[], char messageData[], char destination, char messagecount);
 
