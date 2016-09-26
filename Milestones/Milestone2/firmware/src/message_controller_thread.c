@@ -174,7 +174,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                             "\"numJSONRequestsSent\":\"%d\","
                                             "\"numJSONResponsesSent\":\"%d\""
                                             "}",
-                                    "SEARCHER_MOVER",
+                                    MYMODULESTRING,
                                     statObject.GoodCount,
                                     statObject.ErrorCount,
                                     statObject.Req_From_PathFinder + statObject.Req_From_SearcherMover + statObject.Req_From_TargetGrabber + statObject.Req_From_TargetLocator,
