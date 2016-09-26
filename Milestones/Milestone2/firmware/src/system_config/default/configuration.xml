@@ -285,7 +285,7 @@
       <Template>
         <Name>FreeRTOSConfig.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>4B8830C246227EC06BF88A9845BC3890</Checksum>
+        <Checksum>621F8CAA96BD25D09F56A438C8363987</Checksum>
       </Template>
       <Template>
         <Name>drv_usart_static_byte_model.c</Name>

@@ -122,19 +122,35 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                     case request: {
                         switch(obj.External.Source) {
                             case SEARCHERMOVER:
-                                statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_SearcherMover);
+                                if ((obj.External.MessageCount - statObject.Req_From_SearcherMover) < 0) {
+                                    statObject.PacketsDropped = (256 - statObject.Req_From_SearcherMover) + obj.External.MessageCount;
+                                } else {
+                                    statObject.PacketsDropped = (obj.External.MessageCount - statObject.Req_From_SearcherMover);
+                                }
                                 statObject.Req_From_SearcherMover++;
                                 break;
                             case TARGETLOCATOR:
-                                statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_TargetLocator);
+                                if ((obj.External.MessageCount - statObject.Req_From_TargetLocator) < 0) {
+                                    statObject.PacketsDropped = (256 - statObject.Req_From_TargetLocator) + obj.External.MessageCount;
+                                } else {
+                                    statObject.PacketsDropped = (obj.External.MessageCount - statObject.Req_From_TargetLocator);
+                                }
                                 statObject.Req_From_TargetLocator++;
                                 break;
                             case PATHFINDER:
-                                statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_PathFinder);
+                                if ((obj.External.MessageCount - statObject.Req_From_PathFinder) < 0) {
+                                    statObject.PacketsDropped = (256 - statObject.Req_From_PathFinder) + obj.External.MessageCount;
+                                } else {
+                                    statObject.PacketsDropped = (obj.External.MessageCount - statObject.Req_From_PathFinder);
+                                }
                                 statObject.Req_From_PathFinder++;
                                 break;
                             case TARGETGRABBER:
-                                statObject.PacketsDropped += (obj.External.MessageCount - statObject.Req_From_TargetGrabber);
+                                if ((obj.External.MessageCount - statObject.Req_From_TargetGrabber) < 0) {
+                                    statObject.PacketsDropped = (256 - statObject.Req_From_TargetGrabber) + obj.External.MessageCount;
+                                } else {
+                                    statObject.PacketsDropped = (obj.External.MessageCount - statObject.Req_From_TargetGrabber);
+                                }
                                 statObject.Req_From_TargetGrabber++;
                                 break;
                             case SERVER:
@@ -158,7 +174,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                             "\"numJSONRequestsSent\":\"%d\","
                                             "\"numJSONResponsesSent\":\"%d\""
                                             "}",
-                                    "TARGET_LOCATOR",
+                                    "SEARCHER_MOVER",
                                     statObject.GoodCount,
                                     statObject.ErrorCount,
                                     statObject.Req_From_PathFinder + statObject.Req_From_SearcherMover + statObject.Req_From_TargetGrabber + statObject.Req_From_TargetLocator,
@@ -166,7 +182,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     statObject.Req_To_PathFinder + statObject.Req_To_SearcherMover + statObject.Req_To_TargetGrabber + statObject.Req_To_TargetLocator,
                                     statObject.Res_To_PathFinder + statObject.Res_To_SearcherMover + statObject.Res_To_TargetGrabber + statObject.Res_To_TargetLocator
                                     );
-                                    tx_thread_obj.Destination = SEARCHERMOVER;
+                                    tx_thread_obj.Destination = SERVER;
                                     tx_thread_obj.MessageCount = statObject.Res_To_TargetLocator;
                                     statObject.Res_To_TargetLocator++;
                                     break;

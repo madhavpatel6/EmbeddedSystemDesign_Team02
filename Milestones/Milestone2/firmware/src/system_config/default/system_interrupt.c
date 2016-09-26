@@ -136,7 +136,7 @@ void IntHandlerDrvTmrInstance1(void)
     switch(MYMODULE){
         case SEARCHERMOVER:
             obj.Request = SMtoTL;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+//            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             break;
         case TARGETLOCATOR:
             obj.Request = TLtoSM;
