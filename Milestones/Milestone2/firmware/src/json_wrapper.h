@@ -37,7 +37,6 @@ typedef struct {
 } DictionaryType;
 
 static const DictionaryType Dictionary[] = {
-    {"SensorData", SensorData},
     {"CommStatsSearcherMover", CommStatsSearcherMover},
     {"CommStatsTargetLocator", CommStatsTargetLocator},
     {"CommStatsPathFinder", CommStatsPathFinder},

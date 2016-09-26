@@ -331,7 +331,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         statObject.Req_To_PathFinder++;
                         break;
                     }
-                    case SensorData: {
+                    case SD: {
                         sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"SensorData\"]}");
                         tx_thread_obj.Destination = TARGETLOCATOR;
                         tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;

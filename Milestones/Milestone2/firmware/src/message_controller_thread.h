@@ -93,7 +93,7 @@ typedef enum InternalRequestType_enum { SMtoTL,
                                         PFtoTL, 
                                         PFtoTG, 
                                         TGtoPF,
-                                        SensorData
+                                        SD
  } InternalRequestType;
 
 //------------------------------------------------------------------------------
