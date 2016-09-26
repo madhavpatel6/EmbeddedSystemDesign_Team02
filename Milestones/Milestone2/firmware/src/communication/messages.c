@@ -124,14 +124,14 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
 			parserstate = GET_CHECK_SUM;
             internalBufferIndex = 0;
 		}
-//        if(c == STARTOFTEXT) {
-//            *isError = true;
-//            parserstate = CHECK_DESTINATION_CHAR;
-//        }
-//        if(c == ENDOFTEXT) {
-//            *isError = true;
-//            parserstate = IDLE_STATE;
-//        }
+        if(c == STARTOFTEXT) {
+            *isError = true;
+            parserstate = CHECK_DESTINATION_CHAR;
+        }
+        if(c == ENDOFTEXT) {
+            *isError = true;
+            parserstate = IDLE_STATE;
+        }
         dbgOutputLoc(AFTER_THIRD_IF_GET_DATA_PARSEMESSAGE_MESSAGE_C);
 		return false;
 	}
