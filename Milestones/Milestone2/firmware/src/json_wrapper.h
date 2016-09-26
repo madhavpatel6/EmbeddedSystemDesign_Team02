@@ -27,7 +27,7 @@
 #include "communication/jsmn.h"
 
 typedef enum {request, response, unknown} type_t;
-typedef enum {CommStatsTargetLocator, SensorData} items_t;
+typedef enum {CommStatsTargetLocator, DetailedCommStatsTargetLocator, SensorData} items_t;
 
 typedef struct {
 	char stringValue[512];
@@ -36,7 +36,8 @@ typedef struct {
 
 static const DictionaryType Dictionary[] = {
 	{"SensorData", SensorData },
-	{"CommStatsTargetLocator", CommStatsTargetLocator }
+	{"CommStatsTargetLocator", CommStatsTargetLocator },
+    {"DetailedCommStatsTargetLocator", DetailedCommStatsTargetLocator }
 };
 
 static jsmn_parser p;

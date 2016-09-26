@@ -174,31 +174,75 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 case SensorData: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"SensorData\":\"%0.02f\"", internalData.sensordata);
                                     tx_thread_obj.Destination = obj.External.Source;
-                                    switch(obj.External.Source) {
-                                        case TARGETLOCATOR: {
-                                            tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
-                                            statObject.Req_To_TargetLocator++;
-                                        }
-                                        case PATHFINDER: {
-                                            tx_thread_obj.MessageCount = statObject.Req_To_PathFinder;
-                                            statObject.Req_To_PathFinder++;
-                                        }
-                                        case SEARCHERMOVER: {
-                                            tx_thread_obj.MessageCount = statObject.Req_To_SearcherMover;
-                                            statObject.Req_To_SearcherMover++;
-                                        }
-                                        case TARGETGRABBER: {
-                                            tx_thread_obj.MessageCount = statObject.Req_To_TargetGrabber;
-                                            statObject.Req_To_TargetGrabber++;
-                                        }
-                                    }
                                     break;
+                                }
+                                case DetailedCommStatsTargetLocator: {
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),
+                                    ",\"DetailedStatsTargetLocator\":{"
+                                    "\"RequestTo\":{"
+                                    "\"SM\":\"%d\","
+                                    "\"TL\":\"%d\","
+                                    "\"PF\":\"%d\","
+                                    "\"TG\":\"%d\"},"
+                                    "\"ResponseTo\":{"
+                                    "\"SM\":\"%d\","
+                                    "\"TL\":\"%d\","
+                                    "\"PF\":\"%d\","
+                                    "\"TG\":\"%d\"},"
+                                    "\"ResponseFrom\":{"
+                                    "\"SM\":\"%d\","
+                                    "\"TL\":\"%d\","
+                                    "\"PF\":\"%d\","
+                                    "\"TG\":\"%d\"},"
+                                    "\"ResponseFrom\":{"
+                                    "\"SM\":\"%d\","
+                                    "\"TL\":\"%d\","
+                                    "\"PF\":\"%d\","
+                                    "\"TG\":\"%d\"}}",
+                                    statObject.Req_To_SearcherMover,
+                                    statObject.Req_To_TargetLocator,
+                                    statObject.Req_To_PathFinder,
+                                    statObject.Req_To_TargetGrabber,
+                                    statObject.Res_To_SearcherMover,
+                                    statObject.Res_To_TargetLocator,
+                                    statObject.Res_To_PathFinder,
+                                    statObject.Res_To_TargetGrabber,
+                                    statObject.Req_From_SearcherMover,
+                                    statObject.Req_From_TargetLocator,
+                                    statObject.Req_From_PathFinder,
+                                    statObject.Req_From_TargetGrabber,
+                                    statObject.Res_From_SearcherMover,
+                                    statObject.Res_From_TargetLocator,
+                                    statObject.Res_From_PathFinder,
+                                    statObject.Res_From_TargetGrabber
+                                    );
                                 }
                                 default:
                                     break;
                             }
                         }
                         sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),"}");
+                        switch(obj.External.Source) {
+                            case TARGETLOCATOR: {
+                                tx_thread_obj.MessageCount = statObject.Res_To_TargetLocator;
+                                statObject.Res_To_TargetLocator++;
+                            }
+                            case PATHFINDER: {
+                                tx_thread_obj.MessageCount = statObject.Res_To_PathFinder;
+                                statObject.Res_To_PathFinder++;
+                            }
+                            case SEARCHERMOVER: {
+                                tx_thread_obj.MessageCount = statObject.Res_To_SearcherMover;
+                                statObject.Res_To_SearcherMover++;
+                            }
+                            case TARGETGRABBER: {
+                                tx_thread_obj.MessageCount = statObject.Res_To_TargetGrabber;
+                                statObject.Res_To_TargetGrabber++;
+                            }
+                            default: {
+                                break;
+                            }
+                        }
                         TX_THREAD_SendToQueue(tx_thread_obj);
                         break;
                     }
