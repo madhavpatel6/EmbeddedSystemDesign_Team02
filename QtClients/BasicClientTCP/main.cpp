@@ -19,15 +19,30 @@ int main(int argc, char *argv[])
 
     client->connectToHost(serverIp,serverPort);
 
-    QString request = "{\"type\", \"Request\"}, \"list\": [\"commStats\"]}" ;
+//    qDebug() << "waiting for server\n" ;
+//    while( client->isConnected == false){
+//        QThread::msleep(100);
+//    }
+//    qDebug() << "done waiting for sever\n";
 
-    char message[512];
-    int len = CreateMessage(message, request.toLatin1().data(), 'l', 44);
+//    for(int i = 0; i < 20; i++){
 
-    QByteArray txMessage;
-    txMessage.setRawData(message, len);
+//            QString request = "{\"type\":\"Request\",\"items\":[\"CommStatsTargetLocator\"]}";
 
-    client->send(txMessage);
+//            char message[512];
+//            int len = CreateMessage(message, request.toLatin1().data(), TARGETLOCATOR, i);
+
+//            QByteArray txMessage;
+//            txMessage.setRawData(message, len);
+
+//            int bytesSent = client->send(txMessage);
+//            qDebug() << "bytesSent:" << bytesSent << "\n";
+
+//            QThread::msleep(100);
+//        }
+
+
+
 
     return a.exec();
 }

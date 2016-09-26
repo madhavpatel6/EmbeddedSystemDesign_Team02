@@ -10,22 +10,49 @@ ClientSocket::ClientSocket(QObject *parent) :
     connect(socket, SIGNAL(connected()), this, SLOT(connected()));
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
+    isConnected = false;
 }
 
 void ClientSocket::connectToHost(QString ip,int port){
     socket->connectToHost(ip,port);
 }
 
+QTcpSocket* ClientSocket::getClient(){
+    return socket;
+}
+
 // asynchronous - runs separately from the thread we created
 void ClientSocket::connected()
 {
     qDebug() << "Client connected event";
+    isConnected = true;
+
+    for(int i = 0; i != -1; i++){
+
+            QString request = "{\"type\":\"Request\",\"items\":[\"CommStatsTargetLocator\"]}";
+
+            char message[512];
+            int len = CreateMessage(message, request.toLatin1().data(), TARGETLOCATOR, i);
+
+            QByteArray txMessage;
+            txMessage.setRawData(message, len);
+
+            // qDebug() << txMessage << endl;
+
+            int bytesSent = send(txMessage);
+            qDebug() << "bytesSent:" << bytesSent << "\n";
+
+            socket->flush();
+
+            QThread::msleep(200);
+        }
 }
 
 // asynchronous
 void ClientSocket::disconnected()
 {
     qDebug() << "Client disconnected";
+    isConnected = false;
 }
 
 int  ClientSocket::send(QByteArray words){
@@ -54,15 +81,4 @@ void ClientSocket::readyRead()
 //    // QThreadPool::globalInstance() returns global QThreadPool instance
 //    QThreadPool::globalInstance()->start(mytask);
 
-}
-
-// After a task performed a time consuming task,
-// we grab the result here, and send it to client
-void ClientSocket::TaskResult(int Number)
-{
-    QByteArray Buffer;
-    Buffer.append("\r\nTask result = ");
-    Buffer.append(QString::number(Number));
-
-    socket->write(Buffer);
 }
