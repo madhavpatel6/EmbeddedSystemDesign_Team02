@@ -6,7 +6,7 @@
 #include <QDebug>
 #include <QThreadPool>
 #include "picCode/communication/messages.h"
-#include "mainwindow.h"
+
 
 class ClientSocket : public QObject
 {
@@ -22,15 +22,17 @@ public:
 signals:
     void sendCommStatTargetLocator(QByteArray commStatTargetLocator);
     void serverIsConnectedSignal(bool connectedToServerBoolSignal);
-    void sentCommStatSignal(bool sentCommStatBoolSignal);
+    void sentCommStatSignal();
+    void sendCommStat(char source, QString goodMsg, QString commError, QString reqRecv, QString resRecv, QString reqSent, QString resSent);
 public slots:
     void connected();
     void disconnected();
     void readyRead();
     void commStatRequested();
-    //void connectToHost(QString ip,int port);
 
 private:
+    void SendJSONRequestToSocket(QString request, char destionation);
+    void HandleCommStatsResponse(QJsonObject obj);
     QTcpSocket *socket;
 
 };

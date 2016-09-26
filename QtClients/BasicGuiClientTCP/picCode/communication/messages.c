@@ -46,16 +46,7 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
 	}
 	case CHECK_DESTINATION_CHAR: {
         dbgOutputLoc(CASE_CHECK_DESTINATION_CHAR_PARSEMESSAGE_MESSAGE_C);
-        if (c == MYMODULE) {
-			parserstate = CHECK_SOURCE_CHAR;
-		}
-		else if(c == SEARCHERMOVER || c == PATHFINDER || c == TARGETLOCATOR || c == TARGETGRABBER) {
-			parserstate = IDLE_STATE;
-		}
-        else {
-            *isError = true;
-            parserstate = IDLE_STATE;
-        }
+        parserstate = CHECK_SOURCE_CHAR;
 		return false;
 	}
     case CHECK_SOURCE_CHAR: {

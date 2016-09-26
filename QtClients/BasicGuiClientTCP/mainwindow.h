@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include "clientsocket.h"
 #include "initialization.h"
-
+#include "QTimer"
 namespace Ui {
 class MainWindow;
 }
@@ -19,26 +19,18 @@ public:
 
 signals:
    // void commStatPushed(bool commStatButtonBool);
-    void connectToHostUi(QString ip, int port);
-    void on_commStatButton_clicked();
+    void connectToServerButtonClicked(QString ip, QString port);
+
 public slots:
-    void on_targetLocatorTextEdit_textChanged(QByteArray commStatTargetLocator);
-    void on_connectedToServerTextEdit_textChanged(bool connectedToServerBool);
-    void on_sentCommStatTextEdit_textChanged(bool sentCommStatBool);
-private slots:
-    //void on_commStatButton_clicked();
-
-    void on_connectToServerCheckBox_toggled(bool checked);
-
-    //void on_connectedToServerTextEdit_textChanged();
-
-    //void on_targetLocatorTextEdit_textChanged();
-
-    //void on_sentCommStatTextEdit_textChanged();
-
+    void HostConnectionEvent(bool connected);
+    void on_commStatsButton_clicked();
+    void on_connectToServer_clicked();
+    void CommStatsRequestSent();
+    void UpdateCommStats(char source, QString goodMsg, QString commError, QString reqRecv, QString resRecv, QString reqSent, QString resSent);
 private:
     Ui::MainWindow *ui;
-    ClientSocket::QObject *tcpSocket;
+    ClientSocket *tcpSocket;
+    QTimer *requestTimer;
     int commStatRequestCounter;
 };
 
