@@ -199,7 +199,11 @@
           </spacer>
          </item>
          <item>
-          <widget class="QLineEdit" name="serverIPLineEdit"/>
+          <widget class="QLineEdit" name="serverIPLineEdit">
+           <property name="text">
+            <string>192.168.0.192</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -226,7 +230,11 @@
           </spacer>
          </item>
          <item>
-          <widget class="QLineEdit" name="portLineEdit"/>
+          <widget class="QLineEdit" name="portLineEdit">
+           <property name="text">
+            <string>2000</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>

@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#define REQUESTRATE_MS 175
+#define REQUESTRATE_MS 2000
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -67,13 +67,54 @@ void MainWindow::on_startSensingButton_clicked()
 
 void MainWindow::updateAlignmentData(char source, QString alignmentData)
 {
-    if(source == TARGETGRABBER){
-        sensorRequestCounter = sensorRequestCounter + 1;
-        ui->IR_0CountLabel->setText(QString::number(sensorRequestCounter));
-        ui->IR_1CountLabel->setText(QString::number(sensorRequestCounter));
-        ui->IR_2CountLabel->setText(QString::number(sensorRequestCounter));
-        ui->IR_0PlainTextEdit->appendPlainText(alignmentData);
-        ui->IR_1PlainTextEdit->appendPlainText(alignmentData);
-        ui->IR_2PlainTextEdit->appendPlainText(alignmentData);
+    switch(source){
+        case TARGETGRABBER:
+            sensorRequestCounter = sensorRequestCounter + 1;
+            ui->IR_0CountLabel->setText(QString::number(sensorRequestCounter));
+            ui->IR_1CountLabel->setText(QString::number(sensorRequestCounter));
+            ui->IR_2CountLabel->setText(QString::number(sensorRequestCounter));
+            ui->IR_0PlainTextEdit->appendPlainText(alignmentData);
+            ui->IR_1PlainTextEdit->appendPlainText(alignmentData);
+            ui->IR_2PlainTextEdit->appendPlainText(alignmentData);
+            ui->IR_0PlainTextEdit->appendPlainText(QString(source));
+            ui->IR_1PlainTextEdit->appendPlainText(QString(source));
+            ui->IR_2PlainTextEdit->appendPlainText(QString(source));
+            break;
+        case TARGETLOCATOR:
+            sensorRequestCounter = sensorRequestCounter + 1;
+            ui->IR_0CountLabel->setText(QString::number(sensorRequestCounter));
+            ui->IR_1CountLabel->setText(QString::number(sensorRequestCounter));
+            ui->IR_2CountLabel->setText(QString::number(sensorRequestCounter));
+            ui->IR_0PlainTextEdit->appendPlainText(alignmentData);
+            ui->IR_1PlainTextEdit->appendPlainText(alignmentData);
+            ui->IR_2PlainTextEdit->appendPlainText(alignmentData);
+            ui->IR_0PlainTextEdit->appendPlainText(QString(source));
+            ui->IR_1PlainTextEdit->appendPlainText(QString(source));
+            ui->IR_2PlainTextEdit->appendPlainText(QString(source));
+            break;
+        case PATHFINDER:
+            sensorRequestCounter = sensorRequestCounter + 1;
+            ui->IR_0CountLabel->setText(QString::number(sensorRequestCounter));
+            ui->IR_1CountLabel->setText(QString::number(sensorRequestCounter));
+            ui->IR_2CountLabel->setText(QString::number(sensorRequestCounter));
+            ui->IR_0PlainTextEdit->appendPlainText(alignmentData);
+            ui->IR_1PlainTextEdit->appendPlainText(alignmentData);
+            ui->IR_2PlainTextEdit->appendPlainText(alignmentData);
+            ui->IR_0PlainTextEdit->appendPlainText(QString(source));
+            ui->IR_1PlainTextEdit->appendPlainText(QString(source));
+            ui->IR_2PlainTextEdit->appendPlainText(QString(source));
+            break;
+        case SEARCHERMOVER:
+            sensorRequestCounter = sensorRequestCounter + 1;
+            ui->IR_0CountLabel->setText(QString::number(sensorRequestCounter));
+            ui->IR_1CountLabel->setText(QString::number(sensorRequestCounter));
+            ui->IR_2CountLabel->setText(QString::number(sensorRequestCounter));
+            ui->IR_0PlainTextEdit->appendPlainText(alignmentData);
+            ui->IR_1PlainTextEdit->appendPlainText(alignmentData);
+            ui->IR_2PlainTextEdit->appendPlainText(alignmentData);
+            ui->IR_0PlainTextEdit->appendPlainText(QString(source));
+            ui->IR_1PlainTextEdit->appendPlainText(QString(source));
+            ui->IR_2PlainTextEdit->appendPlainText(QString(source));
+            break;
     }
 }
