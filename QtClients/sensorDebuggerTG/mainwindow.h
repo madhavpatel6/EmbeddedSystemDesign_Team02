@@ -18,6 +18,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+    void serverConnected(bool connected);
+    void updateAlignmentData(char source, QString alignmentData);
+
 private slots:
     void on_connectToServerButton_clicked();
 
