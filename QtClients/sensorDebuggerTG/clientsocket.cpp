@@ -31,7 +31,6 @@ QTcpSocket* ClientSocket::getClient()
 }
 
 void ClientSocket::alignmentRequestedSlot(){
-    qDebug() << "Requesting crap";
     QString request_begin = "{\"type\":\"Request\",\"items\":[\"";
     QString request_end = "\"]}";
     SendJSONRequestToSocket(request_begin + "SensorData" + request_end, TARGETGRABBER);

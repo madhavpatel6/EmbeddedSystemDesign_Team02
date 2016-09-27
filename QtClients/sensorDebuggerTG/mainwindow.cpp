@@ -52,15 +52,15 @@ void MainWindow::on_disconnectFromServerButton_clicked()
 void MainWindow::on_startSensingButton_clicked()
 {
     if(requestTimer->isActive()) {
-        ui->IR_0PlainTextEdit->appendPlainText(QString("Sensor Button Clicked; Start"));
-        ui->IR_1PlainTextEdit->appendPlainText(QString("Sensor Button Clicked; Start"));
-        ui->IR_2PlainTextEdit->appendPlainText(QString("Sensor Button Clicked; Start"));
-        requestTimer->stop();
-    }
-    else {
         ui->IR_0PlainTextEdit->appendPlainText(QString("Sensor Button Clicked; Stop"));
         ui->IR_1PlainTextEdit->appendPlainText(QString("Sensor Button Clicked; Stop"));
         ui->IR_2PlainTextEdit->appendPlainText(QString("Sensor Button Clicked; Stop"));
+        requestTimer->stop();
+    }
+    else {
+        ui->IR_0PlainTextEdit->appendPlainText(QString("Sensor Button Clicked; Start"));
+        ui->IR_1PlainTextEdit->appendPlainText(QString("Sensor Button Clicked; Start"));
+        ui->IR_2PlainTextEdit->appendPlainText(QString("Sensor Button Clicked; Start"));
         requestTimer->start();
     }
 }
