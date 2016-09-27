@@ -30,8 +30,8 @@ void ClientSocket::commStatRequested(){
     QString request_end = "\"]}";
     SendJSONRequestToSocket(request_begin + "CommStatsSearcherMover" + request_end, SEARCHERMOVER);
     SendJSONRequestToSocket(request_begin + "CommStatsTargetLocator" + request_end, TARGETLOCATOR);
-    //SendJSONRequestToSocket(request_begin + "CommStatsPathFinder" + request_end, PATHFINDER);
-    //SendJSONRequestToSocket(request_begin + "CommStatsTargetGrabber" + request_end, TARGETGRABBER);
+    SendJSONRequestToSocket(request_begin + "CommStatsPathFinder" + request_end, PATHFINDER);
+    SendJSONRequestToSocket(request_begin + "CommStatsTargetGrabber" + request_end, TARGETGRABBER);
 }
 
 void ClientSocket::connected()

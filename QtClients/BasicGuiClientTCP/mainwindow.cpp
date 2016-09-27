@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#define REQUESTRATE_MS 500
+#define REQUESTRATE_MS 200
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -53,13 +53,15 @@ void MainWindow::on_connectToServer_clicked()
 
 void MainWindow::HostConnectionEvent(bool connected) {
     qDebug() << "Host Connection Event " << connected;
-    if(connected)
+    if(connected) {
         ui->connectToServer->setText(QString("Connected To Server"));
-    else
+    }
+    else {
         ui->connectToServer->setText(QString("Connect To Server"));
+    }
 }
 void MainWindow::UpdateErrorCount(int count) {
-    ui->serverErrorVal->setText(QString::number(count));
+//ui->serverErrorVal->setText(QString::number(count));
 }
 
 void MainWindow::UpdateCommStats(char source, QString goodMsg, QString commError, QString reqRecv, QString resRecv, QString reqSent, QString resSent) {

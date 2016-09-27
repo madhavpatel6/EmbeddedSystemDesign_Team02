@@ -70,6 +70,7 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
             }
             case SERVER: {
                 *source = SERVER;
+                break;
             }
             default: {
                 *isError = true;

@@ -31,8 +31,8 @@
 #define TARGETGRABBER 'G'
 #define SERVER 'H'
 #define MAXMESSAGESIZE 300
-#define MYMODULE SEARCHERMOVER
-#define MYMODULESTRING "SearcherMover"
+#define MYMODULE TARGETLOCATOR
+#define MYMODULESTRING "TargetLocator"
 
 #define INJECTERRORS 0
 

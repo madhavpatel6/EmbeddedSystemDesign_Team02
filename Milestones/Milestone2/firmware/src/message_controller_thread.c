@@ -75,7 +75,6 @@ void MESSAGE_CONTROLLER_THREAD_Initialize ( void )
 {
     MESSAGE_CONTROLLER_THREAD_InitializeQueue();
     DRV_TMR1_Start();
-    initParser();
     resetSystemClock();
 }
 
@@ -99,6 +98,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
     items_t items[12];
     int numItems;
     while(1) {
+        initParser();
         MessageObj obj;
         memset(&obj, 0, sizeof(MessageObj));
 
@@ -162,6 +162,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         }
 
                         int i = 0;
+                        tx_thread_obj.Destination = obj.External.Source;
                         sprintf(tx_thread_obj.Data, "{\"type\":\"Response\"");
                         for(i = 0; i < numItems; i++) {
                             switch(items[i]) {
@@ -237,7 +238,6 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 }
                                 case SensorData: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"SensorData\":\"%0.02f\"", internalData.sensordata);
-                                    tx_thread_obj.Destination = obj.External.Source;
                                     break;
                                 }
                                 case msLocalTime:{
