@@ -30,11 +30,12 @@
 #define PATHFINDER 'P'
 #define TARGETGRABBER 'G'
 #define SERVER 'H'
-#define MAXMESSAGESIZE 300
-#define MYMODULE SEARCHERMOVER
-#define MYMODULESTRING "SearcherMover"
+#define MAXMESSAGESIZE 512
+#define MYMODULE SERVER
 
-#define INJECTERRORS 0
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 int CreateMessage(char buf[], char messageData[], char destination, char messagecount);
 
@@ -55,6 +56,12 @@ typedef enum {
 } STATES;
 
 bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *isError);
+
+#ifdef __cplusplus
+}
+#endif
+
+
 
 #endif /* _MESSAGELAYER_H */
 

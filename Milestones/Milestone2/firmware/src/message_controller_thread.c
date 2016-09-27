@@ -61,7 +61,7 @@ static QueueHandle_t _queue;
 static int systemClock;
 
 #define TYPEOFQUEUE MessageObj
-#define SIZEOFQUEUE 128
+#define SIZEOFQUEUE 200
 
 /*******************************************************************************
   Function:
@@ -231,7 +231,8 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                         statObject.Res_From_TargetLocator,
                                         statObject.Res_From_PathFinder,
                                         statObject.Res_From_TargetGrabber
-                                    );
+                                        );
+                                    tx_thread_obj.Destination = SERVER;
                                     break;
                                 }
                                 case SensorData: {
@@ -250,21 +251,25 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         }
                         sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),"}");
                         switch(obj.External.Source) {
+                            case SEARCHERMOVER: {
+                                tx_thread_obj.MessageCount = statObject.Res_To_SearcherMover;
+                                statObject.Res_To_SearcherMover++;
+                                break;
+                            }
                             case TARGETLOCATOR: {
                                 tx_thread_obj.MessageCount = statObject.Res_To_TargetLocator;
                                 statObject.Res_To_TargetLocator++;
+                                break;
                             }
                             case PATHFINDER: {
                                 tx_thread_obj.MessageCount = statObject.Res_To_PathFinder;
                                 statObject.Res_To_PathFinder++;
-                            }
-                            case SEARCHERMOVER: {
-                                tx_thread_obj.MessageCount = statObject.Res_To_SearcherMover;
-                                statObject.Res_To_SearcherMover++;
+                                break;
                             }
                             case TARGETGRABBER: {
                                 tx_thread_obj.MessageCount = statObject.Res_To_TargetGrabber;
                                 statObject.Res_To_TargetGrabber++;
+                                break;
                             }
                             default: {
                                 break;
@@ -274,6 +279,27 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         break;
                     }
                     case response: {
+                        switch(obj.External.Source) {
+                            case SEARCHERMOVER: {
+                                statObject.Res_From_SearcherMover++;
+                                break;
+                            }
+                            case TARGETLOCATOR: {
+                                statObject.Res_From_TargetLocator++;
+                                break;
+                            }
+                            case PATHFINDER: {
+                                statObject.Res_From_PathFinder++;
+                                break;
+                            }
+                            case TARGETGRABBER: {
+                                statObject.Res_From_TargetGrabber++;
+                                break;
+                            }
+                            default: {
+                                break;
+                            }
+                        }
                         break;
                     }
                     case unknown: {

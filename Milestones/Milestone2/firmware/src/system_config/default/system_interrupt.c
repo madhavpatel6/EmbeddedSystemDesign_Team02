@@ -135,8 +135,8 @@ void IntHandlerDrvTmrInstance1(void)
     dbgOutputLoc(BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR);
     switch(MYMODULE){
         case SEARCHERMOVER:
-            obj.Request = SD;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+            obj.Request = SMtoTL;
+//            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             break;
         case TARGETLOCATOR:
             obj.Request = TLtoSM;

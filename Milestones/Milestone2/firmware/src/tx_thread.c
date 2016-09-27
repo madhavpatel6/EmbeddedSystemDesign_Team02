@@ -67,7 +67,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 static QueueHandle_t _queue;
 
-#define SIZEOFQUEUE 10
+#define SIZEOFQUEUE 64
 #define TYPEOFQUEUE Tx_Thead_Queue_DataType
 
 

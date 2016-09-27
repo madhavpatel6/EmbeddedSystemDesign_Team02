@@ -62,7 +62,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 static QueueHandle_t _queue;
 
 #define TYPEOFQUEUE char
-#define SIZEOFQUEUE 128
+#define SIZEOFQUEUE 4096
 
 /*******************************************************************************
   Function:
