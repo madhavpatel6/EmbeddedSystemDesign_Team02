@@ -33,7 +33,7 @@ public slots:
 
 private:
     void SendJSONRequestToSocket(QString request, char destination);
-    void HandleAlignmentResponse(QJsonObject obj);
+    void HandleAlignmentResponse(QJsonObject obj, char source);
     QTcpSocket *socket;
 
 };

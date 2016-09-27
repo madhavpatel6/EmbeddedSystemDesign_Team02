@@ -31,9 +31,13 @@ QTcpSocket* ClientSocket::getClient()
 }
 
 void ClientSocket::alignmentRequestedSlot(){
+    qDebug() << "Requesting crap";
     QString request_begin = "{\"type\":\"Request\",\"items\":[\"";
     QString request_end = "\"]}";
     SendJSONRequestToSocket(request_begin + "SensorData" + request_end, TARGETGRABBER);
+    SendJSONRequestToSocket(request_begin + "SensorData" + request_end, TARGETLOCATOR);
+    SendJSONRequestToSocket(request_begin + "SensorData" + request_end, PATHFINDER);
+    SendJSONRequestToSocket(request_begin + "SensorData" + request_end, SEARCHERMOVER);
 }
 
 void ClientSocket::connected()
@@ -57,7 +61,6 @@ int  ClientSocket::send(QByteArray words){
 
 void ClientSocket::readyRead()
 {
-    qDebug() << "ClientSocket::readyRead()";
     QByteArray array = socket->readAll();
     char buffer[MAXMESSAGESIZE];
     char source, messageCount;
@@ -68,13 +71,50 @@ void ClientSocket::readyRead()
             QJsonDocument doc(QJsonDocument::fromJson(buffer));
             QJsonObject json = doc.object();
             QString type = json["type"].toString();
-            if(type == QStringLiteral("Response")) {
-                if(json.contains(QStringLiteral("SensorData"))){
-                    HandleAlignmentResponse(json);
-                }
-            }
-            else if(type == QStringLiteral("Request")){
-                //qDebug() << "Request: " << buffer;
+            switch(source){
+                case TARGETGRABBER:
+                    if(type == QStringLiteral("Response")) {
+                        if(json.contains(QStringLiteral("SensorData"))){
+                            HandleAlignmentResponse(json, TARGETGRABBER);
+                        }
+                    }
+                    else if(type == QStringLiteral("Request")){
+                        //qDebug() << "Request: " << buffer;
+                    }
+                    break;
+                case TARGETLOCATOR:
+                    if(type == QStringLiteral("Response")) {
+                        if(json.contains(QStringLiteral("SensorData"))){
+                            HandleAlignmentResponse(json, TARGETLOCATOR);
+                        }
+                    }
+                    else if(type == QStringLiteral("Request")){
+                        //qDebug() << "Request: " << buffer;
+                    }
+                    break;
+                case SEARCHERMOVER:
+                    if(type == QStringLiteral("Response")) {
+                        if(json.contains(QStringLiteral("SensorData"))){
+                            HandleAlignmentResponse(json, SEARCHERMOVER);
+                        }
+                    }
+                    else if(type == QStringLiteral("Request")){
+                        //qDebug() << "Request: " << buffer;
+                    }
+                    break;
+                case PATHFINDER:
+                    if(type == QStringLiteral("Response")) {
+                        if(json.contains(QStringLiteral("SensorData"))){
+                            HandleAlignmentResponse(json, PATHFINDER);
+                        }
+                    }
+                    else if(type == QStringLiteral("Request")){
+                        //qDebug() << "Request: " << buffer;
+                    }
+                    break;
+                    default:
+                        qDebug() << "BROKEN" << endl;
+                        break;
             }
         }
     }
@@ -96,10 +136,26 @@ void ClientSocket::SendJSONRequestToSocket(QString request, char destination) {
     }
 }
 
-void ClientSocket::HandleAlignmentResponse(QJsonObject obj) {
+void ClientSocket::HandleAlignmentResponse(QJsonObject obj, char source) {
     //qDebug() << "JSON : " << obj << endl;
     if(obj.contains(QStringLiteral("SensorData"))) {
-        emit sendAlignmentSignal(TARGETGRABBER, obj["SensorData"].toString());
+        switch(source){
+            case TARGETGRABBER:
+                emit sendAlignmentSignal(TARGETGRABBER, obj["SensorData"].toString());
+                break;
+            case TARGETLOCATOR:
+                emit sendAlignmentSignal(TARGETLOCATOR, obj["SensorData"].toString());
+                break;
+            case PATHFINDER:
+                emit sendAlignmentSignal(PATHFINDER, obj["SensorData"].toString());
+                break;
+            case SEARCHERMOVER:
+                emit sendAlignmentSignal(SEARCHERMOVER, obj["SensorData"].toString());
+                break;
+            default:
+                qDebug() << "BROKEN" << endl;
+                break;
+        }
     }
 
 }
