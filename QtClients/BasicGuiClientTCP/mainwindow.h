@@ -22,6 +22,7 @@ signals:
     void connectToServerButtonClicked(QString ip, QString port);
 
 public slots:
+    void UpdateErrorCount(int count);
     void HostConnectionEvent(bool connected);
     void on_commStatsButton_clicked();
     void on_connectToServer_clicked();

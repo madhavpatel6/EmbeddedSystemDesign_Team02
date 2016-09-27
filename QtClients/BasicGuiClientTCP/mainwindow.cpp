@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#define REQUESTRATE_MS 175
+#define REQUESTRATE_MS 500
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     requestTimer->setInterval(REQUESTRATE_MS);
     ui->setupUi(this);
     tcpSocket = new ClientSocket();
+    connect(tcpSocket, SIGNAL(updateError(int)), this, SLOT(UpdateErrorCount(int)));
     connect(requestTimer, SIGNAL(timeout()), tcpSocket, SLOT(commStatRequested()));
     connect(tcpSocket, SIGNAL(serverIsConnectedSignal(bool)), this, SLOT(HostConnectionEvent(bool)));
     connect(tcpSocket, SIGNAL(sentCommStatSignal()), this, SLOT(CommStatsRequestSent()));
@@ -56,6 +57,9 @@ void MainWindow::HostConnectionEvent(bool connected) {
         ui->connectToServer->setText(QString("Connected To Server"));
     else
         ui->connectToServer->setText(QString("Connect To Server"));
+}
+void MainWindow::UpdateErrorCount(int count) {
+    ui->serverErrorVal->setText(QString::number(count));
 }
 
 void MainWindow::UpdateCommStats(char source, QString goodMsg, QString commError, QString reqRecv, QString resRecv, QString reqSent, QString resSent) {

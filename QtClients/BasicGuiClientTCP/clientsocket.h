@@ -20,6 +20,7 @@ public:
     bool isConnected;
 
 signals:
+    void updateError(int val);
     void sendCommStatTargetLocator(QByteArray commStatTargetLocator);
     void serverIsConnectedSignal(bool connectedToServerBoolSignal);
     void sentCommStatSignal();
@@ -33,6 +34,7 @@ public slots:
 private:
     void SendJSONRequestToSocket(QString request, char destionation);
     void HandleCommStatsResponse(QJsonObject obj);
+    int numOfErrors;
     QTcpSocket *socket;
 
 };

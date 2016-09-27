@@ -6,6 +6,7 @@
 ClientSocket::ClientSocket(QObject *parent) :
     QObject(parent)
 {
+    numOfErrors = 0;
     socket = new QTcpSocket();
 
     connect(socket, SIGNAL(connected()), this, SLOT(connected()));
@@ -13,6 +14,7 @@ ClientSocket::ClientSocket(QObject *parent) :
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     isConnected = false;
 }
+
 
 void ClientSocket::connectToHost(QString ip,int port){
     socket->disconnectFromHost();
@@ -28,8 +30,8 @@ void ClientSocket::commStatRequested(){
     QString request_end = "\"]}";
     SendJSONRequestToSocket(request_begin + "CommStatsSearcherMover" + request_end, SEARCHERMOVER);
     SendJSONRequestToSocket(request_begin + "CommStatsTargetLocator" + request_end, TARGETLOCATOR);
-    SendJSONRequestToSocket(request_begin + "CommStatsPathFinder" + request_end, PATHFINDER);
-    SendJSONRequestToSocket(request_begin + "CommStatsTargetGrabber" + request_end, TARGETGRABBER);
+    //SendJSONRequestToSocket(request_begin + "CommStatsPathFinder" + request_end, PATHFINDER);
+    //SendJSONRequestToSocket(request_begin + "CommStatsTargetGrabber" + request_end, TARGETGRABBER);
 }
 
 void ClientSocket::connected()
@@ -75,6 +77,10 @@ void ClientSocket::readyRead()
             else if(type == QStringLiteral("Request")){
                 //qDebug() << "Request: " << buffer;
             }
+        }
+        else {
+            numOfErrors++;
+            emit updateError(numOfErrors);
         }
     }
 }
