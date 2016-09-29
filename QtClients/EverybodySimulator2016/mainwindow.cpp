@@ -10,18 +10,25 @@ MainWindow::MainWindow(QWidget *parent) :
 
     socket = new ClientSocket();
 
-    QJsonObject reqres = initialization::getConfig();
+    QJsonObject requests = initialization::getConfig("requests.json");
+
+    QJsonObject responses = initialization::getConfig("responses.json");
 
 
-    QCheckBox* reqBox[reqres.size()];
-    QCheckBox* resBox[reqres.size()];
+    /* The following code read the requests and responses from file and creates checkboxes for them */
+    QCheckBox* reqBox[requests.size()];
+    QCheckBox* resBox[responses.size()];
     int count = 0;
-    for(auto i = reqres.begin(); i != reqres.end(); i++){
+    for(auto i = requests.begin(); i != requests.end(); i++){
         reqBox[count] = new QCheckBox();
         reqBox[count]->setText(i.key());
         ui->requestsEnable->addWidget(reqBox[count]);
-        connect (reqBox[count], SIGNAL(clicked()), this, SLOT(on_resCheckBoxClicked()));
 
+        connect (reqBox[count], SIGNAL(clicked()), this, SLOT(on_resCheckBoxClicked()));
+        count++;
+    }
+    count = 0;
+    for(auto i = responses.begin(); i != responses.end(); i++){
         resBox[count] = new QCheckBox();
         resBox[count]->setText(i.key());
         ui->responsesEnable->addWidget(resBox[count]);
@@ -30,15 +37,17 @@ MainWindow::MainWindow(QWidget *parent) :
         count++;
     }
 }
+
 void MainWindow::on_reqCheckBoxClicked(){
     QObject* obj = sender();
 
-    qDebug() << "req" + ((QCheckBox*)obj)->text() + ((QCheckBox*)obj)->checkState();
+    qDebug() << "req " + ((QCheckBox*)obj)->text() + ((QCheckBox*)obj)->checkState();
 }
+
 void MainWindow::on_resCheckBoxClicked(){
     QObject* obj = sender();
 
-    qDebug() << "res" + ((QCheckBox*)obj)->text() + ((QCheckBox*)obj)->checkState();
+    qDebug() << "res " + ((QCheckBox*)obj)->text() + ((QCheckBox*)obj)->checkState();
 }
 
 MainWindow::~MainWindow()
@@ -46,6 +55,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+/* Connect to server checkbox */
 void MainWindow::on_checkBox_clicked(bool checked)
 {
     if(checked){

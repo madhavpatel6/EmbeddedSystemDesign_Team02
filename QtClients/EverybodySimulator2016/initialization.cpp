@@ -1,9 +1,9 @@
 #include "initialization.h"
 
-QJsonObject initialization::getConfig()
+QJsonObject initialization::getConfig(QString in)
 {
     QByteArray fileData;
-    QFile file(JSON_CONFIG_FILE);
+    QFile file(in);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return QJsonObject();
 

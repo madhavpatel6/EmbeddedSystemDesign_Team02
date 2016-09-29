@@ -63,7 +63,8 @@ OBJECTS       = clientsocket.o \
 		messages.o \
 		moc_clientsocket.o \
 		moc_mainwindow.o
-DIST          = reqres.json \
+DIST          = requests.json \
+		responses.json \
 		/usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/common/unix.conf \
 		/usr/lib/qt/mkspecs/common/linux.conf \

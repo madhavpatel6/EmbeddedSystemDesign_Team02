@@ -25,4 +25,5 @@ SOURCES += clientsocket.cpp \
            picCode/communication/messages.c
 
 DISTFILES += \
-    reqres.json
+    requests.json \
+    responses.json

@@ -5,12 +5,11 @@
 #include <QFile>
 #include <QJsonObject>
 
-#define JSON_CONFIG_FILE "reqres.json"
 
 class initialization
 {
 public:
-    static QJsonObject getConfig();
+    static QJsonObject getConfig(QString in);
 };
 
 #endif // INITIALIZATION_H
