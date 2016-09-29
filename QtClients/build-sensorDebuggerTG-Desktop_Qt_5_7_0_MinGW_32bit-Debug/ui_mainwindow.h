@@ -58,7 +58,7 @@ public:
     QHBoxLayout *horizontalLayout_2;
     QLabel *IR_2Label;
     QLabel *IR_2CountLabel;
-    QWidget *widget;
+    QWidget *layoutWidget2;
     QVBoxLayout *verticalLayout_6;
     QVBoxLayout *verticalLayout_4;
     QHBoxLayout *horizontalLayout_8;
@@ -218,10 +218,10 @@ public:
 
         verticalLayout_5->addLayout(horizontalLayout_5);
 
-        widget = new QWidget(centralWidget);
-        widget->setObjectName(QStringLiteral("widget"));
-        widget->setGeometry(QRect(9, 7, 251, 131));
-        verticalLayout_6 = new QVBoxLayout(widget);
+        layoutWidget2 = new QWidget(centralWidget);
+        layoutWidget2->setObjectName(QStringLiteral("layoutWidget2"));
+        layoutWidget2->setGeometry(QRect(9, 7, 251, 131));
+        verticalLayout_6 = new QVBoxLayout(layoutWidget2);
         verticalLayout_6->setSpacing(6);
         verticalLayout_6->setContentsMargins(11, 11, 11, 11);
         verticalLayout_6->setObjectName(QStringLiteral("verticalLayout_6"));
@@ -232,7 +232,7 @@ public:
         horizontalLayout_8 = new QHBoxLayout();
         horizontalLayout_8->setSpacing(6);
         horizontalLayout_8->setObjectName(QStringLiteral("horizontalLayout_8"));
-        ipAddressLabel = new QLabel(widget);
+        ipAddressLabel = new QLabel(layoutWidget2);
         ipAddressLabel->setObjectName(QStringLiteral("ipAddressLabel"));
 
         horizontalLayout_8->addWidget(ipAddressLabel);
@@ -241,7 +241,7 @@ public:
 
         horizontalLayout_8->addItem(horizontalSpacer_2);
 
-        serverIPLineEdit = new QLineEdit(widget);
+        serverIPLineEdit = new QLineEdit(layoutWidget2);
         serverIPLineEdit->setObjectName(QStringLiteral("serverIPLineEdit"));
 
         horizontalLayout_8->addWidget(serverIPLineEdit);
@@ -252,7 +252,7 @@ public:
         horizontalLayout_9 = new QHBoxLayout();
         horizontalLayout_9->setSpacing(6);
         horizontalLayout_9->setObjectName(QStringLiteral("horizontalLayout_9"));
-        portLabel = new QLabel(widget);
+        portLabel = new QLabel(layoutWidget2);
         portLabel->setObjectName(QStringLiteral("portLabel"));
 
         horizontalLayout_9->addWidget(portLabel);
@@ -261,7 +261,7 @@ public:
 
         horizontalLayout_9->addItem(horizontalSpacer);
 
-        portLineEdit = new QLineEdit(widget);
+        portLineEdit = new QLineEdit(layoutWidget2);
         portLineEdit->setObjectName(QStringLiteral("portLineEdit"));
 
         horizontalLayout_9->addWidget(portLineEdit);
@@ -272,12 +272,12 @@ public:
         horizontalLayout_6 = new QHBoxLayout();
         horizontalLayout_6->setSpacing(6);
         horizontalLayout_6->setObjectName(QStringLiteral("horizontalLayout_6"));
-        connectedLabel = new QLabel(widget);
+        connectedLabel = new QLabel(layoutWidget2);
         connectedLabel->setObjectName(QStringLiteral("connectedLabel"));
 
         horizontalLayout_6->addWidget(connectedLabel);
 
-        connectionStatusLabel = new QLabel(widget);
+        connectionStatusLabel = new QLabel(layoutWidget2);
         connectionStatusLabel->setObjectName(QStringLiteral("connectionStatusLabel"));
 
         horizontalLayout_6->addWidget(connectionStatusLabel);
@@ -291,12 +291,12 @@ public:
         horizontalLayout_7 = new QHBoxLayout();
         horizontalLayout_7->setSpacing(6);
         horizontalLayout_7->setObjectName(QStringLiteral("horizontalLayout_7"));
-        connectToServerButton = new QPushButton(widget);
+        connectToServerButton = new QPushButton(layoutWidget2);
         connectToServerButton->setObjectName(QStringLiteral("connectToServerButton"));
 
         horizontalLayout_7->addWidget(connectToServerButton);
 
-        disconnectFromServerButton = new QPushButton(widget);
+        disconnectFromServerButton = new QPushButton(layoutWidget2);
         disconnectFromServerButton->setObjectName(QStringLiteral("disconnectFromServerButton"));
 
         horizontalLayout_7->addWidget(disconnectFromServerButton);
@@ -336,7 +336,9 @@ public:
         IR_2Label->setText(QApplication::translate("MainWindow", "IR_2:", 0));
         IR_2CountLabel->setText(QApplication::translate("MainWindow", "0", 0));
         ipAddressLabel->setText(QApplication::translate("MainWindow", "IP Address:", 0));
+        serverIPLineEdit->setText(QApplication::translate("MainWindow", "192.168.0.197", 0));
         portLabel->setText(QApplication::translate("MainWindow", "Port: ", 0));
+        portLineEdit->setText(QApplication::translate("MainWindow", "2000", 0));
         connectedLabel->setText(QApplication::translate("MainWindow", "Connected:", 0));
         connectionStatusLabel->setText(QApplication::translate("MainWindow", "No", 0));
         connectToServerButton->setText(QApplication::translate("MainWindow", "Connect To Server", 0));

@@ -164,7 +164,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>9</x>
@@ -201,7 +201,7 @@
          <item>
           <widget class="QLineEdit" name="serverIPLineEdit">
            <property name="text">
-            <string>192.168.0.192</string>
+            <string>192.168.0.197</string>
            </property>
           </widget>
          </item>
