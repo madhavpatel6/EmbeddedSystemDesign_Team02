@@ -21,6 +21,9 @@ public:
 
     bool isConnected;
 
+
+    QTcpSocket *socket;
+
 signals:
 
 public slots:
@@ -29,7 +32,6 @@ public slots:
     void readyRead();
 
 private:
-    QTcpSocket *socket;
 
 };
 
