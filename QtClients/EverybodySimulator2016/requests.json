@@ -1,0 +1,12 @@
+{
+    "PFtoTG": {
+        "destination" : "G",
+        "items": ["targetAlignment", "targetAcquired"]
+    },
+
+    "PFtoTL": {
+        "destination": "L",
+        "items": ["Obstacles", "Targets", "SafeRegions", "R2_Location", "R2_Orientation"]
+    }
+
+}

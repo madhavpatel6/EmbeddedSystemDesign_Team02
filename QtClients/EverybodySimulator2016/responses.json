@@ -1,0 +1,12 @@
+{
+    "currentTargetLocation": {
+        "x": "int",
+        "y": "int"
+    },
+    "R2_Est_Location": {
+        "x": "int",
+        "y": "int"
+    },
+    "targetProximity": "int",
+    "outsideArena": "bool"
+}
