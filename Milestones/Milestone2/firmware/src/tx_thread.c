@@ -52,13 +52,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
-
 #include "tx_thread.h"
-#include "tx_thread_public.h"
-#include "system_interrupt_public.h"
+#include "system_config.h"
+#include "system_definitions.h"
 #include "debug.h"
-#include "communication/messages.h"
-
 // *****************************************************************************
 // *****************************************************************************
 // Section: Global Data Definitions

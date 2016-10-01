@@ -21,6 +21,8 @@
 /* ************************************************************************** */
 /* ************************************************************************** */
 #include "debug.h"
+#include "system_config.h"
+#include "system_definitions.h"
 
 /**
  * [dbgOutputVal Debug function that is utilized to output an 8 bit value to

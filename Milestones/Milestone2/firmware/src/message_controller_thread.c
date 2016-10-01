@@ -54,9 +54,14 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 
 #include "message_controller_thread.h"
-#include "message_controller_thread_public.h"
+#include <string.h>
+#include <stddef.h>
+#include "communication/messages.h"
+#include "system_config.h"
+#include "system_definitions.h"
+#include "debug.h"
+#include "json_wrapper.h"
 #include "tx_thread_public.h"
-
 static QueueHandle_t _queue;
 static int systemClock;
 

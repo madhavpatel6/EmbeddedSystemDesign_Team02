@@ -24,7 +24,7 @@
 /* Section: Included Files                                                    */
 /* ************************************************************************** */
 /* ************************************************************************** */
-#include "communication/messages.h"
+
 /* Provide C++ Compatibility */
 #ifdef __cplusplus
 extern "C" {
