@@ -60,6 +60,12 @@ void MainWindow::on_reqCheckBoxClicked(){
             reqList.removeAll(items[i].toString());
         }
     }
+
+    if(((QCheckBox*)obj)->checkState()){
+        reqObjList.append(requests.value(((QCheckBox*)obj)->text().remove('&')).toObject());
+    }else{
+        reqObjList.removeAll(requests.value(((QCheckBox*)obj)->text().remove('&')).toObject());
+    }
 }
 
 void MainWindow::on_resCheckBoxClicked(){
@@ -94,23 +100,30 @@ void MainWindow::on_shouldRequest_clicked(bool checked)
 
 void MainWindow::requestSlot(){
 
-    QString request = "{\"type\":\"Request\",\"items\":[";
-    for(int i = 0; i < reqList.size(); i++){
-        request += reqList[i];
-        if(i < reqList.size() -1){
-            request+= ", ";
+    QString request;
+    for(int i = 0; i < reqObjList.size(); i++){
+        request = "{\"type\":\"Request\",\"items\":[";
+        for(int j = 0; j < reqObjList[i].value("items").toArray().size(); j++){
+            request += reqObjList[i].value("items").toArray()[j].toString();
+            if(j < reqObjList[i].value("items").toArray().size()-1){
+                request+= ", ";
+            }
         }
+        request += "]}";
+        char message[512];
+        char destination = reqObjList[i].value("destination").toString().toLatin1()[0];
+
+        int len = CreateMessage(message, request.toLatin1().data(), destination, 0);
+
+        QByteArray txMessage;
+        txMessage.setRawData(message, len);
+
+        int bytesSent = socket->send(txMessage);
+
+        qDebug() << request;
+        qDebug() << "bytesSent:" << bytesSent << "\n";
+
     }
-    request += "]}";
-    qDebug() << request;
 
-    char message[512];
-    int len = CreateMessage(message, request.toLatin1().data(), TARGETLOCATOR, 0);
-
-    QByteArray txMessage;
-    txMessage.setRawData(message, len);
-
-    int bytesSent = socket->send(txMessage);
-    qDebug() << "bytesSent:" << bytesSent << "\n";
 
 }

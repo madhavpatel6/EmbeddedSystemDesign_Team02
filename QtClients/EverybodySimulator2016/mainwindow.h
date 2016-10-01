@@ -32,6 +32,7 @@ private:
     ClientSocket *socket;
     QTimer *reqTimer;
     QStringList reqList;
+    QVector<QJsonObject> reqObjList;
 
 };
 
