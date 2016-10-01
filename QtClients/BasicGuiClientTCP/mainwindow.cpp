@@ -61,7 +61,7 @@ void MainWindow::HostConnectionEvent(bool connected) {
     }
 }
 void MainWindow::UpdateErrorCount(int count) {
-//ui->serverErrorVal->setText(QString::number(count));
+    ui->serverErrorVal->setText(QString::number(count));
 }
 
 void MainWindow::UpdateCommStats(char source, QString goodMsg, QString commError, QString reqRecv, QString resRecv, QString reqSent, QString resSent) {

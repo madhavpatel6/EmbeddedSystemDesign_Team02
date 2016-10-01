@@ -22,7 +22,9 @@
 /* ************************************************************************** */
 #include "messages.h"
 #include "debug.h"
-
+#include <string.h>
+#include <stddef.h>
+#include <stdlib.h>
 
 static STATES parserstate = IDLE_STATE;
 static size_t internalBufferIndex = 0;
@@ -83,6 +85,7 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
                 parserstate = IDLE_STATE;
                 return false;
             }
+            return false;
         }
         parserstate = CHECK_MESSAGE_COUNT;
         return false;

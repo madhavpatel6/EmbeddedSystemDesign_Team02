@@ -52,15 +52,13 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-#include <stdint.h>
-#include <stdbool.h>
 #include <stddef.h>
+#include <stdbool.h>
 #include <stdlib.h>
-#include "system_config.h"
-#include "system_definitions.h"
 #include "communication/messages.h"
-#include "communication/jsmn.h"
-#include "json_wrapper.h"
+#include "FreeRTOS.h"
+#include "queue.h"
+
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 

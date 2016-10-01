@@ -66,12 +66,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "debug.h"
 #include "tx_thread.h"
 #include "rx_thread.h"
-#include "message_controller_thread.h"
-#include "message_controller_thread_public.h"
-#include "tx_thread_public.h"
 #include "rx_thread_public.h"
+#include "message_controller_thread.h"
 #include "system_definitions.h"
-#include "system_interrupt_public.h"
 // *****************************************************************************
 // *****************************************************************************
 // Section: System Interrupt Vector Functions
@@ -136,7 +133,7 @@ void IntHandlerDrvTmrInstance1(void)
     switch(MYMODULE){
         case SEARCHERMOVER:
             obj.Request = SMtoTL;
-//            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             break;
         case TARGETLOCATOR:
             obj.Request = TLtoSM;
