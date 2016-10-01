@@ -78,7 +78,7 @@ void ClientSocket::readyRead()
                 //qDebug() << "Request: " << buffer;
             }
         }
-        else {
+        else if(isError){
             numOfErrors++;
             emit updateError(numOfErrors);
         }
