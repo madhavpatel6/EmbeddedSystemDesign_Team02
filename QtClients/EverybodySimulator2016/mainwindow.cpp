@@ -37,11 +37,14 @@ MainWindow::MainWindow(QWidget *parent) :
         count++;
     }
 
-    /* Setup the request response controller */
+    /* Setup the request timer */
     reqTimer = new QTimer();
     reqTimer->setInterval(200);
 
     connect(reqTimer, SIGNAL(timeout()), this, SLOT(requestSlot()));
+
+    /* Setup response handler */
+    connect(socket, SIGNAL(dataRead(QByteArray)), this, SLOT(dataReadSlot(QByteArray)));
 
 }
 
@@ -51,15 +54,8 @@ void MainWindow::on_reqCheckBoxClicked(){
     qDebug() << ((QCheckBox*)obj)->text().remove('&');
 
     QJsonObject requests = initialization::getConfig("requests.json");
-    QJsonArray items = requests.value(((QCheckBox*)obj)->text().remove('&')).toObject().value("items").toArray();
+    // QJsonArray items = requests.value(((QCheckBox*)obj)->text().remove('&')).toObject().value("items").toArray();
     //qDebug() << requests.value(((QCheckBox*)obj)->text().remove('&')).toObject().value("items").toArray();
-    for(int i = 0; i < items.size(); i++){
-        if(((QCheckBox*)obj)->checkState()){
-            reqList.append(items[i].toString());
-        }else{
-            reqList.removeAll(items[i].toString());
-        }
-    }
 
     if(((QCheckBox*)obj)->checkState()){
         reqObjList.append(requests.value(((QCheckBox*)obj)->text().remove('&')).toObject());
@@ -104,7 +100,7 @@ void MainWindow::requestSlot(){
     for(int i = 0; i < reqObjList.size(); i++){
         request = "{\"type\":\"Request\",\"items\":[";
         for(int j = 0; j < reqObjList[i].value("items").toArray().size(); j++){
-            request += reqObjList[i].value("items").toArray()[j].toString();
+            request += '\"' + reqObjList[i].value("items").toArray()[j].toString() + '\"';
             if(j < reqObjList[i].value("items").toArray().size()-1){
                 request+= ", ";
             }
@@ -120,10 +116,35 @@ void MainWindow::requestSlot(){
 
         int bytesSent = socket->send(txMessage);
 
-        qDebug() << request;
         qDebug() << "bytesSent:" << bytesSent << "\n";
 
     }
 
 
+}
+void MainWindow::dataReadSlot(QByteArray data){
+    // qDebug() << data << endl;
+    QByteArray array = data;
+    char buffer[MAXMESSAGESIZE];
+    char source, messageCount;
+    int numOfErrors = 0;
+    bool isError;
+    for(int i = 0; i < array.size(); i++) {
+        bool isCompleted = ParseMessage(array[i], buffer, &source, &messageCount, &isError);
+        if(isCompleted) {
+            QJsonDocument doc(QJsonDocument::fromJson(buffer));
+            QJsonObject json = doc.object();
+            QString type = json["type"].toString();
+            if(type == QStringLiteral("Response")) {
+                qDebug() << "Response: " << json;
+            }
+            else if(type == QStringLiteral("Request")){
+                qDebug() << "Request: " << json["items"];
+            }
+        }
+        else {
+            numOfErrors++;
+            // emit updateError(numOfErrors);
+        }
+    }
 }

@@ -26,12 +26,12 @@ private slots:
 
     void on_shouldRequest_clicked(bool checked);
     void requestSlot();
+    void dataReadSlot(QByteArray data);
 
 private:
     Ui::MainWindow *ui;
     ClientSocket *socket;
     QTimer *reqTimer;
-    QStringList reqList;
     QVector<QJsonObject> reqObjList;
 
 };

@@ -25,6 +25,7 @@ public:
     QTcpSocket *socket;
 
 signals:
+    void dataRead(QByteArray in);
 
 public slots:
     void connected();
