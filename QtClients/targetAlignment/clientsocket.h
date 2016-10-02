@@ -5,6 +5,8 @@
 #include <QTcpSocket>
 #include <QDebug>
 #include <QThreadPool>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include "picCode/communication/messages.h"
 
 

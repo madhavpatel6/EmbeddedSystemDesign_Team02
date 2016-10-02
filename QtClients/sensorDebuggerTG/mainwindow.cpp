@@ -21,9 +21,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    sensorRequestCounter = 0;
     delete requestTimer;
     delete tcpSocket;
+    delete ui;
 }
 
 void MainWindow::serverConnected(bool connected)

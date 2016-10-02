@@ -23,12 +23,12 @@ targetAlignment::targetAlignment(QWidget *parent) :
 
 targetAlignment::~targetAlignment()
 {
-    delete ui;
-    delete requestTimer;
-    delete tcpSocket;
     IR0RequestCounter = 0;
     IR1RequestCounter = 0;
     IR2RequestCounter = 0;
+    delete requestTimer;
+    delete tcpSocket;
+    delete ui;
 }
 
 void targetAlignment::serverConnected(bool connected)
@@ -72,20 +72,35 @@ void targetAlignment::on_startSensingButton_clicked()
 
 void targetAlignment::updateAlignmentData(char source, QString alignmentData0, QString alignmentData1, QString alignmentData2)
 {
+    if(alignmentData0 == "0.00"){
+        IR0RequestCounter = IR0RequestCounter;
+    }
+    else{
+        IR0RequestCounter = IR0RequestCounter + 1;
+    }
+    if(alignmentData1 == "0.00"){
+        IR1RequestCounter = IR1RequestCounter;
+    }
+    else{
+        IR1RequestCounter = IR1RequestCounter + 1;
+    }
+    if(alignmentData2 == "0.00"){
+        IR2RequestCounter = IR2RequestCounter;
+    }
+    else{
+        IR2RequestCounter = IR2RequestCounter + 1;
+    }
     switch(source){
         case TARGETGRABBER:
-            IR0RequestCounter = IR0RequestCounter + 1;
-            IR1RequestCounter = IR1RequestCounter + 1;
-            IR2RequestCounter = IR2RequestCounter + 1;
             ui->IR_0CountLabel->setText(QString::number(IR0RequestCounter));
             ui->IR_1CountLabel->setText(QString::number(IR1RequestCounter));
             ui->IR_2CountLabel->setText(QString::number(IR2RequestCounter));
             ui->IR_0PlainTextEdit->appendPlainText(alignmentData0);
             ui->IR_1PlainTextEdit->appendPlainText(alignmentData1);
             ui->IR_2PlainTextEdit->appendPlainText(alignmentData2);
-            ui->IR_0PlainTextEdit->appendPlainText(QString(source));
-            ui->IR_1PlainTextEdit->appendPlainText(QString(source));
-            ui->IR_2PlainTextEdit->appendPlainText(QString(source));
+            //ui->IR_0PlainTextEdit->appendPlainText(QString(source));
+            //ui->IR_1PlainTextEdit->appendPlainText(QString(source));
+            //ui->IR_2PlainTextEdit->appendPlainText(QString(source));
             break;
         case TARGETLOCATOR:
             IR0RequestCounter = IR0RequestCounter + 1;
