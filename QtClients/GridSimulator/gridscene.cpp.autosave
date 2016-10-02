@@ -56,7 +56,6 @@ void GridScene::paintEvent(QPaintEvent *) {
     painter.rotate(90 - roverLocation.orientation);
 
     // we need to move the rectangle that we draw by rx and ry so it's in the center.
-
     painter.drawRect(QRect(-6*CELL_SIZE/2, -6*CELL_SIZE/2, 6*CELL_SIZE, 6*CELL_SIZE));
     painter.setBrush(Qt::black);
     painter.drawRect(QRect(-1*CELL_SIZE/2, -6*CELL_SIZE/2, 1*CELL_SIZE, 1*CELL_SIZE));

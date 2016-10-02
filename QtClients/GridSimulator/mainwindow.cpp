@@ -4,6 +4,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
 {
     setupUi(this);
+    grid->addLine(142,144,321,124);
+//    grid->addLine(12,38,22,88);
 }
 
 MainWindow::~MainWindow()
@@ -20,5 +22,8 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     verticalLayout->setContentsMargins(5,5,5,5);
     verticalLayout->setObjectName(QString("verticalLayout"));
     grid = new GridScene();
+//    button = new QPushButton();
     verticalLayout->addWidget(grid);
+    verticalLayout->setAlignment(Qt::AlignCenter);
 }
+

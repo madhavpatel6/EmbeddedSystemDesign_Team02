@@ -7,6 +7,8 @@ class GridCell
 public:
     GridCell(int _x, int _y, int size);
     void draw(QPainter* painter);
+    void increment();
+    void decrement();
 private:
     QRect box;
     int count;

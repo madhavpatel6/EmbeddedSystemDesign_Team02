@@ -11,3 +11,13 @@ void GridCell::draw(QPainter *painter) {
     painter->fillRect(box, QBrush(QColor(colorVal, colorVal, colorVal)));
     painter->drawRect(box);
 }
+
+void GridCell::decrement() {
+    if(count != MINIMUM)
+        count--;
+}
+
+void GridCell::increment() {
+    if(count != MINIMUM)
+        count++;
+}
