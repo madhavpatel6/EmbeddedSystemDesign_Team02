@@ -16,12 +16,10 @@ TEMPLATE = app
 SOURCES += main.cpp\
         targetalignment.cpp \
     clientsocket.cpp \
-    initialization.cpp \
     picCode/communication/messages.c \
     picCode/debug.c
 
 HEADERS  += targetalignment.h \
-    initialization.h \
     clientsocket.h \
     picCode/communication/messages.h \
     picCode/debug.h

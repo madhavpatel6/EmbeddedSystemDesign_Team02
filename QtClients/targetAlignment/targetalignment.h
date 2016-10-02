@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include "clientsocket.h"
-#include "initialization.h"
 #include "QTimer"
 
 namespace Ui {
