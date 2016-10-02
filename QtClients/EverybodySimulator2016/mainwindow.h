@@ -33,6 +33,7 @@ private:
     ClientSocket *socket;
     QTimer *reqTimer;
     QVector<QJsonObject> reqObjList;
+    QStringList resEnabled;
 
 };
 

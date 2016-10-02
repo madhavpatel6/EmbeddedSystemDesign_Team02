@@ -7,6 +7,14 @@
     "PFtoTL": {
         "destination": "L",
         "items": ["Obstacles", "Targets", "SafeRegions", "R2_Location", "R2_Orientation"]
+    },
+    "TGtoPF": {
+        "destination": "P",
+        "items": ["targetProximity", "outsideArena"]
+    },
+    "TLtoPF": {
+        "destination": "P",
+        "items": ["R2_Est_Location", "R2_Est_Orientation"]
     }
 
 }

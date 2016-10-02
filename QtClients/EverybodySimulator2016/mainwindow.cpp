@@ -66,8 +66,12 @@ void MainWindow::on_reqCheckBoxClicked(){
 
 void MainWindow::on_resCheckBoxClicked(){
     QObject* obj = sender();
-
-    qDebug() << "res " + ((QCheckBox*)obj)->text() + ((QCheckBox*)obj)->checkState();
+    if(((QCheckBox*)obj)->checkState()){
+        resEnabled.append((((QCheckBox*)obj)->text().remove('&')));
+    }else{
+        resEnabled.removeAll((((QCheckBox*)obj)->text().remove('&')));
+    }
+    //qDebug() << "res " + ((QCheckBox*)obj)->text() + ((QCheckBox*)obj)->checkState();
 }
 
 MainWindow::~MainWindow()
@@ -140,6 +144,36 @@ void MainWindow::dataReadSlot(QByteArray data){
             }
             else if(type == QStringLiteral("Request")){
                 qDebug() << "Request: " << json["items"];
+
+                QJsonObject responses = initialization::getConfig("responses.json");
+                QString jsonMessage = "{\"type\": \"Response\",";
+                for(int i = 0; i < json["items"].toArray().size(); i++){
+                    if(resEnabled.contains(json["items"].toArray()[i].toString())){
+                        QString key = "\"" + json["items"].toArray()[i].toString() + "\"";
+                        QString value;
+                        if(responses.value(json["items"].toArray()[i].toString()).isObject()){
+                            value = QJsonDocument(responses.value(json["items"].toArray()[i].toString()).toObject()).toJson();
+                        }else{
+                            value = "\"" + responses.value(json["items"].toArray()[i].toString()).toString() + "\"";
+                        }
+                        jsonMessage += key + ":" + value + ",";
+                    }
+                }
+                jsonMessage.chop(1); // this removes the extra comma at the end
+                jsonMessage += "}";
+                qDebug() << jsonMessage;
+                char message[512];
+                char destination = source;
+
+                int len = CreateMessage(message, jsonMessage.toLatin1().data(), destination, 0);
+
+                QByteArray txMessage;
+                txMessage.setRawData(message, len);
+
+                int bytesSent = socket->send(txMessage);
+
+                qDebug() << "bytesSent:" << bytesSent << "\n";
+
             }
         }
         else {
