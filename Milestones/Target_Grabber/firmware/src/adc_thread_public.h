@@ -20,7 +20,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
+  
+// This struct contains the three IR sensor values
 typedef struct {
     float IR_0;
     float IR_1;

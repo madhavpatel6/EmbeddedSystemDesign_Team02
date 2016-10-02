@@ -261,13 +261,12 @@
       <Template>
         <Name>drv_adc_static.h</Name>
         <Path>Header Files/app/system_config/default/framework/driver/adc</Path>
-        <Checksum>EB83B77B6F50631DF29C48BC407262EE</Checksum>
+        <Checksum>AF320FFD8C422507C45F9BDE3813B526</Checksum>
       </Template>
       <Template>
         <Name>drv_adc_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/adc/src</Path>
-        <Checksum>97D2F3AE688ECF1C1E980EDC76D0AC00</Checksum>
-        <ProjectFileChecksum>2C32FE238245445E27745F0B96FB4E15</ProjectFileChecksum>
+        <Checksum>19F7A0AA754099BCC5D1F788C8F28BED</Checksum>
       </Template>
       <Template>
         <Name>tx_thread.c</Name>

@@ -74,6 +74,7 @@ typedef struct {
     float y;
 } Coordinates;
 
+// This is from adc thread public
 //typedef struct {
 //    float IR_0;
 //    float IR_1;

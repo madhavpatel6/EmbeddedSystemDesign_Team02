@@ -84,29 +84,30 @@ void IntHandlerDrvAdc(void)
     dbgOutputLoc(ENTER_ADC_ISR);
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     TargetAlignment_Type alignmentADCVals;
+    //memset(&alignmentADCVals, 0, (size_t)3 * sizeof(TargetAlignment_Type));
     
-    alignmentADCVals.IR_0 = 0.0;
-    alignmentADCVals.IR_1 = 0.0;
-    alignmentADCVals.IR_2 = 0.0;
-    
-    
+//    alignmentADCVals.IR_0 = 0.0;
+//    alignmentADCVals.IR_1 = 0.0;
+//    alignmentADCVals.IR_2 = 0.0; 
     
     int i = 0;
-    float adcValToQ = 0.0;
-    float adcValToQF = 0.0;
-    float adcVoltage = 0.0;
-    DRV_ADC_Stop();
+    
+    //DRV_ADC_Start();
+    //DRV_ADC_Stop();
+    //while(!DRV_ADC_SamplesAvailable());
     //Read data before clearing interrupt flag
     dbgOutputLoc(ADDING_ADC_VAL_ISR);
+    
+    for(i; i < 15; i=i+3) {
+        alignmentADCVals.IR_0 = alignmentADCVals.IR_0 + DRV_ADC_SamplesRead(i);
+        alignmentADCVals.IR_1 = alignmentADCVals.IR_1 + DRV_ADC_SamplesRead(i+1);
+        alignmentADCVals.IR_2 = alignmentADCVals.IR_2 + DRV_ADC_SamplesRead(i+2);
+    }
     //for(i; i < 16; i++) {
-        alignmentADCVals.IR_0 = adcValToQ + PLIB_ADC_ResultGetByIndex(ADC_ID_1, 0);
+        //alignmentADCVals.IR_0 = alignmentADCVals.IR_0 + PLIB_ADC_ResultGetByIndex(ADC_ID_1, 0);
     //}
-//    adcValToQF = ((adcValToQ)/(1.0))*(1.0);
-//    adcVoltage = (adcValToQF*5.0)/(1024.0); 
-//    float distance = (adcVoltage / 0.009766) * (2.54);
+    dbgOutputVal('A');
     dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
-//    adc_app_SendValToMsgQFromISR(distance, &pxHigherPriorityTaskWoken);
-    //adc_app_SendValToMsgQFromISR(adcValToQ, &pxHigherPriorityTaskWoken);
     adc_app_SendValToMsgQFromISR(alignmentADCVals, &pxHigherPriorityTaskWoken);
     dbgOutputLoc(AFTER_SEND_TO_Q_ISR);
     dbgOutputLoc(LEAVE_ADC_ISR);
@@ -121,14 +122,31 @@ void IntHandlerDrvAdc(void)
 void IntHandlerDrvTmrInstance0(void)
 {
     dbgOutputLoc(ENTER_TMR_INSTANCE_0_ISR);
+    dbgOutputVal('T');
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-    DRV_ADC_Start();
-    dbgOutputLoc(SET_ADC_FLAG_TMR_INSTANCE_0_ISR);
-    //PLIB_INT_SourceFlagSet(INT_ID_0, INT_SOURCE_ADC_1);
-    PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
-    dbgOutputLoc(LEAVE_TMR_INSTANCE_0_ISR);
-    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
-    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
+//    DRV_ADC_Start();
+//    DRV_ADC_Stop();
+//    while(!DRV_ADC_SamplesAvailable());
+    if(!PLIB_INT_SourceFlagGet(INT_ID_0, INT_SOURCE_ADC_1)){
+        dbgOutputLoc(SET_ADC_FLAG_TMR_INSTANCE_0_ISR);
+        DRV_ADC_Start();
+        DRV_ADC_Stop();
+        while(!DRV_ADC_SamplesAvailable());
+        PLIB_INT_SourceFlagSet(INT_ID_0, INT_SOURCE_ADC_1);
+        PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
+        dbgOutputLoc(LEAVE_TMR_INSTANCE_0_ISR);
+        portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
+        PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
+    }
+    else{
+        //DRV_ADC_Stop();
+        dbgOutputLoc(LEAVE_TMR_INSTANCE_0_ISR);
+        portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
+        PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
+    }
+//    dbgOutputLoc(LEAVE_TMR_INSTANCE_0_ISR);
+//    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
+//    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
 }
 
 /* This timer is for the TX to fire every 200ms */
