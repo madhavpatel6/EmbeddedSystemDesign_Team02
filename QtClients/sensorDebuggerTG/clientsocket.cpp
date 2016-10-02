@@ -18,6 +18,7 @@ ClientSocket::~ClientSocket()
 {
     socket->disconnectFromHost();
     qDebug() << "Disconnected from host" << endl;
+    delete socket;
 }
 
 void ClientSocket::connectToHost(QString ip,int port)
