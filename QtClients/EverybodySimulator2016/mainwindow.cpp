@@ -46,6 +46,9 @@ MainWindow::MainWindow(QWidget *parent) :
     /* Setup response handler */
     connect(socket, SIGNAL(dataRead(QByteArray)), this, SLOT(dataReadSlot(QByteArray)));
 
+    /* print what module we are emulating to the gui */
+    ui->myModuleLabel->setText(QString(MYMODULE));
+
 }
 
 void MainWindow::on_reqCheckBoxClicked(){
