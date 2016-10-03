@@ -54,6 +54,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 
 #include "motor_controller_thread.h"
+#include "motor_controller_thread_public.h"
 
 static QueueHandle_t _queue;
 
@@ -120,27 +121,35 @@ void MOTOR_CONTROLLER_THREAD_Initialize ( void )
 
 void MOTOR_CONTROLLER_THREAD_Tasks ( void )
 {
-
-    /* Check the application's current state. */
-    switch ( motor_controller_threadData.state )
-    {
-        /* Application's initial state. */
-        case MOTOR_CONTROLLER_THREAD_STATE_INIT:
+    char buf[10];
+    
+    while(1) {
+        /* Check the application's current state. */
+        switch ( motor_controller_threadData.state )
         {
-            bool appInitialized = true;
-            if (appInitialized)
+            /* Application's initial state. */
+            case MOTOR_CONTROLLER_THREAD_STATE_INIT:
             {
-                motor_controller_threadData.state = MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS;
+                bool appInitialized = true;
+                
+                MOTOR_CONTROLLER_THREAD_FORWARD();
+                
+                if (appInitialized)
+                {
+                    motor_controller_threadData.state = MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS;
+                }
+                break;
             }
-            break;
-        }
-        case MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS:
-        {
-            break;
-        }
-        default:
-        {
-            break;
+            case MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS:
+            {
+                MOTOR_CONTROLLER_THREAD_ReadFromQueue(buf);
+                
+                break;
+            }
+            default:
+            {
+                break;
+            }
         }
     }
 }
@@ -149,16 +158,36 @@ void MOTOR_CONTROLLER_THREAD_InitializeQueue() {
     _queue = xQueueCreate(SIZEOFQUEUE, sizeof(TYPEOFQUEUE));
 }
 
-void MOTOR_CONTROLLER_THREAD_ReadFromQueue(MessageObj* pvBuffer) {
+void MOTOR_CONTROLLER_THREAD_ReadFromQueue(char* pvBuffer) {
     xQueueReceive(_queue, pvBuffer, portMAX_DELAY);
 }
 
-void MOTOR_CONTROLLER_THREAD_SendToQueue(MessageObj buffer) {
+void MOTOR_CONTROLLER_THREAD_SendToQueue(char buffer) {
     xQueueSend(_queue, &buffer, portMAX_DELAY);
 }
 
-void MOTOR_CONTROLLER_THREAD_SendToQueueISR(MessageObj buffer, BaseType_t *pxHigherPriorityTaskWoken) {
+void MOTOR_CONTROLLER_THREAD_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken) {
     xQueueSendFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
+}
+
+void MOTOR_CONTROLLER_THREAD_FORWARD( void ) {
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_F, 1, 0);
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 5, 0);
+}
+
+void MOTOR_CONTROLLER_THREAD_REVERSE( void ) {
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_F, 1, 1);
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 5, 1);
+}
+
+void MOTOR_CONTROLLER_THREAD_LEFT( void ) {
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_F, 1, 1);
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 5, 0);
+}
+
+void MOTOR_CONTROLLER_THREAD_RIGHT( void ) {
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_F, 1, 0);
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 5, 1);    
 }
 
 /*******************************************************************************
