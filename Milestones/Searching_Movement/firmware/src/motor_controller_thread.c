@@ -122,8 +122,10 @@ void MOTOR_CONTROLLER_THREAD_Initialize ( void )
 void MOTOR_CONTROLLER_THREAD_Tasks ( void )
 {
     char buf[10];
+    char c;
     
     while(1) {
+        MOTOR_CONTROLLER_THREAD_ReadFromQueue(&c);
         /* Check the application's current state. */
         switch ( motor_controller_threadData.state )
         {
@@ -142,7 +144,9 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
             }
             case MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS:
             {
-                MOTOR_CONTROLLER_THREAD_ReadFromQueue(buf);
+                switch(c) {
+                    
+                }
                 
                 break;
             }
