@@ -186,14 +186,14 @@ bool cmValChecker(float cmVal){
 
  void ADC_THREAD_Tasks ( void )
  {
-     dbgOutputLoc(ENTER_TASK_ADC_APP);
+     dbgOutputLoc(ENTER_COMPUTATION_THREAD);
      MessageObj obj;
      TargetAlignment_Type distanceIR;
      obj.Type = UPDATE;
      obj.Update.Type = ALIGNMENTDATA;
-     dbgOutputLoc(BEFORE_WHILE_ADC_APP);
+     dbgOutputLoc(BEFORE_WHILE_TARGET_ALIGNMENT_SUBR_COMPUTATION_THREAD);
      while(1){
-         dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_ADC_APP);
+         dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_TARGET_ALIGNMENT_SUBR_COMPUTATION_THREAD);
          if(xQueueReceive(_queue, &distanceIR, portMAX_DELAY)){
              // Storing the converted cm value in the message object
              obj.Update.Data.alignmentData.IR_0_bool = cmValChecker(convertTocmIR(distanceIR.IR_0));
@@ -212,7 +212,7 @@ bool cmValChecker(float cmVal){
              // Sending to Tx Thread Q
              MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
          }
-         dbgOutputLoc(AFTER_RECEIVE_FROM_Q_ADC_APP);
+         dbgOutputLoc(AFTER_RECEIVE_FROM_Q_TARGET_ALIGNMENT_SUBR_COMPUTATION_THREAD);
      }
  }
 

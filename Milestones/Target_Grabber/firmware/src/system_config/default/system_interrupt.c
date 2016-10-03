@@ -61,8 +61,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include <xc.h>
 #include <sys/attribs.h>
-#include "adc_thread.h"
-#include "adc_thread_public.h"
+#include "computation_thread.h"
+#include "computation_thread_public.h"
 #include "debug.h"
 #include "tx_thread.h"
 #include "rx_thread.h"
@@ -95,7 +95,7 @@ void IntHandlerDrvAdc(void)
         alignmentADCVals.IR_2 = alignmentADCVals.IR_2 + DRV_ADC_SamplesRead(i+2);
     }
     dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
-    adc_app_SendValToMsgQFromISR(alignmentADCVals, &pxHigherPriorityTaskWoken);
+    computation_thread_SendValToMsgQFromISR(alignmentADCVals, &pxHigherPriorityTaskWoken);
     dbgOutputLoc(AFTER_SEND_TO_Q_ISR);
     dbgOutputLoc(LEAVE_ADC_ISR);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);

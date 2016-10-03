@@ -245,10 +245,18 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"targetAlignment\":{"
                                                                                            "\"IR_0\":\"%0.2f\","
                                                                                            "\"IR_1\":\"%0.2f\","
-                                                                                           "\"IR_2\":\"%0.2f\"}", 
+                                                                                           "\"IR_2\":\"%0.2f\","
+                                                                                           "\"IR_0_bool\":\"%d\","
+                                                                                           "\"IR_1_bool\":\"%d\","
+                                                                                           "\"IR_2_bool\":\"%d\","
+                                                                                           "\"Grabber_Aligned\":\"%d\"}",
                                                                                            internalData.alignmentData.IR_0,
                                                                                            internalData.alignmentData.IR_1,
-                                                                                           internalData.alignmentData.IR_2
+                                                                                           internalData.alignmentData.IR_2,
+                                                                                           internalData.alignmentData.IR_0_bool,
+                                                                                           internalData.alignmentData.IR_1_bool,
+                                                                                           internalData.alignmentData.IR_2_bool,
+                                                                                           internalData.alignmentData.Grabber_Aligned
                                                                                            );
                                     //tx_thread_obj.Destination = obj.External.Source; // looks like it is set at top
                                     break;

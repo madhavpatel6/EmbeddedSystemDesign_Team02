@@ -56,7 +56,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_definitions.h"
 #include "rx_thread.h"
 #include "tx_thread.h"
-#include "adc_thread.h"
+#include "computation_thread.h"
 #include "message_controller_thread.h"
 
 
@@ -71,7 +71,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 static void _SYS_Tasks ( void );
 static void _RX_THREAD_Tasks(void);
 static void _TX_THREAD_Tasks(void);
-static void _ADC_THREAD_Tasks(void);
+static void _COMPUTATION_THREAD_Tasks(void);
 static void _MESSAGE_CONTROLLER_THREAD_Tasks(void);
 
 
@@ -106,9 +106,9 @@ void SYS_Tasks ( void )
                 "TX_THREAD Tasks",
                 1024, NULL, 1, NULL);
 
-    /* Create OS Thread for ADC_THREAD Tasks. */
-    xTaskCreate((TaskFunction_t) _ADC_THREAD_Tasks,
-                "ADC_THREAD Tasks",
+    /* Create OS Thread for COMPUTATION_THREAD Tasks. */
+    xTaskCreate((TaskFunction_t) _COMPUTATION_THREAD_Tasks,
+                "COMPUTATION_THREAD Tasks",
                 1024, NULL, 1, NULL);
 
     /* Create OS Thread for MESSAGE_CONTROLLER_THREAD Tasks. */
@@ -182,17 +182,17 @@ static void _TX_THREAD_Tasks(void)
 
 /*******************************************************************************
   Function:
-    void _ADC_THREAD_Tasks ( void )
+    void _COMPUTATION_THREAD_Tasks ( void )
 
   Summary:
-    Maintains state machine of ADC_THREAD.
+    Maintains state machine of COMPUTATION_THREAD.
 */
 
-static void _ADC_THREAD_Tasks(void)
+static void _COMPUTATION_THREAD_Tasks(void)
 {
     while(1)
     {
-        ADC_THREAD_Tasks();
+        COMPUTATION_THREAD_Tasks();
     }
 }
 

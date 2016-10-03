@@ -69,7 +69,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "task.h"
 #include "rx_thread.h"
 #include "tx_thread.h"
-#include "adc_thread.h"
+#include "computation_thread.h"
 #include "message_controller_thread.h"
 
 

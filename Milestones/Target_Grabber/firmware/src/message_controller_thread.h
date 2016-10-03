@@ -58,7 +58,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "communication/messages.h"
 #include "FreeRTOS.h"
 #include "queue.h"
-#include "adc_thread_public.h"
+#include "computation_thread_public.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -82,6 +82,7 @@ typedef struct {
     bool  IR_0_bool;
     bool  IR_1_bool;
     bool  IR_2_bool;
+    bool  Grabber_Aligned;
 } TargetAlignmentFloat_Type;
 
 //This is any data that someone else might request for
@@ -103,8 +104,7 @@ typedef enum InternalRequestType_enum { SMtoTL,
                                         PFtoTL, 
                                         PFtoTG, 
                                         TGtoPF,
-                                        SD,
-                                        AD
+                                        SD
  } InternalRequestType;
 
 //------------------------------------------------------------------------------

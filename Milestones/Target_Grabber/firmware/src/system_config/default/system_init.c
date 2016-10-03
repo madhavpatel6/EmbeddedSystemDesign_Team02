@@ -196,7 +196,7 @@ void SYS_Initialize ( void* data )
     /* Initialize the Application */
     RX_THREAD_Initialize();
     TX_THREAD_Initialize();
-    ADC_THREAD_Initialize();
+    COMPUTATION_THREAD_Initialize();
     MESSAGE_CONTROLLER_THREAD_Initialize();
 }
 
