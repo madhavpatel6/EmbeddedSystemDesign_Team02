@@ -75,18 +75,18 @@ typedef struct {
 } Coordinates;
 
 // This is from adc thread public
-//typedef struct {
-//    float IR_0;
-//    float IR_1;
-//    float IR_2;
-//} TargetAlignment_Type;
+typedef struct {
+    float IR_0;
+    float IR_1;
+    float IR_2;
+} TargetAlignmentFloat_Type;
 
 //This is any data that someone else might request for
 typedef struct {
     Coordinates location;
     float orientation;
     float sensordata;
-    TargetAlignment_Type alignmentData;
+    TargetAlignmentFloat_Type alignmentData;
 }InternalData;
 
 //This should include a new enum for anything in the InternalData

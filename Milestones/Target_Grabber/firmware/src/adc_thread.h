@@ -142,7 +142,7 @@ QueueHandle_t createAdcQ();
 void convertTocmUltra(float *ultraDigitalVal);
 
 /* This converts the IR sensor values to cm for 4cm - 30cm */
-void convertTocmIR(float *irDigitalVal);
+float convertTocmIR(uint32_t irDigitalVal); // return float
 
 #endif /* _ADC_THREAD_H */
 

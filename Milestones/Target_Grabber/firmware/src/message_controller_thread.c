@@ -243,9 +243,9 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 }
                                 case targetAlignment: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"targetAlignment\":{"
-                                                                                           "\"IR_0\":\"%0.02f\","
-                                                                                           "\"IR_1\":\"%0.02f\","
-                                                                                           "\"IR_2\":\"%0.02f\"}", 
+                                                                                           "\"IR_0\":\"%0.2f\","
+                                                                                           "\"IR_1\":\"%0.2f\","
+                                                                                           "\"IR_2\":\"%0.2f\"}", 
                                                                                            internalData.alignmentData.IR_0,
                                                                                            internalData.alignmentData.IR_1,
                                                                                            internalData.alignmentData.IR_2
