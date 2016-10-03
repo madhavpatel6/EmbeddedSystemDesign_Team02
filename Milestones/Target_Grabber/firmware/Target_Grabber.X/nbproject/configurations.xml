@@ -37,7 +37,6 @@
         <itemPath>../src/tx_thread.h</itemPath>
         <itemPath>../src/message_controller_thread.h</itemPath>
         <itemPath>../src/computation_thread.h</itemPath>
-        <itemPath>../src/computation_thread_public.h</itemPath>
       </logicalFolder>
       <logicalFolder name="communication"
                      displayName="communication"
@@ -135,6 +134,7 @@
       <itemPath>../src/system_interrupt_public.h</itemPath>
       <itemPath>../src/rx_thread_public.h</itemPath>
       <itemPath>../src/tx_thread_public.h</itemPath>
+      <itemPath>../src/computation_thread_public.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
