@@ -1,5 +1,13 @@
 {
-    "currentTargetLocation": {
+    "R1_Location": {
+        "x": "int",
+        "y": "int"
+    },
+    "R2_Location": {
+        "x": "int",
+        "y": "int"
+    },
+    "R1_Est_Location": {
         "x": "int",
         "y": "int"
     },
@@ -7,7 +15,55 @@
         "x": "int",
         "y": "int"
     },
+    "R1_Orientation" : "int",
+    "R2_Orientation" : "int",
+    "R1_Est_Orientation" : "int",
     "R2_Est_Orientation" : "int",
+    "Targets": [
+            [
+                    ["int", "int"],
+                    ["int", "int"],
+                    ["int", "int"],
+                    ["int", "int"]
+            ],
+            [
+                    ["int", "int"],
+                    ["int", "int"],
+                    ["int", "int"],
+                    ["int", "int"]
+            ]
+    ],
+    "Obstacles": [
+                [
+                    ["int", "int"],
+                    ["int", "int"],
+                    ["int", "int"],
+                    ["int", "int"]
+                ]
+    ],
+    "SafeRegions": [
+                [
+                    ["int", "int"],
+                    ["int", "int"],
+                    ["int", "int"],
+                    ["int", "int"]
+                ]
+    ],
+    "currentTargetLocation": {
+        "x": "int",
+        "y": "int"
+    },
     "targetProximity": "int",
-    "outsideArena": "bool"
+    "outsideArena": "bool",
+
+    "targetAcquired": "bool",
+    "targetAlignment": {
+            "IR_0": "float",
+            "IR_1": "float",
+            "IR_2": "float",
+            "IR_0_bool": "bool",
+            "IR_1_bool": "bool",
+            "IR_2_bool": "bool",
+            "Grabber_Aligned": "bool"
+    }
 }

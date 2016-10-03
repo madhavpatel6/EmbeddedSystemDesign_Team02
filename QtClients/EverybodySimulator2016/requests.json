@@ -1,20 +1,27 @@
 {
-    "PFtoTG": {
-        "destination" : "G",
-        "items": ["targetAlignment", "targetAcquired"]
+    "SMtoTL": {
+        "destination" : "L",
+        "items": ["Obstacles", "R1_Location", "R1_Orientation"]
     },
-
-    "PFtoTL": {
-        "destination": "L",
-        "items": ["Obstacles", "Targets", "SafeRegions", "R2_Location", "R2_Orientation"]
-    },
-    "TGtoPF": {
-        "destination": "P",
-        "items": ["targetProximity", "outsideArena"]
+    "TLtoSM": {
+        "destination" : "S",
+        "items": ["R1_Est_Location", "R1_Est_Orientation"]
     },
     "TLtoPF": {
         "destination": "P",
         "items": ["R2_Est_Location", "R2_Est_Orientation"]
+    },
+    "PFtoTL": {
+        "destination": "L",
+        "items": ["Obstacles", "Targets", "SafeRegions", "R2_Location", "R2_Orientation"]
+    },
+    "PFtoTG": {
+        "destination" : "G",
+        "items": ["targetAlignment", "targetAcquired"]
+    },
+    "TGtoPF": {
+        "destination": "P",
+        "items": ["targetProximity", "outsideArena"]
     }
 
 }
