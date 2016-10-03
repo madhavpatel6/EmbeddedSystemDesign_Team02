@@ -64,6 +64,10 @@ void DRV_ADC_Initialize(void)
     PLIB_ADC_VoltageReferenceSelect(DRV_ADC_ID_1, ADC_REFERENCE_VDD_TO_AVSS);
 
     /* Sampling Selections */
+    /* Enable Auto Sample Mode */
+    PLIB_ADC_SampleAutoStartEnable(DRV_ADC_ID_1);
+    /* Sample Acquisition Time (Auto Sample Mode) */	
+    PLIB_ADC_SampleAcquisitionTimeSet(DRV_ADC_ID_1, 31);
     /* Select Sampling Mode */
     PLIB_ADC_SamplingModeSelect(DRV_ADC_ID_1, ADC_SAMPLING_MODE_MUXA);
     /* Number of Samples Per Interrupt */
@@ -81,35 +85,41 @@ void DRV_ADC_Initialize(void)
     /* MUX A Negative Input Select */
     PLIB_ADC_MuxChannel0InputNegativeSelect(DRV_ADC_ID_1, ADC_MUX_A, ADC_INPUT_NEGATIVE_VREF_MINUS);
  
-/*scan enable*/
-    /* Select Scan Input 0 */
-    PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN0);
     
-    /* Enable Scan mode */
-    PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
+/*scan enable*/
+    /* Select Scan Input 0,1,2 */
+     PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN0 | ADC_INPUT_SCAN_AN1 | ADC_INPUT_SCAN_AN2);
 
- 
- 
-/*scan enable*/
-    /* Select Scan Input 1 */
-    PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN1);
+     /* Enable Scan mode */
+    PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1); 
     
-    /* Enable Scan mode */
-    PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
-
- 
- 
-/*scan enable*/
-    /* Select Scan Input 2 */
-    PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN2);
-    
-    /* Enable Scan mode */
-    PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
+///*scan enable*/
+//    /* Select Scan Input 0 */
+//    PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN0);
+//    
+//    /* Enable Scan mode */
+//    PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
+// 
+///*scan enable*/
+//    /* Select Scan Input 1 */
+//    PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN1);
+//    
+//    /* Enable Scan mode */
+//    PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
+//
+// 
+// 
+///*scan enable*/
+//    /* Select Scan Input 2 */
+//    PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN2);
+//    
+//    /* Enable Scan mode */
+//    PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
 
  
     /* Initialize ADC Interrupt */
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
-    PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
+    //PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
     PLIB_INT_VectorPrioritySet(INT_ID_0, INT_VECTOR_AD1, INT_PRIORITY_LEVEL3);
     PLIB_INT_VectorSubPrioritySet(INT_ID_0, INT_VECTOR_AD1, INT_SUBPRIORITY_LEVEL0);	
 }

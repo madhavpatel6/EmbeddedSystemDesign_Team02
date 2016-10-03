@@ -96,7 +96,6 @@ void ADC_THREAD_Initialize ( void )
     _queue = createAdcQ();
     DRV_TMR0_Start();
     DRV_ADC_Open();
-    //PLIB_ADC_SampleAcquisitionTimeSet(ADC_ID_1, 12);
     /* TODO: Initialize your application's state machine and other
      * parameters.
      */
@@ -141,11 +140,10 @@ void convertTocmIR(float *irDigitalVal){
         *irDigitalVal = 0.0;
     }
     else{
-        float tempIRAdcVal = 0.0;
-        float tempIRAdcVoltageConv = 0.0;
+        float tempIRAdcVal;
+        float tempIRAdcVoltageConv;
+        tempIRAdcVal = ((*irDigitalVal)/(5.0));
         //tempIRAdcVal = ((*irDigitalVal)/(5.0))*(1.0); // This is because of 3 sensors and 15 samples
-        tempIRAdcVal = ((*irDigitalVal) / (5.0))*(1.0); // This is because of 3 sensors and 15 samples
-        //tempIRAdcVoltageConv = (tempIRAdcVal - 11.0);
         tempIRAdcVoltageConv = (tempIRAdcVal - 11.0);
         *irDigitalVal = ((2076.0) / tempIRAdcVoltageConv)*(1.0);
     }
