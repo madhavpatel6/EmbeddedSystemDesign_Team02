@@ -94,7 +94,6 @@ void IntHandlerDrvAdc(void)
         alignmentADCVals.IR_1 = alignmentADCVals.IR_1 + DRV_ADC_SamplesRead(i+1);
         alignmentADCVals.IR_2 = alignmentADCVals.IR_2 + DRV_ADC_SamplesRead(i+2);
     }
-    dbgOutputVal('A');
     dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
     adc_app_SendValToMsgQFromISR(alignmentADCVals, &pxHigherPriorityTaskWoken);
     dbgOutputLoc(AFTER_SEND_TO_Q_ISR);
@@ -108,7 +107,6 @@ void IntHandlerDrvAdc(void)
 void IntHandlerDrvTmrInstance0(void)
 {
     dbgOutputLoc(ENTER_TMR_INSTANCE_0_ISR);
-    dbgOutputVal('T');
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     if(PLIB_INT_SourceIsEnabled(INT_ID_0, INT_SOURCE_ADC_1) != true){
         PLIB_ADC_SampleAutoStartEnable(ADC_ID_1);

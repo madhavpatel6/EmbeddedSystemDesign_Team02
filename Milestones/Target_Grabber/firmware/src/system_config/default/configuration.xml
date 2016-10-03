@@ -267,6 +267,7 @@
         <Name>drv_adc_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/adc/src</Path>
         <Checksum>D8F9461BE9CAFFFD11846261178C9F83</Checksum>
+        <ProjectFileChecksum>2C32FE238245445E27745F0B96FB4E15</ProjectFileChecksum>
       </Template>
       <Template>
         <Name>tx_thread.c</Name>
