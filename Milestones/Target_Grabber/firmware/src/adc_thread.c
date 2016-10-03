@@ -134,13 +134,13 @@ void convertTocmUltra(float *ultraDigitalVal){
     *ultraDigitalVal = (tempAdcVoltageConv / 0.009766) * (2.54);
 }
 
-/* This converts the IR sensor values to cm for 3.42cm -~ 20cm       */
-/* This uses Chris' equation :             1                         */
-/*                            ---------------------------------      */
-/*                            (AnalogVoltage - 0.2243)/(9.6762)      */
-/* Analog voltage is found by converting the digital value to analog */
-/* Inputs a uint32_t digital value from ADC                          */
-/* Outputs converted digital value to cm                             */
+/* This converts the IR sensor values to cm for ~3.42cm -~ 20cm       */
+/* This uses Chris' equation :             1                          */
+/*                            ---------------------------------       */
+/*                            (AnalogVoltage - 0.2243)/(9.6762)       */
+/* Analog voltage is found by converting the digital value to analog  */
+/* Inputs a uint32_t digital value from ADC                           */
+/* Outputs float converted digital value to cm                        */
 float convertTocmIR(uint32_t irDigitalVal){
     if((irDigitalVal == 0.0) || (irDigitalVal < 0.0)){
         irDigitalVal = 0.0;
@@ -159,6 +159,21 @@ float convertTocmIR(uint32_t irDigitalVal){
         return cmIRVal;
     }
 }
+
+/* Determines if the converted cm value is reasonable                   */
+/* Checks to make sure the value is within reading via Chris equation   */
+/* and datasheet.  Also makes sure the distance is within 6" range      */
+/* Inputs: float converted cm value                                     */
+/* Outputs: true or false based on cm value                             */
+bool cmValChecker(float cmVal){
+    if((cmVal < 3.5) || (cmVal > 15.24)){
+        return false;
+    }
+    else{
+        return true;
+    }
+}
+
 
 
 /******************************************************************************
@@ -180,13 +195,20 @@ float convertTocmIR(uint32_t irDigitalVal){
      while(1){
          dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_ADC_APP);
          if(xQueueReceive(_queue, &distanceIR, portMAX_DELAY)){
-             convertTocmIR(distanceIR.IR_0);
-             convertTocmIR(distanceIR.IR_1);
-             convertTocmIR(distanceIR.IR_2);
              // Storing the converted cm value in the message object
-             obj.Update.Data.alignmentData.IR_0 = convertTocmIR(distanceIR.IR_0);
-             obj.Update.Data.alignmentData.IR_1 = convertTocmIR(distanceIR.IR_1);
-             obj.Update.Data.alignmentData.IR_2 = convertTocmIR(distanceIR.IR_2);
+             obj.Update.Data.alignmentData.IR_0_bool = cmValChecker(convertTocmIR(distanceIR.IR_0));
+             obj.Update.Data.alignmentData.IR_1_bool = cmValChecker(convertTocmIR(distanceIR.IR_1));
+             obj.Update.Data.alignmentData.IR_2_bool = cmValChecker(convertTocmIR(distanceIR.IR_2));
+             
+             if(obj.Update.Data.alignmentData.IR_0_bool == true){
+                 obj.Update.Data.alignmentData.IR_0 = convertTocmIR(distanceIR.IR_0);
+             }
+             if(obj.Update.Data.alignmentData.IR_1_bool == true){
+                 obj.Update.Data.alignmentData.IR_1 = convertTocmIR(distanceIR.IR_1);
+             }
+             if(obj.Update.Data.alignmentData.IR_2_bool == true){
+                 obj.Update.Data.alignmentData.IR_2 = convertTocmIR(distanceIR.IR_2);
+             }
              // Sending to Tx Thread Q
              MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
          }

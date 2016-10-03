@@ -79,6 +79,9 @@ typedef struct {
     float IR_0;
     float IR_1;
     float IR_2;
+    bool  IR_0_bool;
+    bool  IR_1_bool;
+    bool  IR_2_bool;
 } TargetAlignmentFloat_Type;
 
 //This is any data that someone else might request for

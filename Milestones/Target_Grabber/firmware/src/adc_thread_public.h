@@ -21,7 +21,8 @@
 extern "C" {
 #endif
   
-// This struct contains the three IR sensor values
+// This struct contains the three IR sensor values in uint32_t because
+// that is what the adc outputs
 typedef struct {
     uint32_t IR_0;
     uint32_t IR_1;

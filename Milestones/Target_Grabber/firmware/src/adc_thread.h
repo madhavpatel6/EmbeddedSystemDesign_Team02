@@ -141,8 +141,21 @@ QueueHandle_t createAdcQ();
 /* This converts the ultrasonic sensor values to cm for 10cm - 80cm */
 void convertTocmUltra(float *ultraDigitalVal);
 
-/* This converts the IR sensor values to cm for 4cm - 30cm */
+/* This converts the IR sensor values to cm for ~3.42cm -~ 20cm       */
+/* This uses Chris' equation :             1                          */
+/*                            ---------------------------------       */
+/*                            (AnalogVoltage - 0.2243)/(9.6762)       */
+/* Analog voltage is found by converting the digital value to analog  */
+/* Inputs a uint32_t digital value from ADC                           */
+/* Outputs float converted digital value to cm                        */
 float convertTocmIR(uint32_t irDigitalVal); // return float
+
+/* Determines if the converted cm value is reasonable                   */
+/* Checks to make sure the value is within reading via Chris equation   */
+/* and datasheet.  Also makes sure the distance is within 6" range      */
+/* Inputs: float converted cm value                                     */
+/* Outputs: true or false based on cm value                             */
+bool cmValChecker(float cmVal);
 
 #endif /* _ADC_THREAD_H */
 
