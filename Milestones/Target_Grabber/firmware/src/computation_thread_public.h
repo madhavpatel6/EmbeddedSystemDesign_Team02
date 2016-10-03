@@ -1,5 +1,5 @@
-#ifndef _ADC_APP_PUBLIC_H    /* Guard against multiple inclusion */
-#define _ADC_APP_PUBLIC_H
+#ifndef _COMPUTATION_THREAD_PUBLIC_H    /* Guard against multiple inclusion */
+#define _COMPUTATION_THREAD_PUBLIC_H
 
 
 /* ************************************************************************** */
@@ -30,8 +30,8 @@ typedef struct {
 } TargetAlignment_Type;
     
     
-    int adc_app_SendValToMsgQ(float adcVal);
-    int adc_app_SendValToMsgQFromISR(TargetAlignment_Type adcVal, BaseType_t *pxHigherPriorityTaskWoken);
+    int computation_thread_SendValToMsgQ(float adcVal);
+    int computation_thread_SendValToMsgQFromISR(TargetAlignment_Type adcVal, BaseType_t *pxHigherPriorityTaskWoken);
 
 
     /* Provide C++ Compatibility */
@@ -39,7 +39,7 @@ typedef struct {
 }
 #endif
 
-#endif /* _EXAMPLE_FILE_NAME_H */
+#endif /* _COMPUTATION_THREAD_PUBLIC_H */
 
 /* *****************************************************************************
  End of File

@@ -26,7 +26,7 @@ public:
 signals:
     void sendCommStatTargetLocator(QByteArray commStatTargetLocator);
     void serverIsConnectedSignal(bool connectedToServerBoolSignal);
-    void sendAlignmentSignal(char source, QString alignmentData0, QString alignmentData1, QString alignmentData2);
+    void sendAlignmentSignal(char source, QString alignmentData0, QString alignmentData1, QString alignmentData2, QString alignmentBool_0, QString alignmentBool_1, QString alignmentBool_2, QString alignmentGrabberBool);
 public slots:
     void connected();
     void disconnected();

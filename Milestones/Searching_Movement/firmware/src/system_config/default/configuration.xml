@@ -375,7 +375,7 @@
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>5865FD3FF1780C681B7F9E3D456E8CFD</Checksum>
+        <Checksum>4A95C19020476C573DC8964CFFD33E5F</Checksum>
       </Template>
       <Template>
         <Name>drv_tmr_static.c</Name>

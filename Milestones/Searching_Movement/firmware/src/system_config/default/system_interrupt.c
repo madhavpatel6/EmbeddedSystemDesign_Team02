@@ -108,7 +108,7 @@ void IntHandlerDrvAdc(void)
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
 }
 
-/* This timer is for the ADC to fire every 10ms */
+/* This timer is for the ADC to fire every 50ms */
 void IntHandlerDrvTmrInstance0(void)
 {
     dbgOutputLoc(ENTER_TMR_INSTANCE_0_ISR);
@@ -122,18 +122,23 @@ void IntHandlerDrvTmrInstance0(void)
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
 }
 
-/* This timer is for the TX to fire every 50ms */
+int bufCount = 0;
+
+/* This timer is for the TX to fire every 200ms */
 void IntHandlerDrvTmrInstance1(void)
 {
     dbgOutputLoc(ENTER_TMR_INSTANCE_1_ISR);
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     MessageObj obj;
+    char buf[5] = "FRLR";
     obj.Type = SEND_REQUEST;
     dbgOutputLoc(BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR);
+    
     switch(MYMODULE){
         case SEARCHERMOVER:
             obj.Request = SMtoTL;
             MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+            MOTOR_CONTROLLER_THREAD_SendToQueueISR(buf[bufCount], &pxHigherPriorityTaskWoken);
             break;
         case TARGETLOCATOR:
             obj.Request = TLtoSM;
@@ -153,6 +158,11 @@ void IntHandlerDrvTmrInstance1(void)
             break;
     }
     dbgOutputLoc(AFTER_SEND_TO_Q_TMR_INSTANCE_1_ISR);
+    if (bufCount < 3) {
+        bufCount++;
+    } else {
+        bufCount = 0;
+    }
     incrementSystemClock();
     dbgOutputLoc(LEAVE_TMR_INSTANCE_1_ISR);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);

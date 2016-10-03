@@ -58,7 +58,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "communication/messages.h"
 #include "FreeRTOS.h"
 #include "queue.h"
-#include "adc_thread_public.h"
+#include "computation_thread_public.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -75,18 +75,22 @@ typedef struct {
 } Coordinates;
 
 // This is from adc thread public
-//typedef struct {
-//    float IR_0;
-//    float IR_1;
-//    float IR_2;
-//} TargetAlignment_Type;
+typedef struct {
+    float IR_0;
+    float IR_1;
+    float IR_2;
+    bool  IR_0_bool;
+    bool  IR_1_bool;
+    bool  IR_2_bool;
+    bool  Grabber_Aligned;
+} TargetAlignmentFloat_Type;
 
 //This is any data that someone else might request for
 typedef struct {
     Coordinates location;
     float orientation;
     float sensordata;
-    TargetAlignment_Type alignmentData;
+    TargetAlignmentFloat_Type alignmentData;
 }InternalData;
 
 //This should include a new enum for anything in the InternalData
@@ -100,8 +104,7 @@ typedef enum InternalRequestType_enum { SMtoTL,
                                         PFtoTL, 
                                         PFtoTG, 
                                         TGtoPF,
-                                        SD,
-                                        AD
+                                        SD
  } InternalRequestType;
 
 //------------------------------------------------------------------------------

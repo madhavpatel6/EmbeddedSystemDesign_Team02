@@ -39,21 +39,23 @@ void dbgOutputVal(unsigned char outVal) {
  * @param outVal [The location value to put to the bus; see debug.h for the LocationEnum]
  */
 void dbgOutputLoc(unsigned char outVal) {
-    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 5, 0);
+//    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 5, 0);
     SYS_PORTS_Clear(PORTS_ID_0, PORT_CHANNEL_B, 0b0011100000000000);
     SYS_PORTS_Clear(PORTS_ID_0, PORT_CHANNEL_G, 0b100000000);
     SYS_PORTS_Clear(PORTS_ID_0, PORT_CHANNEL_A, 0b10000000000);
-    SYS_PORTS_Clear(PORTS_ID_0, PORT_CHANNEL_F, 0b11);
-    SYS_PORTS_Clear(PORTS_ID_0, PORT_CHANNEL_D, 0b1000000);
+//    SYS_PORTS_Clear(PORTS_ID_0, PORT_CHANNEL_F, 0b11);
+    SYS_PORTS_Clear(PORTS_ID_0, PORT_CHANNEL_F, 0b1);
+    SYS_PORTS_Clear(PORTS_ID_0, PORT_CHANNEL_D, 0b101000000);
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, 11,(outVal & 0b10000000) >> 7);
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, 13,(outVal & 0b1000000) >> 6);
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_B, 12,(outVal & 0b100000) >> 5);
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 8,(outVal & 0b10000) >> 4);
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_A, 10,(outVal & 0b1000) >> 3);
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_F, 0,(outVal & 0b100) >> 2);
-    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_F, 1,(outVal & 0b10));
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 8,(outVal & 0b10));
+//    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_F, 1,(outVal & 0b10));
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 6,(outVal & 0b1));
-    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 5, 1);
+//    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 5, 1);
 }
 
 /**

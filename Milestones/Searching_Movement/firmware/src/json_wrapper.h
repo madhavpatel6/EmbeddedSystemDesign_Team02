@@ -29,7 +29,7 @@
 typedef enum {request, response, unknown} type_t;
 typedef enum {CommStatsSearcherMover, CommStatsTargetLocator, CommStatsPathFinder, CommStatsTargetGrabber,
        DetailedCommStatsSearcherMover, DetailedCommStatsTargetLocator, DetailedCommStatsPathFinder,
-       DetailedCommStatsTargetGrabber, SensorData, msLocalTime} items_t;
+       DetailedCommStatsTargetGrabber, SensorData, msLocalTime, Obstacles} items_t;
 
 typedef struct {
   char stringValue[512];
@@ -47,7 +47,8 @@ static const DictionaryType Dictionary[] = {
     {"DetailedCommStatsTargetGrabber", DetailedCommStatsTargetGrabber},
     {"DetailedCommStatsTargetLocator", DetailedCommStatsTargetLocator},
     {"SensorData", SensorData},
-    {"msLocalTime", msLocalTime}
+    {"msLocalTime", msLocalTime},
+    {"Obstacles", Obstacles}
 };
 
 static jsmn_parser p;

@@ -267,6 +267,7 @@
         <Name>drv_adc_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/adc/src</Path>
         <Checksum>D8F9461BE9CAFFFD11846261178C9F83</Checksum>
+        <ProjectFileChecksum>2C32FE238245445E27745F0B96FB4E15</ProjectFileChecksum>
       </Template>
       <Template>
         <Name>tx_thread.c</Name>
@@ -293,10 +294,6 @@
         <ProjectFileChecksum>18E546A68981C8919E24F52D16DA57AF</ProjectFileChecksum>
       </Template>
       <Template>
-        <Name>adc_thread.h</Name>
-        <Path>Header Files/app</Path>
-      </Template>
-      <Template>
         <Name>sys_clk_static.h</Name>
         <Path>Header Files/app/system_config/default/framework/system/clk</Path>
         <Checksum>B4BD59D8D7C4DA95DC5E3B57755FD352</Checksum>
@@ -304,7 +301,7 @@
       <Template>
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>672B667C5883C513ED5C4C6939EBBC0B</Checksum>
+        <Checksum>129808DAC7D7A686B193ED8465DDFFCB</Checksum>
         <ProjectFileChecksum>55F054EF9C5DA5BBC617A76D3B2A5A74</ProjectFileChecksum>
       </Template>
       <Template>
@@ -320,7 +317,7 @@
       <Template>
         <Name>system_init.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>DBCFC1360E9865DFE006FA64831FF0EC</Checksum>
+        <Checksum>C8787FCBBD10346580552C1EAAA5C51B</Checksum>
         <ProjectFileChecksum>DC9E5DB9F42054C910B98A6F82F70207</ProjectFileChecksum>
       </Template>
       <Template>
@@ -332,18 +329,22 @@
         <Path>Header Files/app</Path>
       </Template>
       <Template>
-        <Name>adc_thread.c</Name>
-        <Path>Source Files/app</Path>
-      </Template>
-      <Template>
         <Name>system_definitions.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>7FB82A734D8C8353F53627D697DD3C90</Checksum>
+        <Checksum>11A5BEF550B384905D2AE998CFD407AB</Checksum>
       </Template>
       <Template>
         <Name>system_exceptions.c</Name>
         <Path>Source Files/app/system_config/default</Path>
         <Checksum>C111969CA43D6CEA1E9E33A6164E7AE0</Checksum>
+      </Template>
+      <Template>
+        <Name>computation_thread.h</Name>
+        <Path>Header Files/app</Path>
+      </Template>
+      <Template>
+        <Name>computation_thread.c</Name>
+        <Path>Source Files/app</Path>
       </Template>
       <Template>
         <Name>rx_thread.c</Name>
@@ -357,7 +358,7 @@
       <Template>
         <Name>system_tasks.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>A377A0EE160251C82DE4594012B1B575</Checksum>
+        <Checksum>8D5A98F1BB793A9BF1C2CAEA2948BF03</Checksum>
       </Template>
       <Template>
         <Name>rx_thread.h</Name>

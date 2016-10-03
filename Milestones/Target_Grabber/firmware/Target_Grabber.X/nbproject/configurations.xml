@@ -33,11 +33,10 @@
             <itemPath>../src/system_config/default/system_definitions.h</itemPath>
           </logicalFolder>
         </logicalFolder>
-        <itemPath>../src/adc_thread.h</itemPath>
-        <itemPath>../src/adc_thread_public.h</itemPath>
         <itemPath>../src/rx_thread.h</itemPath>
         <itemPath>../src/tx_thread.h</itemPath>
         <itemPath>../src/message_controller_thread.h</itemPath>
+        <itemPath>../src/computation_thread.h</itemPath>
       </logicalFolder>
       <logicalFolder name="communication"
                      displayName="communication"
@@ -135,6 +134,7 @@
       <itemPath>../src/system_interrupt_public.h</itemPath>
       <itemPath>../src/rx_thread_public.h</itemPath>
       <itemPath>../src/tx_thread_public.h</itemPath>
+      <itemPath>../src/computation_thread_public.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -189,10 +189,10 @@
           </logicalFolder>
         </logicalFolder>
         <itemPath>../src/main.c</itemPath>
-        <itemPath>../src/adc_thread.c</itemPath>
         <itemPath>../src/rx_thread.c</itemPath>
         <itemPath>../src/tx_thread.c</itemPath>
         <itemPath>../src/message_controller_thread.c</itemPath>
+        <itemPath>../src/computation_thread.c</itemPath>
       </logicalFolder>
       <logicalFolder name="communication"
                      displayName="communication"
