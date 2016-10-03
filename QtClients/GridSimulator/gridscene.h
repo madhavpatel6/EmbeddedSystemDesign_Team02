@@ -7,6 +7,7 @@
 #include "gridcell.h"
 #include <vector>
 #include <QLine>
+#include <cmath>
 
 typedef struct {
     QPoint location;
