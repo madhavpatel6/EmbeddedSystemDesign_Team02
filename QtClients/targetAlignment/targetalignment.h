@@ -18,7 +18,7 @@ public:
     ~targetAlignment();
 public slots:
     void serverConnected(bool connected);
-    void updateAlignmentData(char source, QString alignmentData0, QString alignmentData1, QString alignmentData2, QString alignmentBool_0, QString alignmentBool_1, QString alignmentBool_2, QString alignmentGrabberBool);
+    void updateAlignmentData(char source, QString alignmentData0, QString alignmentData1, QString alignmentData2, QString alignmentBool_0, QString alignmentBool_1, QString alignmentBool_2, QString alignmentGrabberBool, QString alignmentInfo);
 
 private slots:
     void on_connectToServerButton_clicked();

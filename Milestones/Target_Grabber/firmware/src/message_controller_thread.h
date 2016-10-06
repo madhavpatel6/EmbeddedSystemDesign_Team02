@@ -74,6 +74,16 @@ typedef struct {
     float y;
 } Coordinates;
 
+// This holds the values that will be converted to a string to send to the PathFinder
+typedef enum internalAlignmentResult_enum { NOT_ALIGNED_INTERNAL = 0,       // 0 
+                                    SLIGHT_RIGHT_INTERNAL,                  // 1
+                                    SLIGHT_LEFT_INTERNAL,                   // 2
+                                    MAJOR_RIGHT_INTERNAL,                   // 3
+                                    MAJOR_LEFT_INTERNAL,                    // 4
+                                    ALIGNED_NOT_CLOSE_INTERNAL,             // 5
+                                    ALIGNED_INTERNAL                        // 6
+} INTERNAL_ALIGNMENT_RESULTS;
+
 // This is from adc thread public
 typedef struct {
     float IR_0;
@@ -83,6 +93,7 @@ typedef struct {
     bool  IR_1_bool;
     bool  IR_2_bool;
     bool  Grabber_Aligned;
+    INTERNAL_ALIGNMENT_RESULTS internalAlignment;
 } TargetAlignmentFloat_Type;
 
 //This is any data that someone else might request for
@@ -238,6 +249,8 @@ void incrementSystemClock();
 
 int getSystemClock();
 
+// This returns a string to build the correct target alignment json string
+const char* getAlignment(INTERNAL_ALIGNMENT_RESULTS InternalAlignmentResults);
 #endif /* _MESSAGE_CONTROLLER_THREAD_H */
 
 //DOM-IGNORE-BEGIN

@@ -12,7 +12,7 @@ targetAlignment::targetAlignment(QWidget *parent) :
     ui->setupUi(this);
     tcpSocket = new ClientSocket();
     connect(requestTimer, SIGNAL(timeout()), tcpSocket, SLOT(alignmentRequestedSlot()));
-    connect(tcpSocket, SIGNAL(sendAlignmentSignal(char,QString,QString,QString,QString,QString,QString,QString)), this, SLOT(updateAlignmentData(char,QString,QString,QString,QString,QString,QString,QString)));
+    connect(tcpSocket, SIGNAL(sendAlignmentSignal(char,QString,QString,QString,QString,QString,QString,QString,QString)), this, SLOT(updateAlignmentData(char,QString,QString,QString,QString,QString,QString,QString,QString)));
     IR0RequestCounter = 0;
     IR1RequestCounter = 0;
     IR2RequestCounter = 0;
@@ -82,7 +82,7 @@ void targetAlignment::on_startSensingButton_clicked()
     }
 }
 
-void targetAlignment::updateAlignmentData(char source, QString alignmentData0, QString alignmentData1, QString alignmentData2, QString alignmentBool_0, QString alignmentBool_1, QString alignmentBool_2, QString alignmentGrabberBool)
+void targetAlignment::updateAlignmentData(char source, QString alignmentData0, QString alignmentData1, QString alignmentData2, QString alignmentBool_0, QString alignmentBool_1, QString alignmentBool_2, QString alignmentGrabberBool, QString alignmentInfo)
 {
     if(alignmentData0 == "0.00"){
         IR0RequestCounter = IR0RequestCounter;
@@ -119,6 +119,7 @@ void targetAlignment::updateAlignmentData(char source, QString alignmentData0, Q
             ui->IR_0CountLabel->setText(QString::number(IR0RequestCounter));
             ui->IR_1CountLabel->setText(QString::number(IR1RequestCounter));
             ui->IR_2CountLabel->setText(QString::number(IR2RequestCounter));
+            ui->Alignment_InfoLabel->setText(QString(alignmentInfo));
 
             if(alignmentBool_0 == "1"){
                 ui->IR_0PlainTextEdit->appendPlainText(alignmentData0);
@@ -180,12 +181,10 @@ void targetAlignment::updateAlignmentData(char source, QString alignmentData0, Q
             }
             break;
         case TARGETLOCATOR:
-            IR0RequestCounter = IR0RequestCounter + 1;
-            IR1RequestCounter = IR1RequestCounter + 1;
-            IR2RequestCounter = IR2RequestCounter + 1;
             ui->IR_0CountLabel->setText(QString::number(IR0RequestCounter));
             ui->IR_1CountLabel->setText(QString::number(IR1RequestCounter));
             ui->IR_2CountLabel->setText(QString::number(IR2RequestCounter));
+            ui->Alignment_InfoLabel->setText(QString(alignmentInfo));
             ui->IR_0PlainTextEdit->appendPlainText(alignmentData0);
             ui->IR_1PlainTextEdit->appendPlainText(alignmentData1);
             ui->IR_2PlainTextEdit->appendPlainText(alignmentData2);
@@ -194,9 +193,7 @@ void targetAlignment::updateAlignmentData(char source, QString alignmentData0, Q
             ui->IR_2PlainTextEdit->appendPlainText(QString(source));
             break;
         case PATHFINDER:
-            IR0RequestCounter = IR0RequestCounter + 1;
-            IR1RequestCounter = IR1RequestCounter + 1;
-            IR2RequestCounter = IR2RequestCounter + 1;
+            ui->Alignment_InfoLabel->setText(QString(alignmentInfo));
             ui->IR_0CountLabel->setText(QString::number(IR0RequestCounter));
             ui->IR_1CountLabel->setText(QString::number(IR1RequestCounter));
             ui->IR_2CountLabel->setText(QString::number(IR2RequestCounter));
@@ -208,9 +205,7 @@ void targetAlignment::updateAlignmentData(char source, QString alignmentData0, Q
             ui->IR_2PlainTextEdit->appendPlainText(QString(source));
             break;
         case SEARCHERMOVER:
-            IR0RequestCounter = IR0RequestCounter + 1;
-            IR1RequestCounter = IR1RequestCounter + 1;
-            IR2RequestCounter = IR2RequestCounter + 1;
+            ui->Alignment_InfoLabel->setText(QString(alignmentInfo));
             ui->IR_0CountLabel->setText(QString::number(IR0RequestCounter));
             ui->IR_1CountLabel->setText(QString::number(IR1RequestCounter));
             ui->IR_2CountLabel->setText(QString::number(IR2RequestCounter));
