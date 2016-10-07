@@ -51,23 +51,7 @@ public:
     QHBoxLayout *horizontalLayout_7;
     QPushButton *connectToServerButton;
     QPushButton *disconnectFromServerButton;
-    QWidget *widget;
-    QVBoxLayout *verticalLayout_2;
-    QPushButton *startSensingButton;
-    QVBoxLayout *verticalLayout_7;
-    QVBoxLayout *verticalLayout_5;
-    QLabel *numberOfSensorValuesReceivedLabel;
-    QHBoxLayout *horizontalLayout_2;
-    QLabel *IR_0Label;
-    QLabel *IR_0CountLabel;
-    QLabel *IR_1Label;
-    QLabel *IR_1CountLabel;
-    QLabel *IR_2Label;
-    QLabel *IR_2CountLabel;
-    QHBoxLayout *horizontalLayout_3;
-    QLabel *GrabberIsAlignedLabel;
-    QLabel *Grabber_AlignedLabel;
-    QWidget *widget1;
+    QWidget *layoutWidget;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout_4;
     QSpacerItem *horizontalSpacer_10;
@@ -92,6 +76,24 @@ public:
     QSpacerItem *horizontalSpacer_4;
     QPlainTextEdit *IR_2PlainTextEdit;
     QTextEdit *IR_2_bool_textEdit;
+    QWidget *widget;
+    QHBoxLayout *horizontalLayout_5;
+    QLabel *AlignmentInfoLabel;
+    QLabel *Alignment_InfoLabel;
+    QWidget *widget1;
+    QVBoxLayout *verticalLayout_2;
+    QPushButton *startSensingButton;
+    QLabel *numberOfSensorValuesReceivedLabel;
+    QHBoxLayout *horizontalLayout_3;
+    QLabel *IR_0Label;
+    QLabel *IR_0CountLabel;
+    QLabel *IR_1Label;
+    QLabel *IR_1CountLabel;
+    QLabel *IR_2Label;
+    QLabel *IR_2CountLabel;
+    QHBoxLayout *horizontalLayout_2;
+    QLabel *GrabberIsAlignedLabel;
+    QLabel *Grabber_AlignedLabel;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -100,7 +102,7 @@ public:
     {
         if (targetAlignment->objectName().isEmpty())
             targetAlignment->setObjectName(QStringLiteral("targetAlignment"));
-        targetAlignment->resize(563, 389);
+        targetAlignment->resize(701, 434);
         centralWidget = new QWidget(targetAlignment);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         layoutWidget_3 = new QWidget(centralWidget);
@@ -122,7 +124,7 @@ public:
 
         horizontalLayout_8->addWidget(ipAddressLabel);
 
-        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        horizontalSpacer_2 = new QSpacerItem(48, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
 
         horizontalLayout_8->addItem(horizontalSpacer_2);
 
@@ -189,93 +191,10 @@ public:
 
         verticalLayout_6->addLayout(horizontalLayout_7);
 
-        widget = new QWidget(centralWidget);
-        widget->setObjectName(QStringLiteral("widget"));
-        widget->setGeometry(QRect(351, 7, 173, 131));
-        verticalLayout_2 = new QVBoxLayout(widget);
-        verticalLayout_2->setSpacing(6);
-        verticalLayout_2->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
-        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
-        startSensingButton = new QPushButton(widget);
-        startSensingButton->setObjectName(QStringLiteral("startSensingButton"));
-
-        verticalLayout_2->addWidget(startSensingButton);
-
-        verticalLayout_7 = new QVBoxLayout();
-        verticalLayout_7->setSpacing(6);
-        verticalLayout_7->setObjectName(QStringLiteral("verticalLayout_7"));
-        verticalLayout_5 = new QVBoxLayout();
-        verticalLayout_5->setSpacing(6);
-        verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
-        numberOfSensorValuesReceivedLabel = new QLabel(widget);
-        numberOfSensorValuesReceivedLabel->setObjectName(QStringLiteral("numberOfSensorValuesReceivedLabel"));
-        numberOfSensorValuesReceivedLabel->setAlignment(Qt::AlignCenter);
-
-        verticalLayout_5->addWidget(numberOfSensorValuesReceivedLabel);
-
-        horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setSpacing(6);
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
-        IR_0Label = new QLabel(widget);
-        IR_0Label->setObjectName(QStringLiteral("IR_0Label"));
-
-        horizontalLayout_2->addWidget(IR_0Label);
-
-        IR_0CountLabel = new QLabel(widget);
-        IR_0CountLabel->setObjectName(QStringLiteral("IR_0CountLabel"));
-
-        horizontalLayout_2->addWidget(IR_0CountLabel);
-
-        IR_1Label = new QLabel(widget);
-        IR_1Label->setObjectName(QStringLiteral("IR_1Label"));
-
-        horizontalLayout_2->addWidget(IR_1Label);
-
-        IR_1CountLabel = new QLabel(widget);
-        IR_1CountLabel->setObjectName(QStringLiteral("IR_1CountLabel"));
-
-        horizontalLayout_2->addWidget(IR_1CountLabel);
-
-        IR_2Label = new QLabel(widget);
-        IR_2Label->setObjectName(QStringLiteral("IR_2Label"));
-
-        horizontalLayout_2->addWidget(IR_2Label);
-
-        IR_2CountLabel = new QLabel(widget);
-        IR_2CountLabel->setObjectName(QStringLiteral("IR_2CountLabel"));
-
-        horizontalLayout_2->addWidget(IR_2CountLabel);
-
-
-        verticalLayout_5->addLayout(horizontalLayout_2);
-
-
-        verticalLayout_7->addLayout(verticalLayout_5);
-
-        horizontalLayout_3 = new QHBoxLayout();
-        horizontalLayout_3->setSpacing(6);
-        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
-        GrabberIsAlignedLabel = new QLabel(widget);
-        GrabberIsAlignedLabel->setObjectName(QStringLiteral("GrabberIsAlignedLabel"));
-
-        horizontalLayout_3->addWidget(GrabberIsAlignedLabel);
-
-        Grabber_AlignedLabel = new QLabel(widget);
-        Grabber_AlignedLabel->setObjectName(QStringLiteral("Grabber_AlignedLabel"));
-
-        horizontalLayout_3->addWidget(Grabber_AlignedLabel);
-
-
-        verticalLayout_7->addLayout(horizontalLayout_3);
-
-
-        verticalLayout_2->addLayout(verticalLayout_7);
-
-        widget1 = new QWidget(centralWidget);
-        widget1->setObjectName(QStringLiteral("widget1"));
-        widget1->setGeometry(QRect(10, 140, 511, 181));
-        verticalLayout = new QVBoxLayout(widget1);
+        layoutWidget = new QWidget(centralWidget);
+        layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
+        layoutWidget->setGeometry(QRect(10, 140, 681, 181));
+        verticalLayout = new QVBoxLayout(layoutWidget);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
@@ -287,36 +206,36 @@ public:
 
         horizontalLayout_4->addItem(horizontalSpacer_10);
 
-        label = new QLabel(widget1);
+        label = new QLabel(layoutWidget);
         label->setObjectName(QStringLiteral("label"));
         label->setAlignment(Qt::AlignCenter);
 
         horizontalLayout_4->addWidget(label);
 
-        horizontalSpacer_7 = new QSpacerItem(26, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        horizontalSpacer_7 = new QSpacerItem(47, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
 
         horizontalLayout_4->addItem(horizontalSpacer_7);
 
-        IR_0_boolLabel = new QLabel(widget1);
+        IR_0_boolLabel = new QLabel(layoutWidget);
         IR_0_boolLabel->setObjectName(QStringLiteral("IR_0_boolLabel"));
 
         horizontalLayout_4->addWidget(IR_0_boolLabel);
 
-        horizontalSpacer_5 = new QSpacerItem(20, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        horizontalSpacer_5 = new QSpacerItem(11, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
 
         horizontalLayout_4->addItem(horizontalSpacer_5);
 
-        label_2 = new QLabel(widget1);
+        label_2 = new QLabel(layoutWidget);
         label_2->setObjectName(QStringLiteral("label_2"));
         label_2->setAlignment(Qt::AlignCenter);
 
         horizontalLayout_4->addWidget(label_2);
 
-        horizontalSpacer_8 = new QSpacerItem(24, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        horizontalSpacer_8 = new QSpacerItem(56, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
 
         horizontalLayout_4->addItem(horizontalSpacer_8);
 
-        IR_1_boolLabel = new QLabel(widget1);
+        IR_1_boolLabel = new QLabel(layoutWidget);
         IR_1_boolLabel->setObjectName(QStringLiteral("IR_1_boolLabel"));
 
         horizontalLayout_4->addWidget(IR_1_boolLabel);
@@ -325,7 +244,7 @@ public:
 
         horizontalLayout_4->addItem(horizontalSpacer_6);
 
-        label_3 = new QLabel(widget1);
+        label_3 = new QLabel(layoutWidget);
         label_3->setObjectName(QStringLiteral("label_3"));
         label_3->setAlignment(Qt::AlignCenter);
 
@@ -335,7 +254,7 @@ public:
 
         horizontalLayout_4->addItem(horizontalSpacer_9);
 
-        IR_2_boolLabel = new QLabel(widget1);
+        IR_2_boolLabel = new QLabel(layoutWidget);
         IR_2_boolLabel->setObjectName(QStringLiteral("IR_2_boolLabel"));
 
         horizontalLayout_4->addWidget(IR_2_boolLabel);
@@ -350,12 +269,12 @@ public:
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setSpacing(6);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-        IR_0PlainTextEdit = new QPlainTextEdit(widget1);
+        IR_0PlainTextEdit = new QPlainTextEdit(layoutWidget);
         IR_0PlainTextEdit->setObjectName(QStringLiteral("IR_0PlainTextEdit"));
 
         horizontalLayout->addWidget(IR_0PlainTextEdit);
 
-        IR_0_bool_textEdit = new QTextEdit(widget1);
+        IR_0_bool_textEdit = new QTextEdit(layoutWidget);
         IR_0_bool_textEdit->setObjectName(QStringLiteral("IR_0_bool_textEdit"));
 
         horizontalLayout->addWidget(IR_0_bool_textEdit);
@@ -364,12 +283,12 @@ public:
 
         horizontalLayout->addItem(horizontalSpacer_3);
 
-        IR_1PlainTextEdit = new QPlainTextEdit(widget1);
+        IR_1PlainTextEdit = new QPlainTextEdit(layoutWidget);
         IR_1PlainTextEdit->setObjectName(QStringLiteral("IR_1PlainTextEdit"));
 
         horizontalLayout->addWidget(IR_1PlainTextEdit);
 
-        IR_1_bool_textEdit = new QTextEdit(widget1);
+        IR_1_bool_textEdit = new QTextEdit(layoutWidget);
         IR_1_bool_textEdit->setObjectName(QStringLiteral("IR_1_bool_textEdit"));
 
         horizontalLayout->addWidget(IR_1_bool_textEdit);
@@ -378,12 +297,12 @@ public:
 
         horizontalLayout->addItem(horizontalSpacer_4);
 
-        IR_2PlainTextEdit = new QPlainTextEdit(widget1);
+        IR_2PlainTextEdit = new QPlainTextEdit(layoutWidget);
         IR_2PlainTextEdit->setObjectName(QStringLiteral("IR_2PlainTextEdit"));
 
         horizontalLayout->addWidget(IR_2PlainTextEdit);
 
-        IR_2_bool_textEdit = new QTextEdit(widget1);
+        IR_2_bool_textEdit = new QTextEdit(layoutWidget);
         IR_2_bool_textEdit->setObjectName(QStringLiteral("IR_2_bool_textEdit"));
 
         horizontalLayout->addWidget(IR_2_bool_textEdit);
@@ -391,10 +310,101 @@ public:
 
         verticalLayout->addLayout(horizontalLayout);
 
+        widget = new QWidget(centralWidget);
+        widget->setObjectName(QStringLiteral("widget"));
+        widget->setGeometry(QRect(12, 330, 271, 31));
+        horizontalLayout_5 = new QHBoxLayout(widget);
+        horizontalLayout_5->setSpacing(6);
+        horizontalLayout_5->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
+        horizontalLayout_5->setContentsMargins(0, 0, 0, 0);
+        AlignmentInfoLabel = new QLabel(widget);
+        AlignmentInfoLabel->setObjectName(QStringLiteral("AlignmentInfoLabel"));
+
+        horizontalLayout_5->addWidget(AlignmentInfoLabel);
+
+        Alignment_InfoLabel = new QLabel(widget);
+        Alignment_InfoLabel->setObjectName(QStringLiteral("Alignment_InfoLabel"));
+        Alignment_InfoLabel->setAlignment(Qt::AlignCenter);
+
+        horizontalLayout_5->addWidget(Alignment_InfoLabel);
+
+        widget1 = new QWidget(centralWidget);
+        widget1->setObjectName(QStringLiteral("widget1"));
+        widget1->setGeometry(QRect(352, 10, 341, 131));
+        verticalLayout_2 = new QVBoxLayout(widget1);
+        verticalLayout_2->setSpacing(6);
+        verticalLayout_2->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        verticalLayout_2->setContentsMargins(0, 0, 0, 0);
+        startSensingButton = new QPushButton(widget1);
+        startSensingButton->setObjectName(QStringLiteral("startSensingButton"));
+
+        verticalLayout_2->addWidget(startSensingButton);
+
+        numberOfSensorValuesReceivedLabel = new QLabel(widget1);
+        numberOfSensorValuesReceivedLabel->setObjectName(QStringLiteral("numberOfSensorValuesReceivedLabel"));
+        numberOfSensorValuesReceivedLabel->setAlignment(Qt::AlignCenter);
+        numberOfSensorValuesReceivedLabel->setWordWrap(false);
+
+        verticalLayout_2->addWidget(numberOfSensorValuesReceivedLabel);
+
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setSpacing(6);
+        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        IR_0Label = new QLabel(widget1);
+        IR_0Label->setObjectName(QStringLiteral("IR_0Label"));
+
+        horizontalLayout_3->addWidget(IR_0Label);
+
+        IR_0CountLabel = new QLabel(widget1);
+        IR_0CountLabel->setObjectName(QStringLiteral("IR_0CountLabel"));
+
+        horizontalLayout_3->addWidget(IR_0CountLabel);
+
+        IR_1Label = new QLabel(widget1);
+        IR_1Label->setObjectName(QStringLiteral("IR_1Label"));
+
+        horizontalLayout_3->addWidget(IR_1Label);
+
+        IR_1CountLabel = new QLabel(widget1);
+        IR_1CountLabel->setObjectName(QStringLiteral("IR_1CountLabel"));
+
+        horizontalLayout_3->addWidget(IR_1CountLabel);
+
+        IR_2Label = new QLabel(widget1);
+        IR_2Label->setObjectName(QStringLiteral("IR_2Label"));
+
+        horizontalLayout_3->addWidget(IR_2Label);
+
+        IR_2CountLabel = new QLabel(widget1);
+        IR_2CountLabel->setObjectName(QStringLiteral("IR_2CountLabel"));
+
+        horizontalLayout_3->addWidget(IR_2CountLabel);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_3);
+
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setSpacing(6);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        GrabberIsAlignedLabel = new QLabel(widget1);
+        GrabberIsAlignedLabel->setObjectName(QStringLiteral("GrabberIsAlignedLabel"));
+
+        horizontalLayout_2->addWidget(GrabberIsAlignedLabel);
+
+        Grabber_AlignedLabel = new QLabel(widget1);
+        Grabber_AlignedLabel->setObjectName(QStringLiteral("Grabber_AlignedLabel"));
+
+        horizontalLayout_2->addWidget(Grabber_AlignedLabel);
+
+
+        verticalLayout_2->addLayout(horizontalLayout_2);
+
         targetAlignment->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(targetAlignment);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 563, 21));
+        menuBar->setGeometry(QRect(0, 0, 701, 17));
         targetAlignment->setMenuBar(menuBar);
         mainToolBar = new QToolBar(targetAlignment);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -419,6 +429,14 @@ public:
         connectionStatusLabel->setText(QApplication::translate("targetAlignment", "No", 0));
         connectToServerButton->setText(QApplication::translate("targetAlignment", "Connect To Server", 0));
         disconnectFromServerButton->setText(QApplication::translate("targetAlignment", "Disconnect From Server", 0));
+        label->setText(QApplication::translate("targetAlignment", "IR_0", 0));
+        IR_0_boolLabel->setText(QApplication::translate("targetAlignment", "IR_0_bool", 0));
+        label_2->setText(QApplication::translate("targetAlignment", "IR_1", 0));
+        IR_1_boolLabel->setText(QApplication::translate("targetAlignment", "IR_1_bool", 0));
+        label_3->setText(QApplication::translate("targetAlignment", "IR_2", 0));
+        IR_2_boolLabel->setText(QApplication::translate("targetAlignment", "IR_2_bool", 0));
+        AlignmentInfoLabel->setText(QApplication::translate("targetAlignment", "Alignment Information:", 0));
+        Alignment_InfoLabel->setText(QApplication::translate("targetAlignment", "N/A", 0));
         startSensingButton->setText(QApplication::translate("targetAlignment", "Start Reading Sensors", 0));
         numberOfSensorValuesReceivedLabel->setText(QApplication::translate("targetAlignment", "Number of Sensor Values Received", 0));
         IR_0Label->setText(QApplication::translate("targetAlignment", "IR_0:", 0));
@@ -429,12 +447,6 @@ public:
         IR_2CountLabel->setText(QApplication::translate("targetAlignment", "0", 0));
         GrabberIsAlignedLabel->setText(QApplication::translate("targetAlignment", "Grabber is Aligned:", 0));
         Grabber_AlignedLabel->setText(QApplication::translate("targetAlignment", "No", 0));
-        label->setText(QApplication::translate("targetAlignment", "IR_0", 0));
-        IR_0_boolLabel->setText(QApplication::translate("targetAlignment", "IR_0_bool", 0));
-        label_2->setText(QApplication::translate("targetAlignment", "IR_1", 0));
-        IR_1_boolLabel->setText(QApplication::translate("targetAlignment", "IR_1_bool", 0));
-        label_3->setText(QApplication::translate("targetAlignment", "IR_2", 0));
-        IR_2_boolLabel->setText(QApplication::translate("targetAlignment", "IR_2_bool", 0));
     } // retranslateUi
 
 };

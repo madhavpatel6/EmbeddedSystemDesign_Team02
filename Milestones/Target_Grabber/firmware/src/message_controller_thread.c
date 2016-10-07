@@ -249,14 +249,16 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                                                                            "\"IR_0_bool\":\"%d\","
                                                                                            "\"IR_1_bool\":\"%d\","
                                                                                            "\"IR_2_bool\":\"%d\","
-                                                                                           "\"Grabber_Aligned\":\"%d\"}",
+                                                                                           "\"Grabber_Aligned\":\"%d\","
+                                                                                           "\"Alignment_Info\":\"%s\"}",
                                                                                            internalData.alignmentData.IR_0,
                                                                                            internalData.alignmentData.IR_1,
                                                                                            internalData.alignmentData.IR_2,
                                                                                            internalData.alignmentData.IR_0_bool,
                                                                                            internalData.alignmentData.IR_1_bool,
                                                                                            internalData.alignmentData.IR_2_bool,
-                                                                                           internalData.alignmentData.Grabber_Aligned
+                                                                                           internalData.alignmentData.Grabber_Aligned,
+                                                                                           getAlignment(internalData.alignmentData.internalAlignment)
                                                                                            );
                                     //tx_thread_obj.Destination = obj.External.Source; // looks like it is set at top
                                     break;
@@ -456,6 +458,55 @@ void incrementSystemClock(){
 
 int getSystemClock(){
     return systemClock;
+}
+
+// This returns a string to build the correct target alignment json string
+const char* getAlignment(INTERNAL_ALIGNMENT_RESULTS InternalAlignmentResults){
+    const char* alignmentStr = "alignmentStr";
+    switch(InternalAlignmentResults){
+        case NOT_ALIGNED_INTERNAL:{
+            alignmentStr = "Not_Aligned";
+            return alignmentStr;
+            break;
+        }
+        case SLIGHT_RIGHT_INTERNAL:{
+            alignmentStr = "Slight_Right";
+            return alignmentStr;
+            break;
+        }
+        case SLIGHT_LEFT_INTERNAL:{
+            alignmentStr = "Slight_Left";
+            return alignmentStr;
+            break;
+        }
+        case MAJOR_RIGHT_INTERNAL:{
+            alignmentStr = "Major_Right";
+            return alignmentStr;
+            break;
+        }
+        case MAJOR_LEFT_INTERNAL:{
+            alignmentStr = "Major_Left";
+            return alignmentStr;
+            break;
+        }
+        case ALIGNED_NOT_CLOSE_INTERNAL:{
+            alignmentStr = "Aligned_Not_Close";
+            return alignmentStr;
+            break;
+        }
+        case ALIGNED_INTERNAL:{
+            alignmentStr = "Aligned";
+            return alignmentStr;
+            break;
+        }
+        default:{
+            alignmentStr = "alignmentStr";
+            return alignmentStr;
+            break;
+        }
+    }
+                
+                                
 }
 
 /*******************************************************************************

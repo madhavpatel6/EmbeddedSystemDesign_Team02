@@ -211,16 +211,43 @@ bool targetAlignmentSubr(){
             switch(computation_threadData.alignmentResult)
             {
                 case NOT_ALIGNED:
+                    obj.Update.Data.alignmentData.internalAlignment = NOT_ALIGNED;
                     obj.Update.Data.alignmentData.Grabber_Aligned = false;
                     // Sending to Tx Thread Q
                     MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
                     break;
-                case NOT_CLOSE:
+                case SLIGHT_RIGHT:
+                    obj.Update.Data.alignmentData.internalAlignment = SLIGHT_RIGHT;
+                    obj.Update.Data.alignmentData.Grabber_Aligned = false;
+                    // Sending to Tx Thread Q
+                    MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
+                    break;
+                case SLIGHT_LEFT:
+                    obj.Update.Data.alignmentData.internalAlignment = SLIGHT_LEFT;
+                    obj.Update.Data.alignmentData.Grabber_Aligned = false;
+                    // Sending to Tx Thread Q
+                    MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
+                    break;
+                case MAJOR_RIGHT:
+                    obj.Update.Data.alignmentData.internalAlignment = MAJOR_RIGHT;
+                    obj.Update.Data.alignmentData.Grabber_Aligned = false;
+                    // Sending to Tx Thread Q
+                    MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
+                    break;
+                case MAJOR_LEFT:
+                    obj.Update.Data.alignmentData.internalAlignment = MAJOR_LEFT;
+                    obj.Update.Data.alignmentData.Grabber_Aligned = false;
+                    // Sending to Tx Thread Q
+                    MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
+                    break;
+                case ALIGNED_NOT_CLOSE:
+                    obj.Update.Data.alignmentData.internalAlignment = ALIGNED_NOT_CLOSE;
                     obj.Update.Data.alignmentData.Grabber_Aligned = false;
                     // Sending to Tx Thread Q
                     MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
                     break;
                 case ALIGNED:
+                    obj.Update.Data.alignmentData.internalAlignment = ALIGNED;
                     obj.Update.Data.alignmentData.Grabber_Aligned = true;
                     // Sending to Tx Thread Q
                     MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
@@ -229,8 +256,8 @@ bool targetAlignmentSubr(){
                     break;
             }
         }
-        return obj.Update.Data.alignmentData.Grabber_Aligned; // returning if its aligned
         dbgOutputLoc(AFTER_RECEIVE_FROM_Q_TARGET_ALIGNMENT_SUBR_COMPUTATION_THREAD);
+        return obj.Update.Data.alignmentData.Grabber_Aligned; // returning if its aligned
     }
 }
 

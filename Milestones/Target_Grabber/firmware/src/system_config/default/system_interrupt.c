@@ -110,7 +110,6 @@ void IntHandlerDrvTmrInstance0(void)
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     if(PLIB_INT_SourceIsEnabled(INT_ID_0, INT_SOURCE_ADC_1) != true){
         PLIB_ADC_SampleAutoStartEnable(ADC_ID_1);
-//        while(DRV_ADC_SamplesAvailable() != true);
         PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
         portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
         PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);

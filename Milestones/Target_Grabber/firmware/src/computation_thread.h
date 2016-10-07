@@ -98,10 +98,14 @@ typedef enum
 
 } COMPUTATION_THREAD_STATES;
 
-// This holds the possible states for 
+// This holds the values that will be converted to a string to send to the PathFinder
 typedef enum AlignmentResult_enum { NOT_ALIGNED = 0,       // 0 
-                                    NOT_CLOSE,             // 1
-                                    ALIGNED                // 2
+                                    SLIGHT_RIGHT,          // 1
+                                    SLIGHT_LEFT,           // 2
+                                    MAJOR_RIGHT,           // 3
+                                    MAJOR_LEFT,            // 4
+                                    ALIGNED_NOT_CLOSE,     // 5
+                                    ALIGNED                // 6
 } ALIGNMENT_RESULTS;
 
 

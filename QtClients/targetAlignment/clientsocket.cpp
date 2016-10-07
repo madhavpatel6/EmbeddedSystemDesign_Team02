@@ -143,16 +143,16 @@ void ClientSocket::HandleAlignmentResponse(QJsonObject obj, char source) {
         targetAlignmentObj = obj["targetAlignment"].toObject();
         switch(source){
             case TARGETGRABBER:
-                emit sendAlignmentSignal(TARGETGRABBER, targetAlignmentObj["IR_0"].toString(), targetAlignmentObj["IR_1"].toString(), targetAlignmentObj["IR_2"].toString(), targetAlignmentObj["IR_0_bool"].toString(), targetAlignmentObj["IR_1_bool"].toString(), targetAlignmentObj["IR_2_bool"].toString(), targetAlignmentObj["Grabber_Aligned"].toString());
+                emit sendAlignmentSignal(TARGETGRABBER, targetAlignmentObj["IR_0"].toString(), targetAlignmentObj["IR_1"].toString(), targetAlignmentObj["IR_2"].toString(), targetAlignmentObj["IR_0_bool"].toString(), targetAlignmentObj["IR_1_bool"].toString(), targetAlignmentObj["IR_2_bool"].toString(), targetAlignmentObj["Grabber_Aligned"].toString(), targetAlignmentObj["Alignment_Info"].toString());
                 break;
             case TARGETLOCATOR:
-                emit sendAlignmentSignal(TARGETGRABBER, targetAlignmentObj["IR_0"].toString(), targetAlignmentObj["IR_1"].toString(), targetAlignmentObj["IR_2"].toString(), targetAlignmentObj["IR_0_bool"].toString(), targetAlignmentObj["IR_1_bool"].toString(), targetAlignmentObj["IR_2_bool"].toString(), targetAlignmentObj["Grabber_Aligned"].toString());
+                emit sendAlignmentSignal(TARGETGRABBER, targetAlignmentObj["IR_0"].toString(), targetAlignmentObj["IR_1"].toString(), targetAlignmentObj["IR_2"].toString(), targetAlignmentObj["IR_0_bool"].toString(), targetAlignmentObj["IR_1_bool"].toString(), targetAlignmentObj["IR_2_bool"].toString(), targetAlignmentObj["Grabber_Aligned"].toString(), targetAlignmentObj["Alignment_Info"].toString());
                 break;
             case PATHFINDER:
-                emit sendAlignmentSignal(TARGETGRABBER, targetAlignmentObj["IR_0"].toString(), targetAlignmentObj["IR_1"].toString(), targetAlignmentObj["IR_2"].toString(), targetAlignmentObj["IR_0_bool"].toString(), targetAlignmentObj["IR_1_bool"].toString(), targetAlignmentObj["IR_2_bool"].toString(), targetAlignmentObj["Grabber_Aligned"].toString());
+                emit sendAlignmentSignal(TARGETGRABBER, targetAlignmentObj["IR_0"].toString(), targetAlignmentObj["IR_1"].toString(), targetAlignmentObj["IR_2"].toString(), targetAlignmentObj["IR_0_bool"].toString(), targetAlignmentObj["IR_1_bool"].toString(), targetAlignmentObj["IR_2_bool"].toString(), targetAlignmentObj["Grabber_Aligned"].toString(), targetAlignmentObj["Alignment_Info"].toString());
                 break;
             case SEARCHERMOVER:
-                emit sendAlignmentSignal(TARGETGRABBER, targetAlignmentObj["IR_0"].toString(), targetAlignmentObj["IR_1"].toString(), targetAlignmentObj["IR_2"].toString(), targetAlignmentObj["IR_0_bool"].toString(), targetAlignmentObj["IR_1_bool"].toString(), targetAlignmentObj["IR_2_bool"].toString(), targetAlignmentObj["Grabber_Aligned"].toString());
+                emit sendAlignmentSignal(TARGETGRABBER, targetAlignmentObj["IR_0"].toString(), targetAlignmentObj["IR_1"].toString(), targetAlignmentObj["IR_2"].toString(), targetAlignmentObj["IR_0_bool"].toString(), targetAlignmentObj["IR_1_bool"].toString(), targetAlignmentObj["IR_2_bool"].toString(), targetAlignmentObj["Grabber_Aligned"].toString(), targetAlignmentObj["Alignment_Info"].toString());
                 break;
             default:
                 qDebug() << "BROKEN" << endl;
