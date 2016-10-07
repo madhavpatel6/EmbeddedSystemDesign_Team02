@@ -1,29 +1,121 @@
 #include "mainwindow.h"
 #include <QGraphicsView>
+#include <QThread>
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
 {
     setupUi(this);
-    grid->addLine(142,144,321,124);
+    connect(moveRoverButton, SIGNAL(released()), this, SLOT(handleRoverUpdate()));
+    connect(simulateButton, SIGNAL(released()), this, SLOT(handleSimulate()));
+    connect(grid, SIGNAL(updateCursorPosition(int,int)), this, SLOT(updateCursorPosition(int,int)));
+    sensorReadingTimer = new QTimer();
+    sensorReadingTimer->setInterval(1);
+    sensorReadingTimer->start();
+    connect(sensorReadingTimer, SIGNAL(timeout()), this, SLOT(handleSimulate()));
+    connect(showObjects, SIGNAL(released()), this, SLOT(handleShowObjects()));
+//    grid->UpdateSensorReading(GridScene::MIDDLESENSOR, 13*GridScene::CELL_SIZE);
+//    grid->addLine(142,144,321,124);
 //    grid->addLine(12,38,22,88);
+    middleFIRDistance->setText(QString::number(20));
+    rightFIRDistance->setText(QString::number(20));
+    leftFIRDistance->setText(QString::number(20));
 }
 
 MainWindow::~MainWindow()
 {
-    delete grid;
-    delete verticalLayout;
+//    delete grid;
+//    delete verticalLayout1;
+//    delete verticalLayout2;
+//    delete horizontalLayout;
 }
 
 void MainWindow::setupUi(QWidget* mainwindow) {
     if (mainwindow->objectName().isEmpty())
         mainwindow->setObjectName(QString("Occupany Grid Simulator"));
-    verticalLayout = new QVBoxLayout(mainwindow);
-    verticalLayout->setSpacing(5);
-    verticalLayout->setContentsMargins(5,5,5,5);
-    verticalLayout->setObjectName(QString("verticalLayout"));
+    horizontalLayout = new QHBoxLayout(mainwindow);
+    horizontalLayout->setSpacing(5);
+    horizontalLayout->setContentsMargins(5,5,5,5);
+    horizontalLayout->setObjectName(QString("horizontalLayout"));
     grid = new GridScene();
-//    button = new QPushButton();
-    verticalLayout->addWidget(grid);
-    verticalLayout->setAlignment(Qt::AlignCenter);
+    horizontalLayout->addWidget(grid);
+    horizontalLayout->setAlignment(Qt::AlignCenter);
+
+    verticalLayout1 = new QVBoxLayout();
+    horizontalLayout->addLayout(verticalLayout1);
+    moveRoverButton = new QPushButton();
+    simulateButton = new QPushButton();
+    verticalLayout2 = new QVBoxLayout();
+
+    horizontalLayout->addLayout(verticalLayout2);
+
+    simulateButton->setText("Update Map");
+    moveRoverButton->setText("Update Rover's Location");
+
+    xRoverLoc = new QLineEdit();
+    yRoverLoc = new QLineEdit();
+    roverAngle = new QLineEdit();
+    roverLocXLabel = new QLabel("X Location");
+    roverLocYLabel = new QLabel("Y Location");
+    roverAngleLabel = new QLabel("Angle");
+    middleFIRDistanceLabel = new QLabel("Middle Front IR Sensor (1 cm = 1 grid cell)");
+    rightFIRDistanceLabel = new QLabel("Right Front IR Sensor (1 cm = 1 grid cell)");
+    leftFIRDistanceLabel = new QLabel("Left Front IR Sensor (1 cm = 1 grid cell)");
+    cursorPosition = new QLabel("");
+    verticalSpacer1 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    verticalSpacer2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    verticalLayout1->addWidget(roverLocXLabel);
+    verticalLayout1->addWidget(xRoverLoc);
+    verticalLayout1->addWidget(roverLocYLabel);
+    verticalLayout1->addWidget(yRoverLoc);
+    verticalLayout1->addWidget(roverAngleLabel);
+    verticalLayout1->addWidget(roverAngle);
+    verticalLayout1->addWidget(moveRoverButton);
+    verticalLayout1->addWidget(cursorPosition);
+    verticalLayout1->addItem(verticalSpacer1);
+    middleFIRDistance = new QLineEdit();
+    rightFIRDistance = new QLineEdit();
+    leftFIRDistance = new QLineEdit();
+    showObjects = new QPushButton("Hide Objects");
+    verticalLayout2->addWidget(leftFIRDistanceLabel);
+    verticalLayout2->addWidget(leftFIRDistance);
+    verticalLayout2->addWidget(middleFIRDistanceLabel);
+    verticalLayout2->addWidget(middleFIRDistance);
+    verticalLayout2->addWidget(rightFIRDistanceLabel);
+    verticalLayout2->addWidget(rightFIRDistance);
+    verticalLayout2->addWidget(simulateButton);
+    verticalLayout2->addWidget(showObjects);
+    verticalLayout2->addItem(verticalSpacer2);
+    setFocusProxy(grid);
 }
 
+void MainWindow::handleRoverUpdate() {
+    grid->updateRoverLocation(QPoint(xRoverLoc->text().toInt()*GridScene::CELL_SIZE, yRoverLoc->text().toInt()*GridScene::CELL_SIZE), roverAngle->text().toInt());
+}
+
+void MainWindow::handleSimulate() {
+    grid->setFocus();
+    if(middleFIRDistance->text().toInt() != 0) {
+        grid->updateSensorReading(GridScene::MIDDLESENSOR, middleFIRDistance->text().toInt()*GridScene::CELL_SIZE);
+    }
+    if(leftFIRDistance->text().toInt() != 0) {
+    //    grid->updateSensorReading(GridScene::LEFTSENSOR, leftFIRDistance->text().toInt()*GridScene::CELL_SIZE);
+    }
+    if(rightFIRDistance->text().toInt() != 0) {
+    //    grid->updateSensorReading(GridScene::RIGHTSENSOR, rightFIRDistance->text().toInt()*GridScene::CELL_SIZE);
+    }
+}
+
+void MainWindow::handleShowObjects() {
+    if(grid->showObjects) {
+        grid->showObjects = false;
+        showObjects->setText("Show Objects");
+    }
+    else if(!grid->showObjects) {
+        grid->showObjects = true;
+        showObjects->setText("Hide Objects");
+    }
+}
+
+void MainWindow::updateCursorPosition(int x, int y) {
+    cursorPosition->setText(QString("%1\t%2").arg(x, 2, 10, QChar('0')).arg(y, 2, 10, QChar('0')));
+}

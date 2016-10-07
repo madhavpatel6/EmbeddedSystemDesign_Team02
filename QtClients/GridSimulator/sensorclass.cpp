@@ -1,0 +1,111 @@
+#include "sensorclass.h"
+#include <cmath>
+#include <QDebug>
+#define M_PI 3.14159265358979323846
+SensorClass::SensorClass(QPoint roverLocation, int roverOrientation, int _maximumDistanceCM, int _cell_pixel_size, SensorLocation location)
+{
+    cell_pixel_size = _cell_pixel_size;
+    type = location;
+    maximumDistanceCM = _maximumDistanceCM;
+    updatePosition(roverLocation, roverOrientation);
+}
+
+void SensorClass::updatePosition(QPoint roverLocation, int roverOrientation) {
+    sensorOrientation = roverOrientation;
+    switch(type) {
+        case MIDDLESENSOR:
+            sensorLocation = rotatePoint(roverLocation.x(), roverLocation.y(),
+                    roverLocation.x() + 3, roverLocation.y(),
+                        roverOrientation);
+            sensorPixelLocation = rotatePoint(roverLocation.x()*cell_pixel_size, roverLocation.y()*cell_pixel_size,
+                                              roverLocation.x()*cell_pixel_size + 3*cell_pixel_size, roverLocation.y()*cell_pixel_size,
+                                                  roverOrientation);
+            break;
+        case LEFTSENSOR:
+            sensorLocation = rotatePoint(roverLocation.x(), roverLocation.y(),
+                    roverLocation.x() + 3, roverLocation.y() - 2,
+                        roverOrientation);
+            sensorPixelLocation = rotatePoint(roverLocation.x()*cell_pixel_size, roverLocation.y()*cell_pixel_size,
+                                              roverLocation.x()*cell_pixel_size + 3*cell_pixel_size, roverLocation.y()*cell_pixel_size - 2*cell_pixel_size,
+                                                  roverOrientation);
+            break;
+        case RIGHTSENSOR:
+            sensorLocation = rotatePoint(roverLocation.x(), roverLocation.y(),
+                    roverLocation.x() + 3, roverLocation.y() + 2,
+                        roverOrientation);
+            sensorPixelLocation = rotatePoint(roverLocation.x()*cell_pixel_size, roverLocation.y()*cell_pixel_size,
+                                              roverLocation.x()*cell_pixel_size + 3*cell_pixel_size, roverLocation.y()*cell_pixel_size + 2*cell_pixel_size,
+                                                  roverOrientation);
+            sensorMaximumLocation = rotatePoint(roverLocation.x(), roverLocation.y(),
+                                                roverLocation.x() + 3, roverLocation.y() + 2,
+                                                    roverOrientation);
+            break;
+    }
+    sensorMaximumLocation = QPoint(sensorLocation.x() + maximumDistanceCM*cos(sensorOrientation*M_PI/180.0),
+                                   sensorLocation.y() + maximumDistanceCM*sin(sensorOrientation*M_PI/180.0));
+}
+
+void SensorClass::draw(QPainter* painter) {
+    painter->drawEllipse(sensorPixelLocation, 3, 3);
+    painter->save();
+    painter->setPen(QPen(QBrush(Qt::black),3));
+    for(int i = 0; i < temp.size(); i++) {
+        painter->drawPoint(temp[i]);
+    }
+    painter->restore();
+}
+
+int SensorClass::readDistance(QVector<QRect> objs) {
+    QPoint absoluteIntersectionPoint = findFirstIntersection(objs);
+//    qDebug() << absoluteIntersectionPoint;
+    if(absoluteIntersectionPoint != sensorPixelLocation) {
+        int absoluteDistance = computeDistance(absoluteIntersectionPoint, sensorPixelLocation);
+//        qDebug() << "Distance found " << absoluteDistance/cell_pixel_size;
+        return absoluteDistance/cell_pixel_size;
+    }
+    return -1;
+}
+
+int SensorClass::getSensorOrientation() {
+    return sensorOrientation;
+}
+
+QPoint SensorClass::getSensorLocation() {
+    return sensorLocation;
+}
+
+QPoint SensorClass::getMaximumSensorLocation() {
+    return sensorMaximumLocation;
+}
+
+int SensorClass::computeDistance(QPoint p1, QPoint p2) {
+    return floor(sqrt( pow(p1.x() - p2.x(),2) + pow(p1.y() - p2.y(),2) ));
+}
+
+QPoint SensorClass::findFirstIntersection(QVector<QRect> objs) {
+//    qDebug() << "Sensor location " << sensorLocation << " orientation " << sensorOrientation;
+    temp.clear();
+    for(int i = 0; i < maximumDistanceCM*cell_pixel_size; i++) {
+        QPoint checkPoint = QPoint ( i*cos(sensorOrientation*M_PI/180.0) + sensorPixelLocation.x(),
+                                        i*1*sin(sensorOrientation*M_PI/180.0) + sensorPixelLocation.y());
+//        qDebug() << "check point = " << checkPoint;
+        temp.push_back(checkPoint);
+        for(int j = 0; j < objs.size(); j++) {
+//            qDebug() << "checking object " << objs[j];
+            if(objs[j].contains(checkPoint, false)) {
+                return checkPoint;
+            }
+        }
+    }
+    return sensorPixelLocation;
+}
+
+QPoint SensorClass::rotatePoint(int originX, int originY, int pointX, int pointY, double rotationAngle) {
+    int translatedX = pointX - originX;
+    int translatedY = pointY - originY;
+    rotationAngle = rotationAngle*M_PI/180.0;
+    QPoint point = QPoint(translatedX * cos(rotationAngle) - translatedY * sin(rotationAngle) + originX,
+                  translatedX * sin(rotationAngle) + translatedY * cos(rotationAngle) + originY);
+//    qDebug() << "new Point " << point;
+    return point;
+}
