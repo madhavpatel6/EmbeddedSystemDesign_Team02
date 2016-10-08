@@ -61,14 +61,16 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 #include <xc.h>
 #include <sys/attribs.h>
+#include "rx_thread.h"
+#include "tx_thread.h"
 #include "adc_thread.h"
 #include "adc_thread_public.h"
 #include "debug.h"
-#include "tx_thread.h"
-#include "rx_thread.h"
 #include "rx_thread_public.h"
 #include "message_controller_thread.h"
+#include "motor_controller_thread.h"
 #include "system_definitions.h"
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: System Interrupt Vector Functions
@@ -85,30 +87,22 @@ void IntHandlerDrvAdc(void)
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     int i = 0;
     float adcValToQ = 0.0;
-    float adcValToQF = 0.0;
-    float adcVoltage = 0.0;
     DRV_ADC_Stop();
     //Read data before clearing interrupt flag
     dbgOutputLoc(ADDING_ADC_VAL_ISR);
-    //for(i; i < 16; i++) {
-        adcValToQ = adcValToQ + PLIB_ADC_ResultGetByIndex(ADC_ID_1, 0);
-    //}
-//    adcValToQF = ((adcValToQ)/(1.0))*(1.0);
-//    adcVoltage = (adcValToQF*5.0)/(1024.0); 
-//    float distance = (adcVoltage / 0.009766) * (2.54);
+    adcValToQ = adcValToQ + PLIB_ADC_ResultGetByIndex(ADC_ID_1, 0);
     dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
-//    adc_app_SendValToMsgQFromISR(distance, &pxHigherPriorityTaskWoken);
     adc_app_SendValToMsgQFromISR(adcValToQ, &pxHigherPriorityTaskWoken);
     dbgOutputLoc(AFTER_SEND_TO_Q_ISR);
     dbgOutputLoc(LEAVE_ADC_ISR);
-    //PLIB_ADC_SampleAutoStartEnable(ADC_ID_1);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
     /* Clear ADC Interrupt Flag */
     PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_ADC_1);
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
 }
 
-/* This timer is for the ADC to fire every 50ms */
+/* This timer is for the ADC to fire every 50 ms */
+// Timer 2
 void IntHandlerDrvTmrInstance0(void)
 {
     dbgOutputLoc(ENTER_TMR_INSTANCE_0_ISR);
@@ -123,17 +117,19 @@ void IntHandlerDrvTmrInstance0(void)
 }
 
 int bufCount = 0;
+int ISRcount = 0;
+char buf[22] = "F";
+uint16_t timerCount = 0;
 
-/* This timer is for the TX to fire every 200ms */
+/* This timer is for the TX to fire every 200 ms */
+// Timer 5
 void IntHandlerDrvTmrInstance1(void)
 {
     dbgOutputLoc(ENTER_TMR_INSTANCE_1_ISR);
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     MessageObj obj;
-    char buf[5] = "FRLR";
     obj.Type = SEND_REQUEST;
     dbgOutputLoc(BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR);
-    
     switch(MYMODULE){
         case SEARCHERMOVER:
             obj.Request = SMtoTL;
@@ -157,15 +153,33 @@ void IntHandlerDrvTmrInstance1(void)
             MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             break;
     }
-    dbgOutputLoc(AFTER_SEND_TO_Q_TMR_INSTANCE_1_ISR);
-    if (bufCount < 3) {
-        bufCount++;
+    if (ISRcount == 4) {
+        if (bufCount < strlen(buf)-1) {
+            bufCount++;
+        } else {
+            bufCount = 0;
+        }
+        ISRcount = 0;
     } else {
-        bufCount = 0;
+        ISRcount++;
     }
+
+    dbgOutputLoc(AFTER_SEND_TO_Q_TMR_INSTANCE_1_ISR);
     incrementSystemClock();
     dbgOutputLoc(LEAVE_TMR_INSTANCE_1_ISR);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_5);
+}
+
+// Timer 3
+void IntHandlerDrvTmrInstance2(void)
+{
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
+}
+
+// Timer 4
+void IntHandlerDrvTmrInstance3(void)
+{
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
 }
 
@@ -224,18 +238,6 @@ void IntHandlerDrvUsartInstance0(void)
 void InitializeISRQueues() {
     Usart0_InitializeQueue();
 }
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
   
 /*******************************************************************************
  End of File

@@ -120,9 +120,9 @@ _IntHandlerDrvTmrInstance0:
 /* TMR Instance 1 Interrupt */
    .extern  IntHandlerDrvTmrInstance1
 
-   .section	.vector_16,code, keep
-   .equ     __vector_dispatch_16, IntVectorDrvTmrInstance1
-   .global  __vector_dispatch_16
+   .section	.vector_20,code, keep
+   .equ     __vector_dispatch_20, IntVectorDrvTmrInstance1
+   .global  __vector_dispatch_20
    .set     nomicromips
    .set     noreorder
    .set     nomips16
@@ -149,6 +149,74 @@ _IntHandlerDrvTmrInstance1:
     nop
     portRESTORE_CONTEXT
     .end	_IntHandlerDrvTmrInstance1
+
+
+/* TMR Instance 2 Interrupt */
+   .extern  IntHandlerDrvTmrInstance2
+
+   .section	.vector_12,code, keep
+   .equ     __vector_dispatch_12, IntVectorDrvTmrInstance2
+   .global  __vector_dispatch_12
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  IntVectorDrvTmrInstance2
+
+IntVectorDrvTmrInstance2:
+    la    $26,  _IntHandlerDrvTmrInstance2         
+    jr    $26
+    nop
+	.end	IntVectorDrvTmrInstance2
+
+   .section	.DrvTmrInstance2_vector_text, code, keep
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  _IntHandlerDrvTmrInstance2
+
+_IntHandlerDrvTmrInstance2:
+    portSAVE_CONTEXT
+    la    s6,  IntHandlerDrvTmrInstance2
+    jalr  s6
+    nop
+    portRESTORE_CONTEXT
+    .end	_IntHandlerDrvTmrInstance2
+
+
+/* TMR Instance 3 Interrupt */
+   .extern  IntHandlerDrvTmrInstance3
+
+   .section	.vector_16,code, keep
+   .equ     __vector_dispatch_16, IntVectorDrvTmrInstance3
+   .global  __vector_dispatch_16
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  IntVectorDrvTmrInstance3
+
+IntVectorDrvTmrInstance3:
+    la    $26,  _IntHandlerDrvTmrInstance3         
+    jr    $26
+    nop
+	.end	IntVectorDrvTmrInstance3
+
+   .section	.DrvTmrInstance3_vector_text, code, keep
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  _IntHandlerDrvTmrInstance3
+
+_IntHandlerDrvTmrInstance3:
+    portSAVE_CONTEXT
+    la    s6,  IntHandlerDrvTmrInstance3
+    jalr  s6
+    nop
+    portRESTORE_CONTEXT
+    .end	_IntHandlerDrvTmrInstance3
 
 
 

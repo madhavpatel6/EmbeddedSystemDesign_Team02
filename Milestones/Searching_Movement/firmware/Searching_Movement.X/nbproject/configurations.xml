@@ -39,7 +39,6 @@
         <itemPath>../src/tx_thread.h</itemPath>
         <itemPath>../src/message_controller_thread.h</itemPath>
         <itemPath>../src/motor_controller_thread.h</itemPath>
-        <itemPath>C:/ECE4534/Milestones/Searching_Movement/firmware/src/motor_controller_thread_public.h</itemPath>
       </logicalFolder>
       <logicalFolder name="communication"
                      displayName="communication"
@@ -137,6 +136,7 @@
       <itemPath>../src/system_interrupt_public.h</itemPath>
       <itemPath>../src/rx_thread_public.h</itemPath>
       <itemPath>../src/tx_thread_public.h</itemPath>
+      <itemPath>C:/ECE4534/Milestones/Searching_Movement/firmware/src/motor_controller_thread_public.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -306,7 +306,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value=";../src;../src/system_config/default;../src/default;../../../../../microchip/harmony/v1_08_01/framework;../src/system_config/default/framework;../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX;../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include"/>
+                  value="../src;../src/system_config/default;../src/default;../../../../../microchip/harmony/v1_08_01/framework;../src/system_config/default/framework;../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX;../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="true"/>
@@ -331,7 +331,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="exclude-floating-point-library" value="false"/>
         <property key="expand-macros" value="false"/>
-        <property key="extra-include-directories-for-assembler" value=""/>
+        <property key="extra-include-directories-for-assembler" value=";"/>
         <property key="extra-include-directories-for-preprocessor"
                   value=";../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX;../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include;../src/system_config/default"/>
         <property key="false-conditionals" value="false"/>

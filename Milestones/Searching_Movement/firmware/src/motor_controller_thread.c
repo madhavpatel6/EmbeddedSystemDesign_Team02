@@ -53,13 +53,15 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
+#include "debug.h"
 #include "motor_controller_thread.h"
 #include "motor_controller_thread_public.h"
+#include "math.h"
 
 static QueueHandle_t _queue;
 
 #define TYPEOFQUEUE char
-#define SIZEOFQUEUE 200
+#define SIZEOFQUEUE 48
 
 // *****************************************************************************
 // *****************************************************************************
@@ -100,16 +102,11 @@ MOTOR_CONTROLLER_THREAD_DATA motor_controller_threadData;
 
 void MOTOR_CONTROLLER_THREAD_Initialize ( void )
 {
-    /* Place the App state machine in its initial state. */
-    motor_controller_threadData.state = MOTOR_CONTROLLER_THREAD_STATE_INIT;
-
     MOTOR_CONTROLLER_THREAD_InitializeQueue();
-
-    /* TODO: Initialize your application's state machine and other
-     * parameters.
-     */
+    DRV_TMR2_Start();
+    DRV_TMR3_Start();
+    motor_controller_threadData.state = MOTOR_CONTROLLER_THREAD_STATE_INIT;
 }
-
 
 /******************************************************************************
   Function:
@@ -121,33 +118,98 @@ void MOTOR_CONTROLLER_THREAD_Initialize ( void )
 
 void MOTOR_CONTROLLER_THREAD_Tasks ( void )
 {
-    char buf[10];
     char c;
+    MessageObj obj;
+    int leftCount = 0;
+    int rightCount = 0;
+    float x = 0;
+    float y = 0;
+    float orientation = 0;
+    float ticksPerCm = 23.65;
+    float circumference = 40.84;
+    int leftSign = 1;
+    int rightSign = 1;
+    int distance = 0;
+    
+    obj.Type = UPDATE;
+    obj.Update.Type = POSITION;
     
     while(1) {
-        MOTOR_CONTROLLER_THREAD_ReadFromQueue(&c);
         /* Check the application's current state. */
         switch ( motor_controller_threadData.state )
         {
             /* Application's initial state. */
             case MOTOR_CONTROLLER_THREAD_STATE_INIT:
             {
-                bool appInitialized = true;
-                
+                MOTOR_CONTROLLER_THREAD_OFF();
                 MOTOR_CONTROLLER_THREAD_FORWARD();
-                
-                if (appInitialized)
-                {
-                    motor_controller_threadData.state = MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS;
-                }
+                motor_controller_threadData.state = MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS;
                 break;
             }
             case MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS:
             {
+                // Read direction of travel from queue
+                dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
+                MOTOR_CONTROLLER_THREAD_ReadFromQueue(&c);
+                dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
+                
                 switch(c) {
-                    
+                    case 'F': {
+                        MOTOR_CONTROLLER_THREAD_OFF();
+                        MOTOR_CONTROLLER_THREAD_FORWARD();
+                        MOTOR_CONTROLLER_THREAD_ON();
+                        leftSign = 1;
+                        rightSign = 1;
+                        break;
+                    }
+                    case 'B': {
+                        MOTOR_CONTROLLER_THREAD_OFF();
+                        MOTOR_CONTROLLER_THREAD_REVERSE();
+                        MOTOR_CONTROLLER_THREAD_ON();
+                        leftSign = -1;
+                        rightSign = -1;
+                        break;
+                    }
+                    case 'L': {
+                        MOTOR_CONTROLLER_THREAD_OFF();
+                        MOTOR_CONTROLLER_THREAD_LEFT();
+                        MOTOR_CONTROLLER_THREAD_ON();
+                        leftSign = -1;
+                        rightSign = 1;
+                        break;
+                    }
+                    case 'R': {
+                        MOTOR_CONTROLLER_THREAD_OFF();
+                        MOTOR_CONTROLLER_THREAD_RIGHT();
+                        MOTOR_CONTROLLER_THREAD_ON();
+                        leftSign = 1;
+                        rightSign = -1;
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
                 }
                 
+                // Get encoder values from each motor
+                leftCount = PLIB_TMR_Counter16BitGet(TMR_ID_3) * leftSign;
+                rightCount = PLIB_TMR_Counter16BitGet(TMR_ID_4) * rightSign;
+                
+                // Clear encoder counters
+                PLIB_TMR_Counter16BitClear(TMR_ID_3);
+                PLIB_TMR_Counter16BitClear(TMR_ID_4);
+                
+                // Update position of rover
+                orientation += (((((leftCount-rightCount)/2.0)/ticksPerCm)/circumference)*360);
+                distance = (((leftCount+rightCount)/2.0)/ticksPerCm);
+                x = distance*cos(orientation);
+                y = distance*sin(orientation);
+                
+                obj.Update.Data.location.x = x;
+                obj.Update.Data.location.y = y;
+                obj.Update.Data.orientation = orientation;
+                
+                MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
                 break;
             }
             default:
@@ -160,6 +222,10 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
 
 void MOTOR_CONTROLLER_THREAD_InitializeQueue() {
     _queue = xQueueCreate(SIZEOFQUEUE, sizeof(TYPEOFQUEUE));
+    if(_queue == 0) {
+        /*Handle this Error*/
+        dbgOutputBlock(pdFALSE);
+    }
 }
 
 void MOTOR_CONTROLLER_THREAD_ReadFromQueue(char* pvBuffer) {
@@ -174,24 +240,34 @@ void MOTOR_CONTROLLER_THREAD_SendToQueueISR(char buffer, BaseType_t *pxHigherPri
     xQueueSendFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
 }
 
+void MOTOR_CONTROLLER_THREAD_ON( void ) {
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 0, 1);
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 1, 1);
+}
+
+void MOTOR_CONTROLLER_THREAD_OFF( void ) {
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 0, 0);
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 1, 0);
+}
+
 void MOTOR_CONTROLLER_THREAD_FORWARD( void ) {
-    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_F, 1, 0);
-    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 5, 0);
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, 14, 0);
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 1);
 }
 
 void MOTOR_CONTROLLER_THREAD_REVERSE( void ) {
-    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_F, 1, 1);
-    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 5, 1);
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, 14, 1);
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 0);
 }
 
 void MOTOR_CONTROLLER_THREAD_LEFT( void ) {
-    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_F, 1, 1);
-    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 5, 0);
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, 14, 0);
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 0);
 }
 
 void MOTOR_CONTROLLER_THREAD_RIGHT( void ) {
-    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_F, 1, 0);
-    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 5, 1);    
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, 14, 1);
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 0);
 }
 
 /*******************************************************************************
