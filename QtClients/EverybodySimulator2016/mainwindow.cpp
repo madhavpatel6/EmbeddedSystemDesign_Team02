@@ -140,7 +140,6 @@ void MainWindow::requestSlot(){
 
 }
 void MainWindow::dataReadSlot(QByteArray data){
-    // qDebug() << data << endl;
     QByteArray array = data;
     char buffer[MAXMESSAGESIZE];
     char source, messageCount;
@@ -192,7 +191,20 @@ void MainWindow::dataReadSlot(QByteArray data){
         }
         else {
             numOfErrors++;
-            // emit updateError(numOfErrors);
         }
     }
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    switch(MYMODULE){
+        case PATHFINDER:
+            pSim = new PathSimulator();
+            pSim->setConfig(config);
+            pSim->show();
+        break;
+        default:
+        break;
+    }
+
 }

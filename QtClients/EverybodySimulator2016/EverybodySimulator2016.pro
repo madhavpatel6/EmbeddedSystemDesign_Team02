@@ -15,14 +15,17 @@ HEADERS += clientsocket.h \
            mainwindow.h \
            ui_mainwindow.h \
            picCode/debug.h \
-           picCode/communication/messages.h
-FORMS += mainwindow.ui
+           picCode/communication/messages.h \
+    pathsimulator.h
+FORMS += mainwindow.ui \
+    pathsimulator.ui
 SOURCES += clientsocket.cpp \
            initialization.cpp \
            main.cpp \
            mainwindow.cpp \
            picCode/debug.c \
-           picCode/communication/messages.c
+           picCode/communication/messages.c \
+    pathsimulator.cpp
 
 DISTFILES += \
     requests.json \

@@ -53,16 +53,20 @@ SOURCES       = clientsocket.cpp \
 		main.cpp \
 		mainwindow.cpp \
 		picCode/debug.c \
-		picCode/communication/messages.c moc_clientsocket.cpp \
-		moc_mainwindow.cpp
+		picCode/communication/messages.c \
+		pathsimulator.cpp moc_clientsocket.cpp \
+		moc_mainwindow.cpp \
+		moc_pathsimulator.cpp
 OBJECTS       = clientsocket.o \
 		initialization.o \
 		main.o \
 		mainwindow.o \
 		debug.o \
 		messages.o \
+		pathsimulator.o \
 		moc_clientsocket.o \
-		moc_mainwindow.o
+		moc_mainwindow.o \
+		moc_pathsimulator.o
 DIST          = requests.json \
 		responses.json \
 		/usr/lib/qt/mkspecs/features/spec_pre.prf \
@@ -252,12 +256,14 @@ DIST          = requests.json \
 		mainwindow.h \
 		ui_mainwindow.h \
 		picCode/debug.h \
-		picCode/communication/messages.h clientsocket.cpp \
+		picCode/communication/messages.h \
+		pathsimulator.h clientsocket.cpp \
 		initialization.cpp \
 		main.cpp \
 		mainwindow.cpp \
 		picCode/debug.c \
-		picCode/communication/messages.c
+		picCode/communication/messages.c \
+		pathsimulator.cpp
 QMAKE_TARGET  = EverybodySimulator2016
 DESTDIR       = 
 TARGET        = EverybodySimulator2016
@@ -266,7 +272,7 @@ TARGET        = EverybodySimulator2016
 first: all
 ####### Build rules
 
-$(TARGET): ui_mainwindow.h $(OBJECTS)  
+$(TARGET): ui_mainwindow.h ui_pathsimulator.h $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
 Makefile: EverybodySimulator2016.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/features/spec_pre.prf \
@@ -658,9 +664,9 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents clientsocket.h initialization.h mainwindow.h ui_mainwindow.h picCode/debug.h picCode/communication/messages.h $(DISTDIR)/
-	$(COPY_FILE) --parents clientsocket.cpp initialization.cpp main.cpp mainwindow.cpp picCode/debug.c picCode/communication/messages.c $(DISTDIR)/
-	$(COPY_FILE) --parents mainwindow.ui $(DISTDIR)/
+	$(COPY_FILE) --parents clientsocket.h initialization.h mainwindow.h ui_mainwindow.h picCode/debug.h picCode/communication/messages.h pathsimulator.h $(DISTDIR)/
+	$(COPY_FILE) --parents clientsocket.cpp initialization.cpp main.cpp mainwindow.cpp picCode/debug.c picCode/communication/messages.c pathsimulator.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents mainwindow.ui pathsimulator.ui $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -686,9 +692,9 @@ benchmark: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_clientsocket.cpp moc_mainwindow.cpp
+compiler_moc_header_make_all: moc_clientsocket.cpp moc_mainwindow.cpp moc_pathsimulator.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_clientsocket.cpp moc_mainwindow.cpp
+	-$(DEL_FILE) moc_clientsocket.cpp moc_mainwindow.cpp moc_pathsimulator.cpp
 moc_clientsocket.cpp: picCode/communication/messages.h \
 		clientsocket.h \
 		/usr/lib/qt/bin/moc
@@ -697,18 +703,28 @@ moc_clientsocket.cpp: picCode/communication/messages.h \
 moc_mainwindow.cpp: clientsocket.h \
 		picCode/communication/messages.h \
 		initialization.h \
+		pathsimulator.h \
 		mainwindow.h \
 		/usr/lib/qt/bin/moc
 	/usr/lib/qt/bin/moc $(DEFINES) -I/usr/lib/qt/mkspecs/linux-g++ -I/data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/usr/include/qt -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include mainwindow.h -o moc_mainwindow.cpp
 
+moc_pathsimulator.cpp: initialization.h \
+		pathsimulator.h \
+		/usr/lib/qt/bin/moc
+	/usr/lib/qt/bin/moc $(DEFINES) -I/usr/lib/qt/mkspecs/linux-g++ -I/data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/usr/include/qt -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include pathsimulator.h -o moc_pathsimulator.cpp
+
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
-compiler_uic_make_all: ui_mainwindow.h
+compiler_uic_make_all: ui_mainwindow.h ui_pathsimulator.h
 compiler_uic_clean:
-	-$(DEL_FILE) ui_mainwindow.h
+	-$(DEL_FILE) ui_mainwindow.h ui_pathsimulator.h
 ui_mainwindow.h: mainwindow.ui \
 		/usr/lib/qt/bin/uic
 	/usr/lib/qt/bin/uic mainwindow.ui -o ui_mainwindow.h
+
+ui_pathsimulator.h: pathsimulator.ui \
+		/usr/lib/qt/bin/uic
+	/usr/lib/qt/bin/uic pathsimulator.ui -o ui_pathsimulator.h
 
 compiler_yacc_decl_make_all:
 compiler_yacc_decl_clean:
@@ -730,13 +746,15 @@ initialization.o: initialization.cpp initialization.h
 main.o: main.cpp mainwindow.h \
 		clientsocket.h \
 		picCode/communication/messages.h \
-		initialization.h
+		initialization.h \
+		pathsimulator.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 mainwindow.o: mainwindow.cpp mainwindow.h \
 		clientsocket.h \
 		picCode/communication/messages.h \
 		initialization.h \
+		pathsimulator.h \
 		ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o mainwindow.cpp
 
@@ -747,11 +765,19 @@ messages.o: picCode/communication/messages.c picCode/communication/messages.h \
 		picCode/debug.h
 	$(CC) -c $(CFLAGS) $(INCPATH) -o messages.o picCode/communication/messages.c
 
+pathsimulator.o: pathsimulator.cpp pathsimulator.h \
+		initialization.h \
+		ui_pathsimulator.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o pathsimulator.o pathsimulator.cpp
+
 moc_clientsocket.o: moc_clientsocket.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_clientsocket.o moc_clientsocket.cpp
 
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp
+
+moc_pathsimulator.o: moc_pathsimulator.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_pathsimulator.o moc_pathsimulator.cpp
 
 ####### Install
 
