@@ -22,15 +22,15 @@ GridScene::GridScene(QWidget *parent) : QWidget(parent)
     mouseState = FIRSTCORNER;
     setFocusPolicy(Qt::StrongFocus);
     showObjects = true;
-    QPointF initialDistancePoint = QPointF(40.5,25.5);
-    QPointF rotatedPoint;
-    for(int degrees = 0; degrees < 360; degrees = degrees + 10) {
-        rotatedPoint = rotatePoint(25.5,25.5,initialDistancePoint.x(), initialDistancePoint.y(),degrees);
-        addLine(25.5,25.5,rotatedPoint.x(), rotatedPoint.y());
-        addLine(25.5,25.5,rotatedPoint.x(), rotatedPoint.y());
-        addLine(25.5,25.5,rotatedPoint.x(), rotatedPoint.y());
-        addLine(25.5,25.5,rotatedPoint.x(), rotatedPoint.y());
-    }
+//    QPointF initialDistancePoint = QPointF(40.5,25.5);
+//    QPointF rotatedPoint;
+//    for(int degrees = 0; degrees < 360; degrees = degrees + 10) {
+//        rotatedPoint = rotatePoint(25.5,25.5,initialDistancePoint.x(), initialDistancePoint.y(),degrees);
+//        addLine(25.5,25.5,rotatedPoint.x(), rotatedPoint.y());
+//        addLine(25.5,25.5,rotatedPoint.x(), rotatedPoint.y());
+//        addLine(25.5,25.5,rotatedPoint.x(), rotatedPoint.y());
+//        addLine(25.5,25.5,rotatedPoint.x(), rotatedPoint.y());
+//    }
 
 }
 

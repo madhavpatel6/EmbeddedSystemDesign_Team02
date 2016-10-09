@@ -97,10 +97,15 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
 {
     dbgOutputLoc(ENTER_MESSAGE_CONTROLLER_THREAD);
     InternalData internalData;
+    InternalData initialData;
     memset(&internalData, 0, sizeof(InternalData));
+    memset(&initialData, 0, sizeof(InternalData));
     internalData.location.x = 0;
     internalData.location.y = 0;
     internalData.orientation = 0;
+    initialData.location.x = 0;
+    initialData.location.y = 0;
+    initialData.orientation = 0;
     StatObjectType statObject;
     memset(&statObject, 0, sizeof(StatObjectType));
     type_t type = unknown;
@@ -246,6 +251,14 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     tx_thread_obj.Destination = SERVER;
                                     break;
                                 }
+                                case R1_Est_Location: {
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"R1_Est_Location\":{\"x\":\"%0.02f\",\"y\":\"%0.02f\"}", internalData.location.x, internalData.location.y);
+                                    break;
+                                }
+                                case R1_Est_Orientation: {
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"R1_Est_Orientation\":\"%0.02f\"", internalData.orientation);
+                                    break;
+                                }
                                 case SensorData: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"SensorData\":\"%0.02f\"", internalData.sensordata);
                                     break;
@@ -259,7 +272,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     break;
                             }
                         }
-                        sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),"}");
+                        sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),"}"); // Print ending brace }
                         switch(obj.External.Source) {
                             case SEARCHERMOVER: {
                                 tx_thread_obj.MessageCount = statObject.Res_To_SearcherMover;
@@ -326,7 +339,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                 // We will only need to have a new case for something we are requesting from another PIC
                 switch(obj.Request) {
                     case SMtoTL: {
-                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"Obstacles\",\"RV1_Location\",\"RV1_Orientation\"]}");
+                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"Obstacles\",\"R1_Location\",\"R1_Orientation\"]}");
                         tx_thread_obj.Destination = TARGETLOCATOR;
                         tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
                         statObject.Req_To_TargetLocator++;
@@ -384,9 +397,10 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
             case UPDATE: {
                 dbgOutputLoc(CASE_UPDATE_MESSAGE_CONTROLLER_THREAD);
                 switch(obj.Update.Type) {
-                    case POSITION:{
-                        internalData.location = obj.Update.Data.location;
-                        internalData.orientation = obj.Update.Data.orientation;
+                    case POSITION: {
+                        internalData.location.x = initialData.location.x + obj.Update.Data.location.x;
+                        internalData.location.y = initialData.location.y + obj.Update.Data.location.y;
+                        internalData.orientation = initialData.orientation + obj.Update.Data.orientation;
                         break;
                     }
                     case SENSORDATA: {
