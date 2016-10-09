@@ -186,6 +186,10 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                         rightSign = -1;
                         break;
                     }
+                    case 'S': {
+                        MOTOR_CONTROLLER_THREAD_OFF();
+                        break;
+                    }
                     default: {
                         break;
                     }
