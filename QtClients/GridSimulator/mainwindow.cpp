@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(simulateButton, SIGNAL(released()), this, SLOT(handleSimulate()));
     connect(grid, SIGNAL(updateCursorPosition(int,int)), this, SLOT(updateCursorPosition(int,int)));
     sensorReadingTimer = new QTimer();
-    sensorReadingTimer->setInterval(1);
+    sensorReadingTimer->setInterval(50);
     sensorReadingTimer->start();
     connect(sensorReadingTimer, SIGNAL(timeout()), this, SLOT(handleSimulate()));
     connect(showObjects, SIGNAL(released()), this, SLOT(handleShowObjects()));
@@ -89,20 +89,13 @@ void MainWindow::setupUi(QWidget* mainwindow) {
 }
 
 void MainWindow::handleRoverUpdate() {
-    grid->updateRoverLocation(QPoint(xRoverLoc->text().toInt()*GridScene::CELL_SIZE, yRoverLoc->text().toInt()*GridScene::CELL_SIZE), roverAngle->text().toInt());
+//    grid->updateRoverLocation(QPoint(xRoverLoc->text().toInt()*GridScene::CELL_SIZE, yRoverLoc->text().toInt()*GridScene::CELL_SIZE), roverAngle->text().toInt());
+    grid->reset();
 }
 
 void MainWindow::handleSimulate() {
     grid->setFocus();
-    if(middleFIRDistance->text().toInt() != 0) {
-        grid->updateSensorReading(GridScene::MIDDLESENSOR, middleFIRDistance->text().toInt()*GridScene::CELL_SIZE);
-    }
-    if(leftFIRDistance->text().toInt() != 0) {
-    //    grid->updateSensorReading(GridScene::LEFTSENSOR, leftFIRDistance->text().toInt()*GridScene::CELL_SIZE);
-    }
-    if(rightFIRDistance->text().toInt() != 0) {
-    //    grid->updateSensorReading(GridScene::RIGHTSENSOR, rightFIRDistance->text().toInt()*GridScene::CELL_SIZE);
-    }
+    grid->updateSensorReading();
 }
 
 void MainWindow::handleShowObjects() {

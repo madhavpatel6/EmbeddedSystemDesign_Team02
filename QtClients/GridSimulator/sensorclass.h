@@ -9,22 +9,22 @@ class SensorClass
 {
 public:
 typedef enum { MIDDLESENSOR, RIGHTSENSOR, LEFTSENSOR, RIGHTSIDESENSOR, LEFTSIDESENSOR } SensorLocation;
-    SensorClass(QPoint roverLocation, int roverOrientation, int _maximumDistanceCM, int _cell_pixel_size, SensorLocation location);
-    void updatePosition(QPoint roverLocation, int roverOrientation);
+    SensorClass(QPointF roverLocation, int roverOrientation, int _maximumDistanceCM, int _cell_pixel_size, SensorLocation location);
+    void updatePosition(QPointF roverLocation, int roverOrientation);
     void draw(QPainter* painter);
-    int readDistance(QVector<QRect> objs);
-    QPoint getSensorLocation();
+    float readDistance(QVector<QRectF> objs);
+    QPointF getSensorLocation();
     int getSensorOrientation();
-    QPoint getMaximumSensorLocation();
+    QPointF getMaximumSensorLocation();
 private:
-    int computeDistance(QPoint p1, QPoint p2);
-    QPoint rotatePoint(int originX, int originY, int pointX, int pointY, double rotationAngle);
-    QPoint findFirstIntersection(QVector<QRect> objs);
+    float computeDistance(QPointF p1, QPointF p2);
+    QPointF rotatePoint(float originX, float originY, float pointX, float pointY, double rotationAngle);
+    QPointF findFirstIntersection(QVector<QRectF> objs);
     SensorLocation type;
-    QPoint sensorLocation;
-    QPoint sensorPixelLocation;
-    QPoint sensorMaximumLocation;
-    QVector<QPoint> temp;
+    QPointF sensorLocation;
+    QPointF sensorPixelLocation;
+    QPointF sensorMaximumLocation;
+    QVector<QPointF> temp;
     int sensorOrientation;
     int cell_pixel_size;
     int maximumDistanceCM;

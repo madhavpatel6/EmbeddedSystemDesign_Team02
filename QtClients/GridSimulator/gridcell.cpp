@@ -6,21 +6,25 @@ GridCell::GridCell(int _x, int _y, int size) {
 //        qDebug() << "Created grid cell " << box.bottomLeft();
     count = 0;
 }
-
+#include <iostream>
 void GridCell::draw(QPainter *painter) {
-    int colorVal = (1.0*count/MINIMUM*127 + 127);
+    int colorVal = (-1.0*count/MAXIMUM*127 + 127);
     painter->fillRect(box, QBrush(QColor(colorVal, colorVal, colorVal)));
-//    painter->drawRect(box);
+    painter->drawRect(box);
 }
 
 void GridCell::decrement() {
-    if(count != MINIMUM)
-        count--;
+    if(count > MINIMUM + 10) {
+        count-=10;
+    }
 }
 
 void GridCell::increment() {
-    if(count != MAXIMUM) {
-        count++;
-//        qDebug() << "Cell count " << count;
+    if(count < (MAXIMUM - 10)) {
+        count+=10;
     }
+}
+
+void GridCell::reset() {
+    count = 0;
 }

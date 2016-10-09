@@ -12,32 +12,40 @@ GridScene::GridScene(QWidget *parent) : QWidget(parent)
     Pal.setColor(QPalette::Background, Qt::black);
     this->setAutoFillBackground(true);
     this->setPalette(Pal);
-    middleFrontSensor = new SensorClass(roverLocation.center, roverLocation.orientation, 30, CELL_SIZE, SensorClass::MIDDLESENSOR);
-    leftFrontSensor = new SensorClass(roverLocation.center, roverLocation.orientation, 30, CELL_SIZE, SensorClass::LEFTSENSOR);
-    rightFrontSensor = new SensorClass(roverLocation.center, roverLocation.orientation, 30, CELL_SIZE, SensorClass::RIGHTSENSOR);
-
-    updateRoverLocation(QPoint(50,50), 0);
-
+    rover = new RoverClass();
+    middleFrontSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 30, CELL_SIZE, SensorClass::MIDDLESENSOR);
+    leftFrontSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 30, CELL_SIZE, SensorClass::LEFTSENSOR);
+    rightFrontSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 30, CELL_SIZE, SensorClass::RIGHTSENSOR);
+    rightSideSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 30, CELL_SIZE, SensorClass::RIGHTSIDESENSOR);
+    leftSideSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 30, CELL_SIZE, SensorClass::LEFTSIDESENSOR);
     this->setMouseTracking(true);
     mouseState = FIRSTCORNER;
     setFocusPolicy(Qt::StrongFocus);
     showObjects = true;
+    QPointF initialDistancePoint = QPointF(40.5,25.5);
+    QPointF rotatedPoint;
+    for(int degrees = 0; degrees < 360; degrees = degrees + 10) {
+        rotatedPoint = rotatePoint(25.5,25.5,initialDistancePoint.x(), initialDistancePoint.y(),degrees);
+        addLine(25.5,25.5,rotatedPoint.x(), rotatedPoint.y());
+        addLine(25.5,25.5,rotatedPoint.x(), rotatedPoint.y());
+        addLine(25.5,25.5,rotatedPoint.x(), rotatedPoint.y());
+        addLine(25.5,25.5,rotatedPoint.x(), rotatedPoint.y());
+    }
+
 }
 
 GridScene::~GridScene() {
     delete middleFrontSensor;
     delete rightFrontSensor;
     delete leftFrontSensor;
-
 }
 
-void GridScene::updateRoverLocation(QPoint center, int angle) {
-    roverLocation.center = center;
-    roverLocation.orientation = angle;
-    middleFrontSensor->updatePosition(roverLocation.center, roverLocation.orientation);
-    leftFrontSensor->updatePosition(roverLocation.center, roverLocation.orientation);
-    rightFrontSensor->updatePosition(roverLocation.center, roverLocation.orientation);
-    this->update();
+void GridScene::reset() {
+    for(int locY = 0; locY < HEIGHT; locY++) {
+        for(int locX = 0; locX < WIDTH; locX++) {
+            grid[locY][locX].reset();
+        }
+    }
 }
 
 void GridScene::paintEvent(QPaintEvent *) {
@@ -63,8 +71,8 @@ void GridScene::paintEvent(QPaintEvent *) {
 //    }
     painter.save();
     // xc and yc are the center of the widget's rect.
-    qreal xc = roverLocation.center.x() * CELL_SIZE;
-    qreal yc = roverLocation.center.y() * CELL_SIZE;
+    qreal xc = rover->getLocationInformation().center.x() * CELL_SIZE;
+    qreal yc = rover->getLocationInformation().center.y() * CELL_SIZE;
 
     painter.setBrush(Qt::white);
     painter.setPen(Qt::blue);
@@ -76,7 +84,7 @@ void GridScene::paintEvent(QPaintEvent *) {
     painter.translate(xc, yc);
 
     // then rotate the coordinate system by the number of degrees
-    painter.rotate(roverLocation.orientation);
+    painter.rotate(rover->getLocationInformation().orientation);
 
     // we need to move the rectangle that we draw by rx and ry so it's in the center.
 
@@ -87,13 +95,16 @@ void GridScene::paintEvent(QPaintEvent *) {
     painter.restore();
     painter.setPen(Qt::blue);
     painter.setBrush(Qt::blue);
-    if(showObjects) painter.drawRects(rects);
+    if(showObjects)
+        painter.drawRects(rects);
 
     painter.drawRect(newRect);
     middleFrontSensor->draw(&painter);
     leftFrontSensor->draw(&painter);
     rightFrontSensor->draw(&painter);
-//    painter.drawLines(lin);
+    rightSideSensor->draw(&painter);
+    leftSideSensor->draw(&painter);
+    painter.drawLines(lines);
     painter.end();
 }
 
@@ -102,39 +113,44 @@ void GridScene::initializeGrid() {
         std::vector<GridCell> tempV;
         for(int locX = 0; locX < WIDTH; locX++) {
             GridCell tempCell = GridCell(locX,locY,CELL_SIZE);
-//            qDebug() << "X loc " << locX << " Y loc " << locY;
             tempV.push_back(tempCell);
         }
-//        qDebug() << "locY " << locY;
         grid.push_back(tempV);
     }
 }
 
-void GridScene::addLine(float x1, float y1, float x2, float y2) {
-    QLineF line = QLineF(x1, y1, x2, y2);
+void GridScene::addLine(double x1, double y1, double x2, double y2) {
+//    qDebug() << "Point 1 = " << x1 << ", " << y1 << "Point 2 = " << x2 << ", " << y2;
+//    raytrace3(floor(x1), floor(y1), floor(x2), floor(y2));
+    raytrace2(x1, y1, x2, y2,false);
+    QLineF line = QLineF(CELL_SIZE*x1, CELL_SIZE*y1, CELL_SIZE*x2, CELL_SIZE*y2);
     //Uncomment this if you want to see a line from a sensor to each reading
     lines.push_back(line);
 }
 
-void GridScene::updateSensorReading(SensorLocation asds, int asdf) {
-    int distanceMiddle = middleFrontSensor->readDistance(rects);
-    qDebug() << "distance = " << distanceMiddle;
-    QPoint middleSensorLocation = middleFrontSensor->getSensorLocation();
-    int middleSensorOrientation = middleFrontSensor->getSensorOrientation();
-//    qDebug() << "distance  = " << distanceMiddle;
-    QPoint middleDistancePoint;
+void GridScene::updateSensorReading() {
+    addRayTrace(middleFrontSensor);
+    addRayTrace(leftFrontSensor);
+    addRayTrace(rightFrontSensor);
+    addRayTrace(rightSideSensor);
+    addRayTrace(leftSideSensor);
+    update();
+}
+
+void GridScene::addRayTrace(SensorClass* impl) {
+    float distance = impl->readDistance(rects);
+    QPointF sensorLocation = impl->getSensorLocation();
+    int sensorOrientation = impl->getSensorOrientation();
+    QPointF distancePoint;
     bool maximum = false;
-    if(distanceMiddle != -1) {
-        middleDistancePoint = QPoint(middleSensorLocation.x() + distanceMiddle*cos(middleSensorOrientation*M_PI/180), middleSensorLocation.y() + distanceMiddle*sin(middleSensorOrientation*M_PI/180));
+    if(distance != -1) {
+        distancePoint = QPointF(sensorLocation.x() + distance*cos(sensorOrientation*M_PI/180), sensorLocation.y() + distance*sin(sensorOrientation*M_PI/180));
     }
     else {
-        middleDistancePoint = middleFrontSensor->getMaximumSensorLocation();
+        distancePoint = impl->getMaximumSensorLocation();
         maximum = true;
     }
-//    qDebug() << "Sensor Location  = " << middleSensorLocation << " distance location = " << middleDistancePoint << " sensor orientation = " << middleSensorOrientation;
-//    addLine(middleSensorLocation.x(), middleSensorLocation.y(), middleDistancePoint.x(), middleDistancePoint.y());
-    raytrace2(middleSensorLocation.x(), middleSensorLocation.y(), middleDistancePoint.x(), middleDistancePoint.y(), maximum);
-    update();
+    raytrace2(sensorLocation.x(), sensorLocation.y(), distancePoint.x(), distancePoint.y(), maximum);
 }
 
 void GridScene::mouseMoveEvent(QMouseEvent *_event) {
@@ -145,104 +161,72 @@ void GridScene::mouseMoveEvent(QMouseEvent *_event) {
 
 void GridScene::mousePressEvent(QMouseEvent *event) {
     if(event->buttons() == Qt::LeftButton) {
-        QPoint pos = event->pos();
+        QPointF pos = event->pos();
         pos.setY(CELL_SIZE*HEIGHT - pos.y());
         newRect.setTopLeft(pos);
         newRect.setBottomRight(pos);
-//        qDebug() << "Pressed at " << pos;
     }
 }
 
 void GridScene::mouseReleaseEvent(QMouseEvent *event) {
-    QPoint pos = event->pos();
-//    qDebug() << pos;
-//    pos.setX(pos.x() - width()/2);
+    QPointF pos = event->pos();
     pos.setY(CELL_SIZE*HEIGHT - pos.y());
     newRect.setBottomRight(pos);
     rects.push_back(newRect);
     qDebug() << "new object created at " << newRect;
-//    qDebug() << newRect.contains(100,100,false);
     newRect = QRect();
-//    newRect = QRect(QPoint(0,0), QPoint(200,200));
-//    qDebug() << "Released at " << pos;
     update();
 }
 
 void GridScene::keyPressEvent(QKeyEvent *event) {
-//    qDebug() << "Key Press Event";
-//    qDebug() << event->key();
-//    qDebug() << Qt::DownArrow;
     switch(event->key()) {
     case Qt::Key_Left: case Qt::Key_A:{
-        turnRoverLeft(2);
+        rover->turnRoverLeft(2);
         break;
     }
     case Qt::Key_Up: case Qt::Key_W:{
-//        qDebug() << "Moving Up";
-        moveRoverUp(2);
+        rover->moveRoverUp(.25);
         break;
     }
     case Qt::Key_Down: case Qt::Key_S:{
-//        qDebug() << "Moving Back";
-        moveRoverBack(2);
+        rover->moveRoverBack(.25);
         break;
     }
     case Qt::Key_Right: case Qt::Key_D:{
-        turnRoverRight(2);
+        rover->turnRoverRight(2);
         break;
     }
     default:
         break;
     }
-    update();
+    middleFrontSensor->updatePosition(rover->getLocationInformation().center, rover->getLocationInformation().orientation);
+    leftFrontSensor->updatePosition(rover->getLocationInformation().center, rover->getLocationInformation().orientation);
+    rightFrontSensor->updatePosition(rover->getLocationInformation().center, rover->getLocationInformation().orientation);
+    rightSideSensor->updatePosition(rover->getLocationInformation().center, rover->getLocationInformation().orientation);
+    leftSideSensor->updatePosition(rover->getLocationInformation().center, rover->getLocationInformation().orientation);
+    this->update();
 }
 
-void GridScene::moveRoverUp(int distanceCM) {
-//    int pixelDistance = distanceCM*CELL_SIZE;
-//    qDebug() << "Pixel distance " << pixelDistance;
-    QPoint newPosition = QPoint(roverLocation.center.x() + cos(roverLocation.orientation*M_PI/180.0) * distanceCM,
-                                roverLocation.center.y() + sin(roverLocation.orientation*M_PI/180.0) * distanceCM);
-//    qDebug() << "new position " << newPosition;
-    updateRoverLocation(newPosition, roverLocation.orientation);
-}
-
-void GridScene::moveRoverBack(int distanceCM) {
-//    int pixelDistance = distanceCM*CELL_SIZE;
-    QPoint newPosition = QPoint(roverLocation.center.x() - cos(roverLocation.orientation*M_PI/180.0) * distanceCM,
-                                roverLocation.center.y() - sin(roverLocation.orientation*M_PI/180.0) * distanceCM);
-    updateRoverLocation(newPosition, roverLocation.orientation);
-}
-
-void GridScene::turnRoverRight(int angleDegrees) {
-    updateRoverLocation(roverLocation.center, roverLocation.orientation - angleDegrees);
-}
-
-void GridScene::turnRoverLeft(int angleDegrees) {
-    updateRoverLocation(roverLocation.center, roverLocation.orientation + angleDegrees);
-}
-
-QPoint GridScene::rotatePoint(int originX, int originY, int pointX, int pointY, double rotationAngle) {
+QPointF GridScene::rotatePoint(float originX, float originY, float pointX, float pointY, double rotationAngle) {
     int translatedX = pointX - originX;
     int translatedY = pointY - originY;
     rotationAngle = rotationAngle*M_PI/180.0;
 //    qDebug() << "translated X = " << translatedX << " translatedY = " << translatedY;
-    QPoint point = QPoint(translatedX * cos(rotationAngle) - translatedY * sin(rotationAngle) + originX,
+    QPointF point = QPointF(translatedX * cos(rotationAngle) - translatedY * sin(rotationAngle) + originX,
                   translatedX * sin(rotationAngle) + translatedY * cos(rotationAngle) + originY);
     return point;
 }
 
-void GridScene::raytrace(int x1, int y1, int const x2, int const y2)
+void GridScene::raytrace(double x1, double y1, double x2, double y2)
 {
     int delta_x(x2 - x1);
-    qDebug() << "x = " << delta_x;
     // if x1 == x2, then it does not matter what we set here
-    signed char const ix(((delta_x > 0) - (delta_x < 0))*CELL_SIZE);
+    signed char const ix(((delta_x > 0) - (delta_x < 0)));
     delta_x = std::abs(delta_x) << 1;
 
     int delta_y(y2 - y1);
-    qDebug() << "y = " << delta_y;
     // if y1 == y2, then it does not matter what we set here
-    signed char const iy(((delta_y > 0) - (delta_y < 0))*CELL_SIZE);
+    signed char const iy(((delta_y > 0) - (delta_y < 0)));
     delta_y = std::abs(delta_y) << 1;
 
     //plot(x1, y1);
@@ -252,16 +236,11 @@ void GridScene::raytrace(int x1, int y1, int const x2, int const y2)
         // error may go below zero
         int error(delta_y - (delta_x >> 1));
 
-        while (x1 != x2)
+        while (floor(x1) != floor(x2))
         {
-            qDebug() << "x = " << y1/CELL_SIZE << "y = " << y1/CELL_SIZE;
-            grid[y1/CELL_SIZE][x1/CELL_SIZE].increment();
-            grid[y1/CELL_SIZE][x1/CELL_SIZE].increment();
-            grid[y1/CELL_SIZE][x1/CELL_SIZE].increment();
-            grid[y1/CELL_SIZE][x1/CELL_SIZE].increment();
-            grid[y1/CELL_SIZE][x1/CELL_SIZE].increment();
-            grid[y1/CELL_SIZE][x1/CELL_SIZE].increment();
-            grid[y1/CELL_SIZE][x1/CELL_SIZE].increment();
+            if(checkBounds(x1, y1)) {
+                grid[y1][x1].decrement();
+            }
             if ((error >= 0) && (error || (ix > 0)))
             {
                 error -= delta_x;
@@ -278,17 +257,11 @@ void GridScene::raytrace(int x1, int y1, int const x2, int const y2)
     {
         // error may go below zero
         int error(delta_x - (delta_y >> 1));
-        qDebug() << "Error = " << error;
-        while (y1 != y2)
+        while (floor(y1) != floor(y2))
         {
-            qDebug() << "x = " << y1/CELL_SIZE << "y = " << y1/CELL_SIZE;
-            grid[y1/CELL_SIZE][x1/CELL_SIZE].increment();
-            grid[y1/CELL_SIZE][x1/CELL_SIZE].increment();
-            grid[y1/CELL_SIZE][x1/CELL_SIZE].increment();
-            grid[y1/CELL_SIZE][x1/CELL_SIZE].increment();
-            grid[y1/CELL_SIZE][x1/CELL_SIZE].increment();
-            grid[y1/CELL_SIZE][x1/CELL_SIZE].increment();
-            grid[y1/CELL_SIZE][x1/CELL_SIZE].increment();
+            if(checkBounds(x1, y1)) {
+                grid[y1][x1].decrement();
+            }
             if ((error >= 0) && (error || (iy > 0)))
             {
                 error -= delta_y;
@@ -298,27 +271,23 @@ void GridScene::raytrace(int x1, int y1, int const x2, int const y2)
 
             error += delta_x;
             y1 += iy;
-            //plot(x1, y1);
         }
     }
 }
 
 void GridScene::raytrace2(double x0, double y0, double x1, double y1, bool maximum)
 {
-//    qDebug() << " first point x = " << x0 << " y = " << y0 << " second point x = " << x1 << " y = " << y1;
     double dx = fabs(x1 - x0);
     double dy = fabs(y1 - y0);
     x0 = x0;
     y0 = y0;
     x1 = x1;
     y1 = y1;
-//    qDebug() << "dx = " << dx << "dy = " << dy;
     int x = int(floor(x0));
     int y = int(floor(y0));
 
     double dt_dx = 1.0 / dx;
     double dt_dy = 1.0 / dy;
-//    qDebug() << "dt_dx = " << dt_dx << " dt_dy = " << dt_dy;
     double t = 0;
 
     int n = 1;
@@ -360,25 +329,15 @@ void GridScene::raytrace2(double x0, double y0, double x1, double y1, bool maxim
         n += y - int(floor(y1));
         t_next_vertical = (y0 - floor(y0)) * dt_dy;
     }
-//    x_inc *= CELL_SIZE;
-//    y_inc *= CELL_SIZE;
-//    n = n / CELL_SIZE;
-//    qDebug() << "xinc = " << x_inc;
-//    qDebug() << "yinc = " << y_inc;
-//    qDebug() << "n = " << n;
-//    qDebug() << "x_inc = " << x_inc << " y_inc = " << y_inc;
     for (; n > 0; --n)
     {
-//        qDebug() << "X = " << x << " Y = " << y;
-        if(n == 1 && !maximum) {
-//            qDebug() << maximum;
-            grid[y][x].increment();
-            grid[y][x].increment();
-            grid[y][x].increment();
-        }
-        else {
-//            qDebug() << "decrementing";
-            grid[y][x].decrement();
+        if(checkBounds(y, x)) {
+            if(n == 1 && !maximum) {
+                grid[y][x].increment();
+            }
+            else{
+                grid[y][x].decrement();
+            }
         }
         if (t_next_vertical < t_next_horizontal)
         {
@@ -395,20 +354,81 @@ void GridScene::raytrace2(double x0, double y0, double x1, double y1, bool maxim
     }
 }
 
-QPoint GridScene::findFirstIntersection(SensorLocation sensor) {
-    switch(sensor) {
-    case MIDDLESENSOR: {
-//        middleFrontSensor->readDistance(rects);
-        break;
+void GridScene::raytrace3(int x1, int y1, int x2, int y2)
+{
+  int i;               // loop counter
+  int ystep, xstep;    // the step on y and x axis
+  int error;           // the error accumulated during the increment
+  int errorprev;       // *vision the previous value of the error variable
+  int y = y1, x = x1;  // the line points
+  int ddy, ddx;        // compulsory variables: the double values of dy and dx
+  int dx = x2 - x1;
+  int dy = y2 - y1;
+  if(y1 < HEIGHT && x1 < WIDTH) {
+    grid[y1][x1].decrement();// first point
+  }
+  // NB the last point can't be here, because of its previous point (which has to be verified)
+  if (dy < 0){
+    ystep = -1;
+    dy = -dy;
+  }else
+    ystep = 1;
+  if (dx < 0){
+    xstep = -1;
+    dx = -dx;
+  }else
+    xstep = 1;
+  ddy = 2 * dy;  // work with double values for full precision
+  ddx = 2 * dx;
+  if (ddx >= ddy){  // first octant (0 <= slope <= 1)
+    // compulsory initialization (even for errorprev, needed when dx==dy)
+    errorprev = error = dx;  // start in the middle of the square
+    for (i=0 ; i < dx ; i++){  // do not use the first point (already done)
+      x += xstep;
+      error += ddy;
+      if (error > ddx){  // increment y if AFTER the middle ( > )
+        y += ystep;
+        error -= ddx;
+        // three cases (octant == right->right-top for directions below):
+        if(checkBounds(x, y) && checkBounds(x, y-ystep) && checkBounds(x-xstep, y)) {
+            if (error + errorprev < ddx)  // bottom square also
+              grid[y-ystep][x].decrement();
+            else if (error + errorprev > ddx)  // left square also
+              grid[y][x-xstep].decrement();
+            else {  // corner: bottom and left squares also
+              grid[y-ystep][x].decrement();
+              grid[y][x-xstep].decrement();
+            }
+        }
+      }
+      if(checkBounds(x, y)) {
+        grid[y][x].decrement();
+      }
+      errorprev = error;
     }
-    case RIGHTSENSOR: {
-//        rightFrontSensor->readDistance(rects);
-        break;
+  }else{  // the same as above
+    errorprev = error = dy;
+    for (i=0 ; i < dy ; i++){
+      y += ystep;
+      error += ddx;
+      if (error > ddy){
+        x += xstep;
+        error -= ddy;
+        if(checkBounds(x, y) && checkBounds(x, y-ystep) && checkBounds(x-xstep, y)) {
+            if (error + errorprev < ddy)
+              grid[y][x-xstep].decrement();
+            else if (error + errorprev > ddy)
+              grid[y-ystep][x].decrement();
+            else{
+              grid[y][x-xstep].decrement();
+              grid[y-ystep][x].decrement();
+            }
+        }
+      }
+      if(checkBounds(x, y))
+        grid[y][x].decrement();
+      errorprev = error;
     }
-    case LEFTSENSOR: {
-//        leftFrontSensor->readDistance(rects);
-        break;
-    }
-    }
-    return QPoint();
+  }
+  // assert ((y == y2) && (x == x2));  // the last point (y2,x2) has to be the same with the last point of the algorithm
 }

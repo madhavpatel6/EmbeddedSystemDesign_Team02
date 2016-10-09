@@ -4,16 +4,13 @@
 #include <QDebug>
 #include <QPainter>
 #include <QWidget>
-#include "gridcell.h"
 #include <vector>
 #include <QLine>
 #include <QRect>
 #include <cmath>
+#include "gridcell.h"
 #include "sensorclass.h"
-typedef struct {
-    QPoint center;
-    int orientation;
-} RoverLocationType;
+#include "roverclass.h"
 
 class GridScene : public QWidget
 {
@@ -22,42 +19,44 @@ public:
     typedef enum { MIDDLESENSOR, RIGHTSENSOR, LEFTSENSOR, RIGHTSIDESENSOR, LEFTSIDESENSOR } SensorLocation;
     typedef enum { FIRSTCORNER, SECONDCORNER, IDLE } MouseStateType;
     GridScene(QWidget* parent = 0);
+    void reset();
     ~GridScene();
-    void updateSensorReading(SensorLocation sensor, int distance);
-    void addLine(float x1, float y1, float x2, float y2);
-    QPoint rotatePoint(int originX, int originY, int pointX, int pointY, double rotationAngle);
-    void raytrace(int x1, int y1, int const x2, int const y2);
+    void updateSensorReading();
+    void addRayTrace(SensorClass* impl);
+    void addLine(double x1, double y1, double x2, double y2);
+    QPointF rotatePoint(float originX, float originY, float pointX, float pointY, double rotationAngle);
+    void raytrace(double x1, double y1, double x2, double y2);
     void raytrace2(double x0, double y0, double x1, double y1, bool maximum);
-    void updateRoverLocation(QPoint center, int angle);
-    void moveRoverUp(int distanceCM);
-    void moveRoverBack(int distanceCM);
-    void turnRoverRight(int angleDegrees);
-    void turnRoverLeft(int angleDegrees);
-    QPoint findFirstIntersection(SensorLocation sensor);
+    void raytrace3(int x1, int y1, int x2, int y2);
     void mouseMoveEvent(QMouseEvent *_event);
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
     void keyPressEvent(QKeyEvent *event);
-    static const int WIDTH = 100;
-    static const int HEIGHT = 100;
-    static const int CELL_SIZE = 5;
+    static const int WIDTH = 50;
+    static const int HEIGHT = 50;
+    static const int CELL_SIZE = 20;
     static const int PADDING = 2;
     bool showObjects;
 signals:
     void updateCursorPosition(int x, int y);
 
 private:
+    bool checkBounds(double x1, double y1) {
+        return y1 < HEIGHT && x1 < WIDTH && y1 >= 0 && x1 >= 0;
+    }
+
     MouseStateType mouseState;
-    RoverLocationType roverLocation;
+    RoverClass* rover;
     SensorClass *middleFrontSensor;
     SensorClass *rightFrontSensor;
     SensorClass *leftFrontSensor;
-
+    SensorClass *rightSideSensor;
+    SensorClass *leftSideSensor;
     void initializeGrid();
     void paintEvent(QPaintEvent *);
     std::vector<std::vector<GridCell>> grid;
-    QVector<QRect> rects;
-    QRect newRect;
+    QVector<QRectF> rects;
+    QRectF newRect;
     QVector<QLineF> lines;
 };
 

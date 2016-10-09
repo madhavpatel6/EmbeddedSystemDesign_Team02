@@ -9,11 +9,12 @@ public:
     void draw(QPainter* painter);
     void increment();
     void decrement();
+    void reset();
 private:
     QRect box;
     int count;
-    static const int MAXIMUM = 20;
-    static const int MINIMUM = -20;
+    static const int MAXIMUM = 127;
+    static const int MINIMUM = -128;
 //    typedef enum { EMPTY, UNKNOWN, OCCUPIED } CellStateType;
 //    CellStateType state;
 };

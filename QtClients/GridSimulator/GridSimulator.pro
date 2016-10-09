@@ -16,10 +16,12 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     gridscene.cpp \
     gridcell.cpp \
-    sensorclass.cpp
+    sensorclass.cpp \
+    roverclass.cpp
 
 HEADERS  += mainwindow.h \
     gridscene.h \
     gridcell.h \
     sensorclass.h \
-    sensorclass.h
+    sensorclass.h \
+    roverclass.h
