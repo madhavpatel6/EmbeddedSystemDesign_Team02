@@ -62,6 +62,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "debug.h"
 #include "json_wrapper.h"
 #include "tx_thread_public.h"
+
 static QueueHandle_t _queue;
 static int systemClock;
 
@@ -97,13 +98,15 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
     dbgOutputLoc(ENTER_MESSAGE_CONTROLLER_THREAD);
     InternalData internalData;
     memset(&internalData, 0, sizeof(InternalData));
+    internalData.location.x = 0;
+    internalData.location.y = 0;
+    internalData.orientation = 0;
     StatObjectType statObject;
     memset(&statObject, 0, sizeof(StatObjectType));
     type_t type = unknown;
     items_t items[12];
     int numItems;
-    int i = 0;
-
+    
     while(1) {
         initParser();
         MessageObj obj;
@@ -168,6 +171,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 continue;
                         }
 
+                        int i = 0;
                         tx_thread_obj.Destination = obj.External.Source;
                         sprintf(tx_thread_obj.Data, "{\"type\":\"Response\"");
                         for(i = 0; i < numItems; i++) {
@@ -285,18 +289,6 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         break;
                     }
                     case response: {
-                        for(i = 0; i < numItems; i++) {
-                            switch(items[i]) {
-                                case Obstacles: {
-                                    
-                                    break;
-                                }
-                                default: {
-                                    break;
-                                }
-                            }
-                        }
-                       
                         switch(obj.External.Source) {
                             case SEARCHERMOVER: {
                                 statObject.Res_From_SearcherMover++;
@@ -304,7 +296,6 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                             }
                             case TARGETLOCATOR: {
                                 statObject.Res_From_TargetLocator++;
-                                
                                 break;
                             }
                             case PATHFINDER: {
@@ -393,11 +384,8 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
             case UPDATE: {
                 dbgOutputLoc(CASE_UPDATE_MESSAGE_CONTROLLER_THREAD);
                 switch(obj.Update.Type) {
-                    case LOCATION:{
+                    case POSITION:{
                         internalData.location = obj.Update.Data.location;
-                        break;
-                    }
-                    case ORIENTATION: {
                         internalData.orientation = obj.Update.Data.orientation;
                         break;
                     }

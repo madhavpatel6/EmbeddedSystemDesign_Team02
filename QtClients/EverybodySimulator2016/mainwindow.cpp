@@ -7,12 +7,14 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    config = new initialization();
+
 
     socket = new ClientSocket();
 
-    QJsonObject requests = initialization::getConfig("requests.json");
+    QJsonObject requests = config->getConfig("requests.json");
 
-    QJsonObject responses = initialization::getConfig("responses.json");
+    QJsonObject responses = config->getConfig("responses.json");
 
 
     /* The following code read the requests and responses from file and creates checkboxes for them */
@@ -49,6 +51,14 @@ MainWindow::MainWindow(QWidget *parent) :
     /* print what module we are emulating to the gui */
     ui->myModuleLabel->setText(QString(MYMODULE));
 
+    qDebug() << config->getConfig("responses.json")["targetProximity"].toString();
+    QJsonObject object
+    {
+        {"targetProximity", "300"}
+    };
+    config->changeResponse(object);
+    qDebug() << config->getConfig("responses.json")["targetProximity"].toString();
+
 }
 
 void MainWindow::on_reqCheckBoxClicked(){
@@ -56,7 +66,7 @@ void MainWindow::on_reqCheckBoxClicked(){
 
     qDebug() << ((QCheckBox*)obj)->text().remove('&');
 
-    QJsonObject requests = initialization::getConfig("requests.json");
+    QJsonObject requests = config->getConfig("requests.json");
     // QJsonArray items = requests.value(((QCheckBox*)obj)->text().remove('&')).toObject().value("items").toArray();
     //qDebug() << requests.value(((QCheckBox*)obj)->text().remove('&')).toObject().value("items").toArray();
 
@@ -130,7 +140,6 @@ void MainWindow::requestSlot(){
 
 }
 void MainWindow::dataReadSlot(QByteArray data){
-    // qDebug() << data << endl;
     QByteArray array = data;
     char buffer[MAXMESSAGESIZE];
     char source, messageCount;
@@ -148,7 +157,8 @@ void MainWindow::dataReadSlot(QByteArray data){
             else if(type == QStringLiteral("Request")){
                 qDebug() << "Request: " << json["items"];
 
-                QJsonObject responses = initialization::getConfig("responses.json");
+                QJsonObject responses = config->getConfig("responses.json");
+
                 QString jsonMessage = "{\"type\": \"Response\",";
                 for(int i = 0; i < json["items"].toArray().size(); i++){
                     if(resEnabled.contains(json["items"].toArray()[i].toString())){
@@ -181,7 +191,20 @@ void MainWindow::dataReadSlot(QByteArray data){
         }
         else {
             numOfErrors++;
-            // emit updateError(numOfErrors);
         }
     }
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    switch(MYMODULE){
+        case PATHFINDER:
+            pSim = new PathSimulator();
+            pSim->setConfig(config);
+            pSim->show();
+        break;
+        default:
+        break;
+    }
+
 }

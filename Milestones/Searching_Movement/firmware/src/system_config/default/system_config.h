@@ -102,7 +102,11 @@ extern "C" {
 #define SYS_PORT_B_LAT          0x0
 #define SYS_PORT_B_ODC          0x0
 
-#define SYS_PORT_D_TRIS         0xfe9c
+#define SYS_PORT_C_TRIS         0xb01e
+#define SYS_PORT_C_LAT          0x0
+#define SYS_PORT_C_ODC          0x0
+
+#define SYS_PORT_D_TRIS         0xff9c
 #define SYS_PORT_D_LAT          0x0
 #define SYS_PORT_D_ODC          0x0
 
@@ -114,7 +118,7 @@ extern "C" {
 #define SYS_PORT_F_LAT          0x0
 #define SYS_PORT_F_ODC          0x0
 
-#define SYS_PORT_G_TRIS         0xf2cf
+#define SYS_PORT_G_TRIS         0xf2cd
 #define SYS_PORT_G_LAT          0x0
 #define SYS_PORT_G_ODC          0x0
 
@@ -141,10 +145,10 @@ extern "C" {
 #define DRV_TMR_POWER_STATE_IDX0            
 
 /*** Timer Driver 1 Configuration ***/
-#define DRV_TMR_PERIPHERAL_ID_IDX1          TMR_ID_4
-#define DRV_TMR_INTERRUPT_SOURCE_IDX1       INT_SOURCE_TIMER_4
-#define DRV_TMR_INTERRUPT_VECTOR_IDX1       INT_VECTOR_T4
-#define DRV_TMR_ISR_VECTOR_IDX1             _TIMER_4_VECTOR
+#define DRV_TMR_PERIPHERAL_ID_IDX1          TMR_ID_5
+#define DRV_TMR_INTERRUPT_SOURCE_IDX1       INT_SOURCE_TIMER_5
+#define DRV_TMR_INTERRUPT_VECTOR_IDX1       INT_VECTOR_T5
+#define DRV_TMR_ISR_VECTOR_IDX1             _TIMER_5_VECTOR
 #define DRV_TMR_INTERRUPT_PRIORITY_IDX1     INT_PRIORITY_LEVEL1
 #define DRV_TMR_INTERRUPT_SUB_PRIORITY_IDX1 INT_SUBPRIORITY_LEVEL0
 #define DRV_TMR_CLOCK_SOURCE_IDX1           DRV_TMR_CLKSOURCE_INTERNAL
@@ -152,6 +156,32 @@ extern "C" {
 #define DRV_TMR_OPERATION_MODE_IDX1         DRV_TMR_OPERATION_MODE_16_BIT
 #define DRV_TMR_ASYNC_WRITE_ENABLE_IDX1     false
 #define DRV_TMR_POWER_STATE_IDX1            
+
+/*** Timer Driver 2 Configuration ***/
+#define DRV_TMR_PERIPHERAL_ID_IDX2          TMR_ID_3
+#define DRV_TMR_INTERRUPT_SOURCE_IDX2       INT_SOURCE_TIMER_3
+#define DRV_TMR_INTERRUPT_VECTOR_IDX2       INT_VECTOR_T3
+#define DRV_TMR_ISR_VECTOR_IDX2             _TIMER_3_VECTOR
+#define DRV_TMR_INTERRUPT_PRIORITY_IDX2     INT_PRIORITY_LEVEL1
+#define DRV_TMR_INTERRUPT_SUB_PRIORITY_IDX2 INT_SUBPRIORITY_LEVEL0
+#define DRV_TMR_CLOCK_SOURCE_IDX2           DRV_TMR_CLKSOURCE_EXTERNAL_SYNCHRONOUS
+#define DRV_TMR_PRESCALE_IDX2               TMR_PRESCALE_VALUE_1
+#define DRV_TMR_OPERATION_MODE_IDX2         DRV_TMR_OPERATION_MODE_16_BIT
+#define DRV_TMR_ASYNC_WRITE_ENABLE_IDX2     false
+#define DRV_TMR_POWER_STATE_IDX2            
+
+/*** Timer Driver 3 Configuration ***/
+#define DRV_TMR_PERIPHERAL_ID_IDX3          TMR_ID_4
+#define DRV_TMR_INTERRUPT_SOURCE_IDX3       INT_SOURCE_TIMER_4
+#define DRV_TMR_INTERRUPT_VECTOR_IDX3       INT_VECTOR_T4
+#define DRV_TMR_ISR_VECTOR_IDX3             _TIMER_4_VECTOR
+#define DRV_TMR_INTERRUPT_PRIORITY_IDX3     INT_PRIORITY_LEVEL1
+#define DRV_TMR_INTERRUPT_SUB_PRIORITY_IDX3 INT_SUBPRIORITY_LEVEL0
+#define DRV_TMR_CLOCK_SOURCE_IDX3           DRV_TMR_CLKSOURCE_EXTERNAL_SYNCHRONOUS
+#define DRV_TMR_PRESCALE_IDX3               TMR_PRESCALE_VALUE_1
+#define DRV_TMR_OPERATION_MODE_IDX3         DRV_TMR_OPERATION_MODE_16_BIT
+#define DRV_TMR_ASYNC_WRITE_ENABLE_IDX3     false
+#define DRV_TMR_POWER_STATE_IDX3            
 
  // *****************************************************************************
 /* USART Driver Configuration Options

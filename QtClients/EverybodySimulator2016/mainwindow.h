@@ -6,6 +6,7 @@
 #include <QJsonArray>
 #include "clientsocket.h"
 #include "initialization.h"
+#include "pathsimulator.h"
 
 namespace Ui {
 class MainWindow;
@@ -28,12 +29,16 @@ private slots:
     void requestSlot();
     void dataReadSlot(QByteArray data);
 
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     ClientSocket *socket;
     QTimer *reqTimer;
     QVector<QJsonObject> reqObjList;
     QStringList resEnabled;
+    initialization* config;
+    PathSimulator *pSim;
 
 };
 

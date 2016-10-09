@@ -15,8 +15,8 @@
  */
 /* ************************************************************************** */
 
-#ifndef _UARTRXTHREAD_PUBLIC_H    /* Guard against multiple inclusion */
-#define _UARTRXTHREAD_PUBLIC_H
+#ifndef _RXTHREAD_PUBLIC_H    /* Guard against multiple inclusion */
+#define _RXTHREAD_PUBLIC_H
 
 
 /* ************************************************************************** */

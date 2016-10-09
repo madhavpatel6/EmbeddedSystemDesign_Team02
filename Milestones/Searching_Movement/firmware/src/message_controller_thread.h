@@ -81,7 +81,7 @@ typedef struct {
 }InternalData;
 
 //This should include a new enum for anything in the InternalData
-typedef enum UpdateType_enum { LOCATION, ORIENTATION, SENSORDATA } UpdateType;
+typedef enum UpdateType_enum { POSITION, SENSORDATA } UpdateType;
 
 //This is any request that you would want to ... well ... request
 // these are really the categories of requests. the specific objects in them is added later
