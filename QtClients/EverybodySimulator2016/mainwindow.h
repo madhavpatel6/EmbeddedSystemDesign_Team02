@@ -34,6 +34,7 @@ private:
     QTimer *reqTimer;
     QVector<QJsonObject> reqObjList;
     QStringList resEnabled;
+    initialization* config;
 
 };
 

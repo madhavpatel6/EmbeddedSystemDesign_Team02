@@ -4,12 +4,20 @@
 #include <QJsonObject>
 #include <QFile>
 #include <QJsonObject>
+#include <QHash>
+#include <QDebug>
 
 
 class initialization
 {
+private:
+    // this caches all json files that have been parsed (one for requests.json one for responses.json)
+    QHash<QString, QJsonObject> cache;
+
 public:
-    static QJsonObject getConfig(QString in);
+    initialization();
+    QJsonObject getConfig(QString in);
+    bool changeResponse(QJsonObject in);
 };
 
 #endif // INITIALIZATION_H
