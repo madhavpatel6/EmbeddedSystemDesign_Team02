@@ -10,7 +10,7 @@ GridCell::GridCell(int _x, int _y, int size) {
 void GridCell::draw(QPainter *painter) {
     int colorVal = (-1.0*count/MAXIMUM*127 + 127);
     painter->fillRect(box, QBrush(QColor(colorVal, colorVal, colorVal)));
-    painter->drawRect(box);
+//    painter->drawRect(box);
 }
 
 void GridCell::decrement() {

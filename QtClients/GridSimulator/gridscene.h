@@ -32,9 +32,9 @@ public:
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
     void keyPressEvent(QKeyEvent *event);
-    static const int WIDTH = 50;
-    static const int HEIGHT = 50;
-    static const int CELL_SIZE = 20;
+    static const int WIDTH = 100;
+    static const int HEIGHT = 100;
+    static const int CELL_SIZE = 5;
     static const int PADDING = 2;
     bool showObjects;
 signals:
