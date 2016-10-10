@@ -400,7 +400,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                     case POSITION: {
                         internalData.location.x = initialData.location.x + obj.Update.Data.location.x;
                         internalData.location.y = initialData.location.y + obj.Update.Data.location.y;
-                        internalData.orientation = initialData.orientation + obj.Update.Data.orientation;
+                        internalData.orientation = (initialData.orientation + obj.Update.Data.orientation);
                         break;
                     }
                     case SENSORDATA: {
