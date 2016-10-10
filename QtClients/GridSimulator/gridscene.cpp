@@ -13,11 +13,11 @@ GridScene::GridScene(QWidget *parent) : QWidget(parent)
     this->setAutoFillBackground(true);
     this->setPalette(Pal);
     rover = new RoverClass();
-    middleFrontSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 10, 80, CELL_SIZE, SensorClass::MIDDLESENSOR);
-    leftFrontSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 20, 150, CELL_SIZE, SensorClass::LEFTSENSOR);
-    rightFrontSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 4, 30, CELL_SIZE, SensorClass::RIGHTSENSOR);
-    rightSideSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 20, 150, CELL_SIZE, SensorClass::RIGHTSIDESENSOR);
-    leftSideSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 20, 150, CELL_SIZE, SensorClass::LEFTSIDESENSOR);
+    middleFrontSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::MIDDLESENSOR, 4, 50, 30, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
+    leftFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::LEFTSENSOR, 20, 150, 0, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
+    rightFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::RIGHTSENSOR, 20, 150, 0, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
+    rightSideSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::RIGHTSIDESENSOR, 20, 150, 0, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
+    leftSideSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::LEFTSIDESENSOR, 20, 150, 0, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
     this->setMouseTracking(true);
     mouseState = FIRSTCORNER;
     setFocusPolicy(Qt::StrongFocus);
@@ -53,12 +53,9 @@ void GridScene::paintEvent(QPaintEvent *) {
     painter.begin(this);
     QPen pen(Qt::white,1, Qt::SolidLine, Qt::RoundCap);
     painter.setPen(pen);
-//    painter.translate(width()2, height()/2);
     painter.translate(0,height());
     painter.scale(1,-1);
-//    painter.drawEllipse(QPoint(5,5),5,5);
 
-//    qDebug() << "H " << this->size().height() <<" W " << this->size().width();
     for(int i = 0; i < HEIGHT; i++) {
         for(int j = 0; j < WIDTH; j++) {
             grid[i][j].draw(&painter);
@@ -66,9 +63,7 @@ void GridScene::paintEvent(QPaintEvent *) {
     }
     QPen pen1(Qt::black,2, Qt::SolidLine, Qt::RoundCap);
     painter.setPen(pen1);
-//    for(int i = 0; i < lines.size(); i++) {
-//        painter.drawLine(lines[i]);
-//    }
+
     painter.save();
     // xc and yc are the center of the widget's rect.
     qreal xc = rover->getLocationInformation().center.x() * CELL_SIZE;
@@ -76,9 +71,6 @@ void GridScene::paintEvent(QPaintEvent *) {
 
     painter.setBrush(Qt::white);
     painter.setPen(Qt::blue);
-
-    // Draw a 13x17 rectangle rotated to 45 degrees around its center-point
-    // in the center of the canvas.
 
     // translates the coordinate system by xc and yc
     painter.translate(xc, yc);
@@ -143,12 +135,14 @@ void GridScene::addRayTrace(SensorClass* impl) {
     int sensorOrientation = impl->getSensorOrientation();
     QPointF distancePoint;
     bool maximum = false;
-    if(distance != -1) {
-        distancePoint = QPointF(sensorLocation.x() + distance*cos(sensorOrientation*M_PI/180), sensorLocation.y() + distance*sin(sensorOrientation*M_PI/180));
-    }
-    else {
+    if(distance == -2)
+        return;
+    if(distance == -1) {
         distancePoint = impl->getMaximumSensorLocation();
         maximum = true;
+    }
+    else {
+        distancePoint = QPointF(sensorLocation.x() + distance*cos(sensorOrientation*M_PI/180), sensorLocation.y() + distance*sin(sensorOrientation*M_PI/180));
     }
     raytrace2(sensorLocation.x(), sensorLocation.y(), distancePoint.x(), distancePoint.y(), maximum);
 }
@@ -189,11 +183,11 @@ void GridScene::keyPressEvent(QKeyEvent *event) {
         break;
     }
     case Qt::Key_Down: case Qt::Key_S:{
-        rover->moveRoverBack(.25);
+        rover->moveRoverBack(1.5);
         break;
     }
     case Qt::Key_Right: case Qt::Key_D:{
-        rover->turnRoverRight(1.5);
+        rover->turnRoverRight(2);
         break;
     }
     default:
@@ -211,7 +205,6 @@ QPointF GridScene::rotatePoint(float originX, float originY, float pointX, float
     int translatedX = pointX - originX;
     int translatedY = pointY - originY;
     rotationAngle = rotationAngle*M_PI/180.0;
-//    qDebug() << "translated X = " << translatedX << " translatedY = " << translatedY;
     QPointF point = QPointF(translatedX * cos(rotationAngle) - translatedY * sin(rotationAngle) + originX,
                   translatedX * sin(rotationAngle) + translatedY * cos(rotationAngle) + originY);
     return point;

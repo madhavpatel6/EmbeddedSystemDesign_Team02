@@ -7,7 +7,7 @@
 
 RoverClass::RoverClass()
 {
-    locationInformation = RoverLocation(QPoint(50,50),0);
+    locationInformation = RoverLocation(QPoint(0,0),0);
 }
 
 void RoverClass::moveRoverUp(float distanceCM) {
@@ -21,8 +21,8 @@ void RoverClass::moveRoverUp(float distanceCM) {
 void RoverClass::moveRoverBack(float distanceCM) {
     float cosVal = cos(locationInformation.orientation*M_PI/180.0);
     float sinVal = sin(locationInformation.orientation*M_PI/180.0);
-    cosVal = cosVal < 0.00001 ? 0 : cosVal;
-    sinVal = sinVal < 0.00001 ? 0 : sinVal;
+//    cosVal = cosVal < 0.00001 ? 0 : cosVal;
+//    sinVal = sinVal < 0.00001 ? 0 : sinVal;
     QPointF newPosition = QPointF(locationInformation.center.x() - cosVal * distanceCM,
                                 locationInformation.center.y() - sinVal * distanceCM);
     locationInformation = RoverLocation(newPosition, locationInformation.orientation);

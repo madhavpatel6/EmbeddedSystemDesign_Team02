@@ -2,13 +2,15 @@
 #include <cmath>
 #include <QDebug>
 #define M_PI 3.14159265358979323846
-SensorClass::SensorClass(QPointF roverLocation, int roverOrientation, int _minimumDistanceCM, int _maximumDistanceCM, int _cell_pixel_size, SensorLocation location)
+SensorClass::SensorClass(SensorType _sensorType, SensorLocation location, int _minimumDistanceCM, int _maximumDistanceCM, int _coneAngle, QPointF roverLocation, int roverOrientation, int _cell_pixel_size)
 {
     cell_pixel_size = _cell_pixel_size;
     type = location;
     maximumDistanceCM = _maximumDistanceCM;
+    coneAngle = _coneAngle;
     minimumDistanceCM = _minimumDistanceCM;
     updatePosition(roverLocation, roverOrientation);
+    sensorType = _sensorType;
 }
 
 void SensorClass::updatePosition(QPointF roverLocation, int roverOrientation) {
@@ -79,14 +81,37 @@ void SensorClass::draw(QPainter* painter) {
 }
 
 float SensorClass::readDistance(QVector<QRectF> objs) {
-    QPointF absoluteIntersectionPoint = findFirstIntersection(objs);
-//    qDebug() << absoluteIntersectionPoint;
-    if(absoluteIntersectionPoint != sensorPixelLocation) {
-        float absoluteDistance = computeDistance(absoluteIntersectionPoint, sensorPixelLocation);
-//        qDebug() << "Distance found " << absoluteDistance/cell_pixel_size;
-        return absoluteDistance/cell_pixel_size;
+    switch(sensorType) {
+        case IRSENSOR: {
+            QPointF absoluteIntersectionPoint = findFirstIntersectionIR(objs);
+            if(absoluteIntersectionPoint == sensorPixelLocation) {
+                return -1;
+            }
+            else if (absoluteIntersectionPoint == QPointF(-1,-1)) {
+                return -2;
+            }
+            else {
+                float absoluteDistance = computeDistance(absoluteIntersectionPoint, sensorPixelLocation);
+                return absoluteDistance/cell_pixel_size;
+            }
+            break;
+        }
+        case ULTRASONICSENSOR: {
+            QPointF absoluteIntersectionPoint = findFirstIntersectionUltrasonic(objs);
+            if(absoluteIntersectionPoint == sensorPixelLocation) {
+                return -1;
+            }
+            else if (absoluteIntersectionPoint == QPointF(-1,-1)) {
+                return -2;
+            }
+            else {
+                float absoluteDistance = computeDistance(absoluteIntersectionPoint, sensorPixelLocation);
+                return absoluteDistance/cell_pixel_size;
+            }
+            break;
+        }
     }
-    return -1;
+    return -2;
 }
 
 int SensorClass::getSensorOrientation() {
@@ -105,7 +130,7 @@ float SensorClass::computeDistance(QPointF p1, QPointF p2) {
     return floor(sqrt( pow(p1.x() - p2.x(),2) + pow(p1.y() - p2.y(),2) ));
 }
 
-QPointF SensorClass::findFirstIntersection(QVector<QRectF> objs) {
+QPointF SensorClass::findFirstIntersectionIR(QVector<QRectF> objs) {
     temp.clear();
     for(int i = 0; i < maximumDistanceCM*cell_pixel_size; i++) {
         QPointF checkPoint = QPointF ( i*cos(sensorOrientation*M_PI/180.0) + sensorPixelLocation.x(),
@@ -115,10 +140,40 @@ QPointF SensorClass::findFirstIntersection(QVector<QRectF> objs) {
         for(int j = 0; j < objs.size(); j++) {
             if(objs[j].contains(checkPoint)) {
                 if(i < minimumDistanceCM * cell_pixel_size) {
-                    return sensorPixelLocation;
+                    return QPointF(-1,-1);
                 }
                 return checkPoint;
             }
+        }
+    }
+    return sensorPixelLocation;
+}
+
+
+QPointF SensorClass::findFirstIntersectionUltrasonic(QVector<QRectF> objs) {
+    temp.clear();
+    int alternate = 0;
+    for(int i = 0; i <= maximumDistanceCM*cell_pixel_size; i++) {
+        QPointF centerCheckPoint = QPointF ( i*cos(sensorOrientation*M_PI/180.0) + sensorPixelLocation.x(),
+                                        i*1*sin(sensorOrientation*M_PI/180.0) + sensorPixelLocation.y());
+        for(double l = -coneAngle/2.0; l <= coneAngle / 2.0; l = l + .5) {
+            QPointF coneCheckPoint = rotatePoint(sensorPixelLocation.x(), sensorPixelLocation.y(), centerCheckPoint.x(), centerCheckPoint.y(), l);
+            if(((l == 0 || l == -coneAngle/2.0 || l == coneAngle/2.0 || centerCheckPoint == coneCheckPoint) && alternate == 10 || i == maximumDistanceCM*cell_pixel_size || i == minimumDistanceCM*cell_pixel_size) && i >= minimumDistanceCM * cell_pixel_size)
+                temp.push_back(coneCheckPoint);
+            for(int j = 0; j < objs.size(); j++) {
+                if(objs[j].contains(coneCheckPoint)) {
+                    if(i < minimumDistanceCM * cell_pixel_size) {
+                        return QPointF(-1,-1);
+                    }
+                    return coneCheckPoint;
+                }
+            }
+        }
+        if(alternate == 10) {
+            alternate = 0;
+        }
+        else {
+            alternate++;
         }
     }
     return sensorPixelLocation;
