@@ -13,11 +13,11 @@ GridScene::GridScene(QWidget *parent) : QWidget(parent)
     this->setAutoFillBackground(true);
     this->setPalette(Pal);
     rover = new RoverClass();
-    middleFrontSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 30, CELL_SIZE, SensorClass::MIDDLESENSOR);
-    leftFrontSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 30, CELL_SIZE, SensorClass::LEFTSENSOR);
-    rightFrontSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 30, CELL_SIZE, SensorClass::RIGHTSENSOR);
-    rightSideSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 30, CELL_SIZE, SensorClass::RIGHTSIDESENSOR);
-    leftSideSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 30, CELL_SIZE, SensorClass::LEFTSIDESENSOR);
+    middleFrontSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 10, 80, CELL_SIZE, SensorClass::MIDDLESENSOR);
+    leftFrontSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 20, 150, CELL_SIZE, SensorClass::LEFTSENSOR);
+    rightFrontSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 4, 30, CELL_SIZE, SensorClass::RIGHTSENSOR);
+    rightSideSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 20, 150, CELL_SIZE, SensorClass::RIGHTSIDESENSOR);
+    leftSideSensor = new SensorClass(rover->getLocationInformation().center, rover->getLocationInformation().orientation, 20, 150, CELL_SIZE, SensorClass::LEFTSIDESENSOR);
     this->setMouseTracking(true);
     mouseState = FIRSTCORNER;
     setFocusPolicy(Qt::StrongFocus);
@@ -132,8 +132,8 @@ void GridScene::updateSensorReading() {
     addRayTrace(middleFrontSensor);
     addRayTrace(leftFrontSensor);
     addRayTrace(rightFrontSensor);
-    addRayTrace(rightSideSensor);
-    addRayTrace(leftSideSensor);
+//    addRayTrace(rightSideSensor);
+//    addRayTrace(leftSideSensor);
     update();
 }
 
@@ -185,7 +185,7 @@ void GridScene::keyPressEvent(QKeyEvent *event) {
         break;
     }
     case Qt::Key_Up: case Qt::Key_W:{
-        rover->moveRoverUp(.25);
+        rover->moveRoverUp(1.5);
         break;
     }
     case Qt::Key_Down: case Qt::Key_S:{
@@ -193,7 +193,7 @@ void GridScene::keyPressEvent(QKeyEvent *event) {
         break;
     }
     case Qt::Key_Right: case Qt::Key_D:{
-        rover->turnRoverRight(2);
+        rover->turnRoverRight(1.5);
         break;
     }
     default:

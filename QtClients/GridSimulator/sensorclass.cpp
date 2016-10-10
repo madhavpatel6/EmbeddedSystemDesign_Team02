@@ -2,11 +2,12 @@
 #include <cmath>
 #include <QDebug>
 #define M_PI 3.14159265358979323846
-SensorClass::SensorClass(QPointF roverLocation, int roverOrientation, int _maximumDistanceCM, int _cell_pixel_size, SensorLocation location)
+SensorClass::SensorClass(QPointF roverLocation, int roverOrientation, int _minimumDistanceCM, int _maximumDistanceCM, int _cell_pixel_size, SensorLocation location)
 {
     cell_pixel_size = _cell_pixel_size;
     type = location;
     maximumDistanceCM = _maximumDistanceCM;
+    minimumDistanceCM = _minimumDistanceCM;
     updatePosition(roverLocation, roverOrientation);
 }
 
@@ -105,16 +106,17 @@ float SensorClass::computeDistance(QPointF p1, QPointF p2) {
 }
 
 QPointF SensorClass::findFirstIntersection(QVector<QRectF> objs) {
-//    qDebug() << "Sensor location " << sensorLocation << " orientation " << sensorOrientation;
     temp.clear();
     for(int i = 0; i < maximumDistanceCM*cell_pixel_size; i++) {
         QPointF checkPoint = QPointF ( i*cos(sensorOrientation*M_PI/180.0) + sensorPixelLocation.x(),
                                         i*1*sin(sensorOrientation*M_PI/180.0) + sensorPixelLocation.y());
-//        qDebug() << "check point = " << checkPoint;
-        temp.push_back(checkPoint);
+        if(i > minimumDistanceCM * cell_pixel_size)
+            temp.push_back(checkPoint);
         for(int j = 0; j < objs.size(); j++) {
-//            qDebug() << "checking object " << objs[j];
             if(objs[j].contains(checkPoint)) {
+                if(i < minimumDistanceCM * cell_pixel_size) {
+                    return sensorPixelLocation;
+                }
                 return checkPoint;
             }
         }

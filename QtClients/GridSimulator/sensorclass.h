@@ -9,7 +9,7 @@ class SensorClass
 {
 public:
 typedef enum { MIDDLESENSOR, RIGHTSENSOR, LEFTSENSOR, RIGHTSIDESENSOR, LEFTSIDESENSOR } SensorLocation;
-    SensorClass(QPointF roverLocation, int roverOrientation, int _maximumDistanceCM, int _cell_pixel_size, SensorLocation location);
+    SensorClass(QPointF roverLocation, int roverOrientation, int _minimumDistanceCM, int _maximumDistanceCM, int _cell_pixel_size, SensorLocation location);
     void updatePosition(QPointF roverLocation, int roverOrientation);
     void draw(QPainter* painter);
     float readDistance(QVector<QRectF> objs);
@@ -28,6 +28,7 @@ private:
     int sensorOrientation;
     int cell_pixel_size;
     int maximumDistanceCM;
+    int minimumDistanceCM;
 };
 
 #endif // SENSORCLASS_H
