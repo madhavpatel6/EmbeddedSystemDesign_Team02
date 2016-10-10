@@ -126,13 +126,10 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
     float x = 0;
     float y = 0;
     float orientation = 0;
-    float deltaOrientation = 0;
-    float ticksPerCm = 42.5;
-    float circumference = 62.5;
     int leftSign = 1;
     int rightSign = 1;
     float distance = 0;
-    
+    int orientationCorrection = 0;
     float totalDistance = 0;
     float initialOrientation = 0;
     bool motionComplete = true;
@@ -147,8 +144,8 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
             /* Application's initial state. */
             case MOTOR_CONTROLLER_THREAD_STATE_INIT:
             {
-                MOTOR_CONTROLLER_THREAD_OFF();
-                MOTOR_CONTROLLER_THREAD_FORWARD();
+                disableMotors();
+                setDirectionForward();
                 motor_controller_threadData.state = MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS;
                 break;
             }
@@ -164,55 +161,65 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 
                 switch(c) {
                     case 'F': {
-                        MOTOR_CONTROLLER_THREAD_FORWARD();
-                        MOTOR_CONTROLLER_THREAD_ON();
+                        setDirectionForward();
+                        enableMotors();
                         leftSign = 1;
                         rightSign = 1;
                         if (totalDistance > 10) {
-                            MOTOR_CONTROLLER_THREAD_OFF();
+                            disableMotors();
                             motionComplete = true;
                             totalDistance = 0;
                         }
                         break;
                     }
                     case 'B': {
-                        MOTOR_CONTROLLER_THREAD_REVERSE();
-                        MOTOR_CONTROLLER_THREAD_ON();
+                        setDirectionBack();
+                        enableMotors();
                         leftSign = -1;
                         rightSign = -1;
                         if (totalDistance < -10) {
-                            MOTOR_CONTROLLER_THREAD_OFF();
+                            disableMotors();
                             motionComplete = true;
                             totalDistance = 0;
                         }
                         break;
                     }
                     case 'L': {
-                        MOTOR_CONTROLLER_THREAD_LEFT();
-                        MOTOR_CONTROLLER_THREAD_ON();
+                        setDirectionLeft();
+                        enableMotors();
                         leftSign = -1;
                         rightSign = 1;
-                        if ((orientation - initialOrientation) > 90) {
-                            MOTOR_CONTROLLER_THREAD_OFF();
+                        if (orientation < initialOrientation) {
+                            orientationCorrection = 360;
+                        } else {
+                            orientationCorrection = 0;
+                        }
+                        if ((orientation + orientationCorrection - initialOrientation) > 90) {
+                            disableMotors();
                             motionComplete = true;
                             initialOrientation = orientation;
                         }
                         break;
                     }
                     case 'R': {
-                        MOTOR_CONTROLLER_THREAD_RIGHT();
-                        MOTOR_CONTROLLER_THREAD_ON();
+                        setDirectionRight();
+                        enableMotors();
                         leftSign = 1;
                         rightSign = -1;
-                        if ((orientation - initialOrientation) < -90) {
-                            MOTOR_CONTROLLER_THREAD_OFF();
+                        if (orientation > initialOrientation) {
+                            orientationCorrection = -360;
+                        } else {
+                            orientationCorrection = 0;
+                        }
+                        if ((orientation + orientationCorrection - initialOrientation) < -90) {
+                            disableMotors();
                             motionComplete = true;
                             initialOrientation = orientation;
                         }
                         break;
                     }
                     case 'S': {
-                        MOTOR_CONTROLLER_THREAD_OFF();
+                        disableMotors();
                         motionComplete = true;
                         break;
                     }
@@ -224,6 +231,10 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 // Get encoder values from each motor
                 leftCount = PLIB_TMR_Counter16BitGet(TMR_ID_3) * leftSign;
                 rightCount = PLIB_TMR_Counter16BitGet(TMR_ID_4) * rightSign;
+                
+                // Clear encoder counters
+                PLIB_TMR_Counter16BitClear(TMR_ID_3);
+                PLIB_TMR_Counter16BitClear(TMR_ID_4);
                 
                 switch(c) {
                     case 'F': case 'B': {
@@ -237,24 +248,19 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                     }
                 }
                 
-                // Clear encoder counters
-                PLIB_TMR_Counter16BitClear(TMR_ID_3);
-                PLIB_TMR_Counter16BitClear(TMR_ID_4);
-                
-                // Update position of rover
-                deltaOrientation = (((((rightCount-leftCount)/2.0)/ticksPerCm)/circumference)*360);
-                orientation += deltaOrientation;
-//                if (orientation > 360) {
-//                    orientation -= 360;
-//                } else if (orientation < -360) {
-//                    orientation += 360;
-//                }
                 distance = (((leftCount+rightCount)/2.0)/ticksPerCm);
                 totalDistance += distance;
                 
-                x += distance*cos(deltaOrientation);
-                y += distance*sin(deltaOrientation);
+                x += distance*cos(orientation*2*M_PI/360);
+                y += distance*sin(orientation*2*M_PI/360);
                 
+                // Update position of rover
+                orientation += (((((rightCount-leftCount)/2.0)/ticksPerCm)/circumference)*360);
+                if (orientation > 360 || orientation < -360) {
+                    orientation -= ((int)orientation/360)*360;
+                    orientation *= 360;
+                }
+
                 obj.Update.Data.location.x = x;
                 obj.Update.Data.location.y = y;
                 obj.Update.Data.orientation = orientation;
@@ -290,32 +296,32 @@ void MOTOR_CONTROLLER_THREAD_SendToQueueISR(char buffer, BaseType_t *pxHigherPri
     xQueueSendFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
 }
 
-void MOTOR_CONTROLLER_THREAD_ON( void ) {
+void enableMotors( void ) {
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 0, 1);
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 1, 1);
 }
 
-void MOTOR_CONTROLLER_THREAD_OFF( void ) {
+void disableMotors( void ) {
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 0, 0);
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 1, 0);
 }
 
-void MOTOR_CONTROLLER_THREAD_FORWARD( void ) {
+void setDirectionForward( void ) {
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, 14, 0);
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 1);
 }
 
-void MOTOR_CONTROLLER_THREAD_REVERSE( void ) {
+void setDirectionBack( void ) {
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, 14, 1);
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 0);
 }
 
-void MOTOR_CONTROLLER_THREAD_LEFT( void ) {
+void setDirectionLeft( void ) {
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, 14, 0);
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 0);
 }
 
-void MOTOR_CONTROLLER_THREAD_RIGHT( void ) {
+void setDirectionRight( void ) {
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, 14, 1);
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 1);
 }

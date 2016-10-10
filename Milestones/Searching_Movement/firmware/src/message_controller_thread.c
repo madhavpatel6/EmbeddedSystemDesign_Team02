@@ -54,6 +54,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 
 #include "message_controller_thread.h"
+#include "motor_controller_thread_public.h"
 #include <string.h>
 #include <stddef.h>
 #include "communication/messages.h"
@@ -259,6 +260,22 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"R1_Est_Orientation\":\"%0.02f\"", internalData.orientation);
                                     break;
                                 }
+                                case Forward: {
+                                    MOTOR_CONTROLLER_THREAD_SendToQueue('F');
+                                    break;
+                                }
+                                case Back: {
+                                    MOTOR_CONTROLLER_THREAD_SendToQueue('B');
+                                    break;
+                                }
+                                case Left: {
+                                    MOTOR_CONTROLLER_THREAD_SendToQueue('L');
+                                    break;
+                                }
+                                case Right: {
+                                    MOTOR_CONTROLLER_THREAD_SendToQueue('R');
+                                    break;
+                                }
                                 case SensorData: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"SensorData\":\"%0.02f\"", internalData.sensordata);
                                     break;
@@ -323,6 +340,8 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 break;
                             }
                         }
+                        
+                        
                         break;
                     }
                     case unknown: {
