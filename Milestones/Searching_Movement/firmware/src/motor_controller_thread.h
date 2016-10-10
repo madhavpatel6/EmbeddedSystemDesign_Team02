@@ -60,6 +60,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_definitions.h"
 #include "queue.h"
 
+#define ticksPerCm      45.0f
+#define circumference   58.0f
+    
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
@@ -203,17 +206,17 @@ void MOTOR_CONTROLLER_THREAD_InitializeQueue();
 
 void MOTOR_CONTROLLER_THREAD_ReadFromQueue(char* pvBuffer);
 
-void MOTOR_CONTROLLER_THREAD_ON( void );
+void enableMotors( void );
 
-void MOTOR_CONTROLLER_THREAD_OFF( void );
+void disableMotors( void );
 
-void MOTOR_CONTROLLER_THREAD_FORWARD( void );
+void setDirectionForward( void );
 
-void MOTOR_CONTROLLER_THREAD_REVERSE( void );
+void setDirectionBack( void );
 
-void MOTOR_CONTROLLER_THREAD_LEFT( void );
+void setDirectionLeft( void );
 
-void MOTOR_CONTROLLER_THREAD_RIGHT( void );
+void setDirectionRight( void );
 
 
 #endif /* _MOTOR_CONTROLLER_THREAD_H */

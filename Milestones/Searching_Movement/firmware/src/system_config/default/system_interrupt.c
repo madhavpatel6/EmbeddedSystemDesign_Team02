@@ -116,9 +116,9 @@ void IntHandlerDrvTmrInstance0(void)
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
 }
 
-int bufCount = 0;
-int ISRcount = 0;
-char buf[22] = "FRLB";
+//int bufCount = 0;
+//int ISRcount = 0;
+//char buf[22] = "FRLB";
 uint16_t timerCount = 0;
 
 /* This timer is for the TX to fire every 200 ms */
@@ -152,17 +152,17 @@ void IntHandlerDrvTmrInstance1(void)
             MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             break;
     }
-    if (ISRcount == 16) {
-        MOTOR_CONTROLLER_THREAD_SendToQueueISR(buf[bufCount], &pxHigherPriorityTaskWoken);
-        if (bufCount < strlen(buf)-1) {
-            bufCount++;
-        } else {
-            bufCount = 0;
-        }
-        ISRcount = 0;
-    } else {
-        ISRcount++;
-    }
+//    if (ISRcount == 16) {
+//        MOTOR_CONTROLLER_THREAD_SendToQueueISR(buf[bufCount], &pxHigherPriorityTaskWoken);
+//        if (bufCount < strlen(buf)-1) {
+//            bufCount++;
+//        } else {
+//            bufCount = 0;
+//        }
+//        ISRcount = 0;
+//    } else {
+//        ISRcount++;
+//    }
 
     dbgOutputLoc(AFTER_SEND_TO_Q_TMR_INSTANCE_1_ISR);
     incrementSystemClock();
