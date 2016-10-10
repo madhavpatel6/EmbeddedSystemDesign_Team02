@@ -31,6 +31,30 @@ void ClientSocket::positionRequested(){
     SendJSONRequestToSocket(request_begin + "\"R1_Est_Location\",\"R1_Est_Orientation\"" + request_end, SEARCHERMOVER);
 }
 
+void ClientSocket::sendForwardCommand(){
+    QString request_begin = "{\"type\":\"Request\",\"items\":[";
+    QString request_end = "]}";
+    SendJSONRequestToSocket(request_begin + "\"Forward\"" + request_end, SEARCHERMOVER);
+}
+
+void ClientSocket::sendBackCommand(){
+    QString request_begin = "{\"type\":\"Request\",\"items\":[";
+    QString request_end = "]}";
+    SendJSONRequestToSocket(request_begin + "\"Back\"" + request_end, SEARCHERMOVER);
+}
+
+void ClientSocket::sendLeftCommand(){
+    QString request_begin = "{\"type\":\"Request\",\"items\":[";
+    QString request_end = "]}";
+    SendJSONRequestToSocket(request_begin + "\"Left\"" + request_end, SEARCHERMOVER);
+}
+
+void ClientSocket::sendRightCommand(){
+    QString request_begin = "{\"type\":\"Request\",\"items\":[";
+    QString request_end = "]}";
+    SendJSONRequestToSocket(request_begin + "\"Right\"" + request_end, SEARCHERMOVER);
+}
+
 void ClientSocket::connected()
 {
     qDebug() << "Client connected event";

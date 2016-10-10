@@ -30,6 +30,10 @@ public slots:
     void disconnected();
     void readyRead();
     void positionRequested();
+    void sendForwardCommand();
+    void sendBackCommand();
+    void sendLeftCommand();
+    void sendRightCommand();
 
 private:
     void SendJSONRequestToSocket(QString request, char destination);

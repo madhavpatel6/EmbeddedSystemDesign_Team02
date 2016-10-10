@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "QShortcut"
 
 #define REQUESTRATE_MS 200
 
@@ -11,7 +12,12 @@ MainWindow::MainWindow(QWidget *parent) :
     requestTimer->setInterval(REQUESTRATE_MS);
     ui->setupUi(this);
     tcpSocket = new ClientSocket();
+
     connect(requestTimer, SIGNAL(timeout()), tcpSocket, SLOT(positionRequested()));
+    connect(this, SIGNAL(pb_forwardClicked()), tcpSocket, SLOT(sendForwardCommand()));
+    connect(this, SIGNAL(pb_backClicked()), tcpSocket, SLOT(sendBackCommand()));
+    connect(this, SIGNAL(pb_leftClicked()), tcpSocket, SLOT(sendLeftCommand()));
+    connect(this, SIGNAL(pb_rightClicked()), tcpSocket, SLOT(sendRightCommand()));
     connect(tcpSocket, SIGNAL(serverIsConnectedSignal(bool)), this, SLOT(HostConnectionEvent(bool)));
     connect(tcpSocket, SIGNAL(sentPositionSignal()), this, SLOT(positionRequestSent()));
     connect(tcpSocket, SIGNAL(sendLocation(char,QString,QString)), this, SLOT(updateLocation(char,QString,QString)));
@@ -85,4 +91,24 @@ void MainWindow::updateOrientation(char source, QString orientation)
             break;
         }
     }
+}
+
+void MainWindow::on_pb_forward_clicked()
+{
+    emit pb_forwardClicked();
+}
+
+void MainWindow::on_pb_back_clicked()
+{
+    emit pb_backClicked();
+}
+
+void MainWindow::on_pb_left_clicked()
+{
+    emit pb_leftClicked();
+}
+
+void MainWindow::on_pb_right_clicked()
+{
+    emit pb_rightClicked();
 }
