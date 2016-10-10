@@ -18,11 +18,9 @@ SOURCES += main.cpp\
     clientsocket.cpp \
     initialization.cpp \
     picCode/communication/messages.c \
-    picCode/debug.c
 
 HEADERS  += mainwindow.h \
     picCode/communication/messages.h \
-    picCode/debug.h \
     clientsocket.h \
     initialization.h
 

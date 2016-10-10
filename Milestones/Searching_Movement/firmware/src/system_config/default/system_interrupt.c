@@ -118,7 +118,7 @@ void IntHandlerDrvTmrInstance0(void)
 
 int bufCount = 0;
 int ISRcount = 0;
-char buf[22] = "F";
+char buf[22] = "FRLB";
 uint16_t timerCount = 0;
 
 /* This timer is for the TX to fire every 200 ms */
@@ -134,7 +134,6 @@ void IntHandlerDrvTmrInstance1(void)
         case SEARCHERMOVER:
             obj.Request = SMtoTL;
             MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            MOTOR_CONTROLLER_THREAD_SendToQueueISR(buf[bufCount], &pxHigherPriorityTaskWoken);
             break;
         case TARGETLOCATOR:
             obj.Request = TLtoSM;
@@ -153,7 +152,8 @@ void IntHandlerDrvTmrInstance1(void)
             MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             break;
     }
-    if (ISRcount == 4) {
+    if (ISRcount == 16) {
+        MOTOR_CONTROLLER_THREAD_SendToQueueISR(buf[bufCount], &pxHigherPriorityTaskWoken);
         if (bufCount < strlen(buf)-1) {
             bufCount++;
         } else {

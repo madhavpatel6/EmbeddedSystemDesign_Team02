@@ -122,14 +122,20 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
     MessageObj obj;
     int leftCount = 0;
     int rightCount = 0;
+    int tempCount = 0;
     float x = 0;
     float y = 0;
     float orientation = 0;
-    float ticksPerCm = 23.65;
-    float circumference = 40.84;
+    float deltaOrientation = 0;
+    float ticksPerCm = 42.5;
+    float circumference = 62.5;
     int leftSign = 1;
     int rightSign = 1;
-    int distance = 0;
+    float distance = 0;
+    
+    float totalDistance = 0;
+    float initialOrientation = 0;
+    bool motionComplete = true;
     
     obj.Type = UPDATE;
     obj.Update.Type = POSITION;
@@ -149,45 +155,65 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
             case MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS:
             {
                 // Read direction of travel from queue
-                dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
-                MOTOR_CONTROLLER_THREAD_ReadFromQueue(&c);
-                dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
+                if (motionComplete) {
+                    dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
+                    MOTOR_CONTROLLER_THREAD_ReadFromQueue(&c);
+                    dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
+                    motionComplete = false;
+                }
                 
                 switch(c) {
                     case 'F': {
-                        MOTOR_CONTROLLER_THREAD_OFF();
                         MOTOR_CONTROLLER_THREAD_FORWARD();
                         MOTOR_CONTROLLER_THREAD_ON();
                         leftSign = 1;
                         rightSign = 1;
+                        if (totalDistance > 10) {
+                            MOTOR_CONTROLLER_THREAD_OFF();
+                            motionComplete = true;
+                            totalDistance = 0;
+                        }
                         break;
                     }
                     case 'B': {
-                        MOTOR_CONTROLLER_THREAD_OFF();
                         MOTOR_CONTROLLER_THREAD_REVERSE();
                         MOTOR_CONTROLLER_THREAD_ON();
                         leftSign = -1;
                         rightSign = -1;
+                        if (totalDistance < -10) {
+                            MOTOR_CONTROLLER_THREAD_OFF();
+                            motionComplete = true;
+                            totalDistance = 0;
+                        }
                         break;
                     }
                     case 'L': {
-                        MOTOR_CONTROLLER_THREAD_OFF();
                         MOTOR_CONTROLLER_THREAD_LEFT();
                         MOTOR_CONTROLLER_THREAD_ON();
                         leftSign = -1;
                         rightSign = 1;
+                        if ((orientation - initialOrientation) > 90) {
+                            MOTOR_CONTROLLER_THREAD_OFF();
+                            motionComplete = true;
+                            initialOrientation = orientation;
+                        }
                         break;
                     }
                     case 'R': {
-                        MOTOR_CONTROLLER_THREAD_OFF();
                         MOTOR_CONTROLLER_THREAD_RIGHT();
                         MOTOR_CONTROLLER_THREAD_ON();
                         leftSign = 1;
                         rightSign = -1;
+                        if ((orientation - initialOrientation) < -90) {
+                            MOTOR_CONTROLLER_THREAD_OFF();
+                            motionComplete = true;
+                            initialOrientation = orientation;
+                        }
                         break;
                     }
                     case 'S': {
                         MOTOR_CONTROLLER_THREAD_OFF();
+                        motionComplete = true;
                         break;
                     }
                     default: {
@@ -199,15 +225,35 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 leftCount = PLIB_TMR_Counter16BitGet(TMR_ID_3) * leftSign;
                 rightCount = PLIB_TMR_Counter16BitGet(TMR_ID_4) * rightSign;
                 
+                switch(c) {
+                    case 'F': case 'B': {
+                        tempCount = (leftCount+rightCount)/2;
+                        leftCount = tempCount;
+                        rightCount = tempCount;
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+                
                 // Clear encoder counters
                 PLIB_TMR_Counter16BitClear(TMR_ID_3);
                 PLIB_TMR_Counter16BitClear(TMR_ID_4);
                 
                 // Update position of rover
-                orientation += (((((leftCount-rightCount)/2.0)/ticksPerCm)/circumference)*360);
+                deltaOrientation = (((((rightCount-leftCount)/2.0)/ticksPerCm)/circumference)*360);
+                orientation += deltaOrientation;
+//                if (orientation > 360) {
+//                    orientation -= 360;
+//                } else if (orientation < -360) {
+//                    orientation += 360;
+//                }
                 distance = (((leftCount+rightCount)/2.0)/ticksPerCm);
-                x = distance*cos(orientation);
-                y = distance*sin(orientation);
+                totalDistance += distance;
+                
+                x += distance*cos(deltaOrientation);
+                y += distance*sin(deltaOrientation);
                 
                 obj.Update.Data.location.x = x;
                 obj.Update.Data.location.y = y;
@@ -271,7 +317,7 @@ void MOTOR_CONTROLLER_THREAD_LEFT( void ) {
 
 void MOTOR_CONTROLLER_THREAD_RIGHT( void ) {
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, 14, 1);
-    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 0);
+    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 1);
 }
 
 /*******************************************************************************

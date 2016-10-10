@@ -21,8 +21,6 @@
 /* ************************************************************************** */
 /* ************************************************************************** */
 #include "messages.h"
-#include "../debug.h"
-
 
 static STATES parserstate = IDLE_STATE;
 static size_t internalBufferIndex = 0;
@@ -30,10 +28,8 @@ static char internalCheckSum = 0;
 static size_t size = 0;
 
 bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *isError) {
-    dbgOutputLoc(ENTER_PARSEMESSAGE_MESSAGE_C);
 	switch (parserstate) {
 	case IDLE_STATE: {
-        dbgOutputLoc(CASE_IDLE_STATE_PARSEMESSAGE_MESSAGE_C);
         *isError = false;
 		internalBufferIndex = 0;
 		internalCheckSum = NULL;
@@ -45,12 +41,10 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
 		return false;
 	}
 	case CHECK_DESTINATION_CHAR: {
-        dbgOutputLoc(CASE_CHECK_DESTINATION_CHAR_PARSEMESSAGE_MESSAGE_C);
         parserstate = CHECK_SOURCE_CHAR;
 		return false;
 	}
     case CHECK_SOURCE_CHAR: {
-        dbgOutputLoc(CASE_CHECK_SOURCE_CHAR_PARSEMESSAGE_MESSAGE_C);
         switch(c) {
             case SEARCHERMOVER: {
                 *source = SEARCHERMOVER;
@@ -82,20 +76,17 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
         return false;
     }
 	case CHECK_MESSAGE_COUNT: {
-        dbgOutputLoc(CASE_CHECK_MESSAGE_COUNT_PARSEMESSAGE_MESSAGE_C);
         parserstate = GET_DATALENGTH_UPPER;
         //Pass the message count back
         *messageCount = c;
 		return false;
 	}
 	case GET_DATALENGTH_UPPER: {
-        dbgOutputLoc(CASE_GET_DATALENGTH_UPPER_PARSEMESSAGE_MESSAGE_C);
         size = (c & 0xFF) << 8;
 		parserstate = GET_DATALENGTH_LOWER;
 		return false;
 	}
 	case GET_DATALENGTH_LOWER: {
-        dbgOutputLoc(CASE_GET_DATALENGTH_LOWER_PARSEMESSAGE_MESSAGE_C);
         size = size | (c & 0x00FF);
         if(size > (MAXMESSAGESIZE - 8)) {
             parserstate = IDLE_STATE;
@@ -106,10 +97,8 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
 		return false;
 	}
 	case GET_DATA: {
-        dbgOutputLoc(CASE_GET_DATA_PARSEMESSAGE_MESSAGE_C);
         data[internalBufferIndex] = c;
 		internalBufferIndex = internalBufferIndex + 1;
-        dbgOutputLoc(BEFORE_FIRST_IF_GET_DATA_PARSEMESSAGE_MESSAGE_C);
         if (internalBufferIndex >= size || internalBufferIndex >= MAXMESSAGESIZE) {
 			parserstate = GET_CHECK_SUM;
             internalBufferIndex = 0;
@@ -122,11 +111,9 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
             *isError = true;
             parserstate = IDLE_STATE;
         }
-        dbgOutputLoc(AFTER_THIRD_IF_GET_DATA_PARSEMESSAGE_MESSAGE_C);
 		return false;
 	}
 	case GET_CHECK_SUM: {
-        dbgOutputLoc(CASE_GET_CHECK_SUM_PARSEMESSAGE_MESSAGE_C);
         internalCheckSum = c;
 		if (internalCheckSum != checksum(data)) {
             *isError = true;
@@ -138,13 +125,11 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
 		return false;
 	}
 	case CHECK_ENDCHAR: {
-        dbgOutputLoc(CASE_CHECK_ENDCHAR_PARSEMESSAGE_MESSAGE_C);
         parserstate = IDLE_STATE;
         *isError = c != ENDOFTEXT;
 		return !(*isError);
 	}
 	}
-    dbgOutputLoc(LEAVE_PARSEMESSAGE_MESSAGE_C);
 }
 
 /**
@@ -155,7 +140,6 @@ bool ParseMessage(char c, char data[], char* source, char* messageCount, bool *i
  * @return length of the message
  */
 int CreateMessage(char buf[], char messageData[], char destination, char messagecount) {
-    dbgOutputLoc(ENTER_CREATEMESSAGE_MESSAGE_C);
     if (messageData == NULL) {
 		//dbgOutputBlock(false);
 	}
@@ -174,13 +158,11 @@ int CreateMessage(char buf[], char messageData[], char destination, char message
 		checksum(messageData),
 		ENDOFTEXT
 		);
-    dbgOutputLoc(LEAVE_CREATEMESSAGE_MESSAGE_C);
 }
 
 // Simple string checksum
 char checksum(char* s)
 {
-    dbgOutputLoc(ENTER_CHECKSUM_MESSAGE_C);
     char* temp = s;
 	signed char sum = -1;
 	while (*temp != 0)
@@ -188,7 +170,6 @@ char checksum(char* s)
 		sum += *temp;
 		temp++;
 	}
-    dbgOutputLoc(LEAVE_CHECKSUM_MESSAGE_C);
 	return sum;
 }
 
