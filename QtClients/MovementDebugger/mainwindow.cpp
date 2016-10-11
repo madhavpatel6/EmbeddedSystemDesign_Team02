@@ -9,20 +9,23 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     requestTimer = new QTimer();
+    requestTimer2 = new QTimer();
     requestTimer->setInterval(REQUESTRATE_MS);
+    requestTimer2->setInterval(REQUESTRATE_MS);
+
     ui->setupUi(this);
     tcpSocket = new ClientSocket();
 
     connect(requestTimer, SIGNAL(timeout()), tcpSocket, SLOT(positionRequested()));
+    connect(requestTimer2, SIGNAL(timeout()), tcpSocket, SLOT(lineLocationRequested()));
     connect(this, SIGNAL(pb_forwardClicked()), tcpSocket, SLOT(sendForwardCommand()));
     connect(this, SIGNAL(pb_backClicked()), tcpSocket, SLOT(sendBackCommand()));
     connect(this, SIGNAL(pb_leftClicked()), tcpSocket, SLOT(sendLeftCommand()));
     connect(this, SIGNAL(pb_rightClicked()), tcpSocket, SLOT(sendRightCommand()));
     connect(tcpSocket, SIGNAL(serverIsConnectedSignal(bool)), this, SLOT(HostConnectionEvent(bool)));
-    connect(tcpSocket, SIGNAL(sentPositionSignal()), this, SLOT(positionRequestSent()));
     connect(tcpSocket, SIGNAL(sendLocation(char,QString,QString)), this, SLOT(updateLocation(char,QString,QString)));
     connect(tcpSocket, SIGNAL(sendOrientation(char,QString)), this, SLOT(updateOrientation(char,QString)));
-    requestCounter = 0;
+    connect(tcpSocket, SIGNAL(sendLineLocation(int)), this, SLOT(updateLineLocation(int)));
 }
 
 MainWindow::~MainWindow()
@@ -33,19 +36,19 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::on_btn_connectToServer_clicked()
+void MainWindow::on_pb_connectToServer_clicked()
 {
     tcpSocket->connectToHost(ui->le_IPAddress->text(), ui->le_port->text().toInt());
 }
 
-void MainWindow::on_btn_requestPosition_clicked()
+void MainWindow::on_pb_requestPosition_clicked()
 {
     if(requestTimer->isActive()) {
-        ui->btn_requestPosition->setText(QString("Request Position"));
+        ui->pb_requestPosition->setText(QString("Request Position"));
         requestTimer->stop();
     }
     else {
-        ui->btn_requestPosition->setText(QString("Stop Requesting Position"));
+        ui->pb_requestPosition->setText(QString("Stop Requesting Position"));
         requestTimer->start();
     }
 }
@@ -53,17 +56,11 @@ void MainWindow::on_btn_requestPosition_clicked()
 void MainWindow::HostConnectionEvent(bool connected) {
     qDebug() << "Host Connection Event " << connected;
     if(connected) {
-        ui->btn_connectToServer->setText(QString("Connected To Server"));
+        ui->pb_connectToServer->setText(QString("Connected To Server"));
     }
     else {
-        ui->btn_connectToServer->setText(QString("Connect To Server"));
+        ui->pb_connectToServer->setText(QString("Connect To Server"));
     }
-}
-
-void MainWindow::positionRequestSent()
-{
-    requestCounter += 1;
-    ui->lbl_requestCounter->setText(QString::number(requestCounter));
 }
 
 void MainWindow::updateLocation(char source, QString x, QString y)
@@ -93,6 +90,18 @@ void MainWindow::updateOrientation(char source, QString orientation)
     }
 }
 
+void MainWindow::updateLineLocation(int location)
+{
+    ui->rb_lineSensor0->setChecked(location & 1);
+    ui->rb_lineSensor1->setChecked(location & (1 << 1));
+    ui->rb_lineSensor2->setChecked(location & (1 << 2));
+    ui->rb_lineSensor3->setChecked(location & (1 << 3));
+    ui->rb_lineSensor4->setChecked(location & (1 << 4));
+    ui->rb_lineSensor5->setChecked(location & (1 << 5));
+    ui->rb_lineSensor6->setChecked(location & (1 << 6));
+    ui->rb_lineSensor7->setChecked(location & (1 << 7));
+}
+
 void MainWindow::on_pb_forward_clicked()
 {
     emit pb_forwardClicked();
@@ -111,4 +120,16 @@ void MainWindow::on_pb_left_clicked()
 void MainWindow::on_pb_right_clicked()
 {
     emit pb_rightClicked();
+}
+
+void MainWindow::on_pb_requestLineSensor_clicked()
+{
+    if(requestTimer2->isActive()) {
+        ui->pb_requestLineSensor->setText(QString("Request"));
+        requestTimer2->stop();
+    }
+    else {
+        ui->pb_requestLineSensor->setText(QString("Stop"));
+        requestTimer2->start();
+    }
 }

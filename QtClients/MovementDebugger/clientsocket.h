@@ -7,6 +7,7 @@
 #include <QThreadPool>
 #include "picCode/communication/messages.h"
 
+#define ANALOG 0
 
 class ClientSocket : public QObject
 {
@@ -22,14 +23,15 @@ public:
 signals:
     void sendCommStatTargetLocator(QByteArray commStatTargetLocator);
     void serverIsConnectedSignal(bool connectedToServerBoolSignal);
-    void sentPositionSignal();
     void sendLocation(char source, QString x, QString y);
     void sendOrientation(char source, QString orientation);
+    void sendLineLocation(int);
 public slots:
     void connected();
     void disconnected();
     void readyRead();
     void positionRequested();
+    void lineLocationRequested();
     void sendForwardCommand();
     void sendBackCommand();
     void sendLeftCommand();
