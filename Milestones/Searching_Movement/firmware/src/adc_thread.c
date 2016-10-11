@@ -54,6 +54,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 
 #include "adc_thread.h"
+#include "adc_thread_public.h"
 #include "system_config.h"
 #include "system_definitions.h"
 #include "debug.h"
@@ -80,7 +81,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 static QueueHandle_t _queue;
 
 #define SIZEOFQUEUE 10
-#define TYPEOFQUEUE float
+#define TYPEOFQUEUE LineObj
 
 
 /*******************************************************************************
@@ -93,47 +94,11 @@ static QueueHandle_t _queue;
 
 void ADC_THREAD_Initialize ( void )
 {
-    _queue = createAdcQ();
+    ADC_THREAD_InitializeQueue();
     DRV_TMR0_Start();
     DRV_ADC_Open();
-    /* TODO: Initialize your application's state machine and other
-     * parameters.
-     */
+    DRV_ADC_Start();
 }
-
-/******************************************************************************
-  Function:
-    void ADC_APP_Tasks ( void )
-
-  Remarks:
-    See prototype in adc_app.h.
- */
-
-/* Following functions are for milestone1 */
-QueueHandle_t createAdcQ(){
-    //8 b/c "team 2" //10 is size of Q
-    return xQueueCreate(SIZEOFQUEUE,sizeof(TYPEOFQUEUE));
-}
-
-/* Sends value from adc to adc_app Queue */
-int adc_app_SendValToMsgQ(float adcVal){
-    return xQueueSend(_queue, &adcVal, portMAX_DELAY);
-}
-
-/* Sends value from adc ISR to adc_app Queue */
-int adc_app_SendValToMsgQFromISR(float adcVal, BaseType_t *pxHigherPriorityTaskWoken){
-    return xQueueSendFromISR(_queue, &adcVal, pxHigherPriorityTaskWoken);
-}
-
-/* This converts the sensor values to cm */
-void convertTocm(float *sensorDigitalVal){
-    float tempAdcVal = 0.0;
-    float tempAdcVoltageConv = 0.0;
-    tempAdcVal = ((*sensorDigitalVal)/(1.0))*(1.0);
-    tempAdcVoltageConv = (tempAdcVal*5.0)/(1024.0);
-    *sensorDigitalVal = (tempAdcVoltageConv / 0.009766) * (2.54);
-}
-
 
 /******************************************************************************
   Function:
@@ -145,25 +110,64 @@ void convertTocm(float *sensorDigitalVal){
 
  void ADC_THREAD_Tasks ( void )
  {
-     dbgOutputLoc(ENTER_TASK_ADC_APP);
-     MessageObj obj;
-     obj.Type = UPDATE;
-     obj.Update.Type = SENSORDATA;
-     dbgOutputLoc(BEFORE_WHILE_ADC_APP);
-     float distance = 0.0;
-     while(1){
-         dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_ADC_APP);
-         if(xQueueReceive(_queue, &distance, portMAX_DELAY)){
-             convertTocm(&distance);
-              // Sending to Tx Thread Q
-             obj.Update.Data.sensordata = distance;
-             MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
-         }
-         dbgOutputLoc(AFTER_RECEIVE_FROM_Q_ADC_APP);
-     }
+    dbgOutputLoc(ENTER_TASK_ADC_THREAD);
+    MessageObj messageObj;
+    LineObj lineObj;
+    MotorObj motorObj;
+
+    dbgOutputLoc(BEFORE_WHILE_ADC_THREAD);
+    while(1){
+        memset(&messageObj, 0, sizeof(MessageObj));
+        memset(&lineObj, 0, sizeof(LineObj));
+        memset(&motorObj, 0, sizeof(MotorObj));
+        messageObj.Type = UPDATE;
+        messageObj.Update.Type = LINELOCATION;
+        
+        dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_ADC_THREAD);
+        ADC_THREAD_ReadFromQueue(&lineObj);
+        if (ANALOG) {
+//            averageData(&lineObj);
+        }
+        messageObj.Update.Data.lineLocation = lineObj;
+        // Sending to message controller queue for an update
+        MESSAGE_CONTROLLER_THREAD_SendToQueue(messageObj);
+        dbgOutputLoc(AFTER_RECEIVE_FROM_Q_ADC_THREAD);
+    }
  }
 
+ /* This averages the data coming from the line sensor*/
+ void averageData(LineObj* lineObj) {
+     (*lineObj).IR_0 = ((*lineObj).IR_0/2.0);
+     (*lineObj).IR_1 = ((*lineObj).IR_1/2.0);
+     (*lineObj).IR_2 = ((*lineObj).IR_2/2.0);
+     (*lineObj).IR_3 = ((*lineObj).IR_3/2.0);
+     (*lineObj).IR_4 = ((*lineObj).IR_4/2.0);
+     (*lineObj).IR_5 = ((*lineObj).IR_5/2.0);
+     (*lineObj).IR_6 = ((*lineObj).IR_6/2.0);
+     (*lineObj).IR_7 = ((*lineObj).IR_7/2.0);
+ }
+ 
+void ADC_THREAD_InitializeQueue() {
+    _queue = xQueueCreate(SIZEOFQUEUE, sizeof(TYPEOFQUEUE));
+    if(_queue == 0) {
+        /*Handle this Error*/
+        dbgOutputBlock(pdFALSE);
+    }
+}
 
+int ADC_THREAD_ReadFromQueue(LineObj* lineObj) {
+    return xQueueReceive(_queue, lineObj, portMAX_DELAY);
+}
+
+/* Sends value from ADC to ADC_THREAD Queue */
+int ADC_THREAD_SendToQueue(LineObj lineObj){
+    return xQueueSend(_queue, &lineObj, portMAX_DELAY);
+}
+
+/* Sends value from ADC ISR to ADC_THREAD Queue */
+int ADC_THREAD_SendToQueueISR(LineObj lineObj, BaseType_t *pxHigherPriorityTaskWoken){
+    return xQueueSendFromISR(_queue, &lineObj, pxHigherPriorityTaskWoken);
+}
 
 /*******************************************************************************
  End of File

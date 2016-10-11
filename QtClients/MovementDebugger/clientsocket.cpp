@@ -31,6 +31,12 @@ void ClientSocket::positionRequested(){
     SendJSONRequestToSocket(request_begin + "\"R1_Est_Location\",\"R1_Est_Orientation\"" + request_end, SEARCHERMOVER);
 }
 
+void ClientSocket::lineLocationRequested(){
+    QString request_begin = "{\"type\":\"Request\",\"items\":[";
+    QString request_end = "]}";
+    SendJSONRequestToSocket(request_begin + "\"LineLocation\"" + request_end, SEARCHERMOVER);
+}
+
 void ClientSocket::sendForwardCommand(){
     QString request_begin = "{\"type\":\"Request\",\"items\":[";
     QString request_end = "]}";
@@ -62,7 +68,6 @@ void ClientSocket::connected()
     emit serverIsConnectedSignal(true);
 }
 
-
 void ClientSocket::disconnected()
 {
     qDebug() << "Client disconnected";
@@ -89,7 +94,8 @@ void ClientSocket::readyRead()
             QString type = json["type"].toString();
             if(type == QStringLiteral("Response")) {
                 if(json.contains(QStringLiteral("R1_Est_Location")) ||
-                        json.contains(QStringLiteral("R1_Est_Orientation"))) {
+                        json.contains(QStringLiteral("R1_Est_Orientation")) ||
+                        json.contains(QStringLiteral("LineLocation"))) {
                     HandleResponse(json);
                 }
             }
@@ -116,7 +122,6 @@ void ClientSocket::SendJSONRequestToSocket(QString request, char destination) {
 
         int bytesSent = send(txMessage);
         //qDebug() << "bytesSent:" << bytesSent;
-        emit sentPositionSignal();
         //qDebug() << "Flushing Socket";
         socket->flush();
         //qDebug() << "Flushed Socket";
@@ -136,4 +141,19 @@ void ClientSocket::HandleResponse(QJsonObject obj) {
         emit sendOrientation(SEARCHERMOVER, obj["R1_Est_Orientation"].toString());
         qDebug() << obj["R1_Est_Orientation"];
     }
+    if(obj.contains(QStringLiteral("LineLocation"))) {
+        int location = 0;
+        response = obj["LineLocation"].toObject();
+        for (int i = 0; i < 8; i++) {
+            if (ANALOG) {
+                location |= (response[QString::number(i)].toString().toFloat() < 512) << i;
+            } else {
+                location |= !(response[QString::number(i)].toString().toFloat()) << i;
+            }
+
+        }
+        emit sendLineLocation(location);
+//        qDebug() << obj["LineLocation"];
+    }
+
 }

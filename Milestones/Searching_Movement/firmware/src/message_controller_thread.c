@@ -115,59 +115,61 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
     
     while(1) {
         initParser();
-        MessageObj obj;
-        memset(&obj, 0, sizeof(MessageObj));
+        MessageObj messageObj;
+        MotorObj motorObj;
+        memset(&messageObj, 0, sizeof(MessageObj));
+        memset(&motorObj, 0, sizeof(MotorObj));
 
         Tx_Thead_Queue_DataType tx_thread_obj;
         memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
 
         dbgOutputLoc(BEFORE_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD);
-        MESSAGE_CONTROLLER_THREAD_ReadFromQueue(&obj);
+        MESSAGE_CONTROLLER_THREAD_ReadFromQueue(&messageObj);
         dbgOutputLoc(AFTER_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD);
-        switch(obj.Type) {
+        switch(messageObj.Type) {
             case EXTERNAL_REQUEST_RESPONSE: {
                 dbgOutputLoc(CASE_EXTERNAL_REQUEST_RESPONSE_MESSAGE_CONTROLLER_THREAD);
-                if(obj.External.Error) {
+                if(messageObj.External.Error) {
                     statObject.ErrorCount++;
                     continue;
                 }
                 
                 statObject.GoodCount++;
                 
-                parseJSON(obj.External.Data, &type, items,  &numItems);
+                parseJSON(messageObj.External.Data, &type, items,  &numItems);
                 
                 switch(type) {
                     case request: {
-                        switch(obj.External.Source) {
+                        switch(messageObj.External.Source) {
                             case SEARCHERMOVER:
-                                if ((obj.External.MessageCount - statObject.Req_From_SearcherMover) < 0) {
-                                    statObject.PacketsDropped = (256 - statObject.Req_From_SearcherMover) + obj.External.MessageCount;
+                                if ((messageObj.External.MessageCount - statObject.Req_From_SearcherMover) < 0) {
+                                    statObject.PacketsDropped = (256 - statObject.Req_From_SearcherMover) + messageObj.External.MessageCount;
                                 } else {
-                                    statObject.PacketsDropped = (obj.External.MessageCount - statObject.Req_From_SearcherMover);
+                                    statObject.PacketsDropped = (messageObj.External.MessageCount - statObject.Req_From_SearcherMover);
                                 }
                                 statObject.Req_From_SearcherMover++;
                                 break;
                             case TARGETLOCATOR:
-                                if ((obj.External.MessageCount - statObject.Req_From_TargetLocator) < 0) {
-                                    statObject.PacketsDropped = (256 - statObject.Req_From_TargetLocator) + obj.External.MessageCount;
+                                if ((messageObj.External.MessageCount - statObject.Req_From_TargetLocator) < 0) {
+                                    statObject.PacketsDropped = (256 - statObject.Req_From_TargetLocator) + messageObj.External.MessageCount;
                                 } else {
-                                    statObject.PacketsDropped = (obj.External.MessageCount - statObject.Req_From_TargetLocator);
+                                    statObject.PacketsDropped = (messageObj.External.MessageCount - statObject.Req_From_TargetLocator);
                                 }
                                 statObject.Req_From_TargetLocator++;
                                 break;
                             case PATHFINDER:
-                                if ((obj.External.MessageCount - statObject.Req_From_PathFinder) < 0) {
-                                    statObject.PacketsDropped = (256 - statObject.Req_From_PathFinder) + obj.External.MessageCount;
+                                if ((messageObj.External.MessageCount - statObject.Req_From_PathFinder) < 0) {
+                                    statObject.PacketsDropped = (256 - statObject.Req_From_PathFinder) + messageObj.External.MessageCount;
                                 } else {
-                                    statObject.PacketsDropped = (obj.External.MessageCount - statObject.Req_From_PathFinder);
+                                    statObject.PacketsDropped = (messageObj.External.MessageCount - statObject.Req_From_PathFinder);
                                 }
                                 statObject.Req_From_PathFinder++;
                                 break;
                             case TARGETGRABBER:
-                                if ((obj.External.MessageCount - statObject.Req_From_TargetGrabber) < 0) {
-                                    statObject.PacketsDropped = (256 - statObject.Req_From_TargetGrabber) + obj.External.MessageCount;
+                                if ((messageObj.External.MessageCount - statObject.Req_From_TargetGrabber) < 0) {
+                                    statObject.PacketsDropped = (256 - statObject.Req_From_TargetGrabber) + messageObj.External.MessageCount;
                                 } else {
-                                    statObject.PacketsDropped = (obj.External.MessageCount - statObject.Req_From_TargetGrabber);
+                                    statObject.PacketsDropped = (messageObj.External.MessageCount - statObject.Req_From_TargetGrabber);
                                 }
                                 statObject.Req_From_TargetGrabber++;
                                 break;
@@ -178,7 +180,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         }
 
                         int i = 0;
-                        tx_thread_obj.Destination = obj.External.Source;
+                        tx_thread_obj.Destination = messageObj.External.Source;
                         sprintf(tx_thread_obj.Data, "{\"type\":\"Response\"");
                         for(i = 0; i < numItems; i++) {
                             switch(items[i]) {
@@ -261,28 +263,45 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     break;
                                 }
                                 case Forward: {
-                                    MOTOR_CONTROLLER_THREAD_SendToQueue('F');
+                                    motorObj.direction = 'F';
+                                    MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                     break;
                                 }
                                 case Back: {
-                                    MOTOR_CONTROLLER_THREAD_SendToQueue('B');
+                                    motorObj.direction = 'B';
+                                    MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                     break;
                                 }
                                 case Left: {
-                                    MOTOR_CONTROLLER_THREAD_SendToQueue('L');
+                                    motorObj.direction = 'L';
+                                    MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                     break;
                                 }
                                 case Right: {
-                                    MOTOR_CONTROLLER_THREAD_SendToQueue('R');
+                                    motorObj.direction = 'R';
+                                    MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                     break;
                                 }
                                 case SensorData: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"SensorData\":\"%0.02f\"", internalData.sensordata);
                                     break;
                                 }
+                                case LineLocation: {
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"LineLocation\":{\"0\":\"%0.02f\",\"1\":\"%0.02f\",\"2\":\"%0.02f\","
+                                            "\"3\":\"%0.02f\",\"4\":\"%0.02f\",\"5\":\"%0.02f\",\"6\":\"%0.02f\",\"7\":\"%0.02f\"}", 
+                                            internalData.lineLocation.IR_0,
+                                            internalData.lineLocation.IR_1,
+                                            internalData.lineLocation.IR_2,
+                                            internalData.lineLocation.IR_3,
+                                            internalData.lineLocation.IR_4,
+                                            internalData.lineLocation.IR_5,
+                                            internalData.lineLocation.IR_6,
+                                            internalData.lineLocation.IR_7);
+                                    break;
+                                }
                                 case msLocalTime:{
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"msLocalTime\":\"%d\"", getSystemClock() * 200);
-                                    tx_thread_obj.Destination = obj.External.Source;
+                                    tx_thread_obj.Destination = messageObj.External.Source;
                                     break;
                                 }
                                 default:
@@ -290,7 +309,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                             }
                         }
                         sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),"}"); // Print ending brace }
-                        switch(obj.External.Source) {
+                        switch(messageObj.External.Source) {
                             case SEARCHERMOVER: {
                                 tx_thread_obj.MessageCount = statObject.Res_To_SearcherMover;
                                 statObject.Res_To_SearcherMover++;
@@ -319,7 +338,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         break;
                     }
                     case response: {
-                        switch(obj.External.Source) {
+                        switch(messageObj.External.Source) {
                             case SEARCHERMOVER: {
                                 statObject.Res_From_SearcherMover++;
                                 break;
@@ -356,7 +375,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
             case SEND_REQUEST: {
                 dbgOutputLoc(CASE_SEND_REQUEST_MESSAGE_CONTROLLER_THREAD);
                 // We will only need to have a new case for something we are requesting from another PIC
-                switch(obj.Request) {
+                switch(messageObj.Request) {
                     case SMtoTL: {
                         sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"Obstacles\",\"R1_Location\",\"R1_Orientation\"]}");
                         tx_thread_obj.Destination = TARGETLOCATOR;
@@ -415,15 +434,19 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
             }
             case UPDATE: {
                 dbgOutputLoc(CASE_UPDATE_MESSAGE_CONTROLLER_THREAD);
-                switch(obj.Update.Type) {
+                switch(messageObj.Update.Type) {
                     case POSITION: {
-                        internalData.location.x = initialData.location.x + obj.Update.Data.location.x;
-                        internalData.location.y = initialData.location.y + obj.Update.Data.location.y;
-                        internalData.orientation = (initialData.orientation + obj.Update.Data.orientation);
+                        internalData.location.x = initialData.location.x + messageObj.Update.Data.location.x;
+                        internalData.location.y = initialData.location.y + messageObj.Update.Data.location.y;
+                        internalData.orientation = (initialData.orientation + messageObj.Update.Data.orientation);
                         break;
                     }
                     case SENSORDATA: {
-                        internalData.sensordata = obj.Update.Data.sensordata;
+                        internalData.sensordata = messageObj.Update.Data.sensordata;
+                        break;
+                    }
+                    case LINELOCATION: {
+                        internalData.lineLocation = messageObj.Update.Data.lineLocation;
                         break;
                     }
                     default: {

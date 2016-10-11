@@ -58,6 +58,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "communication/messages.h"
 #include "FreeRTOS.h"
 #include "queue.h"
+#include "adc_thread_public.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -78,10 +79,11 @@ typedef struct {
     Coordinates location;
     float orientation;
     float sensordata;
+    LineObj lineLocation;
 }InternalData;
 
 //This should include a new enum for anything in the InternalData
-typedef enum UpdateType_enum { POSITION, SENSORDATA } UpdateType;
+typedef enum UpdateType_enum { POSITION, SENSORDATA, LINELOCATION } UpdateType;
 
 //This is any request that you would want to ... well ... request
 // these are really the categories of requests. the specific objects in them is added later

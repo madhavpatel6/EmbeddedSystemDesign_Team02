@@ -64,10 +64,14 @@ void DRV_ADC_Initialize(void)
     PLIB_ADC_VoltageReferenceSelect(DRV_ADC_ID_1, ADC_REFERENCE_VDD_TO_AVSS);
 
     /* Sampling Selections */
+    /* Enable Auto Sample Mode */
+    PLIB_ADC_SampleAutoStartEnable(DRV_ADC_ID_1);
+    /* Sample Acquisition Time (Auto Sample Mode) */	
+    PLIB_ADC_SampleAcquisitionTimeSet(DRV_ADC_ID_1, 20);
     /* Select Sampling Mode */
     PLIB_ADC_SamplingModeSelect(DRV_ADC_ID_1, ADC_SAMPLING_MODE_MUXA);
     /* Number of Samples Per Interrupt */
-    PLIB_ADC_SamplesPerInterruptSelect(DRV_ADC_ID_1, ADC_1SAMPLE_PER_INTERRUPT);
+    PLIB_ADC_SamplesPerInterruptSelect(DRV_ADC_ID_1, ADC_16SAMPLES_PER_INTERRUPT);
 
     /* Conversion Selections */
     /* Select Trigger Source */
@@ -81,10 +85,69 @@ void DRV_ADC_Initialize(void)
     /* MUX A Negative Input Select */
     PLIB_ADC_MuxChannel0InputNegativeSelect(DRV_ADC_ID_1, ADC_MUX_A, ADC_INPUT_NEGATIVE_VREF_MINUS);
  
+/*scan enable*/
+    /* Select Scan Input 8-15 */
+    PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN8 | ADC_INPUT_SCAN_AN9 | ADC_INPUT_SCAN_AN10 |
+    	ADC_INPUT_SCAN_AN11 | ADC_INPUT_SCAN_AN12 | ADC_INPUT_SCAN_AN13 | ADC_INPUT_SCAN_AN14 | ADC_INPUT_SCAN_AN15);
 
+     /* Enable Scan mode */
+    PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1); 
 
-    /* MUX A Positive Input Select */
-    PLIB_ADC_MuxChannel0InputPositiveSelect(DRV_ADC_ID_1, ADC_MUX_A, ADC_INPUT_POSITIVE_AN0);
+// /*scan enable*/
+//     /* Select Scan Input 0 */
+//     PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN8);
+
+//     /* Enable Scan mode */
+//     PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
+
+// /*scan enable*/
+//     /* Select Scan Input 1 */
+//     PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN9);
+    
+//     /* Enable Scan mode */
+//     PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
+
+// /*scan enable*/
+//     /* Select Scan Input 2 */
+//     PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN10);
+    
+//     /* Enable Scan mode */
+//     PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
+
+// /*scan enable*/
+//     /* Select Scan Input 3 */
+//     PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN11);
+    
+//     /* Enable Scan mode */
+//     PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
+ 
+// /*scan enable*/
+//     /* Select Scan Input 4 */
+//     PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN12);
+    
+//     /* Enable Scan mode */
+//     PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
+
+// /*scan enable*/
+//     /* Select Scan Input 5 */
+//     PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN13);
+    
+//     /* Enable Scan mode */
+//     PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
+ 
+// /*scan enable*/
+//     /* Select Scan Input 6 */
+//     PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN14);
+    
+//     /* Enable Scan mode */
+//     PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
+ 
+// /*scan enable*/
+//     /* Select Scan Input 7 */
+//     PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN15);
+    
+//     /* Enable Scan mode */
+//     PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
  
     /* Initialize ADC Interrupt */
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);

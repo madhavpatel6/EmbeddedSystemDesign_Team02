@@ -62,14 +62,14 @@ enum LocationEnum {
     AFTER_RECEIVE_FR_QUEUE_READFROMQUEUE_RXTHREAD,    // 34
     
     // ADC APP DEBUG
-    ENTER_TASK_ADC_APP = 40,            // 40
-    BEFORE_WHILE_ADC_APP,               // 41
-    BEFORE_SEND_TO_Q_ADC_APP,           // 42
-    BEFORE_RECEIVE_FROM_Q_ADC_APP,      // 43
-    AFTER_SEND_TO_Q_ADC_APP,            // 44
-    AFTER_RECEIVE_FROM_Q_ADC_APP,       // 45
-    ENTER_CONVERTTOCM_ADC_APP,          // 46
-    LEAVE_CONVERTTOCM_ADC_APP,          // 47
+    ENTER_TASK_ADC_THREAD = 40,            // 40
+    BEFORE_WHILE_ADC_THREAD,               // 41
+    BEFORE_SEND_TO_Q_ADC_THREAD,           // 42
+    BEFORE_RECEIVE_FROM_Q_ADC_THREAD,      // 43
+    AFTER_SEND_TO_Q_ADC_THREAD,            // 44
+    AFTER_RECEIVE_FROM_Q_ADC_THREAD,       // 45
+    ENTER_CONVERTTOCM_ADC_THREAD,          // 46
+    LEAVE_CONVERTTOCM_ADC_THREAD,          // 47
            
      
     //Messages.c Debug

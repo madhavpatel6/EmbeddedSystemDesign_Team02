@@ -36,9 +36,16 @@
 extern "C" {
 #endif
 
-void MOTOR_CONTROLLER_THREAD_SendToQueue(char buffer);
+typedef struct {
+    char direction;
+    float distance;
+    float degrees;
+    uint8_t lineLocation;
+} MotorObj;
+    
+void MOTOR_CONTROLLER_THREAD_SendToQueue(MotorObj obj);
 
-void MOTOR_CONTROLLER_THREAD_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken);
+void MOTOR_CONTROLLER_THREAD_SendToQueueISR(MotorObj obj, BaseType_t *pxHigherPriorityTaskWoken);
 
 /* Provide C++ Compatibility */
 #ifdef __cplusplus

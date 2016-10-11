@@ -25,12 +25,12 @@ signals:
     void pb_rightClicked(void);
 
 public slots:
-    void on_btn_connectToServer_clicked();
-    void on_btn_requestPosition_clicked();
+    void on_pb_connectToServer_clicked();
+    void on_pb_requestPosition_clicked();
     void HostConnectionEvent(bool connected);
-    void positionRequestSent();
     void updateLocation(char source, QString x, QString y);
     void updateOrientation(char source, QString orientation);
+    void updateLineLocation(int location);
 
 private slots:
     void on_pb_forward_clicked();
@@ -38,11 +38,13 @@ private slots:
     void on_pb_left_clicked();
     void on_pb_right_clicked();
 
+    void on_pb_requestLineSensor_clicked();
+
 private:
     Ui::MainWindow *ui;
     ClientSocket *tcpSocket;
     QTimer *requestTimer;
-    int requestCounter;
+    QTimer *requestTimer2;
 };
 
 #endif // MAINWINDOW_H
