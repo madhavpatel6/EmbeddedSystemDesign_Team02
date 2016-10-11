@@ -85,18 +85,49 @@ void IntHandlerDrvAdc(void)
 {
     dbgOutputLoc(ENTER_ADC_ISR);
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-    int i = 0;
-    float adcValToQ = 0.0;
-    DRV_ADC_Stop();
-    //Read data before clearing interrupt flag
+    LineObj lineObj;
+    MotorObj motorObj;
+    
+    memset(&lineObj, 0, (size_t) sizeof(LineObj));
+    memset(&motorObj, 0, (size_t) sizeof(MotorObj));
+    //while(DRV_ADC_SamplesAvailable() != true);
+    
+    int i;
+    
     dbgOutputLoc(ADDING_ADC_VAL_ISR);
-    adcValToQ = adcValToQ + PLIB_ADC_ResultGetByIndex(ADC_ID_1, 0);
+    if (ANALOG) {
+        for (i = 0; i < 16; i += 2) {
+            lineObj.IR_0 = DRV_ADC_SamplesRead(i);
+            lineObj.IR_1 = DRV_ADC_SamplesRead(i+1);
+            lineObj.IR_2 = DRV_ADC_SamplesRead(i+2);
+            lineObj.IR_3 = DRV_ADC_SamplesRead(i+3);
+            lineObj.IR_4 = DRV_ADC_SamplesRead(i+4);
+            lineObj.IR_5 = DRV_ADC_SamplesRead(i+5);
+            lineObj.IR_6 = DRV_ADC_SamplesRead(i+6);
+            lineObj.IR_7 = DRV_ADC_SamplesRead(i+7);
+        }
+    } else {
+        lineObj.IR_0 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_F, 13);
+        lineObj.IR_1 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_F, 12);
+        lineObj.IR_2 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_F, 5);
+        lineObj.IR_3 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_F, 4);
+        lineObj.IR_4 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_D, 15);
+        lineObj.IR_5 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_D, 14);
+        lineObj.IR_6 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_A, 15);
+        lineObj.IR_7 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_A, 14);
+        
+        motorObj.lineLocation = ((int)lineObj.IR_7 << 7) | ((int)lineObj.IR_6 << 6) | 
+                ((int)lineObj.IR_5 << 5) | ((int)lineObj.IR_4 << 4) | ((int)lineObj.IR_3 << 3) | 
+                ((int)lineObj.IR_2 << 2) | ((int)lineObj.IR_1 << 1) | ((int)lineObj.IR_0 << 0);
+        
+//        MOTOR_CONTROLLER_THREAD_SendToQueueISR(motorObj, &pxHigherPriorityTaskWoken);
+    }
+    
     dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
-    adc_app_SendValToMsgQFromISR(adcValToQ, &pxHigherPriorityTaskWoken);
+    ADC_THREAD_SendToQueueISR(lineObj, &pxHigherPriorityTaskWoken);
     dbgOutputLoc(AFTER_SEND_TO_Q_ISR);
     dbgOutputLoc(LEAVE_ADC_ISR);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
-    /* Clear ADC Interrupt Flag */
     PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_ADC_1);
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
 }
@@ -107,18 +138,18 @@ void IntHandlerDrvTmrInstance0(void)
 {
     dbgOutputLoc(ENTER_TMR_INSTANCE_0_ISR);
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-    DRV_ADC_Start();
-    dbgOutputLoc(SET_ADC_FLAG_TMR_INSTANCE_0_ISR);
-    //PLIB_INT_SourceFlagSet(INT_ID_0, INT_SOURCE_ADC_1);
-    PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
-    dbgOutputLoc(LEAVE_TMR_INSTANCE_0_ISR);
-    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
-    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
+    if(!PLIB_INT_SourceIsEnabled(INT_ID_0, INT_SOURCE_ADC_1)){
+        PLIB_ADC_SampleAutoStartEnable(ADC_ID_1);
+        PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
+        portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
+        PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
+    }
+    else{
+        portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
+        PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
+    }
 }
 
-//int bufCount = 0;
-//int ISRcount = 0;
-//char buf[22] = "FRLB";
 uint16_t timerCount = 0;
 
 /* This timer is for the TX to fire every 200 ms */
@@ -133,7 +164,7 @@ void IntHandlerDrvTmrInstance1(void)
     switch(MYMODULE){
         case SEARCHERMOVER:
             obj.Request = SMtoTL;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+//            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             break;
         case TARGETLOCATOR:
             obj.Request = TLtoSM;
@@ -152,18 +183,6 @@ void IntHandlerDrvTmrInstance1(void)
             MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             break;
     }
-//    if (ISRcount == 16) {
-//        MOTOR_CONTROLLER_THREAD_SendToQueueISR(buf[bufCount], &pxHigherPriorityTaskWoken);
-//        if (bufCount < strlen(buf)-1) {
-//            bufCount++;
-//        } else {
-//            bufCount = 0;
-//        }
-//        ISRcount = 0;
-//    } else {
-//        ISRcount++;
-//    }
-
     dbgOutputLoc(AFTER_SEND_TO_Q_TMR_INSTANCE_1_ISR);
     incrementSystemClock();
     dbgOutputLoc(LEAVE_TMR_INSTANCE_1_ISR);

@@ -58,8 +58,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <stdlib.h>
 #include "FreeRTOS.h"
 #include "queue.h"
+#include "adc_thread_public.h"
 
-
+#define ANALOG  0
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -136,9 +137,11 @@ void ADC_THREAD_Initialize ( void );
 
 void ADC_THREAD_Tasks( void );
 
-QueueHandle_t createAdcQ();
+void averageData(LineObj* lineObj);
 
-void convertTocm(float *sensorDigitalVal);
+void ADC_THREAD_InitializeQueue();
+
+int ADC_THREAD_ReadFromQueue(LineObj* lineObj);
 
 #endif /* _ADC_THREAD_H */
 

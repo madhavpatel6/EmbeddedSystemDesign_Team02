@@ -59,8 +59,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 #include "queue.h"
+#include "motor_controller_thread_public.h"
 
-#define ticksPerCm      45.0f
+#define ticksPerCm      42.5f
 #define circumference   58.0f
     
 // DOM-IGNORE-BEGIN
@@ -204,7 +205,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks( void );
 
 void MOTOR_CONTROLLER_THREAD_InitializeQueue();
 
-void MOTOR_CONTROLLER_THREAD_ReadFromQueue(char* pvBuffer);
+void MOTOR_CONTROLLER_THREAD_ReadFromQueue(MotorObj* obj);
 
 void enableMotors( void );
 

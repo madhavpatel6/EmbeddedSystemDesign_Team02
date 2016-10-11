@@ -261,12 +261,12 @@
       <Template>
         <Name>drv_adc_static.h</Name>
         <Path>Header Files/app/system_config/default/framework/driver/adc</Path>
-        <Checksum>EB83B77B6F50631DF29C48BC407262EE</Checksum>
+        <Checksum>66ECC7C9E0269D4CEDE4D3AF31A212A6</Checksum>
       </Template>
       <Template>
         <Name>drv_adc_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/adc/src</Path>
-        <Checksum>97D2F3AE688ECF1C1E980EDC76D0AC00</Checksum>
+        <Checksum>11024FB343BFEED07F76465437F5D276</Checksum>
         <ProjectFileChecksum>6E96E409763E47F6A1694F64D86CEE2B</ProjectFileChecksum>
       </Template>
       <Template>
@@ -400,11 +400,11 @@
         <Include value="../src/system_config/default"/>
       </C32-AS>
       <C32>
-        <Include value="C:/ECE4534/Milestones/Searching_Movement/firmware/src"/>
-        <Include value="C:/ECE4534/Milestones/Searching_Movement/firmware/src/system_config/default"/>
-        <Include value="C:/ECE4534/Milestones/Searching_Movement/firmware/src/default"/>
-        <Include value="C:/microchip/harmony/v1_08_01/framework"/>
-        <Include value="C:/ECE4534/Milestones/Searching_Movement/firmware/src/system_config/default/framework"/>
+        <Include value="C:\ECE4534\Milestones\Searching_Movement\firmware\src"/>
+        <Include value="C:\ECE4534\Milestones\Searching_Movement\firmware\src\system_config\default"/>
+        <Include value="C:\ECE4534\Milestones\Searching_Movement\firmware\src\default"/>
+        <Include value="C:\microchip\harmony\v1_08_01\framework"/>
+        <Include value="C:\ECE4534\Milestones\Searching_Movement\firmware\src\system_config\default\framework"/>
         <Include value="../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX"/>
         <Include value="../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include"/>
         <Include value="../src/system_config/default"/>

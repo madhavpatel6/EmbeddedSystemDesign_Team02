@@ -21,9 +21,21 @@
 extern "C" {
 #endif
     
+// This struct contains the 8 IR sensor values in uint32_t because
+// that is what the adc outputs
+typedef struct {
+    float IR_0;
+    float IR_1;
+    float IR_2;
+    float IR_3;
+    float IR_4;
+    float IR_5;
+    float IR_6;
+    float IR_7;
+} LineObj;
     
-    int adc_app_SendValToMsgQ(float adcVal);
-    int adc_app_SendValToMsgQFromISR(float adcVal, BaseType_t *pxHigherPriorityTaskWoken);
+    int ADC_THREAD_SendToQueue(LineObj lineObj);
+    int ADC_THREAD_SendToQueueISR(LineObj lineObj, BaseType_t *pxHigherPriorityTaskWoken);
 
 
     /* Provide C++ Compatibility */
