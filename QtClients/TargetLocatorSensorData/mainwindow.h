@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include <QLabel>
 #include "clientsocket.h"
 namespace Ui {
 class MainWindow;
@@ -20,7 +21,20 @@ private slots:
     void on_connectToServer_clicked();
     void HostConnectionEvent(bool connected);
     void receiveUpdate(QString leftFTSensor, QString middleFTSensor, QString rightFTSensor, QString leftFBSensor, QString middleFBSensor, QString rightFBSensor, QString leftSDSensor, QString rightSDSensor);
+    void on_pushButton_clicked();
+
 private:
+    float computeMean(QVector<float> vec);
+    float computeStd(QVector<float> vec);
+    void updateStatistics(QVector<float> vec, QLabel* label);
+    QVector<float> valuesTL;
+    QVector<float> valuesTM;
+    QVector<float> valuesTR;
+    QVector<float> valuesBL;
+    QVector<float> valuesBM;
+    QVector<float> valuesBR;
+    QVector<float> valuesSL;
+    QVector<float> valuesSR;
     Ui::MainWindow *ui;
     QTimer* requestTimer;
     ClientSocket* tcpSocket;

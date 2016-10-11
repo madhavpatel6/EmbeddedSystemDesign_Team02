@@ -63,7 +63,6 @@ void ClientSocket::readyRead()
         bool isCompleted = ParseMessage(array[i], buffer, &source, &messageCount, &isError);
         if(isCompleted) {
             QJsonDocument doc(QJsonDocument::fromJson(buffer));
-            qDebug() << buffer;
             QJsonObject json = doc.object();
             QString type = json["type"].toString();
             if(type == QStringLiteral("Response")) {

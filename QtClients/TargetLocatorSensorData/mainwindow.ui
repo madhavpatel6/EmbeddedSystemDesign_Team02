@@ -29,16 +29,6 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QLabel" name="label_10">
-          <property name="text">
-           <string>Bottom Left IR Sensor</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
         <item row="4" column="2">
          <widget class="QLabel" name="label_5">
           <property name="text">
@@ -49,19 +39,10 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QTextBrowser" name="bottomleftBrowser"/>
-        </item>
-        <item row="1" column="3">
-         <widget class="QTextBrowser" name="toprightBrowser"/>
-        </item>
-        <item row="3" column="3">
-         <widget class="QTextBrowser" name="bottomrightBrowser"/>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="label_4">
+        <item row="2" column="1">
+         <widget class="QLabel" name="label_10">
           <property name="text">
-           <string>Top Left IR Sensor</string>
+           <string>Bottom Left IR Sensor</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -88,22 +69,78 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="2">
-         <widget class="QTextBrowser" name="topmiddleBrowser"/>
-        </item>
-        <item row="1" column="1">
-         <widget class="QTextBrowser" name="topleftBrowser">
-          <property name="html">
-           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <item row="2" column="2">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>Bottom Middle IR Sensor</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
         <item row="3" column="2">
-         <widget class="QTextBrowser" name="bottommiddleBrowser"/>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <item>
+           <widget class="QLabel" name="labelBM">
+            <property name="text">
+             <string>Variance</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="valuesBM">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTextBrowser" name="bottommiddleBrowser"/>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="3">
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QLabel" name="labelTR">
+            <property name="text">
+             <string>Variance</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="valuesTR">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTextBrowser" name="toprightBrowser"/>
+          </item>
+         </layout>
+        </item>
+        <item row="3" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QLabel" name="labelBL">
+            <property name="text">
+             <string>Variance</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="valuesBL">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTextBrowser" name="bottomleftBrowser"/>
+          </item>
+         </layout>
         </item>
         <item row="2" column="3">
          <widget class="QLabel" name="label_6">
@@ -115,21 +152,128 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
-        <item row="2" column="2">
-         <widget class="QLabel" name="label_9">
+        <item row="0" column="1">
+         <widget class="QLabel" name="label_4">
           <property name="text">
-           <string>Bottom Middle IR Sensor</string>
+           <string>Top Left IR Sensor</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
+        <item row="1" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLabel" name="labelTL">
+            <property name="text">
+             <string>Variance</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="valuesTL">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTextBrowser" name="topleftBrowser">
+            <property name="html">
+             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="2">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QLabel" name="labelTM">
+            <property name="text">
+             <string>Variance</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="valuesTM">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTextBrowser" name="topmiddleBrowser"/>
+          </item>
+         </layout>
+        </item>
+        <item row="3" column="3">
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <item>
+           <widget class="QLabel" name="labelBR">
+            <property name="text">
+             <string>Variance</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="valuesBR">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTextBrowser" name="bottomrightBrowser"/>
+          </item>
+         </layout>
+        </item>
         <item row="5" column="1">
-         <widget class="QTextBrowser" name="leftsideBrowser"/>
+         <layout class="QHBoxLayout" name="horizontalLayout_10">
+          <item>
+           <widget class="QLabel" name="labelLeftSide">
+            <property name="text">
+             <string>Variance</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="valuesLS">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTextBrowser" name="leftsideBrowser"/>
+          </item>
+         </layout>
         </item>
         <item row="5" column="2">
-         <widget class="QTextBrowser" name="rightsideBrowser"/>
+         <layout class="QHBoxLayout" name="horizontalLayout_11">
+          <item>
+           <widget class="QLabel" name="labelRightSide">
+            <property name="text">
+             <string>Variance</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="valuesRS">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTextBrowser" name="rightsideBrowser"/>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
@@ -145,7 +289,7 @@ p, li { white-space: pre-wrap; }
         <item>
          <widget class="QLineEdit" name="serverIPAddressInput">
           <property name="text">
-           <string>192.168.0.74</string>
+           <string>192.168.0.197</string>
           </property>
          </widget>
         </item>
@@ -181,6 +325,13 @@ p, li { white-space: pre-wrap; }
          <widget class="QPushButton" name="requestButton">
           <property name="text">
            <string>Request Sensor Data</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton">
+          <property name="text">
+           <string>Clear Text</string>
           </property>
          </widget>
         </item>
