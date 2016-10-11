@@ -152,7 +152,9 @@ void SENSOR_THREAD_ReadFromQueue(SensorADCType* pvBuffer);
 
 void ConvertDigitalToCM(SensorADCType sensorData, SensorDataType* values);
 
-void ConvertGP2Y0A02YK0FToCM(float* distanceCM, uint32_t adcValue);
+void ConvertTopLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
+
+void ConvertTopRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
 
 #endif /* _SENSOR_THREAD_H */
 

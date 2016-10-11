@@ -118,31 +118,43 @@ void SENSOR_THREAD_SendToQueueISR(SensorADCType buffer, BaseType_t *pxHigherPrio
 
 void ConvertDigitalToCM(SensorADCType sensorData, SensorDataType* values) {
     memset(values, 0, sizeof(SensorDataType));
-    values->leftFTSensor = sensorData.leftFTSensor;
-    values->middleFTSensor = sensorData.middleFTSensor;
-    values->rightFTSensor = sensorData.rightFTSensor;
-    values->leftFBSensor = sensorData.leftFBSensor;
-    values->middleFBSensor = sensorData.middleFBSensor;
-    values->rightFBSensor = sensorData.rightFBSensor;
-    values->leftSDSensor = sensorData.leftSDSensor;
-    values->rightSDSensor = sensorData.rightSDSensor;
-//    ConvertGP2Y0A02YK0FToCM(&(values->leftFTSensor), sensorData.leftFTSensor);
+    ConvertTopLeftLongRangeIRToCM(&(values->leftFTSensor), sensorData.leftFTSensor);
 //    ConvertGP2Y0A02YK0FToCM(&(values->middleFTSensor), sensorData.middleFTSensor);
-//    ConvertGP2Y0A02YK0FToCM(&(values->rightFTSensor),  sensorData.rightFTSensor);
+    ConvertTopRightLongRangeIRToCM(&(values->rightFTSensor),  sensorData.rightFTSensor);
 //    ConvertGP2Y0A02YK0FToCM(&(values->leftFBSensor),  sensorData.leftFBSensor);
 //    ConvertGP2Y0A02YK0FToCM(&(values->middleFBSensor), sensorData.middleFBSensor);
 //    ConvertGP2Y0A02YK0FToCM(&(values->rightFBSensor), sensorData.rightFBSensor);
-    
+//    
 }
 
-void ConvertGP2Y0A02YK0FToCM(float* distanceCM, uint32_t adcValue) {
-    float voltage = adcValue/(310.3030);
-    if(voltage <= 2.51) {
-        *distanceCM = (60.4949)*pow(voltage,-1.1904);
+void ConvertTopLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
+    float avgAdcValue = adcValue;
+    float voltage = avgAdcValue/(310.303);
+    if(voltage <= 2.5 && voltage >=0.899) {
+        *distanceCM = 114.097*(pow(0.484144,voltage));
+    }
+    else if(voltage < 0.899) {
+        *distanceCM = 64.47/(voltage+0.1776);
     }
     else {
         *distanceCM = -1;
     }
+//    *distanceCM = voltage;
+}
+
+void ConvertTopRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
+    float avgAdcValue = adcValue;
+    float voltage = avgAdcValue/(310.303);
+    if(voltage <= 2.5 && voltage >= 1.096) {
+        *distanceCM = 119.191*(pow(0.4879,voltage));
+    }
+    else if(voltage < 1.096){
+        *distanceCM = 61.223/(voltage+0.0173); 
+    }
+    else {
+        *distanceCM = -1;
+    }
+//    *distanceCM = voltage;
 }
 /*******************************************************************************
  End of File
