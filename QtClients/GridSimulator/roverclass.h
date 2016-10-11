@@ -4,9 +4,9 @@
 
 typedef struct RoverLocation {
     QPointF center;
-    int orientation;
-    RoverLocation() : center(QPoint(0,0)) , orientation(0) {}
-    RoverLocation(QPointF newCenter, int newOrientation) : center(newCenter), orientation(newOrientation) { }
+    float orientation;
+    RoverLocation() : center(QPointF(0,0)) , orientation(0) {}
+    RoverLocation(QPointF newCenter, float newOrientation) : center(newCenter), orientation(newOrientation) { }
 } RoverLocation;
 
 class RoverClass
@@ -17,7 +17,7 @@ public:
     void moveRoverBack(float distanceCM);
     void turnRoverRight(float angleDegrees);
     void turnRoverLeft(float angleDegrees);
-    void updateRoverPosition(QPoint location, int newOrientation);
+    void updateRoverPosition(QPointF location, float newOrientation);
     RoverLocation getLocationInformation() {
         return locationInformation;
     }

@@ -14,8 +14,8 @@ void GridCell::draw(QPainter *painter) {
 }
 
 void GridCell::decrement() {
-    if(count > MINIMUM + 10) {
-        count-=10;
+    if(count > MINIMUM) {
+        count--;
     }
 }
 

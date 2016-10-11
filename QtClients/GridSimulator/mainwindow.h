@@ -19,7 +19,7 @@ public:
     QHBoxLayout* horizontalLayout;
     QVBoxLayout* verticalLayout1;
     QVBoxLayout* verticalLayout2;
-    QPushButton* moveRoverButton;
+    QPushButton* clearOccupanyGridButton;
     QPushButton* simulateButton;
     QLineEdit* xRoverLoc;
     QLineEdit* yRoverLoc;
@@ -39,10 +39,11 @@ public:
     QTimer* sensorReadingTimer;
     QPushButton* showObjects;
 public slots:
-    void handleRoverUpdate();
+    void handleGridClear();
     void handleSimulate();
     void handleShowObjects();
     void updateCursorPosition(int x, int y);
+    void handleRoverCoordinateUpdate(float x, float y, float angle);
 private:
     void setupUi(QWidget* mainwindow);
 };

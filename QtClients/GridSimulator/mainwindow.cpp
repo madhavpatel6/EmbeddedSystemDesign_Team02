@@ -5,7 +5,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
 {
     setupUi(this);
-    connect(moveRoverButton, SIGNAL(released()), this, SLOT(handleRoverUpdate()));
+    connect(clearOccupanyGridButton, SIGNAL(released()), this, SLOT(handleGridClear()));
     connect(simulateButton, SIGNAL(released()), this, SLOT(handleSimulate()));
     connect(grid, SIGNAL(updateCursorPosition(int,int)), this, SLOT(updateCursorPosition(int,int)));
     sensorReadingTimer = new QTimer();
@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     sensorReadingTimer->start();
     connect(sensorReadingTimer, SIGNAL(timeout()), this, SLOT(handleSimulate()));
     connect(showObjects, SIGNAL(released()), this, SLOT(handleShowObjects()));
+    connect(grid, SIGNAL(updateRoverPosition(float,float,float)), this, SLOT(handleRoverCoordinateUpdate(float,float,float)));
 //    grid->UpdateSensorReading(GridScene::MIDDLESENSOR, 13*GridScene::CELL_SIZE);
 //    grid->addLine(142,144,321,124);
 //    grid->addLine(12,38,22,88);
@@ -42,14 +43,14 @@ void MainWindow::setupUi(QWidget* mainwindow) {
 
     verticalLayout1 = new QVBoxLayout();
     horizontalLayout->addLayout(verticalLayout1);
-    moveRoverButton = new QPushButton();
+    clearOccupanyGridButton = new QPushButton();
     simulateButton = new QPushButton();
     verticalLayout2 = new QVBoxLayout();
 
     horizontalLayout->addLayout(verticalLayout2);
 
     simulateButton->setText("Update Map");
-    moveRoverButton->setText("Update Rover's Location");
+    clearOccupanyGridButton->setText("Clear Occupany Grid");
 
     xRoverLoc = new QLineEdit();
     yRoverLoc = new QLineEdit();
@@ -69,7 +70,7 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     verticalLayout1->addWidget(yRoverLoc);
     verticalLayout1->addWidget(roverAngleLabel);
     verticalLayout1->addWidget(roverAngle);
-    verticalLayout1->addWidget(moveRoverButton);
+    verticalLayout1->addWidget(clearOccupanyGridButton);
     verticalLayout1->addWidget(cursorPosition);
     verticalLayout1->addItem(verticalSpacer1);
     middleFIRDistance = new QLineEdit();
@@ -88,9 +89,14 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     setFocusProxy(grid);
 }
 
-void MainWindow::handleRoverUpdate() {
-//    grid->updateRoverLocation(QPoint(xRoverLoc->text().toInt()*GridScene::CELL_SIZE, yRoverLoc->text().toInt()*GridScene::CELL_SIZE), roverAngle->text().toInt());
+void MainWindow::handleGridClear() {
     grid->reset();
+}
+
+void MainWindow::handleRoverCoordinateUpdate(float x, float y, float angle) {
+    xRoverLoc->setText(QString::number(x));
+    yRoverLoc->setText(QString::number(y));
+    roverAngle->setText(QString::number(angle));
 }
 
 void MainWindow::handleSimulate() {

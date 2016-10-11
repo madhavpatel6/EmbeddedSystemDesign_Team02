@@ -13,13 +13,13 @@ GridScene::GridScene(QWidget *parent) : QWidget(parent)
     this->setAutoFillBackground(true);
     this->setPalette(Pal);
     rover = new RoverClass();
-    middleFrontSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::MIDDLESENSOR, 4, 50, 30, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
-    leftFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::LEFTSENSOR, 20, 150, 0, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
-    rightFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::RIGHTSENSOR, 20, 150, 0, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
-    rightSideSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::RIGHTSIDESENSOR, 20, 150, 0, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
-    leftSideSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::LEFTSIDESENSOR, 20, 150, 0, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
+    middleFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::MIDDLESENSOR, 4, 70, 30, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
+    leftFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::LEFTSENSOR, 20, 70, 0, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
+    rightFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::RIGHTSENSOR, 20, 70, 0, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
+    rightSideSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::RIGHTSIDESENSOR, 4, 50, 30, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
+    leftSideSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::LEFTSIDESENSOR, 4, 50, 30, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
     this->setMouseTracking(true);
-    mouseState = FIRSTCORNER;
+    mouseState = FIRSTCLICK;
     setFocusPolicy(Qt::StrongFocus);
     showObjects = true;
 //    QPointF initialDistancePoint = QPointF(40.5,25.5);
@@ -90,7 +90,7 @@ void GridScene::paintEvent(QPaintEvent *) {
     if(showObjects)
         painter.drawRects(rects);
 
-    painter.drawRect(newRect);
+    painter.drawPolygon(newRect);
     middleFrontSensor->draw(&painter);
     leftFrontSensor->draw(&painter);
     rightFrontSensor->draw(&painter);
@@ -112,7 +112,6 @@ void GridScene::initializeGrid() {
 }
 
 void GridScene::addLine(double x1, double y1, double x2, double y2) {
-//    qDebug() << "Point 1 = " << x1 << ", " << y1 << "Point 2 = " << x2 << ", " << y2;
 //    raytrace3(floor(x1), floor(y1), floor(x2), floor(y2));
     raytrace2(x1, y1, x2, y2,false);
     QLineF line = QLineF(CELL_SIZE*x1, CELL_SIZE*y1, CELL_SIZE*x2, CELL_SIZE*y2);
@@ -147,29 +146,78 @@ void GridScene::addRayTrace(SensorClass* impl) {
     raytrace2(sensorLocation.x(), sensorLocation.y(), distancePoint.x(), distancePoint.y(), maximum);
 }
 
-void GridScene::mouseMoveEvent(QMouseEvent *_event) {
-    if(this->rect().contains(_event->pos())) {
-        emit updateCursorPosition(_event->x(), _event->y());
+GridScene::SensorDataType GridScene::getSensorData() {
+    SensorDataType data;
+    data.leftFrontSensorDistance = leftFrontSensor->readDistance(rects);
+    data.middleFrontSensorDistance = middleFrontSensor->readDistance(rects);
+    data.rightFrontSensorDistance = rightFrontSensor->readDistance(rects);
+    data.leftFrontSensorDistance = leftFrontSensor->readDistance(rects);
+    return data;
+}
+
+void GridScene::updateOccupanyGrid(SensorDataType sensorData) {
+
+}
+
+void GridScene::mouseMoveEvent(QMouseEvent *event) {
+    if(this->rect().contains(event->pos())) {
+        emit updateCursorPosition(event->x(), height()-event->y());
+        if(mouseState == SECONDCLICK) {
+            QPointF pos = event->pos();
+            pos.setY(CELL_SIZE*HEIGHT - pos.y());
+//            newRect.append(pos);
+        }
+        else if(mouseState == ROTATE) {
+            QTransform t;
+            t.translate(centerRect.x(), height()-centerRect.y());
+            t.rotate(90);
+//            t.translate(-2, -2);
+            QPolygonF p2 = t.map(newRect);
+            qDebug() << newRect << "rotated = " << p2;
+
+        }
     }
 }
 
-void GridScene::mousePressEvent(QMouseEvent *event) {
-    if(event->buttons() == Qt::LeftButton) {
-        QPointF pos = event->pos();
-        pos.setY(CELL_SIZE*HEIGHT - pos.y());
-        newRect.setTopLeft(pos);
-        newRect.setBottomRight(pos);
-    }
-}
 
 void GridScene::mouseReleaseEvent(QMouseEvent *event) {
-    QPointF pos = event->pos();
-    pos.setY(CELL_SIZE*HEIGHT - pos.y());
-    newRect.setBottomRight(pos);
-    rects.push_back(newRect);
-    qDebug() << "new object created at " << newRect;
-    newRect = QRect();
-    update();
+    qDebug() << "mouse release event";
+    switch(mouseState) {
+        case FIRSTCLICK: {
+            qDebug() << "first click";
+            QPointF pos = event->pos();
+            pos.setY(CELL_SIZE*HEIGHT - pos.y());
+            newRect << pos;
+            mouseState = SECONDCLICK;
+            break;
+        }
+        case SECONDCLICK: {
+            qDebug() << "second click";
+            QPointF pos = event->pos();
+            pos.setY(CELL_SIZE*HEIGHT - pos.y());
+            newRect << pos;
+            mouseState = ROTATE;
+            QPointF bottomleft = QPointF(newRect[0].x(), newRect[1].y());
+            newRect << bottomleft;
+            QPointF topright = QPointF(newRect[1].x(), newRect[0].y());
+            newRect << topright;
+
+            centerRect = QPointF(newRect[0].x() + newRect[1].x(), newRect[0].y() + newRect[1].y());
+            centerRect.setX(centerRect.x()/2.0);
+            centerRect.setY(centerRect.y()/2.0);
+            qDebug() << newRect;
+            update();
+            break;
+        }
+        case ROTATE: {
+//            rects.push_back(newRect);
+            newRect = QPolygonF();
+            centerRect = QPointF();
+            mouseState = FIRSTCLICK;
+            update();
+            break;
+        }
+    }
 }
 
 void GridScene::keyPressEvent(QKeyEvent *event) {
@@ -193,6 +241,7 @@ void GridScene::keyPressEvent(QKeyEvent *event) {
     default:
         break;
     }
+    emit updateRoverPosition(rover->getLocationInformation().center.x(), rover->getLocationInformation().center.y(), rover->getLocationInformation().orientation);
     middleFrontSensor->updatePosition(rover->getLocationInformation().center, rover->getLocationInformation().orientation);
     leftFrontSensor->updatePosition(rover->getLocationInformation().center, rover->getLocationInformation().orientation);
     rightFrontSensor->updatePosition(rover->getLocationInformation().center, rover->getLocationInformation().orientation);
