@@ -285,7 +285,7 @@
       <Template>
         <Name>FreeRTOSConfig.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>45C225EB7F1F14FD79FB93A8447C4320</Checksum>
+        <Checksum>2164489DFBF97AAD5FAE1564A46D613B</Checksum>
       </Template>
       <Template>
         <Name>sensor_thread.c</Name>

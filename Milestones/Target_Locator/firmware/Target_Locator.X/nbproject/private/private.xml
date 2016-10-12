@@ -3,22 +3,16 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/system_config/default/system_exceptions.c</file>
-            <file>file:/C:/microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/tasks.c</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/system_config/default/system_interrupt_a.S</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/system_config/default/system_interrupt.c</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/system_config/default/system_init.c</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/sensor_thread.h</file>
-            <file>file:/C:/microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/queue.c</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/rx_thread.c</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/system_config/default/framework/driver/usart/src/drv_usart_static.c</file>
-            <file>file:/C:/microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX/port.c</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/sensor_thread.c</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/main.c</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/tx_thread.c</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/message_controller_thread.c</file>
             <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/message_controller_thread.h</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/system_config/default/system_tasks.c</file>
+            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/sensor_thread.c</file>
+            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/message_controller_thread.c</file>
+            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/rx_thread.c</file>
+            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/sensor_thread.h</file>
+            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/system_config/default/system_interrupt.c</file>
+            <file>file:/C:/microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/queue.c</file>
+            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/json_wrapper.h</file>
+            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/system_config/default/framework/driver/adc/src/drv_adc_static.c</file>
+            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/system_config/default/system_init.c</file>
         </group>
     </open-files>
 </project-private>

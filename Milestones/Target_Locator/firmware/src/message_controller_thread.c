@@ -66,7 +66,7 @@ static QueueHandle_t _queue;
 static int systemClock;
 
 #define TYPEOFQUEUE MessageObj
-#define SIZEOFQUEUE 48
+#define SIZEOFQUEUE 36
 
 /*******************************************************************************
   Function:
