@@ -133,7 +133,7 @@ void ConvertTopLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
     if(voltage <= 2.5 && voltage >=0.899) {
         *distanceCM = 114.097*(pow(0.484144,voltage));
     }
-    else if(voltage < 0.899) {
+    else if(voltage >= 0.747 && voltage < 0.899) {
         *distanceCM = 64.47/(voltage+0.1776);
     }
     else {
@@ -148,7 +148,7 @@ void ConvertTopRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
     if(voltage <= 2.5 && voltage >= 1.096) {
         *distanceCM = 119.191*(pow(0.4879,voltage));
     }
-    else if(voltage < 1.096){
+    else if(voltage >= 0.854 && voltage < 1.096){
         *distanceCM = 61.223/(voltage+0.0173); 
     }
     else {
