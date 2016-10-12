@@ -67,7 +67,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "rx_thread_public.h"
 #include "message_controller_thread.h"
 #include "system_definitions.h"
-
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "timers.h"
 // *****************************************************************************
 // *****************************************************************************
 // Section: System Interrupt Vector Functions
@@ -77,6 +80,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 static QueueHandle_t _usartqueue;
 #define USARTTYPEOFQUEUE char
 #define USARTSIZEOFQUEUE 600
+
+
+static TimerHandle_t timer;
+static bool mode = true;
 
 void IntHandlerDrvAdc(void)
 {
@@ -106,7 +113,38 @@ void IntHandlerDrvAdc(void)
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
 }
 
-/* This timer is for the ADC to fire every 10ms */
+
+void timerExpired(TimerHandle_t xTimer) {
+}
+
+TickType_t startTickCount;
+
+void IntHandlerExternalInterruptInstance0(void)
+{
+    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
+    //rising edge trigger
+    if(mode) {
+        xTimerStartFromISR(timer, &pxHigherPriorityTaskWoken);
+        startTickCount = xTaskGetTickCount();
+        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE0, INT_EDGE_TRIGGER_FALLING);
+        mode = false;
+    }
+    //falling edge trigger
+    else {
+        xTimerStartFromISR(timer, &pxHigherPriorityTaskWoken);
+        MessageObj obj;
+        obj.Update.Data.difftickCount = xTaskGetTickCount() - startTickCount;
+        obj.Type = UPDATE;
+        obj.Update.Type = TIMERTICK;
+        MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+        mode = true;
+        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE0, INT_EDGE_TRIGGER_RISING);
+    }
+    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
+    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_0);
+}
+
+
 void IntHandlerDrvTmrInstance0(void)
 {
     dbgOutputLoc(ENTER_TMR_INSTANCE_0_ISR);
@@ -214,6 +252,7 @@ void IntHandlerDrvUsartInstance0(void)
 
 void InitializeISRQueues() {
     Usart0_InitializeQueue();
+    timer = xTimerCreate("Timer", pdMS_TO_TICKS(500), pdFALSE, (void*)0, timerExpired);
 }
 
  

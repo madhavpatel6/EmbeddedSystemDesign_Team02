@@ -263,6 +263,12 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     tx_thread_obj.Destination = SERVER;
                                     break;
                                 }
+                                case TimerTickCount: {
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"TimerTickCount\": \"%.3f\"",
+                                        internalData.difftickCount
+                                        );
+                                    break;
+                                }
                                 case msLocalTime:{
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"msLocalTime\":\"%d\"", getSystemClock() * 200);
                                     tx_thread_obj.Destination = obj.External.Source;
@@ -407,6 +413,10 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                     }
                     case SENSORDATA: {
                         internalData.sensordata = obj.Update.Data.sensordata;
+                        break;
+                    }
+                    case TIMERTICK: {
+                        internalData.difftickCount = obj.Update.Data.difftickCount;
                         break;
                     }
                     default: {

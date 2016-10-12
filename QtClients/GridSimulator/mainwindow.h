@@ -15,7 +15,7 @@ class MainWindow : public QWidget
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    GridScene *grid;
+    GridScene *gridwidget;
     QHBoxLayout* horizontalLayout;
     QVBoxLayout* verticalLayout1;
     QVBoxLayout* verticalLayout2;

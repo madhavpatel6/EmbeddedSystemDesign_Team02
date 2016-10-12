@@ -7,13 +7,13 @@ MainWindow::MainWindow(QWidget *parent)
     setupUi(this);
     connect(clearOccupanyGridButton, SIGNAL(released()), this, SLOT(handleGridClear()));
     connect(simulateButton, SIGNAL(released()), this, SLOT(handleSimulate()));
-    connect(grid, SIGNAL(updateCursorPosition(int,int)), this, SLOT(updateCursorPosition(int,int)));
+    connect(gridwidget, SIGNAL(updateCursorPosition(int,int)), this, SLOT(updateCursorPosition(int,int)));
     sensorReadingTimer = new QTimer();
     sensorReadingTimer->setInterval(50);
     sensorReadingTimer->start();
     connect(sensorReadingTimer, SIGNAL(timeout()), this, SLOT(handleSimulate()));
     connect(showObjects, SIGNAL(released()), this, SLOT(handleShowObjects()));
-    connect(grid, SIGNAL(updateRoverPosition(float,float,float)), this, SLOT(handleRoverCoordinateUpdate(float,float,float)));
+    connect(gridwidget, SIGNAL(updateRoverPosition(float,float,float)), this, SLOT(handleRoverCoordinateUpdate(float,float,float)));
 //    grid->UpdateSensorReading(GridScene::MIDDLESENSOR, 13*GridScene::CELL_SIZE);
 //    grid->addLine(142,144,321,124);
 //    grid->addLine(12,38,22,88);
@@ -37,8 +37,8 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     horizontalLayout->setSpacing(5);
     horizontalLayout->setContentsMargins(5,5,5,5);
     horizontalLayout->setObjectName(QString("horizontalLayout"));
-    grid = new GridScene();
-    horizontalLayout->addWidget(grid);
+    gridwidget = new GridScene();
+    horizontalLayout->addWidget(gridwidget);
     horizontalLayout->setAlignment(Qt::AlignCenter);
 
     verticalLayout1 = new QVBoxLayout();
@@ -87,11 +87,11 @@ void MainWindow::setupUi(QWidget* mainwindow) {
 //    verticalLayout2->addWidget(simulateButton);
 //    verticalLayout2->addWidget(showObjects);
     verticalLayout2->addItem(verticalSpacer2);
-    setFocusProxy(grid);
+    setFocusProxy(gridwidget);
 }
 
 void MainWindow::handleGridClear() {
-    grid->reset();
+    gridwidget->reset();
 }
 
 void MainWindow::handleRoverCoordinateUpdate(float x, float y, float angle) {
@@ -101,17 +101,17 @@ void MainWindow::handleRoverCoordinateUpdate(float x, float y, float angle) {
 }
 
 void MainWindow::handleSimulate() {
-    grid->setFocus();
-    grid->updateSensorReading();
+    gridwidget->setFocus();
+    gridwidget->updateSensorReading();
 }
 
 void MainWindow::handleShowObjects() {
-    if(grid->showObjects) {
-        grid->showObjects = false;
+    if(gridwidget->showObjects) {
+        gridwidget->showObjects = false;
         showObjects->setText("Show Objects");
     }
-    else if(!grid->showObjects) {
-        grid->showObjects = true;
+    else if(!gridwidget->showObjects) {
+        gridwidget->showObjects = true;
         showObjects->setText("Hide Objects");
     }
 }
