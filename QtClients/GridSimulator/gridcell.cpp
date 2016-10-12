@@ -14,14 +14,14 @@ void GridCell::draw(QPainter *painter) {
 }
 
 void GridCell::decrement() {
-    if(count > MINIMUM) {
-        count--;
+    if(count > MINIMUM + 5) {
+        count-=5;
     }
 }
 
 void GridCell::increment() {
-    if(count < (MAXIMUM - 10)) {
-        count+=10;
+    if(count < (MAXIMUM - 15)) {
+        count+=15;
     }
 }
 

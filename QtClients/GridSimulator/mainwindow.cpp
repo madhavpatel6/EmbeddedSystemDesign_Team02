@@ -64,6 +64,7 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     cursorPosition = new QLabel("");
     verticalSpacer1 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     verticalSpacer2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    showObjects = new QPushButton("Hide Objects");
     verticalLayout1->addWidget(roverLocXLabel);
     verticalLayout1->addWidget(xRoverLoc);
     verticalLayout1->addWidget(roverLocYLabel);
@@ -71,20 +72,20 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     verticalLayout1->addWidget(roverAngleLabel);
     verticalLayout1->addWidget(roverAngle);
     verticalLayout1->addWidget(clearOccupanyGridButton);
+    verticalLayout1->addWidget(simulateButton);
     verticalLayout1->addWidget(cursorPosition);
     verticalLayout1->addItem(verticalSpacer1);
     middleFIRDistance = new QLineEdit();
     rightFIRDistance = new QLineEdit();
     leftFIRDistance = new QLineEdit();
-    showObjects = new QPushButton("Hide Objects");
-    verticalLayout2->addWidget(leftFIRDistanceLabel);
-    verticalLayout2->addWidget(leftFIRDistance);
-    verticalLayout2->addWidget(middleFIRDistanceLabel);
-    verticalLayout2->addWidget(middleFIRDistance);
-    verticalLayout2->addWidget(rightFIRDistanceLabel);
-    verticalLayout2->addWidget(rightFIRDistance);
-    verticalLayout2->addWidget(simulateButton);
-    verticalLayout2->addWidget(showObjects);
+//    verticalLayout2->addWidget(leftFIRDistanceLabel);
+//    verticalLayout2->addWidget(leftFIRDistance);
+//    verticalLayout2->addWidget(middleFIRDistanceLabel);
+//    verticalLayout2->addWidget(middleFIRDistance);
+//    verticalLayout2->addWidget(rightFIRDistanceLabel);
+//    verticalLayout2->addWidget(rightFIRDistance);
+//    verticalLayout2->addWidget(simulateButton);
+//    verticalLayout2->addWidget(showObjects);
     verticalLayout2->addItem(verticalSpacer2);
     setFocusProxy(grid);
 }

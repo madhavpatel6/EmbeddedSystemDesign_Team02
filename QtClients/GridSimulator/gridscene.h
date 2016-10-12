@@ -18,7 +18,6 @@ class GridScene : public QWidget
     Q_OBJECT
 public:
     typedef enum { MIDDLESENSOR, RIGHTSENSOR, LEFTSENSOR, RIGHTSIDESENSOR, LEFTSIDESENSOR } SensorLocation;
-//    typedef enum { FIRSTCORNER, SECONDCORNER, IDLE } MouseStateType;
     typedef enum { FIRSTCLICK, SECONDCLICK, ROTATE } MouseStateType;
     typedef struct {
         float middleFrontSensorDistance;
@@ -47,7 +46,7 @@ public:
     bool showObjects;
 signals:
     void updateCursorPosition(int x, int y);
-    void updateRoverPosition(float x, float y, float angle);
+    void updateRoverPosition(float x, float y, float newRectAngle);
 private:
     bool checkBounds(double x1, double y1) {
         return y1 < HEIGHT && x1 < WIDTH && y1 >= 0 && x1 >= 0;
@@ -65,9 +64,11 @@ private:
     void initializeGrid();
     void paintEvent(QPaintEvent *);
     std::vector<std::vector<GridCell>> grid;
-    QVector<QRectF> rects;
+    QVector<QPolygonF> rects;
     QPolygonF newRect;
-    QPointF centerRect;
+    QPolygonF newRotatedRect;
+    float newRectAngle;
+    QPointF newRectCenter;
     QVector<QLineF> lines;
 };
 

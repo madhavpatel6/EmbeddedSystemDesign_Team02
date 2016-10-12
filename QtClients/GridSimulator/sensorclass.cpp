@@ -80,7 +80,7 @@ void SensorClass::draw(QPainter* painter) {
     painter->restore();
 }
 
-float SensorClass::readDistance(QVector<QRectF> objs) {
+float SensorClass::readDistance(QVector<QPolygonF> objs) {
     switch(sensorType) {
         case IRSENSOR: {
             QPointF absoluteIntersectionPoint = findFirstIntersectionIR(objs);
@@ -130,7 +130,7 @@ float SensorClass::computeDistance(QPointF p1, QPointF p2) {
     return floor(sqrt( pow(p1.x() - p2.x(),2) + pow(p1.y() - p2.y(),2) ));
 }
 
-QPointF SensorClass::findFirstIntersectionIR(QVector<QRectF> objs) {
+QPointF SensorClass::findFirstIntersectionIR(QVector<QPolygonF> objs) {
     temp.clear();
     int alternate = 0;
     for(int i = 0; i < maximumDistanceCM*cell_pixel_size; i++) {
@@ -139,7 +139,7 @@ QPointF SensorClass::findFirstIntersectionIR(QVector<QRectF> objs) {
         if(i > minimumDistanceCM * cell_pixel_size && alternate == 10)
             temp.push_back(checkPoint);
         for(int j = 0; j < objs.size(); j++) {
-            if(objs[j].contains(checkPoint)) {
+            if(objs[j].containsPoint(checkPoint, Qt::WindingFill)) {
                 if(i < minimumDistanceCM * cell_pixel_size) {
                     return QPointF(-1,-1);
                 }
@@ -157,7 +157,7 @@ QPointF SensorClass::findFirstIntersectionIR(QVector<QRectF> objs) {
 }
 
 
-QPointF SensorClass::findFirstIntersectionUltrasonic(QVector<QRectF> objs) {
+QPointF SensorClass::findFirstIntersectionUltrasonic(QVector<QPolygonF> objs) {
     temp.clear();
     int alternate = 0;
     for(int i = 0; i <= maximumDistanceCM*cell_pixel_size; i++) {
@@ -168,7 +168,7 @@ QPointF SensorClass::findFirstIntersectionUltrasonic(QVector<QRectF> objs) {
             if(((l == 0 || l == -coneAngle/2.0 || l == coneAngle/2.0 || centerCheckPoint == coneCheckPoint) && alternate == 10 || i == maximumDistanceCM*cell_pixel_size || i == minimumDistanceCM*cell_pixel_size) && i >= minimumDistanceCM * cell_pixel_size)
                 temp.push_back(coneCheckPoint);
             for(int j = 0; j < objs.size(); j++) {
-                if(objs[j].contains(coneCheckPoint)) {
+                if(objs[j].containsPoint(coneCheckPoint, Qt::WindingFill)) {
                     if(i < minimumDistanceCM * cell_pixel_size) {
                         return QPointF(-1,-1);
                     }
