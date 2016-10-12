@@ -1,13 +1,22 @@
 #ifndef GRIDHELPER_H
 #define GRIDHELPER_H
 
+#include <QPointF>
 
 typedef struct {
-    float middleFrontSensorDistance;
-    float rightFrontSensorDistance;
-    float leftFrontSensorDistance;
-    float rightSideSensorDistance;
-    float leftSideSensorDistance;
+    float distance;
+    float orientation;
+    float coneAngle;
+    QPointF sensorLocation;
+    QPointF maxSensorLocation;
+} SensorData_t;
+
+typedef struct {
+    SensorData_t middleFrontSensor;
+    SensorData_t rightFrontSensor;
+    SensorData_t leftFrontSensor;
+    SensorData_t rightSideSensor;
+    SensorData_t leftSideSensor;
 } SensorDataType;
 
 namespace GridHelper {

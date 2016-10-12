@@ -155,10 +155,10 @@ void GridScene::addRayTrace(SensorClass* impl) {
 
 SensorDataType GridScene::getSensorData() {
     SensorDataType data;
-    data.leftFrontSensorDistance = leftFrontSensor->readDistance(rects);
-    data.middleFrontSensorDistance = middleFrontSensor->readDistance(rects);
-    data.rightFrontSensorDistance = rightFrontSensor->readDistance(rects);
-    data.leftFrontSensorDistance = leftFrontSensor->readDistance(rects);
+    data.leftFrontSensor = leftFrontSensor->getParamAndDistance(rects);
+    data.middleFrontSensor = middleFrontSensor->getParamAndDistance(rects);
+    data.rightFrontSensor = rightFrontSensor->getParamAndDistance(rects);
+    data.leftFrontSensor = leftFrontSensor->getParamAndDistance(rects);
     return data;
 }
 

@@ -1,6 +1,9 @@
 #include <iostream>
-#include "gridscene.h"
 #include "gridhelper.h"
+#include "gridscene.h"
+
+#define M_PI 3.14159265358979323846
+
 namespace GridHelper {
 
 void raytrace(double x1, double y1, double x2, double y2)
@@ -219,7 +222,22 @@ void raytrace3(int x1, int y1, int x2, int y2)
   // assert ((y == y2) && (x == x2));  // the last point (y2,x2) has to be the same with the last point of the algorithm
 }
 
-void updateOccupanyGrid(SensorDataType sensorData) {
+void handleIRSensor(SensorData_t data) {
+    QPointF distancePoint;
+    bool maximum = false;
+    if(data.distance == -2)
+        return;
+    if(data.distance == -1) {
+        distancePoint = data.maxSensorLocation;
+        maximum = true;
+    }
+    else {
+        distancePoint = QPointF(data.sensorLocation.x() + data.distance*cos(data.orientation*M_PI/180), data.sensorLocation.y() + data.distance*sin(data.orientation*M_PI/180));
+    }
+}
 
+void updateOccupanyGrid(SensorDataType sensorData) {
+    handleIRSensor(sensorData.leftFrontSensor);
+    handleIRSensor(sensorData.rightFrontSensor);
 }
 }

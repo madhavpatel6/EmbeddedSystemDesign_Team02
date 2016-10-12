@@ -1,6 +1,7 @@
 #include "sensorclass.h"
 #include <cmath>
 #include <QDebug>
+#include "gridhelper.h"
 #define M_PI 3.14159265358979323846
 SensorClass::SensorClass(SensorType _sensorType, SensorLocation location, int _minimumDistanceCM, int _maximumDistanceCM, int _coneAngle, QPointF roverLocation, int roverOrientation, int _cell_pixel_size)
 {
@@ -80,6 +81,16 @@ void SensorClass::draw(QPainter* painter) {
     painter->restore();
 }
 
+SensorData_t SensorClass::getParamAndDistance(QVector<QPolygonF> objs) {
+    SensorData_t ret;
+    ret.coneAngle = this->coneAngle;
+    ret.distance = readDistance(objs);
+    ret.orientation = this->sensorOrientation;
+    ret.sensorLocation = this->sensorLocation;
+    ret.maxSensorLocation = this->getMaximumSensorLocation();
+    return ret;
+}
+
 float SensorClass::readDistance(QVector<QPolygonF> objs) {
     switch(sensorType) {
         case IRSENSOR: {
@@ -113,6 +124,7 @@ float SensorClass::readDistance(QVector<QPolygonF> objs) {
     }
     return -2;
 }
+
 
 int SensorClass::getSensorOrientation() {
     return sensorOrientation;
