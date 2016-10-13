@@ -7,6 +7,7 @@
 #include "clientsocket.h"
 #include "initialization.h"
 #include "pathsimulator.h"
+#include "pidtuner.h"
 
 namespace Ui {
 class MainWindow;
@@ -31,6 +32,11 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_pushButton_2_clicked();
+
+signals:
+    void pidTunerMessage(QJsonObject rec);
+
 private:
     Ui::MainWindow *ui;
     ClientSocket *socket;
@@ -39,6 +45,8 @@ private:
     QStringList resEnabled;
     initialization* config;
     PathSimulator *pSim;
+    pidTuner *tuner;
+
 
 };
 

@@ -140,6 +140,7 @@ void MainWindow::requestSlot(){
 
 }
 void MainWindow::dataReadSlot(QByteArray data){
+
     QByteArray array = data;
     char buffer[MAXMESSAGESIZE];
     char source, messageCount;
@@ -174,7 +175,7 @@ void MainWindow::dataReadSlot(QByteArray data){
                 }
                 jsonMessage.chop(1); // this removes the extra comma at the end
                 jsonMessage += "}";
-                qDebug() << jsonMessage;
+                // qDebug() << jsonMessage;
                 char message[512];
                 char destination = source;
 
@@ -187,6 +188,11 @@ void MainWindow::dataReadSlot(QByteArray data){
 
                 qDebug() << "bytesSent:" << bytesSent << "\n";
 
+            }else if(type == QStringLiteral("PID")){
+                // qDebug() << "PID Message";
+                if(tuner){
+                    emit pidTunerMessage(json);
+                }
             }
         }
         else {
@@ -207,4 +213,12 @@ void MainWindow::on_pushButton_clicked()
         break;
     }
 
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    tuner = new pidTuner();
+    tuner->show();
+
+    connect(this, SIGNAL(pidTunerMessage(QJsonObject)), tuner, SLOT(motorUpdate(QJsonObject)));
 }

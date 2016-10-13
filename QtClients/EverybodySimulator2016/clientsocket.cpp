@@ -44,7 +44,7 @@ int  ClientSocket::send(QByteArray words){
 
 void ClientSocket::readyRead()
 {
-    qDebug() << "ClientSocket::readyRead()";
+    // qDebug() << "ClientSocket::readyRead()";
     // qDebug() << socket->readAll();
     emit dataRead(socket->readAll());
 
