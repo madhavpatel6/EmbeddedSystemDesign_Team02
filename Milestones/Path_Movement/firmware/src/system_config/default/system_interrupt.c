@@ -116,24 +116,30 @@ void IntHandlerDrvTmrInstance0(void)
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
 }
+//
+//int bufCount = 0;
+//int ISRcount = 0;
+//char buf[22] = "FRLB";
+//uint16_t timerCount = 0;
 
-int bufCount = 0;
-int ISRcount = 0;
-char buf[22] = "FRLB";
-uint16_t timerCount = 0;
 
+static float desiredTicksR = 5;
+static float outputR;
+static unsigned short pwmCmdR = 0;
+static float integralR = 0;
+static float KpR = 7790;// 500;//2900;
+static float KiR = 800; // 14;
+static int rightSign = 1;
 
-int desiredTicksR = 100;
-unsigned short pwmCmdR = 20000;
-int integralR = 0;
-float KpR = 500;//2900;
-float KiR = 14;
-
-int desiredTicksL = 100;
-unsigned short pwmCmdL = 20000;
-int integralL = 0;
-float KpL = 600;// 2700;
-float KiL = 8;
+static float desiredTicksL = 5;
+static float outputL;
+static unsigned short pwmCmdL = 0;
+static float integralL = 0;
+static float KpL = 8000;// ;// 2700;
+static float KiL = 500;// 8;
+static int leftSign = 1;
+static int time = 0;
+static int timeOut = 0;
 
 
 /* This timer is for the TX to fire every 200 ms */
@@ -145,69 +151,110 @@ void IntHandlerDrvTmrInstance1(void)
     MessageObj obj;
     obj.Type = SEND_REQUEST;
     dbgOutputLoc(BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR);
-    switch(MYMODULE){
-        case SEARCHERMOVER:
-            obj.Request = SMtoTL;
-            // MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            break;
-        case TARGETLOCATOR:
-            obj.Request = TLtoSM;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            obj.Request = TLtoPF;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            break;
-        case PATHFINDER:
-            obj.Request = PFtoTL;
-            // MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            obj.Request = PFtoTG;
-            // MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            break;
-        case TARGETGRABBER:
-            obj.Request = TGtoPF;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            break;
-    }
-    if (ISRcount == 16) {
-        MOTOR_CONTROLLER_THREAD_SendToQueueISR(buf[bufCount], &pxHigherPriorityTaskWoken);
-        if (bufCount < strlen(buf)-1) {
-            bufCount++;
-        } else {
-            bufCount = 0;
+    // this is necissary cuz this goes of at 20ms now
+    if(time % 10 == 0){
+        switch(MYMODULE){
+            case SEARCHERMOVER:
+                obj.Request = SMtoTL;
+                // MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                break;
+            case TARGETLOCATOR:
+                obj.Request = TLtoSM;
+                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                obj.Request = TLtoPF;
+                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                break;
+            case PATHFINDER:
+                obj.Request = PFtoTL;
+                // MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                obj.Request = PFtoTG;
+                // MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                break;
+            case TARGETGRABBER:
+                obj.Request = TGtoPF;
+                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                break;
         }
-        ISRcount = 0;
-    } else {
-        ISRcount++;
+    }  
+//    if (ISRcount == 16) {
+//        MOTOR_CONTROLLER_THREAD_SendToQueueISR(buf[bufCount], &pxHigherPriorityTaskWoken);
+//        if (bufCount < strlen(buf)-1) {
+//            bufCount++;
+//        } else {
+//            bufCount = 0;
+//        }
+//        ISRcount = 0;
+//    } else {
+//        ISRcount++;
+//    }
+    
+    if(time >= 50){
+    
+        setDirectionForward();
+
+        int rightCount = PLIB_TMR_Counter16BitGet(TMR_ID_3) * rightSign;
+        int leftCount = PLIB_TMR_Counter16BitGet(TMR_ID_4) * leftSign;
+
+        float errorR = desiredTicksR - (float) rightCount;
+        integralR = integralR + errorR; // for now assume dt = 1 when really its 200ms
+        // derivative = (error - previous_error)/dt
+        outputR = KpR* errorR + KiR* integralR;
+        if(outputR > 0){
+            setDirectionForward();
+            rightSign = 1;
+        }else{
+            setDirectionBack();
+            outputR *= -1;
+            rightSign = -1;
+        }
+        if(outputR > 65535){
+            outputR = 65535;
+        }
+        pwmCmdR = (unsigned short) outputR;
+//        if(pwmCmdL)
+
+        float errorL = desiredTicksL - (float) leftCount;
+        integralL = integralL + errorL; // for now assume dt = 1 when really its 200ms
+        // derivative = (error - previous_error)/dt
+        outputL = KpL*errorL + KiL*integralL;
+        if(outputL > 0){
+            setDirectionForward();
+            leftSign = 1;
+        }else{
+            setDirectionBack();
+            outputL *= -1;
+            leftSign = -1;
+        }
+        if(outputL > 65535){
+            outputL = 65535;
+        }
+        pwmCmdL = (unsigned short) outputL;
+        
+        if(time % 3 == 0){
+            Tx_Thead_Queue_DataType tx_thread_obj;
+            memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
+            tx_thread_obj.Destination = PATHFINDER;
+            //sprintf(tx_thread_obj.Data, " %4d, %4d, %6d, %6d \n", rightCount, leftCount, pwmCmdR, pwmCmdL);
+            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"1\", \"vel\": \"%4d\", \"time\": \"%4d\", \"output\": \"%4f\", \"pwm\": \"%4d\"}", rightCount, timeOut, outputR, pwmCmdR);
+            BaseType_t *ptr;
+            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"2\", \"vel\": \"%4d\", \"time\": \"%4d\"}", leftCount, time);
+            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+        }
+
+        PLIB_OC_PulseWidth16BitSet(OC_ID_1, pwmCmdR);
+        PLIB_OC_PulseWidth16BitSet(OC_ID_2, pwmCmdL);
+
+        // Clear encoder counters
+        PLIB_TMR_Counter16BitClear(TMR_ID_3);
+        PLIB_TMR_Counter16BitClear(TMR_ID_4);
+
+    }else{
+        disableMotors();
     }
+    timeOut++;
+    time++;
     
-    setDirectionForward();
-    
-    int rightCount = PLIB_TMR_Counter16BitGet(TMR_ID_3);
-    int leftCount = PLIB_TMR_Counter16BitGet(TMR_ID_4);
-    
-    int errorR = desiredTicksR - rightCount;
-    integralR = integralR + errorR; // for now assume dt = 1 when really its 200ms
-    // derivative = (error - previous_error)/dt
-    pwmCmdR = (unsigned short) KpR*errorR + KiR*integralR;
-    
-    int errorL = abs(desiredTicksL - leftCount);
-    integralL = integralL + errorL; // for now assume dt = 1 when really its 200ms
-    // derivative = (error - previous_error)/dt
-    pwmCmdL = (unsigned short) KpL*errorL + KiL*integralL;
-    
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, pwmCmdR);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, pwmCmdL);
-
-    // Clear encoder counters
-    PLIB_TMR_Counter16BitClear(TMR_ID_3);
-    PLIB_TMR_Counter16BitClear(TMR_ID_4);
-
-    Tx_Thead_Queue_DataType tx_thread_obj;
-    memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
-    tx_thread_obj.Destination = SERVER;
-    sprintf(tx_thread_obj.Data, " %4d, %4d, %6d, %6d \n", rightCount, leftCount, pwmCmdR, pwmCmdL);
-    BaseType_t *ptr;
-    TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
-
     dbgOutputLoc(AFTER_SEND_TO_Q_TMR_INSTANCE_1_ISR);
     incrementSystemClock();
     dbgOutputLoc(LEAVE_TMR_INSTANCE_1_ISR);
