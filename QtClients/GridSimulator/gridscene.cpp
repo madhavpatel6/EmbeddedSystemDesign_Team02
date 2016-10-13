@@ -4,25 +4,22 @@
 #include "gridhelper.h"
 #define M_PI 3.14159265358979323846
 
-std::vector<std::vector<GridCell>> GridScene::grid;
-
 GridScene::GridScene(QWidget *parent) : QWidget(parent)
 {
-    this->resize(WIDTH*CELL_SIZE + 10, HEIGHT*CELL_SIZE + 10);
-    this->setFixedSize(WIDTH*CELL_SIZE + 1, HEIGHT*CELL_SIZE + 1);
-    initializeGrid();
+    this->resize(Grid::WIDTH*CELL_SIZE + 10, Grid::HEIGHT*CELL_SIZE + 10);
+    this->setFixedSize(Grid::WIDTH*CELL_SIZE + 1, Grid::HEIGHT*CELL_SIZE + 1);
+    Grid::initializeGrid(grid);
     QPalette Pal(palette());
     Pal.setColor(QPalette::Background, Qt::black);
     this->setAutoFillBackground(true);
     this->setPalette(Pal);
     rover = new RoverClass();
-    middleFrontSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::MIDDLESENSOR, 4, 70, 30, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
+    middleFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::MIDDLESENSOR, 4, 70, 30, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
     leftFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::LEFTSENSOR, 20, 70, 0, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
     rightFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::RIGHTSENSOR, 20, 70, 0, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
     rightSideSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::RIGHTSIDESENSOR, 4, 50, 30, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
     leftSideSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::LEFTSIDESENSOR, 4, 50, 30, rover->getLocationInformation().center, rover->getLocationInformation().orientation, CELL_SIZE);
     this->setMouseTracking(true);
-    mouseState = FIRSTCLICK;
     setFocusPolicy(Qt::StrongFocus);
     showObjects = true;
     newRectAngle = 0;
@@ -39,11 +36,7 @@ GridScene::~GridScene() {
 }
 
 void GridScene::reset() {
-    for(int locY = 0; locY < HEIGHT; locY++) {
-        for(int locX = 0; locX < WIDTH; locX++) {
-            grid[locY][locX].reset();
-        }
-    }
+    Grid::initializeGrid(grid);
 }
 
 void GridScene::paintEvent(QPaintEvent *) {
@@ -54,11 +47,7 @@ void GridScene::paintEvent(QPaintEvent *) {
     painter.translate(0,height());
     painter.scale(1,-1);
 
-    for(int i = 0; i < HEIGHT; i++) {
-        for(int j = 0; j < WIDTH; j++) {
-            grid[i][j].draw(&painter);
-        }
-    }
+    Grid::draw(&painter, grid, CELL_SIZE);
     QPen pen1(Qt::black,2, Qt::SolidLine, Qt::RoundCap);
     painter.setPen(pen1);
 
@@ -105,31 +94,20 @@ void GridScene::paintEvent(QPaintEvent *) {
     painter.end();
 }
 
-void GridScene::initializeGrid() {
-    for(int locY = 0; locY < HEIGHT; locY++) {
-        std::vector<GridCell> tempV;
-        for(int locX = 0; locX < WIDTH; locX++) {
-            GridCell tempCell = GridCell(locX,locY,CELL_SIZE);
-            tempV.push_back(tempCell);
-        }
-        grid.push_back(tempV);
-    }
-}
-
 void GridScene::addLine(double x1, double y1, double x2, double y2) {
 //    raytrace3(floor(x1), floor(y1), floor(x2), floor(y2));
-    GridHelper::raytrace2(x1, y1, x2, y2,false);
+    GridHelper::raytrace2(x1, y1, x2, y2, false, grid);
     QLineF line = QLineF(CELL_SIZE*x1, CELL_SIZE*y1, CELL_SIZE*x2, CELL_SIZE*y2);
     //Uncomment this if you want to see a line from a sensor to each reading
 //    lines.push_back(line);
 }
 
 void GridScene::updateSensorReading() {
-    SensorDataType data = getSensorData();
-    GridHelper::updateOccupanyGrid(data);
-//    addRayTrace(middleFrontSensor);
-//    addRayTrace(leftFrontSensor);
-//    addRayTrace(rightFrontSensor);
+//    SensorDataType data = getSensorData();
+//    GridHelper::updateOccupanyGrid(data);
+    addRayTrace(middleFrontSensor);
+    addRayTrace(leftFrontSensor);
+    addRayTrace(rightFrontSensor);
 //    addRayTrace(rightSideSensor);
 //    addRayTrace(leftSideSensor);
     update();
@@ -150,7 +128,7 @@ void GridScene::addRayTrace(SensorClass* impl) {
     else {
         distancePoint = QPointF(sensorLocation.x() + distance*cos(sensorOrientation*M_PI/180), sensorLocation.y() + distance*sin(sensorOrientation*M_PI/180));
     }
-    GridHelper::raytrace2(sensorLocation.x(), sensorLocation.y(), distancePoint.x(), distancePoint.y(), maximum);
+    GridHelper::raytrace3(sensorLocation.x(), sensorLocation.y(), distancePoint.x(), distancePoint.y(), maximum, grid);
 }
 
 SensorDataType GridScene::getSensorData() {
@@ -165,7 +143,7 @@ SensorDataType GridScene::getSensorData() {
 
 void GridScene::mouseMoveEvent(QMouseEvent *event) {
     QPointF pos = event->pos();
-    pos.setY(CELL_SIZE*HEIGHT - pos.y());
+    pos.setY(CELL_SIZE*Grid::HEIGHT - pos.y());
     if(this->rect().contains(event->pos())) {
         emit updateCursorPosition(event->x(), height()-event->y());
         if(mouseState == SECONDCLICK) {
@@ -201,7 +179,7 @@ void GridScene::mouseMoveEvent(QMouseEvent *event) {
 
 void GridScene::mouseReleaseEvent(QMouseEvent *event) {
     QPointF pos = event->pos();
-    pos.setY(CELL_SIZE*HEIGHT - pos.y());
+    pos.setY(CELL_SIZE*Grid::HEIGHT - pos.y());
     switch(mouseState) {
         case FIRSTCLICK: {
             newRect << pos;

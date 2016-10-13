@@ -2,6 +2,8 @@
 #define GRIDHELPER_H
 
 #include <QPointF>
+#include <QPoint>
+#include "grid.h"
 
 typedef struct {
     float distance;
@@ -19,13 +21,19 @@ typedef struct {
     SensorData_t leftSideSensor;
 } SensorDataType;
 
+typedef struct {
+    int number;
+    QVector<QPoint> decrementPoints;
+    QVector<QPoint> incrementPoints;
+} RayTraceReturnType;
+
 namespace GridHelper {
 
-void raytrace(double x1, double y1, double x2, double y2);
+RayTraceReturnType raytrace(double x1, double y1, double x2, double y2,bool maximum, Grid::GridType grid);
 
-void raytrace2(double x0, double y0, double x1, double y1, bool maximum);
+RayTraceReturnType raytrace2(double x0, double y0, double x1, double y1, bool maximum, Grid::GridType grid);
 
-void raytrace3(int x1, int y1, int x2, int y2);
+RayTraceReturnType raytrace3(int x1, int y1, int x2, int y2, bool maximum, Grid::GridType grid);
 
 void updateOccupanyGrid(SensorDataType sensorData);
 

@@ -145,10 +145,10 @@ float SensorClass::computeDistance(QPointF p1, QPointF p2) {
 QPointF SensorClass::findFirstIntersectionIR(QVector<QPolygonF> objs) {
     temp.clear();
     int alternate = 0;
-    for(int i = 0; i < maximumDistanceCM*cell_pixel_size; i++) {
+    for(int i = 0; i <= maximumDistanceCM*cell_pixel_size; i++) {
         QPointF checkPoint = QPointF ( i*cos(sensorOrientation*M_PI/180.0) + sensorPixelLocation.x(),
                                         i*1*sin(sensorOrientation*M_PI/180.0) + sensorPixelLocation.y());
-        if(i > minimumDistanceCM * cell_pixel_size && alternate == 10)
+        if(i > minimumDistanceCM * cell_pixel_size && alternate == 10 || i == maximumDistanceCM*cell_pixel_size)
             temp.push_back(checkPoint);
         for(int j = 0; j < objs.size(); j++) {
             if(objs[j].containsPoint(checkPoint, Qt::WindingFill)) {

@@ -24,10 +24,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-//    delete grid;
-//    delete verticalLayout1;
-//    delete verticalLayout2;
-//    delete horizontalLayout;
+    delete gridwidget;
+    delete verticalLayout1;
+    delete verticalLayout2;
+    delete horizontalLayout;
 }
 
 void MainWindow::setupUi(QWidget* mainwindow) {
@@ -73,6 +73,7 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     verticalLayout1->addWidget(roverAngle);
     verticalLayout1->addWidget(clearOccupanyGridButton);
     verticalLayout1->addWidget(simulateButton);
+    verticalLayout1->addWidget(showObjects);
     verticalLayout1->addWidget(cursorPosition);
     verticalLayout1->addItem(verticalSpacer1);
     middleFIRDistance = new QLineEdit();

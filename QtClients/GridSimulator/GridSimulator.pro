@@ -15,15 +15,15 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     gridscene.cpp \
-    gridcell.cpp \
     sensorclass.cpp \
     roverclass.cpp \
-    gridhelper.cpp
+    gridhelper.cpp \
+    grid.cpp
 
 HEADERS  += mainwindow.h \
     gridscene.h \
-    gridcell.h \
     sensorclass.h \
     sensorclass.h \
     roverclass.h \
-    gridhelper.h
+    gridhelper.h \
+    grid.h
