@@ -17,11 +17,13 @@ SOURCES += main.cpp\
     gridscene.cpp \
     gridcell.cpp \
     sensorclass.cpp \
-    roverclass.cpp
+    roverclass.cpp \
+    gridhelper.cpp
 
 HEADERS  += mainwindow.h \
     gridscene.h \
     gridcell.h \
     sensorclass.h \
     sensorclass.h \
-    roverclass.h
+    roverclass.h \
+    gridhelper.h

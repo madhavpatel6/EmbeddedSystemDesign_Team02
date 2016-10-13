@@ -5,6 +5,7 @@
 #include <QPoint>
 #include <QVector>
 #include <QRect>
+#include "gridhelper.h"
 class SensorClass
 {
 public:
@@ -13,6 +14,7 @@ public:
     SensorClass(SensorType _sensorType, SensorLocation location, int _minimumDistanceCM, int _maximumDistanceCM, int _coneAngle, QPointF roverLocation, int roverOrientation, int _cell_pixel_size);
     void updatePosition(QPointF roverLocation, int roverOrientation);
     void draw(QPainter* painter);
+    SensorData_t getParamAndDistance(QVector<QPolygonF> objs);
     float readDistance(QVector<QPolygonF> objs);
     QPointF getSensorLocation();
     int getSensorOrientation();

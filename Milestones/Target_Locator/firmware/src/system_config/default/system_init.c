@@ -189,6 +189,17 @@ void SYS_Initialize ( void* data )
     /*** Interrupt Service Initialization Code ***/
     SYS_INT_Initialize();
   
+    /*Setup the INT_SOURCE_EXTERNAL_0 and Enable it*/
+    SYS_INT_VectorPrioritySet(INT_VECTOR_INT0, INT_PRIORITY_LEVEL1);
+    SYS_INT_VectorSubprioritySet(INT_VECTOR_INT0, INT_SUBPRIORITY_LEVEL0);
+    SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE0,INT_EDGE_TRIGGER_RISING);
+    SYS_INT_SourceEnable(INT_SOURCE_EXTERNAL_0);
+
+
+
+
+
+  
     /* Initialize Middleware */
     InitializeISRQueues();
 

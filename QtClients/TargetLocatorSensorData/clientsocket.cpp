@@ -32,6 +32,7 @@ void ClientSocket::sendRequest(){
     QString request_begin = "{\"type\":\"Request\",\"items\":[\"";
     QString request_end = "\"]}";
     SendJSONRequestToSocket(request_begin + "TargetLocatorSensorData" + request_end, TARGETLOCATOR);
+    SendJSONRequestToSocket(request_begin + "TimerTickCount" + request_end, TARGETLOCATOR);
 }
 
 void ClientSocket::connected()
@@ -68,6 +69,9 @@ void ClientSocket::readyRead()
             if(type == QStringLiteral("Response")) {
                 if(json.contains(QStringLiteral("TargetLocatorSensorData"))) {
                     HandleResponse(json);
+                }
+                if(json.contains(QStringLiteral("TimerTickCount"))) {
+                    qDebug() << buffer;
                 }
             }
             else if(type == QStringLiteral("Request")){

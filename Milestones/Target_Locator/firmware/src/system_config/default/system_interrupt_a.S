@@ -83,6 +83,41 @@ _IntHandlerDrvAdc:
 
 
 
+/* External Interrupt Instance 0 Interrupt */
+   .extern  IntHandlerExternalInterruptInstance0
+
+   .section	.vector_3,code, keep
+   .equ     __vector_dispatch_3, IntVectorExternalInterruptInstance0
+   .global  __vector_dispatch_3
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  IntVectorExternalInterruptInstance0
+
+IntVectorExternalInterruptInstance0:
+    la    $26,  _IntHandlerExternalInterruptInstance0         
+    jr    $26
+    nop
+	.end	IntVectorExternalInterruptInstance0
+
+   .section	.ExternalInterruptInstance0_vector_text, code, keep
+   .set     nomicromips
+   .set     noreorder
+   .set     nomips16
+   .set     noat
+   .ent  _IntHandlerExternalInterruptInstance0
+
+_IntHandlerExternalInterruptInstance0:
+    portSAVE_CONTEXT
+    la    s6,  IntHandlerExternalInterruptInstance0
+    jalr  s6
+    nop
+    portRESTORE_CONTEXT
+    .end	_IntHandlerExternalInterruptInstance0
+
+
+
 /* TMR Instance 0 Interrupt */
    .extern  IntHandlerDrvTmrInstance0
 
