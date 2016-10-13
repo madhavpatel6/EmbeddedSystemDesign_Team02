@@ -45,9 +45,11 @@ void pidTuner::drawDot(int motorNum, int x, int y){
     QRectF dot(x,y*10,1, 1);
     if(motorNum == 1){
         QGraphicsRectItem *dotR = m1Scene.addRect(dot);
+        dotR->ensureVisible();
 
     }else if(motorNum == 2){
         QGraphicsRectItem *dotR = m2Scene.addRect(dot);
+        dotR->ensureVisible();
 
     }
 }

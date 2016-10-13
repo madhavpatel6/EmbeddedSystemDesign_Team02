@@ -175,7 +175,7 @@ void MainWindow::dataReadSlot(QByteArray data){
                 }
                 jsonMessage.chop(1); // this removes the extra comma at the end
                 jsonMessage += "}";
-                qDebug() << jsonMessage;
+                // qDebug() << jsonMessage;
                 char message[512];
                 char destination = source;
 
@@ -189,7 +189,7 @@ void MainWindow::dataReadSlot(QByteArray data){
                 qDebug() << "bytesSent:" << bytesSent << "\n";
 
             }else if(type == QStringLiteral("PID")){
-                qDebug() << "PID MEssage";
+                // qDebug() << "PID Message";
                 if(tuner){
                     emit pidTunerMessage(json);
                 }
