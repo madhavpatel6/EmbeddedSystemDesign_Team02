@@ -1,10 +1,12 @@
 
+#include <climits>
 
 typedef struct Point{
 	int x;
 	int y;
 	int gScore;
 	int hScore;
+	int parent;
 } Point;
 
 
@@ -20,6 +22,8 @@ void addObstacle(Point one, Point two, Point three, Point four);
 /* add a vertex to the world, more than 3 makes an arena */
 void addVertex(Point one);
 
+// bool isIntersecting(Point one, Point two, Point three, Point four);
+
 /* determines if a point is in the arena */
 bool isInArena(Point one);
 
@@ -30,12 +34,12 @@ bool isEmpty(Point one);
 bool isOccupied(Point one);
 
 /* gets 4 points adjacent to the specified one */
-bool getAdjacent(Point target, Point &one, Point &two, Point &three, Point &four);
+bool getAdjacent(Point target, Point *one, Point *two, Point *three, Point *four);
 
 /* estimates distance to destination by counting city blocks */
 int calculateH(Point start, Point stop);
 
-bool addToClosedList(Point one);
+bool addToClosedList(Point one, Point end);
 
 bool addWalkableLocations();
 
@@ -44,6 +48,13 @@ Point findBestStep();
 bool finalizePath();
 
 bool findPath(Point start, Point stop);
+
+bool isInObstacle(Point one, int obIndex);
+bool isInTarget(Point one, int obIndex);
+bool isOutAllTargets(Point one);
+bool isOutAllObstacles(Point one);
+
+void printPath();
 
 
 /* steps for A_Star */
