@@ -64,6 +64,8 @@ RayTraceReturnType raytrace(double x1, double y1, double x2, double y2, bool max
             y1 += iy;
         }
     }
+    RayTraceReturnType ret;
+    return ret;
 }
 
 RayTraceReturnType raytrace2(double x0, double y0, double x1, double y1, bool maximum, Grid::GridType grid)
