@@ -403,5 +403,34 @@ int main(){
 	findFarPathsTests(); 
 	auto endTime = chrono::steady_clock::now();
     cout << "elapsed " << chrono::duration_cast<chrono::microseconds>(endTime - startTime).count() << endl;
-	
+		
+
+
+}
+
+void openListHeapTests(){
+
+    // Point v1 = {.x = 0, .gScore = 0};
+    Point v1 = {.x = -100, .y = -100, .gScore = 0};
+    Point v2 = {.x = -100, .y = -100, .gScore = 10};
+    Point v3 = {.x = -100, .y = -100, .gScore = 1};
+    Point v4 = {.x = -100, .y = -100, .gScore = 2};
+
+    openHeapAdd(v1);
+    openHeapAdd(v2);
+	openHeapAdd(v3);
+	openHeapAdd(v4);
+
+	Point temp = openHeapRemove();
+	cout  <<temp.gScore +  temp.hScore<< endl;
+	temp = openHeapRemove();
+	cout << temp.gScore +  temp.hScore<< endl;
+	temp = openHeapRemove();
+	cout << temp.gScore +  temp.hScore<< endl;
+	temp = openHeapRemove();
+	cout << temp.gScore +  temp.hScore<< endl;
+
+
+
+	printOpenHeap();
 }

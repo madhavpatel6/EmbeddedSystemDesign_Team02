@@ -59,6 +59,11 @@ void printPath();
 void printWorld();
 bool isIntersecting(Point rayStart, Point rayEnd, Point three, Point four, bool *isVertex);
 
+void openHeapAdd(Point one);
+Point openHeapRemove();
+void printOpenHeap();
+int indexSmallerChild(int index);
+
 
 /* steps for A_Star */
 

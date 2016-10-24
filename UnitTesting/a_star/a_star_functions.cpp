@@ -357,20 +357,22 @@ bool addToClosedList(Point one, Point end){
 	return false;
 }
 bool addToOpenList(Point one, Point end){
-	openList[openLen].x  = one.x;
-	openList[openLen].y  = one.y;
-	openList[openLen].gScore  = one.gScore;
-	openList[openLen].hScore = calculateH(one, end);
-	openList[openLen].parent = one.parent;
-	
-	openLen++;
+	Point temp;
 
-	return false;
+	temp.x  = one.x;
+	temp.y  = one.y;
+	temp.gScore  = one.gScore;
+	temp.hScore = calculateH(one, end);
+	temp.parent = one.parent;
+	
+	openHeapAdd(temp);
+
+	return true;
 }
 
 bool isInOpenList(Point one){
 	for(int i = 0 ; i < closedLen; i++){
-		// this may need to be within boundry not straigh equality later
+		// this may need to be within boundry not straight equality later
 		if(openList[i].x == one.x &&
 			openList[i].y == one.y ){
 			return true;
@@ -381,13 +383,99 @@ bool isInOpenList(Point one){
 
 bool isInClosedList(Point one){
 	for(int i = 0 ; i < closedLen; i++){
-		// this may need to be within boundry not straigh equality later
+		// this may need to be within boundry not straight equality later
 		if(closedList[i].x == one.x &&
 			closedList[i].y == one.y ){
 			return true;
 		}
 	}
 	return false;
+}
+void removeFromOpenList(int index){
+	int i;
+	for(i = index; i < openLen - 1; i++){
+		openList[i] = openList[i+1];
+	}
+	openLen--;
+}
+
+void openHeapAdd(Point in){
+	Point temp;
+
+	openList[openLen] = in;
+
+	int i = openLen;
+	while(openList[i].gScore + openList[i].hScore < openList[i/2].gScore + openList[i/2].hScore && i > 0){
+		temp = openList[i];
+		openList[i] = openList[i/2];
+		openList[i/2] = temp;
+		i = i/2;
+	}
+	openLen++;
+}
+
+int scorePoint(Point temp){
+	return temp.gScore + temp.hScore;
+}
+int indexSmallerChild(int index){
+	Point point = openList[index];
+
+	Point ch1, ch2;
+	int ch1Index, ch2Index;
+	if(index *2 < openLen){
+		ch1 = openList[index * 2];
+		ch1Index = index * 2;
+	}else{
+		ch1 = point;
+		ch1Index = index;
+	}
+	if(index *2 + 1 < openLen){
+		ch2 = openList[index * 2 + 1];
+		ch2Index = index * 2 + 1;
+	}else{
+		ch2 = point;
+		ch2Index = index;
+	}
+	int swapIndex;
+	if (scorePoint(ch1) < scorePoint(point) && scorePoint(ch2) < scorePoint(point)){
+		if(scorePoint(ch1) < scorePoint(ch2)){
+			swapIndex = ch1Index;
+		}else{
+			swapIndex = ch2Index;
+		}
+	}else if(scorePoint(ch1) < scorePoint(point)){
+		swapIndex = ch1Index;
+	}else if(scorePoint(ch2) < scorePoint(point)){
+		swapIndex = ch2Index;
+	}else{
+		swapIndex = index;
+	}
+	return swapIndex;
+}
+
+Point openHeapRemove(){
+	Point result = openList[0];
+
+	openList[0] = openList[openLen-1];
+	int i = 0;
+	int swapIndex = indexSmallerChild(i);
+	while( swapIndex != i){
+		Point temp = openList[swapIndex];
+		openList[swapIndex] = openList[i];
+		openList[i] = temp;
+		i = swapIndex;
+		swapIndex = indexSmallerChild(i);
+	}
+	// cout << scorePoint(result)<< endl;
+
+	openLen--;
+	return result;
+
+}
+void printOpenHeap(){
+	for(int i = 0; i < openLen; i++){
+		cout << openList[i].gScore + openList[i].hScore<< endl;
+	}
 }
 
 void addWalkableLocations(Point current, Point stop, int parentIndex){
@@ -440,21 +528,11 @@ bool findPath(Point start, Point stop){
 		// add walkable locations to open list (calculating F = G + H scores for them)
 		addWalkableLocations(current, stop, parentIndex);
 
-		int minFscore = INT_MAX; // i hope openList has something in it
-		int minFScoreIndex = -1;
-		for(int j = 0; j < openLen; j++){
-			if( !isInClosedList(openList[j]) && 
-					openList[j].gScore + openList[j].hScore < minFscore){
-				minFscore = openList[j].gScore + openList[j].hScore;
-				minFScoreIndex = j;
-			}
-
-		}
-		// cout << openLen << " " << count << " " << closedLen<< endl;
 		parentIndex = closedLen;
-		addToClosedList(openList[minFScoreIndex], stop);
-		current = openList[minFScoreIndex];
-
+		Point temp = openHeapRemove();
+		current = temp;
+		addToClosedList(temp, stop);
+		
 		count ++;
 	}
 
