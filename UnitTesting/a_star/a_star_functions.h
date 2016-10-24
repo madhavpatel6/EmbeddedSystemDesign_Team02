@@ -1,9 +1,10 @@
 
 #include <climits>
+#include <tgmath.h>
 
 typedef struct Point{
-	int x;
-	int y;
+	float x;
+	float y;
 	int gScore;
 	int hScore;
 	int parent;
@@ -22,8 +23,6 @@ void addObstacle(Point one, Point two, Point three, Point four);
 /* add a vertex to the world, more than 3 makes an arena */
 void addVertex(Point one);
 
-// bool isIntersecting(Point one, Point two, Point three, Point four);
-
 /* determines if a point is in the arena */
 bool isInArena(Point one);
 
@@ -41,7 +40,7 @@ int calculateH(Point start, Point stop);
 
 bool addToClosedList(Point one, Point end);
 
-bool addWalkableLocations();
+void addWalkableLocations(Point current, Point stop, int parentIndex);
 
 Point findBestStep();
 
@@ -54,7 +53,16 @@ bool isInTarget(Point one, int obIndex);
 bool isOutAllTargets(Point one);
 bool isOutAllObstacles(Point one);
 
+void resetPath();
+
 void printPath();
+void printWorld();
+bool isIntersecting(Point rayStart, Point rayEnd, Point three, Point four, bool *isVertex);
+
+void openHeapAdd(Point one);
+Point openHeapRemove();
+void printOpenHeap();
+int indexSmallerChild(int index);
 
 
 /* steps for A_Star */
