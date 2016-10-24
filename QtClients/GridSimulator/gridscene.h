@@ -23,13 +23,16 @@ public:
     static const int CELL_SIZE = 5;
     static const int PADDING = 2;
     GridScene(QWidget* parent = 0);
-    void reset();
+    void resetGrid();
+    void resetRoverPosition();
     ~GridScene();
     void updateSensorReading();
     QPointF rotatePoint(float originX, float originY, float pointX, float pointY, double rotationAngle);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent* event);
     void keyPressEvent(QKeyEvent *event);
+    void toggleError();
+    QVector<QPolygonF> rects;
     bool showObjects;
 signals:
     void updateCursorPosition(int x, int y);
@@ -37,7 +40,7 @@ signals:
 private:
     void addRayTrace(SensorClass* impl);
     void addLine(double x1, double y1, double x2, double y2);
-    SensorDataType getSensorData();
+    SensorDataContainerType getSensorData();
     MouseStateType mouseState;
     Grid::GridType grid;
     RoverClass* rover;
@@ -47,7 +50,7 @@ private:
     SensorClass *rightSideSensor;
     SensorClass *leftSideSensor;
     void paintEvent(QPaintEvent *);
-    QVector<QPolygonF> rects;
+
     QPolygonF newRect;
     QPolygonF newRotatedRect;
     float newRectAngle;

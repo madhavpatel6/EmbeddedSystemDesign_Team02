@@ -15,7 +15,7 @@ bool checkBounds(int x, int y) {
 void initializeGrid(GridType grid) {
     for(int locY = 0; locY < HEIGHT; locY++) {
         for(int locX = 0; locX < WIDTH; locX++) {
-            grid[locY][locX] = 0;
+            grid[locY][locX] = MAXIMUM;
         }
     }
 }

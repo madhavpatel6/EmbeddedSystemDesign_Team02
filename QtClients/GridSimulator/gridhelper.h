@@ -6,6 +6,8 @@
 #include "grid.h"
 
 typedef struct {
+    float minimumMeasuringDistance;
+    float maximumMeasuringDistance;
     float distance;
     float orientation;
     float coneAngle;
@@ -19,7 +21,7 @@ typedef struct {
     SensorData_t leftFrontSensor;
     SensorData_t rightSideSensor;
     SensorData_t leftSideSensor;
-} SensorDataType;
+} SensorDataContainerType;
 
 typedef struct {
     int number;
@@ -35,7 +37,7 @@ RayTraceReturnType raytrace2(double x0, double y0, double x1, double y1, bool ma
 
 RayTraceReturnType raytrace3(int x1, int y1, int x2, int y2, bool maximum, Grid::GridType grid);
 
-void updateOccupanyGrid(SensorDataType sensorData);
+void updateOccupanyGrid(SensorDataContainerType sensorData, Grid::GridType grid);
 
 }
 #endif // GRIDHELPER_H

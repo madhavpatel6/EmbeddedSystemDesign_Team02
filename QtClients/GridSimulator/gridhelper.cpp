@@ -6,6 +6,16 @@
 
 namespace GridHelper {
 
+/**
+ * @brief raytrace
+ * @param x1
+ * @param y1
+ * @param x2
+ * @param y2
+ * @param maximum
+ * @param grid
+ * @return
+ */
 RayTraceReturnType raytrace(double x1, double y1, double x2, double y2, bool maximum, Grid::GridType grid)
 {
     int delta_x(x2 - x1);
@@ -68,6 +78,16 @@ RayTraceReturnType raytrace(double x1, double y1, double x2, double y2, bool max
     return ret;
 }
 
+/**
+ * @brief raytrace2
+ * @param x0
+ * @param y0
+ * @param x1
+ * @param y1
+ * @param maximum
+ * @param grid
+ * @return
+ */
 RayTraceReturnType raytrace2(double x0, double y0, double x1, double y1, bool maximum, Grid::GridType grid)
 {
     RayTraceReturnType ret;
@@ -155,6 +175,16 @@ RayTraceReturnType raytrace2(double x0, double y0, double x1, double y1, bool ma
     return ret;
 }
 
+/**
+ * @brief raytrace3
+ * @param x1
+ * @param y1
+ * @param x2
+ * @param y2
+ * @param maximum
+ * @param grid
+ * @return
+ */
 RayTraceReturnType raytrace3(int x1, int y1, int x2, int y2, bool maximum, Grid::GridType grid)
 {
     RayTraceReturnType ret;
@@ -266,7 +296,21 @@ RayTraceReturnType raytrace3(int x1, int y1, int x2, int y2, bool maximum, Grid:
   // assert ((y == y2) && (x == x2));  // the last point (y2,x2) has to be the same with the last point of the algorithm
 }
 
-void handleIRSensor(SensorData_t data) {
+QPointF rotatePoint(float originX, float originY, float pointX, float pointY, double rotationAngle) {
+    int translatedX = pointX - originX;
+    int translatedY = pointY - originY;
+    rotationAngle = rotationAngle*M_PI/180.0;
+    QPointF point = QPointF(translatedX * cos(rotationAngle) - translatedY * sin(rotationAngle) + originX,
+                  translatedX * sin(rotationAngle) + translatedY * cos(rotationAngle) + originY);
+    return point;
+}
+
+/**
+ * @brief handleIRSensor
+ * @param data
+ * @param grid
+ */
+void handleIRSensor(SensorData_t data, Grid::GridType grid) {
     QPointF distancePoint;
     bool maximum = false;
     if(data.distance == -2)
@@ -278,10 +322,55 @@ void handleIRSensor(SensorData_t data) {
     else {
         distancePoint = QPointF(data.sensorLocation.x() + data.distance*cos(data.orientation*M_PI/180), data.sensorLocation.y() + data.distance*sin(data.orientation*M_PI/180));
     }
+    raytrace3(data.sensorLocation.x(), data.sensorLocation.y(), distancePoint.x(), distancePoint.y(), maximum, grid);
 }
 
-void updateOccupanyGrid(SensorDataType sensorData) {
-    handleIRSensor(sensorData.leftFrontSensor);
-    handleIRSensor(sensorData.rightFrontSensor);
+/**
+ * @brief handleUltrasonicSensor
+ *          For ultrasonic sensors we will only be using the distance measured to update the occupany grid with unoccupied cells.
+ *          This will be done by decrementing the cells within the cone up to the distance point measured. By doing this we do
+ *          not have to worry about knowing the exact location of the object whose distance is being measured within the sensor's cone.
+ * @param data
+ *          the ultrasonic sensor data
+ * @param grid
+ *          the occupany grid
+ */
+void handleUltrasonicSensor(SensorData_t data, Grid::GridType grid) {
+    QPointF distancePoint;
+    bool maximum = true;
+    // If we get negative 2 this indicates that the distance read was below the minimum measuring distance
+    if(data.distance == -2)
+        return;
+    // If we get -1 this indicates that the distance read was further than the maximum measuring distance
+    //      In this case we need to just set the distance point to the maximum distance point
+    if(data.distance == -1) {
+        // Get the maximum distance point
+        distancePoint = data.maxSensorLocation;
+    }
+    else {
+        // If we get any other number then we update the occupany grid by decrementing all the cells within the cone up to the distance measured
+        // Decrease the distance point so that we only decrement the cells up to the distance measured
+        data.distance -= 2;
+        distancePoint = QPointF(data.sensorLocation.x() + data.distance*cos(data.orientation*M_PI/180), data.sensorLocation.y() + data.distance*sin(data.orientation*M_PI/180));
+    }
+    for(float angle = -data.coneAngle/2.0; angle < data.coneAngle/2.0; angle++) {
+        //distancePoint = QPointF(data.sensorLocation.x() + data.distance*cos((data.orientation + angle)*M_PI/180), data.sensorLocation.y() + data.distance*sin((data.orientation + angle)*M_PI/180));
+        QPointF rotatedDistancePoint = rotatePoint(data.sensorLocation.x(), data.sensorLocation.y(), distancePoint.x(), distancePoint.y(), angle);
+        raytrace3(data.sensorLocation.x(), data.sensorLocation.y(), rotatedDistancePoint.x(), rotatedDistancePoint.y(), maximum, grid);
+    }
+
+}
+
+/**
+ * @brief updateOccupanyGrid
+ * @param sensorData
+ * @param grid
+ */
+void updateOccupanyGrid(SensorDataContainerType sensorData, Grid::GridType grid) {
+    handleUltrasonicSensor(sensorData.leftFrontSensor, grid);
+    handleUltrasonicSensor(sensorData.rightFrontSensor, grid);
+    handleUltrasonicSensor(sensorData.middleFrontSensor, grid);
+    handleUltrasonicSensor(sensorData.leftSideSensor, grid);
+    handleUltrasonicSensor(sensorData.rightSideSensor, grid);
 }
 }

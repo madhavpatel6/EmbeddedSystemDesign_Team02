@@ -1,7 +1,7 @@
 #ifndef ROVERCLASS_H
 #define ROVERCLASS_H
 #include <QPoint>
-
+#include <QPainter>
 typedef struct RoverLocation {
     QPointF center;
     float orientation;
@@ -13,16 +13,43 @@ class RoverClass
 {
 public:
     RoverClass();
+    float computeMovementError() {
+        movementError.random = 0.25/2 - (float)rand()/(float)(RAND_MAX/(.25));
+        return movementError.random + movementError.bias;
+    }
+
+    float computeRotationError() {
+        rotationError.random =  0.05 - (float)rand()/(float)(RAND_MAX/(0.1));
+        return rotationError.random + rotationError.bias;
+    }
+
+    typedef struct ErrorType {
+        float random;
+        float bias;
+    } ErrorType;
+    void resetPosition() {
+        estimatedLocationInformation = RoverLocation(QPoint(0,0),0);
+        realLocationInformation = RoverLocation(QPoint(0,0),0);
+    }
+
+    void draw(QPainter* painter, int CELL_SIZE);
     void moveRoverUp(float distanceCM);
     void moveRoverBack(float distanceCM);
     void turnRoverRight(float angleDegrees);
     void turnRoverLeft(float angleDegrees);
-    void updateRoverPosition(QPointF location, float newOrientation);
-    RoverLocation getLocationInformation() {
-        return locationInformation;
+    bool simulateWithError;
+    RoverLocation getEstimatedLocationInformation() {
+        return estimatedLocationInformation;
     }
+    RoverLocation getRealLocationInformation() {
+        return realLocationInformation;
+    }
+
 private:
-    RoverLocation locationInformation;
+    ErrorType movementError;
+    ErrorType rotationError;
+    RoverLocation estimatedLocationInformation;
+    RoverLocation realLocationInformation;
 };
 
 #endif // ROVERCLASS_H

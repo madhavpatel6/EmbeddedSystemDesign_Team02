@@ -1,19 +1,29 @@
 #include "mainwindow.h"
 #include <QGraphicsView>
 #include <QThread>
+#include <time.h>
+#include <QKeyEvent>
+#include <QApplication>
+
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
 {
+    srand(time(NULL));
     setupUi(this);
     connect(clearOccupanyGridButton, SIGNAL(released()), this, SLOT(handleGridClear()));
     connect(simulateButton, SIGNAL(released()), this, SLOT(handleSimulate()));
     connect(gridwidget, SIGNAL(updateCursorPosition(int,int)), this, SLOT(updateCursorPosition(int,int)));
     sensorReadingTimer = new QTimer();
+    movementTimer = new QTimer();
+    movementTimer->setInterval(100);
     sensorReadingTimer->setInterval(50);
     sensorReadingTimer->start();
     connect(sensorReadingTimer, SIGNAL(timeout()), this, SLOT(handleSimulate()));
     connect(showObjects, SIGNAL(released()), this, SLOT(handleShowObjects()));
     connect(gridwidget, SIGNAL(updateRoverPosition(float,float,float)), this, SLOT(handleRoverCoordinateUpdate(float,float,float)));
+    connect(errorButton, SIGNAL(released()), this, SLOT(toggleError()));
+    connect(simulateMap, SIGNAL(released()), this, SLOT(handleSimulateMap()));
+    connect(movementTimer, SIGNAL(timeout()), this, SLOT(handleRoverMovementSimulation()));
 //    grid->UpdateSensorReading(GridScene::MIDDLESENSOR, 13*GridScene::CELL_SIZE);
 //    grid->addLine(142,144,321,124);
 //    grid->addLine(12,38,22,88);
@@ -65,6 +75,41 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     verticalSpacer1 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     verticalSpacer2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     showObjects = new QPushButton("Hide Objects");
+    errorButton = new QPushButton("Enable Errors");
+    comboBox = new QComboBox();
+    comboBox->addItem(QString("Map 1"));
+    SimulationSetupType map1;
+    map1.objects = {
+        QPolygonF() << QPointF(204.593,735.672) << QPointF(205.41,646.676) << QPointF(276.407,647.328) << QPointF(275.59,736.324),
+        QPolygonF() << QPointF(577.053,687.591) << QPointF(626.023,580.233) << QPointF(757.947,640.409) << QPointF(708.977,747.767),
+        QPolygonF() << QPointF(640.548,447.495) << QPointF(641.463,404.505) << QPointF(688.452,405.505) << QPointF(687.537,448.495),
+        QPolygonF() << QPointF(417.426,619.445) << QPointF(405.073,583.509) << QPointF(448.574,568.555) << QPointF(460.927,604.491),
+        QPolygonF() << QPointF(73.7421,445.198) << QPointF(79.4961,410.675) << QPointF(314.258,449.802) << QPointF(308.504,484.325),
+        QPolygonF() << QPointF(469.129,368.441) << QPointF(437.679,328.292) << QPointF(462.871,308.559) << QPointF(494.321,348.708),
+        QPolygonF() << QPointF(181.608,234.682) << QPointF(116.712,178.251) << QPointF(178.392,107.318) << QPointF(243.288,163.749),
+        QPolygonF() << QPointF(617.535,104.487) << QPointF(578.775,137.633)  << QPointF(668.465,242.513) << QPointF(707.225,209.367)
+    };
+    map1.keys = {
+        Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,
+        Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,
+        Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,
+        Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,
+        Qt::Key_W ,Qt::Key_W ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,
+        Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,
+        Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,
+        Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,
+        Qt::Key_A ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,
+        Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,
+        Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,
+        Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,
+        Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,
+        Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,
+        Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_D ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_D ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_D ,Qt::Key_W ,Qt::Key_D ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_D ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_D ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_A ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_D ,Qt::Key_D ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_W ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A ,Qt::Key_A
+    };
+    polygons.push_back(map1);
+
+    simulateAllMapsButton = new QPushButton("Simulate All Maps");
+    simulateMap = new QPushButton("Simulate Map");
     verticalLayout1->addWidget(roverLocXLabel);
     verticalLayout1->addWidget(xRoverLoc);
     verticalLayout1->addWidget(roverLocYLabel);
@@ -74,25 +119,20 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     verticalLayout1->addWidget(clearOccupanyGridButton);
     verticalLayout1->addWidget(simulateButton);
     verticalLayout1->addWidget(showObjects);
+    verticalLayout1->addWidget(errorButton);
+    verticalLayout1->addWidget(comboBox);
+    verticalLayout1->addWidget(simulateMap);
     verticalLayout1->addWidget(cursorPosition);
     verticalLayout1->addItem(verticalSpacer1);
     middleFIRDistance = new QLineEdit();
     rightFIRDistance = new QLineEdit();
     leftFIRDistance = new QLineEdit();
-//    verticalLayout2->addWidget(leftFIRDistanceLabel);
-//    verticalLayout2->addWidget(leftFIRDistance);
-//    verticalLayout2->addWidget(middleFIRDistanceLabel);
-//    verticalLayout2->addWidget(middleFIRDistance);
-//    verticalLayout2->addWidget(rightFIRDistanceLabel);
-//    verticalLayout2->addWidget(rightFIRDistance);
-//    verticalLayout2->addWidget(simulateButton);
-//    verticalLayout2->addWidget(showObjects);
     verticalLayout2->addItem(verticalSpacer2);
     setFocusProxy(gridwidget);
 }
 
 void MainWindow::handleGridClear() {
-    gridwidget->reset();
+    gridwidget->resetGrid();
 }
 
 void MainWindow::handleRoverCoordinateUpdate(float x, float y, float angle) {
@@ -117,6 +157,50 @@ void MainWindow::handleShowObjects() {
     }
 }
 
+void MainWindow::handleSimulateMap() {
+    if(simulateMap->text() == "Simulate Map") {
+        gridwidget->rects = polygons[comboBox->currentIndex()].objects;
+        index = 0;
+        sensorReadingTimer->stop();
+        gridwidget->resetRoverPosition();
+        gridwidget->resetGrid();
+        movementTimer->start();
+        simulateMap->setText("Free Roam");
+        sensorReadingTimer->start();
+    }
+    else if(simulateMap->text() == "Free Roam"){
+        sensorReadingTimer->stop();
+        movementTimer->stop();
+        gridwidget->resetRoverPosition();
+        gridwidget->resetGrid();
+        gridwidget->rects.clear();
+        simulateMap->setText("Simulate Map");
+        sensorReadingTimer->start();
+    }
+}
+
+void MainWindow::handleRoverMovementSimulation() {
+    if(index < polygons[comboBox->currentIndex()].keys.size()) {
+        QKeyEvent event = QKeyEvent (QEvent::KeyPress, polygons[comboBox->currentIndex()].keys[index], Qt::NoModifier);
+        QApplication::sendEvent(gridwidget, &event);
+        index++;
+    }
+    else {
+        movementTimer->stop();
+    }
+}
+
 void MainWindow::updateCursorPosition(int x, int y) {
     cursorPosition->setText(QString("%1\t%2").arg(x, 2, 10, QChar('0')).arg(y, 2, 10, QChar('0')));
+}
+
+void MainWindow::toggleError() {
+    gridwidget->toggleError();
+    if(errorButton->text() == "Enable Errors") {
+        errorButton->setText("Disable Errors");
+    }
+    else {
+        errorButton->setText("Enable Errors");
+    }
+    gridwidget->resetGrid();
 }

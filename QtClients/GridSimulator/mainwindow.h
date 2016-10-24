@@ -7,6 +7,8 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QTimer>
+#include <QComboBox>
+#include <QVector>
 #include "gridscene.h"
 class MainWindow : public QWidget
 {
@@ -37,11 +39,26 @@ public:
     QSpacerItem *verticalSpacer2;
     QLabel* cursorPosition;
     QTimer* sensorReadingTimer;
+    QTimer* movementTimer;
     QPushButton* showObjects;
+    QPushButton* errorButton;
+    QPushButton* simulateAllMapsButton;
+    QPushButton* simulateMap;
+    QComboBox* comboBox;
+    typedef struct SimulationSetupType {
+        QVector<QPolygonF> objects;
+        QVector<int> keys;
+    } SimulationSetupType;
+
+    QVector<SimulationSetupType> polygons;
+    int index;
 public slots:
     void handleGridClear();
     void handleSimulate();
+    void toggleError();
     void handleShowObjects();
+    void handleSimulateMap();
+    void handleRoverMovementSimulation();
     void updateCursorPosition(int x, int y);
     void handleRoverCoordinateUpdate(float x, float y, float angle);
 private:

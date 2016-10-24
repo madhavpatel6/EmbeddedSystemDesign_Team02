@@ -2,20 +2,40 @@
 #include <cmath>
 #include <QDebug>
 #include "gridhelper.h"
+#include <time.h>
+#include <random>
 #define M_PI 3.14159265358979323846
-SensorClass::SensorClass(SensorType _sensorType, SensorLocation location, int _minimumDistanceCM, int _maximumDistanceCM, int _coneAngle, QPointF roverLocation, int roverOrientation, int _cell_pixel_size)
+
+SensorClass::SensorClass(SensorType _sensorType, SensorLocation location, int _minimumDistanceCM, int _maximumDistanceCM, int _coneAngle, int _sensorOrientationOffset, QPointF roverLocation, int roverOrientation, int _cell_pixel_size)
 {
     cell_pixel_size = _cell_pixel_size;
     type = location;
     maximumDistanceCM = _maximumDistanceCM;
     coneAngle = _coneAngle;
     minimumDistanceCM = _minimumDistanceCM;
-    updatePosition(roverLocation, roverOrientation);
     sensorType = _sensorType;
+    sensorOrientationOffset = _sensorOrientationOffset;
+    error.bias = 2.0 - (float)rand()/(float)(RAND_MAX/4.0);
+    switch(type) {
+    case MIDDLESENSOR: {
+        qDebug() << "Middle Sensor bias error " << error.bias;
+        break;
+    }
+    case RIGHTSENSOR: {
+        qDebug() << "Right Sensor bias error " << error.bias;
+        break;
+    }
+    case LEFTSENSOR: {
+        qDebug() << "Left Sensor bias error " << error.bias;
+        break;
+    }
+    }
+    simulateWithError = false;
+    updatePosition(roverLocation, roverOrientation);
 }
 
 void SensorClass::updatePosition(QPointF roverLocation, int roverOrientation) {
-    sensorOrientation = roverOrientation;
+    sensorOrientation = roverOrientation + sensorOrientationOffset;
     switch(type) {
         case MIDDLESENSOR: {
             sensorLocation = rotatePoint(roverLocation.x(), roverLocation.y(),
@@ -74,7 +94,7 @@ void SensorClass::updatePosition(QPointF roverLocation, int roverOrientation) {
 void SensorClass::draw(QPainter* painter) {
     painter->drawEllipse(sensorPixelLocation, 3, 3);
     painter->save();
-    painter->setPen(QPen(QBrush(Qt::black),3));
+    painter->setPen(QPen(QBrush(Qt::red),3));
     for(int i = 0; i < temp.size(); i++) {
         painter->drawPoint(temp[i]);
     }
@@ -85,9 +105,14 @@ SensorData_t SensorClass::getParamAndDistance(QVector<QPolygonF> objs) {
     SensorData_t ret;
     ret.coneAngle = this->coneAngle;
     ret.distance = readDistance(objs);
+    if(simulateWithError && ret.distance != -1 && ret.distance != -2) {
+        ret.distance = ret.distance + computeTotalError();
+    }
     ret.orientation = this->sensorOrientation;
     ret.sensorLocation = this->sensorLocation;
     ret.maxSensorLocation = this->getMaximumSensorLocation();
+    ret.minimumMeasuringDistance = this->minimumDistanceCM;
+    ret.maximumMeasuringDistance = this->maximumDistanceCM;
     return ret;
 }
 
