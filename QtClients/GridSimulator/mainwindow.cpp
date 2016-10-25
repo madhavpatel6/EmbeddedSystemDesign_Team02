@@ -4,7 +4,7 @@
 #include <time.h>
 #include <QKeyEvent>
 #include <QApplication>
-
+#include <QFileDialog>
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
 {
@@ -24,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(errorButton, SIGNAL(released()), this, SLOT(toggleError()));
     connect(simulateMap, SIGNAL(released()), this, SLOT(handleSimulateMap()));
     connect(movementTimer, SIGNAL(timeout()), this, SLOT(handleRoverMovementSimulation()));
+    connect(loadSimulationButton, SIGNAL(released()), this, SLOT(handleLoadSimulation()));
+    connect(saveSimulationButton, SIGNAL(released()), this, SLOT(handleSaveSimulation()));
 //    grid->UpdateSensorReading(GridScene::MIDDLESENSOR, 13*GridScene::CELL_SIZE);
 //    grid->addLine(142,144,321,124);
 //    grid->addLine(12,38,22,88);
@@ -76,6 +78,8 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     verticalSpacer2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     showObjects = new QPushButton("Hide Objects");
     errorButton = new QPushButton("Enable Errors");
+    loadSimulationButton = new QPushButton("Load Simulation");
+    saveSimulationButton = new QPushButton("Save Simulation");
     comboBox = new QComboBox();
     comboBox->addItem(QString("Map 1"));
     SimulationSetupType map1;
@@ -108,7 +112,6 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     };
     polygons.push_back(map1);
 
-    simulateAllMapsButton = new QPushButton("Simulate All Maps");
     simulateMap = new QPushButton("Simulate Map");
     verticalLayout1->addWidget(roverLocXLabel);
     verticalLayout1->addWidget(xRoverLoc);
@@ -121,6 +124,8 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     verticalLayout1->addWidget(showObjects);
     verticalLayout1->addWidget(errorButton);
     verticalLayout1->addWidget(comboBox);
+    verticalLayout1->addWidget(loadSimulationButton);
+    verticalLayout1->addWidget(saveSimulationButton);
     verticalLayout1->addWidget(simulateMap);
     verticalLayout1->addWidget(cursorPosition);
     verticalLayout1->addItem(verticalSpacer1);
@@ -154,6 +159,31 @@ void MainWindow::handleShowObjects() {
     else if(!gridwidget->showObjects) {
         gridwidget->showObjects = true;
         showObjects->setText("Hide Objects");
+    }
+}
+
+void MainWindow::handleLoadSimulation() {
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Simulation"),
+                                "",
+                                tr("Simulation (*.sim)"));
+
+}
+
+void MainWindow::handleSaveSimulation() {
+    QString filename = QFileDialog::getSaveFileName(this, tr("Save Simulation"),
+                                "",
+                                tr("Simulation (*.txt)"));
+    QFile fileout(filename);
+    if (fileout.open(QFile::ReadWrite)){
+     QTextStream out(&fileout);
+     for (size_t itr = 0; itr < gridwidget->rects.size(); itr++){
+         for(int i = 0; i < gridwidget->rects[itr].size(); i++) {
+             out << gridwidget->rects[itr][i].x() << " " << gridwidget->rects[itr][i].y() << " ";
+         }
+         out << "\n";
+     }
+     out << "END";
+     fileout.close();
     }
 }
 

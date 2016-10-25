@@ -42,7 +42,8 @@ public:
     QTimer* movementTimer;
     QPushButton* showObjects;
     QPushButton* errorButton;
-    QPushButton* simulateAllMapsButton;
+    QPushButton* loadSimulationButton;
+    QPushButton* saveSimulationButton;
     QPushButton* simulateMap;
     QComboBox* comboBox;
     typedef struct SimulationSetupType {
@@ -51,6 +52,7 @@ public:
     } SimulationSetupType;
 
     QVector<SimulationSetupType> polygons;
+    QVector<int> keys;
     int index;
 public slots:
     void handleGridClear();
@@ -61,6 +63,8 @@ public slots:
     void handleRoverMovementSimulation();
     void updateCursorPosition(int x, int y);
     void handleRoverCoordinateUpdate(float x, float y, float angle);
+    void handleSaveSimulation();
+    void handleLoadSimulation();
 private:
     void setupUi(QWidget* mainwindow);
 };
