@@ -41,6 +41,7 @@ public:
     QTimer* sensorReadingTimer;
     QTimer* movementTimer;
     QPushButton* showObjects;
+    QPushButton* resetButton;
     QPushButton* errorButton;
     QPushButton* loadSimulationButton;
     QPushButton* saveSimulationButton;
@@ -55,6 +56,7 @@ public:
     QVector<int> keys;
     int index;
 public slots:
+    void handleSimulationReset();
     void handleGridClear();
     void handleSimulate();
     void toggleError();

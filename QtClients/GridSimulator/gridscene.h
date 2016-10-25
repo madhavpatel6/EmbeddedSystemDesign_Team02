@@ -32,8 +32,10 @@ public:
     void mouseReleaseEvent(QMouseEvent* event);
     void keyPressEvent(QKeyEvent *event);
     void toggleError();
-    QVector<QPolygonF> rects;
+    QVector<QPolygonF> objects;
+    QVector<int> keys;
     bool showObjects;
+    bool recordKeys;
 signals:
     void updateCursorPosition(int x, int y);
     void updateRoverPosition(float x, float y, float newRectAngle);
@@ -50,7 +52,6 @@ private:
     SensorClass *rightSideSensor;
     SensorClass *leftSideSensor;
     void paintEvent(QPaintEvent *);
-
     QPolygonF newRect;
     QPolygonF newRotatedRect;
     float newRectAngle;

@@ -13,7 +13,7 @@ RoverClass::RoverClass()
     rotationError.bias = 0.25 - (float)rand()/(float)(RAND_MAX/.5);
     qDebug() << "Rover movement bias error: " << movementError.bias;
     qDebug() << "Rover rotation bias error: " << rotationError.bias;
-    simulateWithError = false;
+    simulateWithError = true;
 }
 
 void RoverClass::moveRoverUp(float distanceCM) {

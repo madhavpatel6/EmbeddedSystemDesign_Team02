@@ -30,6 +30,7 @@ GridScene::GridScene(QWidget *parent) : QWidget(parent)
     newRotatedRect = QPolygonF();
     newRectCenter = QPointF();
     mouseState = FIRSTCLICK;
+    recordKeys = true;
 }
 
 GridScene::~GridScene() {
@@ -68,8 +69,8 @@ void GridScene::paintEvent(QPaintEvent *) {
     painter.setPen(Qt::blue);
     painter.setBrush(Qt::blue);
     if(showObjects){
-        for(int i = 0; i < rects.size(); i++)
-            painter.drawPolygon(rects[i]);
+        for(int i = 0; i < objects.size(); i++)
+            painter.drawPolygon(objects[i]);
     }
 
     if(mouseState != ROTATE) {
@@ -105,7 +106,7 @@ void GridScene::updateSensorReading() {
 }
 
 void GridScene::addRayTrace(SensorClass* impl) {
-    float distance = impl->readDistance(rects);
+    float distance = impl->readDistance(objects);
     QPointF sensorLocation = impl->getSensorLocation();
     int sensorOrientation = impl->getSensorOrientation();
     QPointF distancePoint;
@@ -124,11 +125,11 @@ void GridScene::addRayTrace(SensorClass* impl) {
 
 SensorDataContainerType GridScene::getSensorData() {
     SensorDataContainerType data;
-    data.leftFrontSensor = leftFrontSensor->getParamAndDistance(rects);
-    data.middleFrontSensor = middleFrontSensor->getParamAndDistance(rects);
-    data.rightFrontSensor = rightFrontSensor->getParamAndDistance(rects);
-    data.leftSideSensor = leftSideSensor->getParamAndDistance(rects);
-    data.rightSideSensor = rightSideSensor->getParamAndDistance(rects);
+    data.leftFrontSensor = leftFrontSensor->getParamAndDistance(objects);
+    data.middleFrontSensor = middleFrontSensor->getParamAndDistance(objects);
+    data.rightFrontSensor = rightFrontSensor->getParamAndDistance(objects);
+    data.leftSideSensor = leftSideSensor->getParamAndDistance(objects);
+    data.rightSideSensor = rightSideSensor->getParamAndDistance(objects);
     return data;
 }
 
@@ -203,7 +204,7 @@ void GridScene::mouseReleaseEvent(QMouseEvent *event) {
             t.rotate(newRectAngle*180/M_PI);
             t.translate(-newRectCenter.x(), -newRectCenter.y());
             newRotatedRect = t.map(newRect);
-            rects.push_back(newRotatedRect);
+            objects.push_back(newRotatedRect);
             qDebug() << "New Rectangle " << newRotatedRect;
             newRectAngle = 0;
             newRect = QPolygonF();
@@ -219,22 +220,22 @@ void GridScene::mouseReleaseEvent(QMouseEvent *event) {
 void GridScene::keyPressEvent(QKeyEvent *event) {
     switch(event->key()) {
     case Qt::Key_Left: case Qt::Key_A:{
-//        qDebug() << "A";
+        if(recordKeys) keys.push_back(Qt::Key_A);
         rover->turnRoverLeft(2);
         break;
     }
     case Qt::Key_Up: case Qt::Key_W:{
-//        qDebug() << "W";
+        if(recordKeys) keys.push_back(Qt::Key_W);
         rover->moveRoverUp(1.5);
         break;
     }
     case Qt::Key_Down: case Qt::Key_S:{
-//        qDebug() << "S";
+        if(recordKeys) keys.push_back(Qt::Key_S);
         rover->moveRoverBack(1.5);
         break;
     }
     case Qt::Key_Right: case Qt::Key_D:{
-//        qDebug() << "D";
+        if(recordKeys) keys.push_back(Qt::Key_D);
         rover->turnRoverRight(2);
         break;
     }
