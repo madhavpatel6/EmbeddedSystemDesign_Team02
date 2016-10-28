@@ -14,12 +14,12 @@ class RoverClass
 public:
     RoverClass();
     float computeMovementError() {
-        movementError.random = 0.25/2 - (float)rand()/(float)(RAND_MAX/(.25));
+        movementError.random = 0.05/2 - (float)rand()/(float)(RAND_MAX/(0.1));
         return movementError.random + movementError.bias;
     }
 
     float computeRotationError() {
-        rotationError.random =  0.05 - (float)rand()/(float)(RAND_MAX/(0.1));
+        rotationError.random =  0.0005 - (float)rand()/(float)(RAND_MAX/(0.001));
         return rotationError.random + rotationError.bias;
     }
 

@@ -9,8 +9,8 @@ RoverClass::RoverClass()
 {
     estimatedLocationInformation = RoverLocation(QPoint(0,0),0);
     realLocationInformation = RoverLocation(QPoint(0,0),0);
-    movementError.bias = 0.5 - (float)rand()/(float)(RAND_MAX/1);
-    rotationError.bias = 0.25 - (float)rand()/(float)(RAND_MAX/.5);
+    movementError.bias = 0.2 - (float)rand()/(float)(RAND_MAX/0.4); //might be too large and make this the estreme
+    rotationError.bias = 0.004 - (float)rand()/(float)(RAND_MAX/0.008);
     qDebug() << "Rover movement bias error: " << movementError.bias;
     qDebug() << "Rover rotation bias error: " << rotationError.bias;
     simulateWithError = true;

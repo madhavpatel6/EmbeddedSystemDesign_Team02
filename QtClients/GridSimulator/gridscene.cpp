@@ -65,7 +65,9 @@ void GridScene::paintEvent(QPaintEvent *) {
     QPen pen1(Qt::black,2, Qt::SolidLine, Qt::RoundCap);
     painter.setPen(pen1);
 
-    rover->draw(&painter, CELL_SIZE);
+    if(showObjects){
+        rover->draw(&painter, CELL_SIZE);
+    }
     painter.setPen(Qt::blue);
     painter.setBrush(Qt::blue);
     if(showObjects){
@@ -79,11 +81,13 @@ void GridScene::paintEvent(QPaintEvent *) {
     else {
         painter.drawPolygon(newRotatedRect);
     }
+    if(showObjects){
     middleFrontSensor->draw(&painter);
     leftFrontSensor->draw(&painter);
     rightFrontSensor->draw(&painter);
     rightSideSensor->draw(&painter);
     leftSideSensor->draw(&painter);
+    }
     painter.drawLines(lines);
     painter.end();
 }

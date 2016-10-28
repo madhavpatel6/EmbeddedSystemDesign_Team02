@@ -33,15 +33,22 @@ void decrementIndex(int x, int y, GridType grid) {
         grid[y][x]-=5;
     }
 }
-
+#include <QImage>
 void draw(QPainter* painter, GridType grid, size_t size) {
+    QImage image(WIDTH*size, HEIGHT*size, QImage::Format_RGB32);
+    QPainter savePainter;
+    savePainter.begin(&image);
+    savePainter.translate(0,HEIGHT*size);
+    savePainter.scale(1,-1);
     for(int locY = 0; locY < HEIGHT; locY++) {
         for(int locX = 0; locX < WIDTH; locX++) {
             QRect box = QRect(QPoint(locX*size,(locY)*size), QSize(size,size));
             int colorVal = (-1.0*grid[locY][locX]/MAXIMUM*127 + 127);
             painter->fillRect(box, QBrush(QColor(colorVal, colorVal, colorVal)));
+            savePainter.fillRect(box, QBrush(QColor(colorVal, colorVal, colorVal)));
 //            painter->drawRect(box);
         }
     }
+    image.save("image.jpg");
 }
 }
