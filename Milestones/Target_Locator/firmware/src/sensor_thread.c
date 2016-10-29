@@ -59,8 +59,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include <math.h>
 static QueueHandle_t _queue;
 
-#define TYPEOFQUEUE SensorADCType
-#define SIZEOFQUEUE 10
+#define TYPEOFQUEUE SensorADC_t
+#define SIZEOFQUEUE 20
 
 /*******************************************************************************
   Function:
@@ -74,6 +74,7 @@ void SENSOR_THREAD_Initialize ( void )
 {
     SENSOR_THREAD_InitializeQueue();
     DRV_TMR0_Start();
+    DRV_TMR3_Start();
     DRV_ADC_Open();
 }
 
@@ -88,15 +89,28 @@ void SENSOR_THREAD_Initialize ( void )
 
 void SENSOR_THREAD_Tasks ( void )
 {
-    SensorADCType sensorData;
-    MessageObj obj;
-    obj.Type = UPDATE;
-    obj.Update.Type = SENSORDATA;
+    SensorADC_t objRecv;
+    MessageObj objSend;
+    objSend.Type = UPDATE;
+    objSend.Update.Type = SENSORDATA;
+    UltrasonicContainer ultraDistances;
+    memset(&ultraDistances, 0, sizeof(UltrasonicContainer));
     while(1) {
-        memset(&sensorData, 0, sizeof(SensorADCType));
-        SENSOR_THREAD_ReadFromQueue(&sensorData);
-        ConvertDigitalToCM(sensorData, &obj.Update.Data.sensordata);
-        MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
+        memset(&objRecv, 0, sizeof(SensorADC_t));
+        SENSOR_THREAD_ReadFromQueue(&objRecv);
+        
+        switch(objRecv.UpdateType) {
+            case IRSENSORS: {
+                ConvertDigitalToCM(objRecv.IRSensors, &objSend.Update.Data.sensordata.ir);
+                break;
+            }
+            case ULTRASONICSENSORS: {
+                HandleUltrasonicUpdate(objRecv.USSensors, &ultraDistances);
+                objSend.Update.Data.sensordata.ultrasonic = ultraDistances.distance;
+                break;
+            }
+        }
+        MESSAGE_CONTROLLER_THREAD_SendToQueue(objSend);
     }
 }
 
@@ -104,19 +118,19 @@ void SENSOR_THREAD_InitializeQueue() {
     _queue = xQueueCreate(SIZEOFQUEUE, sizeof(TYPEOFQUEUE));
 }
 
-void SENSOR_THREAD_ReadFromQueue(SensorADCType* pvBuffer) {
+void SENSOR_THREAD_ReadFromQueue(SensorADC_t* pvBuffer) {
     xQueueReceive(_queue, pvBuffer, portMAX_DELAY);
 }
 
-void SENSOR_THREAD_SendToQueue(SensorADCType buffer) {
+void SENSOR_THREAD_SendToQueue(SensorADC_t buffer) {
     xQueueSend(_queue, &buffer, portMAX_DELAY);
 }
 
-void SENSOR_THREAD_SendToQueueISR(SensorADCType buffer, BaseType_t *pxHigherPriorityTaskWoken) {
+void SENSOR_THREAD_SendToQueueISR(SensorADC_t buffer, BaseType_t *pxHigherPriorityTaskWoken) {
     xQueueSendFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
 }
 
-void ConvertDigitalToCM(SensorADCType sensorData, SensorDataType* values) {
+void ConvertDigitalToCM(IRSensorsADC_t sensorData, IRSensorDistance_t* values) {
     memset(values, 0, sizeof(SensorDataType));
     ConvertTopLeftLongRangeIRToCM(&(values->leftFTSensor), sensorData.leftFTSensor);
 //    ConvertGP2Y0A02YK0FToCM(&(values->middleFTSensor), sensorData.middleFTSensor);
@@ -130,6 +144,7 @@ void ConvertDigitalToCM(SensorADCType sensorData, SensorDataType* values) {
 void ConvertTopLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
     float avgAdcValue = adcValue;
     float voltage = avgAdcValue/(310.303);
+
     if(voltage <= 2.5 && voltage >=0.899) {
         *distanceCM = 114.097*(pow(0.484144,voltage));
     }
@@ -137,14 +152,15 @@ void ConvertTopLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
         *distanceCM = 64.47/(voltage+0.1776);
     }
     else {
-        *distanceCM = -1;
+        *distanceCM = -2;
     }
-//    *distanceCM = voltage;
+
 }
 
 void ConvertTopRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
     float avgAdcValue = adcValue;
     float voltage = avgAdcValue/(310.303);
+    
     if(voltage <= 2.5 && voltage >= 1.096) {
         *distanceCM = 119.191*(pow(0.4879,voltage));
     }
@@ -155,6 +171,42 @@ void ConvertTopRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
         *distanceCM = -1;
     }
 //    *distanceCM = voltage;
+}
+
+void HandleUltrasonicUpdate(USSensorADC_t sensorData, UltrasonicContainer* values) {
+    switch(sensorData.location) {
+        case LEFTFRONTULTRASONIC: { 
+            ConvertUltrasonicToCM( &(values->distance.leftfront), sensorData.tickCount);
+            values->isSet.leftfront = true;
+            break;
+        }
+        case MIDDLEFRONTULTRASONIC: { 
+            ConvertUltrasonicToCM( &(values->distance.middlefront), sensorData.tickCount);
+            values->isSet.middlefront = true;
+            break;
+        }
+        case RIGHTFRONTULTRASONIC: { 
+            ConvertUltrasonicToCM( &(values->distance.rightfront), sensorData.tickCount);
+            values->isSet.rightfront = true;
+            break;
+        }
+        case LEFTSIDEULTRASONIC: { 
+            ConvertUltrasonicToCM( &(values->distance.leftside), sensorData.tickCount);
+            values->isSet.leftside = true;
+            break;
+        }
+        case RIGHTSIDEULTRASONIC: { 
+            ConvertUltrasonicToCM( &(values->distance.rightside), sensorData.tickCount);
+            values->isSet.rightside = true;
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void ConvertUltrasonicToCM(float* distanceCM, uint32_t tickCount) {
+    *distanceCM = (tickCount)*(1/(80.0))*8/58.0;
 }
 /*******************************************************************************
  End of File

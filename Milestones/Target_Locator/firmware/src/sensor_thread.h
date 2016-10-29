@@ -68,6 +68,14 @@ extern "C" {
 #endif
 // DOM-IGNORE-END 
 
+typedef enum {
+    LEFTFRONTULTRASONIC, MIDDLEFRONTULTRASONIC, RIGHTFRONTULTRASONIC, LEFTSIDEULTRASONIC, RIGHTSIDEULTRASONIC
+} UltrasonicLocation_t;
+
+typedef enum {
+    IRSENSORS, ULTRASONICSENSORS
+} SensorUpdate_t;
+
 typedef struct {
     uint32_t middleFTSensor;
     uint32_t rightFTSensor;
@@ -77,8 +85,31 @@ typedef struct {
     uint32_t leftFBSensor;
     uint32_t rightSDSensor;
     uint32_t leftSDSensor;
-} SensorADCType;
+} IRSensorsADC_t;
 
+typedef struct {
+    UltrasonicLocation_t location;
+    uint32_t tickCount;
+} USSensorADC_t;
+
+typedef struct {
+    SensorUpdate_t UpdateType;
+    IRSensorsADC_t IRSensors;
+    USSensorADC_t USSensors;
+} SensorADC_t;
+
+typedef struct {
+    bool leftfront;
+    bool middlefront;
+    bool rightfront;
+    bool leftside;
+    bool rightside;
+} UltrasonicIsSet_t;
+
+typedef struct {
+    UltrasonicIsSet_t isSet;
+    UltrasonicSensorDistance_t distance;
+} UltrasonicContainer;
 
 /*******************************************************************************
   Function:
@@ -148,14 +179,17 @@ void SENSOR_THREAD_Tasks( void );
 
 void SENSOR_THREAD_InitializeQueue();
 
-void SENSOR_THREAD_ReadFromQueue(SensorADCType* pvBuffer);
+void SENSOR_THREAD_ReadFromQueue(SensorADC_t* pvBuffer);
 
-void ConvertDigitalToCM(SensorADCType sensorData, SensorDataType* values);
+void ConvertDigitalToCM(IRSensorsADC_t sensorData, IRSensorDistance_t* values);
 
 void ConvertTopLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
 
 void ConvertTopRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
 
+void HandleUltrasonicUpdate(USSensorADC_t sensorData, UltrasonicContainer* values);
+
+void ConvertUltrasonicToCM(float* distanceCM, uint32_t tickCount);
 #endif /* _SENSOR_THREAD_H */
 
 //DOM-IGNORE-BEGIN

@@ -83,29 +83,35 @@ static QueueHandle_t _usartqueue;
 
 
 static TimerHandle_t timer;
-static bool mode = true;
+static bool mode0 = true;
+static bool mode1 = true;
+static bool mode2 = true;
+static bool mode3 = true;
+static bool mode4 = true;
+
 
 void IntHandlerDrvAdc(void)
 {
     dbgOutputLoc(ENTER_ADC_ISR);
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-    SensorADCType sensorADCVal;
-    memset(&sensorADCVal, 0, sizeof(SensorADCType));
+    SensorADC_t obj;
+    obj.UpdateType = IRSENSORS;
+    memset(&obj, 0, sizeof(SensorADC_t));
     
     int i = 0;
     dbgOutputLoc(ADDING_ADC_VAL_ISR);
     for(i; i < 8; i=i+8) {
-        sensorADCVal.leftFTSensor = sensorADCVal.leftFTSensor + DRV_ADC_SamplesRead(i);
-        sensorADCVal.middleFTSensor = sensorADCVal.middleFTSensor + DRV_ADC_SamplesRead(i + 1);
-        sensorADCVal.rightFTSensor = sensorADCVal.rightFTSensor + DRV_ADC_SamplesRead(i + 2);
-        sensorADCVal.leftFBSensor = sensorADCVal.leftFBSensor + DRV_ADC_SamplesRead(i + 3);
-        sensorADCVal.middleFBSensor = sensorADCVal.middleFBSensor + DRV_ADC_SamplesRead(i + 4);
-        sensorADCVal.rightFBSensor = sensorADCVal.rightFBSensor + DRV_ADC_SamplesRead(i + 5);
-        sensorADCVal.leftSDSensor = sensorADCVal.leftSDSensor + DRV_ADC_SamplesRead(i + 6);
-        sensorADCVal.rightSDSensor = sensorADCVal.rightSDSensor + DRV_ADC_SamplesRead(i + 7);
+        obj.IRSensors.leftFTSensor += DRV_ADC_SamplesRead(i);
+        obj.IRSensors.middleFTSensor += DRV_ADC_SamplesRead(i + 1);
+        obj.IRSensors.rightFTSensor += DRV_ADC_SamplesRead(i + 2);
+        obj.IRSensors.leftFBSensor += DRV_ADC_SamplesRead(i + 3);
+        obj.IRSensors.middleFBSensor += DRV_ADC_SamplesRead(i + 4);
+        obj.IRSensors.rightFBSensor += DRV_ADC_SamplesRead(i + 5);
+        obj.IRSensors.leftSDSensor += DRV_ADC_SamplesRead(i + 6);
+        obj.IRSensors.rightSDSensor += DRV_ADC_SamplesRead(i + 7);
     }
     dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
-    SENSOR_THREAD_SendToQueueISR(sensorADCVal, &pxHigherPriorityTaskWoken);
+    SENSOR_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
     dbgOutputLoc(AFTER_SEND_TO_Q_ISR);
     dbgOutputLoc(LEAVE_ADC_ISR);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
@@ -114,37 +120,171 @@ void IntHandlerDrvAdc(void)
 }
 
 
-void timerExpired(TimerHandle_t xTimer) {
-}
-
-TickType_t startTickCount;
-
 void IntHandlerExternalInterruptInstance0(void)
 {
+    uint32_t val = DRV_TMR2_CounterValueGet();
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     //rising edge trigger
-    if(mode) {
-        xTimerStartFromISR(timer, &pxHigherPriorityTaskWoken);
-        startTickCount = xTaskGetTickCount();
+    if(mode0) {
+        DRV_TMR2_Start();
         SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE0, INT_EDGE_TRIGGER_FALLING);
-        mode = false;
+        mode0 = false;
     }
     //falling edge trigger
     else {
-        xTimerStartFromISR(timer, &pxHigherPriorityTaskWoken);
-        MessageObj obj;
-        obj.Update.Data.difftickCount = xTaskGetTickCount() - startTickCount;
-        obj.Type = UPDATE;
-        obj.Update.Type = TIMERTICK;
-        MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-        mode = true;
+        DRV_TMR2_Stop();
+        SensorADC_t obj;
+        memset(&obj, 0, sizeof(SensorADC_t));
+        obj.UpdateType = ULTRASONICSENSORS;
+        obj.USSensors.location = LEFTFRONTULTRASONIC;
+        obj.USSensors.tickCount = val;
+        DRV_TMR2_CounterClear();
+                MessageObj obj1;
+            obj1.Update.Data.difftickCount = (val) * 8 / 80;
+            obj1.Type = UPDATE;
+            obj1.Update.Type = TIMERTICK;
+            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj1, &pxHigherPriorityTaskWoken);
         SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE0, INT_EDGE_TRIGGER_RISING);
+        SENSOR_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+        mode0 = true;
+        
     }
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_0);
 }
 
+void IntHandlerExternalInterruptInstance1(void) {
+    uint32_t val = DRV_TMR2_CounterValueGet();
+    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
+    //rising edge trigger
+    if(mode0) {
+        DRV_TMR2_Start();
+        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE1, INT_EDGE_TRIGGER_FALLING);
+        mode0 = false;
+    }
+    //falling edge trigger
+    else {
+        DRV_TMR2_Stop();
+        SensorADC_t obj;
+        memset(&obj, 0, sizeof(SensorADC_t));
+        obj.UpdateType = ULTRASONICSENSORS;
+        obj.USSensors.location = MIDDLEFRONTULTRASONIC;
+        obj.USSensors.tickCount = val;
+        DRV_TMR2_CounterClear();
+                MessageObj obj1;
+            obj1.Update.Data.difftickCount = (val) * 8 / 80;
+            obj1.Type = UPDATE;
+            obj1.Update.Type = TIMERTICK;
+            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj1, &pxHigherPriorityTaskWoken);
+        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE1, INT_EDGE_TRIGGER_RISING);
+        SENSOR_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+        mode0 = true;
+        
+    }
+    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
+    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_1);
+}
 
+void IntHandlerExternalInterruptInstance2(void)
+{    
+    uint32_t val = DRV_TMR2_CounterValueGet();
+    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
+    //rising edge trigger
+    if(mode0) {
+        DRV_TMR2_Start();
+        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE2, INT_EDGE_TRIGGER_FALLING);
+        mode0 = false;
+    }
+    //falling edge trigger
+    else {
+        DRV_TMR2_Stop();
+        SensorADC_t obj;
+        memset(&obj, 0, sizeof(SensorADC_t));
+        obj.UpdateType = ULTRASONICSENSORS;
+        obj.USSensors.location = RIGHTFRONTULTRASONIC;
+        obj.USSensors.tickCount = val;
+        DRV_TMR2_CounterClear();
+                MessageObj obj1;
+            obj1.Update.Data.difftickCount = (val) * 8 / 80;
+            obj1.Type = UPDATE;
+            obj1.Update.Type = TIMERTICK;
+            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj1, &pxHigherPriorityTaskWoken);
+        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE2, INT_EDGE_TRIGGER_RISING);
+        SENSOR_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+        mode0 = true;
+        
+    }
+    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
+    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_2);
+}
+
+void IntHandlerExternalInterruptInstance3(void)
+{
+    uint32_t val = DRV_TMR2_CounterValueGet();
+    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
+    //rising edge trigger
+    if(mode0) {
+        DRV_TMR2_Start();
+        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE3, INT_EDGE_TRIGGER_FALLING);
+        mode0 = false;
+    }
+    //falling edge trigger
+    else {
+        DRV_TMR2_Stop();
+        SensorADC_t obj;
+        memset(&obj, 0, sizeof(SensorADC_t));
+        obj.UpdateType = ULTRASONICSENSORS;
+        obj.USSensors.location = LEFTFRONTULTRASONIC;
+        obj.USSensors.tickCount = val;
+        DRV_TMR2_CounterClear();
+                MessageObj obj1;
+            obj1.Update.Data.difftickCount = (val) * 8 / 80;
+            obj1.Type = UPDATE;
+            obj1.Update.Type = TIMERTICK;
+            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj1, &pxHigherPriorityTaskWoken);
+        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE3, INT_EDGE_TRIGGER_RISING);
+        SENSOR_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+        mode0 = true;
+        
+    }
+    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
+    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_3);
+}
+
+void IntHandlerExternalInterruptInstance4(void)
+{
+    uint32_t val = DRV_TMR2_CounterValueGet();
+    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
+    //rising edge trigger
+    if(mode0) {
+        DRV_TMR2_Start();
+        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE4, INT_EDGE_TRIGGER_FALLING);
+        mode0 = false;
+    }
+    //falling edge trigger
+    else {
+        DRV_TMR2_Stop();
+        SensorADC_t obj;
+        memset(&obj, 0, sizeof(SensorADC_t));
+        obj.UpdateType = ULTRASONICSENSORS;
+        obj.USSensors.location = LEFTFRONTULTRASONIC;
+        obj.USSensors.tickCount = val;
+        DRV_TMR2_CounterClear();
+                MessageObj obj1;
+            obj1.Update.Data.difftickCount = (val) * 8 / 80;
+            obj1.Type = UPDATE;
+            obj1.Update.Type = TIMERTICK;
+            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj1, &pxHigherPriorityTaskWoken);
+        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE4, INT_EDGE_TRIGGER_RISING);
+        SENSOR_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+        mode0 = true;
+        
+    }
+    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
+    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_4);
+}
+
+/* This timer is to fire the ADC */
 void IntHandlerDrvTmrInstance0(void)
 {
     dbgOutputLoc(ENTER_TMR_INSTANCE_0_ISR);
@@ -161,7 +301,7 @@ void IntHandlerDrvTmrInstance0(void)
     }
 }
 
-/* This timer is for the TX to fire every 50ms */
+/* This timer is to send request every ~200ms */
 void IntHandlerDrvTmrInstance1(void)
 {
     dbgOutputLoc(ENTER_TMR_INSTANCE_1_ISR);
@@ -196,6 +336,105 @@ void IntHandlerDrvTmrInstance1(void)
     dbgOutputLoc(LEAVE_TMR_INSTANCE_1_ISR);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
+}
+
+/* This timer is only used to measure the pulse width of the ultrasonic sensors*/
+void IntHandlerDrvTmrInstance2(void)
+{
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
+}
+
+
+UltrasonicLocation_t triggerState = LEFTFRONTULTRASONIC;
+
+void IntHandlerDrvTmrInstance3(void)
+{
+    switch(triggerState) {
+        case LEFTFRONTULTRASONIC: { 
+            PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_EXTERNAL_1);
+            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_1);
+            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_0);
+            PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_EXTERNAL_0);
+      
+            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 13, 1);
+            uint32_t start = DRV_TMR0_CounterValueGet();
+            uint32_t end = start + 4;
+            if(end > 15625) {
+                end = 4;
+            }
+            while(DRV_TMR0_CounterValueGet() < end) {}
+            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 13, 0);
+            triggerState = LEFTFRONTULTRASONIC;
+            break;
+        }
+        case MIDDLEFRONTULTRASONIC: { 
+//            PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_EXTERNAL_0);
+//            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_0);
+//            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_1);
+//            PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_EXTERNAL_1);
+//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 7, 1);
+//            uint32_t start = DRV_TMR0_CounterValueGet();
+//            uint32_t end = start + 4;
+//            if(end > 15625) {
+//                end = 4;
+//            }
+//            while(DRV_TMR0_CounterValueGet() < end) {}
+//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 7, 0);
+//            triggerState = LEFTFRONTULTRASONIC;
+            break;
+        }
+//        case RIGHTFRONTULTRASONIC: { 
+//            PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_EXTERNAL_1);
+//            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_1);
+//            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_2);
+//            PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_EXTERNAL_2);
+//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 1);
+//            uint32_t start = DRV_TMR0_CounterValueGet();
+//            uint32_t end = start + 4;
+//            if(end > 15625) {
+//                end = 4;
+//            }
+//            while(DRV_TMR0_CounterValueGet() < end) {}
+//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 0);
+//            triggerState = LEFTFRONTULTRASONIC;
+//            break;
+//        }
+//        case LEFTSIDEULTRASONIC: { 
+////            PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_EXTERNAL_2);
+////            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_2);
+////            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_3);
+////            PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_EXTERNAL_3);
+//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 0, 1);
+//            uint32_t start = DRV_TMR0_CounterValueGet();
+//            uint32_t end = start + 4;
+//            if(end > 15625) {
+//                end = 4;
+//            }
+//            while(DRV_TMR0_CounterValueGet() < end) {}
+//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 0, 0);
+//            triggerState = RIGHTSIDEULTRASONIC;
+//            break;
+//        }
+//        case RIGHTSIDEULTRASONIC: { 
+////            PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_EXTERNAL_3);
+////            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_3);
+////            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_4);
+////            PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_EXTERNAL_4);
+//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 12, 1);
+//            uint32_t start = DRV_TMR0_CounterValueGet();
+//            uint32_t end = start + 4;
+//            if(end > 15625) {
+//                end = 4;
+//            }
+//            while(DRV_TMR0_CounterValueGet() < end) {}
+//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 12, 0);
+//            triggerState = LEFTFRONTULTRASONIC;
+//            break;
+//        }
+        default:
+            break;
+    }
+    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_TIMER_5);
 }
 
 void Usart0_InitializeQueue() {
@@ -252,7 +491,6 @@ void IntHandlerDrvUsartInstance0(void)
 
 void InitializeISRQueues() {
     Usart0_InitializeQueue();
-    timer = xTimerCreate("Timer", pdMS_TO_TICKS(500), pdFALSE, (void*)0, timerExpired);
 }
 
  

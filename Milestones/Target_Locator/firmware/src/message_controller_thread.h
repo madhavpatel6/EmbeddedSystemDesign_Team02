@@ -82,13 +82,28 @@ typedef struct {
     float leftFBSensor;
     float rightSDSensor;
     float leftSDSensor;
-} SensorDataType;        
+} IRSensorDistance_t;
+
+typedef struct {
+    float leftfront;
+    float middlefront;
+    float rightfront;
+    float leftside;
+    float rightside;
+} UltrasonicSensorDistance_t;
+
+typedef struct {
+    IRSensorDistance_t ir;
+    UltrasonicSensorDistance_t ultrasonic;
+} SensorDataType;
+
+
 //This is any data that someone else might request for
 typedef struct {
     Coordinates location;
     float orientation;
     SensorDataType sensordata;
-    float difftickCount;
+    uint32_t difftickCount;
 } InternalData;
 
 //This should include a new enum for anything in the InternalData

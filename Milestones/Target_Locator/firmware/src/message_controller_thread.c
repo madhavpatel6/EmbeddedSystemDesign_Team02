@@ -243,28 +243,32 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 }
                                 case TargetLocatorSensorData: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"TargetLocatorSensorData\": {"
-                                            "\"leftFTSensor\":\"%.3f\","
-                                            "\"middleFTSensor\":\"%.3f\","
-                                            "\"rightFTSensor\":\"%.3f\","
-                                            "\"leftFBSensor\":\"%.3f\","
-                                            "\"middleFBSensor\":\"%.3f\","
-                                            "\"rightFBSensor\":\"%.3f\","
-                                            "\"leftSDSensor\":\"%.3f\","
-                                            "\"rightSDSensor\":\"%.3f\"}",
-                                            internalData.sensordata.leftFTSensor,
-                                            internalData.sensordata.middleFTSensor,
-                                            internalData.sensordata.rightFTSensor,
-                                            internalData.sensordata.leftFBSensor,
-                                            internalData.sensordata.middleFBSensor,
-                                            internalData.sensordata.rightFBSensor,
-                                            internalData.sensordata.leftSDSensor,
-                                            internalData.sensordata.rightSDSensor
+                                            "\"IR\":{"
+                                            "\"leftFT\":\"%.3f\","
+                                            "\"rightFT\":\"%.3f\","
+                                            "\"leftFB\":\"%.3f\","
+                                            "\"rightFB\":\"%.3f\"},"
+                                            "\"US\":{"
+                                            "\"leftFT\":\"%.3f\","
+                                            "\"middleFT\":\"%.3f\","
+                                            "\"rightFT\":\"%.3f\","
+                                            "\"leftSD\":\"%.3f\","
+                                            "\"rightSD\":\"%.3f\"}}",
+                                            internalData.sensordata.ir.leftFTSensor,
+                                            internalData.sensordata.ir.rightFTSensor,
+                                            internalData.sensordata.ir.leftFBSensor,
+                                            internalData.sensordata.ir.rightFBSensor,
+                                            internalData.sensordata.ultrasonic.leftfront,
+                                            internalData.sensordata.ultrasonic.middlefront,
+                                            internalData.sensordata.ultrasonic.rightfront,
+                                            internalData.sensordata.ultrasonic.leftside,
+                                            internalData.sensordata.ultrasonic.rightside
                                             );
                                     tx_thread_obj.Destination = SERVER;
                                     break;
                                 }
                                 case TimerTickCount: {
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"TimerTickCount\": \"%.3f\"",
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"TimerTickCount\": \"%d\"",
                                         internalData.difftickCount
                                         );
                                     break;
