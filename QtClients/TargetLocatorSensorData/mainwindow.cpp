@@ -12,26 +12,29 @@ MainWindow::MainWindow(QWidget *parent) :
     requestTimer->setInterval(REQUESTRATE_MS);
     ui->setupUi(this);
     ui->labelTL->setText("mean\nstd\nvariance");
-    ui->labelTM->setText("mean\nstd\nvariance");
+    ui->labelLS->setText("mean\nstd\nvariance");
     ui->labelTR->setText("mean\nstd\nvariance");
     ui->labelBL->setText("mean\nstd\nvariance");
-    ui->labelBM->setText("mean\nstd\nvariance");
+    ui->labelRS->setText("mean\nstd\nvariance");
     ui->labelBR->setText("mean\nstd\nvariance");
-    ui->labelRightSide->setText("mean\nstd\nvariance");
-    ui->labelLeftSide->setText("mean\nstd\nvariance");
+    ui->labelUL->setText("mean\nstd\nvariance");
+    ui->labelUM->setText("mean\nstd\nvariance");
+    ui->labelUR->setText("mean\nstd\nvariance");
 
     ui->valuesTL->setText("0.00\n0.00\n0.00");
-    ui->valuesTM->setText("0.00\n0.00\n0.00");
+    ui->valuesLS->setText("0.00\n0.00\n0.00");
     ui->valuesTR->setText("0.00\n0.00\n0.00");
     ui->valuesBL->setText("0.00\n0.00\n0.00");
-    ui->valuesBM->setText("0.00\n0.00\n0.00");
-    ui->valuesBR->setText("0.00\n0.00\n0.00");
-    ui->valuesLS->setText("0.00\n0.00\n0.00");
     ui->valuesRS->setText("0.00\n0.00\n0.00");
+    ui->valuesBR->setText("0.00\n0.00\n0.00");
+    ui->valuesUL->setText("0.00\n0.00\n0.00");
+    ui->valuesUM->setText("0.00\n0.00\n0.00");
+    ui->valuesUR->setText("0.00\n0.00\n0.00");
     tcpSocket  = new ClientSocket();
     connect(requestTimer, SIGNAL(timeout()), tcpSocket, SLOT(sendRequest()));
     connect(tcpSocket, SIGNAL(serverIsConnectedSignal(bool)), this, SLOT(HostConnectionEvent(bool)));
-    connect(tcpSocket, SIGNAL(sendUpdate(QString,QString,QString,QString,QString,QString,QString,QString)), this, SLOT(receiveUpdate(QString,QString,QString,QString,QString,QString,QString,QString)));
+    connect(tcpSocket, SIGNAL(sendUpdate(QString,QString,QString,QString,QString,QString,QString,QString,QString)), this, SLOT(receiveUpdate(QString,QString,QString,QString,QString,QString,QString,QString,QString)));
+    connect(tcpSocket, SIGNAL(updateTime(QString)), this, SLOT(receiveTime(QString)));
 }
 
 MainWindow::~MainWindow()
@@ -61,43 +64,52 @@ void MainWindow::HostConnectionEvent(bool connected) {
     }
 }
 
-void MainWindow::receiveUpdate(QString leftFTSensor, QString middleFTSensor, QString rightFTSensor, QString leftFBSensor, QString middleFBSensor, QString rightFBSensor, QString leftSDSensor, QString rightSDSensor) {
+void MainWindow::receiveUpdate(QString leftFTSensor, QString rightFTSensor, QString leftFBSensor, QString rightFBSensor, QString leftUltra, QString middleUltra, QString rightUltra, QString leftSideUltra, QString rightSideUltra) {
     if(valuesTL.size() == 1000) {
         valuesTL.pop_front();
-        valuesTM.pop_front();
+        valuesUL.pop_front();
         valuesTR.pop_front();
         valuesBL.pop_front();
-        valuesBM.pop_front();
+        valuesUR.pop_front();
+        valuesUM.pop_front();
+        valuesLS.pop_front();
+        valuesRS.pop_front();
         valuesBR.pop_front();
-        valuesSL.pop_front();
-        valuesSR.pop_front();
     }
     valuesTL.push_back(leftFTSensor.toFloat());
-    valuesTM.push_back(middleFTSensor.toFloat());
     valuesTR.push_back(rightFTSensor.toFloat());
     valuesBL.push_back(leftFBSensor.toFloat());
-    valuesBM.push_back(middleFBSensor.toFloat());
     valuesBR.push_back(rightFBSensor.toFloat());
-    valuesSL.push_back(leftSDSensor.toFloat());
-    valuesSR.push_back(rightSDSensor.toFloat());
+    valuesUL.push_back(leftUltra.toFloat());
+    valuesUM.push_back(middleUltra.toFloat());
+    valuesUR.push_back(rightUltra.toFloat());
+    valuesLS.push_back(leftSideUltra.toFloat());
+    valuesRS.push_back(rightSideUltra.toFloat());
 
     ui->topleftBrowser->append(leftFTSensor);
-    ui->topmiddleBrowser->append(middleFTSensor);
     ui->toprightBrowser->append(rightFTSensor);
     ui->bottomleftBrowser->append(leftFBSensor);
-    ui->bottommiddleBrowser->append(middleFBSensor);
     ui->bottomrightBrowser->append(rightFBSensor);
-    ui->leftsideBrowser->append(leftSDSensor);
-    ui->rightsideBrowser->append(rightSDSensor);
+    ui->ultraLeftBrowser->append(leftUltra);
+    ui->ultraMiddleBrowser->append(middleUltra);
+    ui->ultraRightBrowser->append(rightUltra);
+    ui->ultraLeftSideBrowser->append(leftSideUltra);
+    ui->ultraRightSideBrowser->append(rightSideUltra);
 
     updateStatistics(valuesTL, ui->valuesTL);
-    updateStatistics(valuesTM, ui->valuesTM);
     updateStatistics(valuesTR, ui->valuesTR);
     updateStatistics(valuesBL, ui->valuesBL);
-    updateStatistics(valuesBM, ui->valuesBM);
     updateStatistics(valuesBR, ui->valuesBR);
-    updateStatistics(valuesSL, ui->valuesLS);
-    updateStatistics(valuesSR, ui->valuesRS);
+    updateStatistics(valuesUL, ui->valuesUL);
+    updateStatistics(valuesUM, ui->valuesUM);
+    updateStatistics(valuesUR, ui->valuesUR);
+    updateStatistics(valuesLS, ui->valuesLS);
+    updateStatistics(valuesRS, ui->valuesRS);
+
+
+}
+
+void MainWindow::receiveTime(QString time){
 
 }
 
@@ -139,19 +151,23 @@ void MainWindow::on_connectToServer_clicked(){
 void MainWindow::on_pushButton_clicked()
 {
     valuesTL.clear();
-    valuesTM.clear();
+    valuesUL.clear();
     valuesTR.clear();
     valuesBL.clear();
-    valuesBM.clear();
+    valuesUM.clear();
     valuesBR.clear();
-    valuesSL.clear();
-    valuesSR.clear();
+    valuesUR.clear();
+    valuesLS.clear();
+    valuesRS.clear();
+
     ui->topleftBrowser->clear();
-    ui->topmiddleBrowser->clear();
     ui->toprightBrowser->clear();
     ui->bottomleftBrowser->clear();
-    ui->bottommiddleBrowser->clear();
     ui->bottomrightBrowser->clear();
-    ui->leftsideBrowser->clear();
-    ui->rightsideBrowser->clear();
+    ui->ultraLeftBrowser->clear();
+    ui->ultraMiddleBrowser->clear();
+    ui->ultraRightBrowser->clear();
+    ui->ultraLeftSideBrowser->clear();
+    ui->ultraRightSideBrowser->clear();
+
 }

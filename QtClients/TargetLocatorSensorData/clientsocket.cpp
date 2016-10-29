@@ -70,11 +70,9 @@ void ClientSocket::readyRead()
                 if(json.contains(QStringLiteral("TargetLocatorSensorData"))) {
                     HandleResponse(json);
                 }
-                if(json.contains(QStringLiteral("TimerTickCount"))) {
-                    qDebug() << buffer;
-                }
             }
             else if(type == QStringLiteral("Request")){
+
                 //qDebug() << "Request: " << buffer;
             }
         }
@@ -105,8 +103,9 @@ void ClientSocket::SendJSONRequestToSocket(QString request, char destination) {
 
 void ClientSocket::HandleResponse(QJsonObject obj) {
     if(obj.contains(QStringLiteral("TargetLocatorSensorData"))) {
-        QJsonObject sensorData = obj["TargetLocatorSensorData"].toObject();
-        emit sendUpdate(sensorData["leftFTSensor"].toString(), sensorData["middleFTSensor"].toString(), sensorData["rightFTSensor"].toString(), sensorData["leftFBSensor"].toString(), sensorData["middleFBSensor"].toString(), sensorData["rightFBSensor"].toString(), sensorData["leftSDSensor"].toString(), sensorData["rightSDSensor"].toString());
+        QJsonObject ir = obj["TargetLocatorSensorData"].toObject()["IR"].toObject();
+        QJsonObject us = obj["TargetLocatorSensorData"].toObject()["US"].toObject();
+        emit sendUpdate(ir["leftFT"].toString(), ir["rightFT"].toString(), ir["leftFB"].toString(), ir["rightFB"].toString(), us["leftFT"].toString(), us["middleFT"].toString(), us["rightFT"].toString(), us["leftSD"].toString(), us["rightSD"].toString());
     }
 
 }

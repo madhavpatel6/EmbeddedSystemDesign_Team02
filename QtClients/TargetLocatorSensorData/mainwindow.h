@@ -20,7 +20,9 @@ private slots:
     void on_requestButton_clicked();
     void on_connectToServer_clicked();
     void HostConnectionEvent(bool connected);
-    void receiveUpdate(QString leftFTSensor, QString middleFTSensor, QString rightFTSensor, QString leftFBSensor, QString middleFBSensor, QString rightFBSensor, QString leftSDSensor, QString rightSDSensor);
+    void receiveUpdate(QString leftFTSensor, QString rightFTSensor, QString leftFBSensor, QString rightFBSensor, QString leftUltra, QString middleUltra, QString rightUltra, QString leftSideUltra, QString rightSideUltra);
+    void receiveTime(QString time);
+
     void on_pushButton_clicked();
 
 private:
@@ -28,13 +30,14 @@ private:
     float computeStd(QVector<float> vec);
     void updateStatistics(QVector<float> vec, QLabel* label);
     QVector<float> valuesTL;
-    QVector<float> valuesTM;
     QVector<float> valuesTR;
     QVector<float> valuesBL;
-    QVector<float> valuesBM;
     QVector<float> valuesBR;
-    QVector<float> valuesSL;
-    QVector<float> valuesSR;
+    QVector<float> valuesUL;
+    QVector<float> valuesUM;
+    QVector<float> valuesUR;
+    QVector<float> valuesLS;
+    QVector<float> valuesRS;
     Ui::MainWindow *ui;
     QTimer* requestTimer;
     ClientSocket* tcpSocket;

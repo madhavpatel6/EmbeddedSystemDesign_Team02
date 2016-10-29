@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1037</width>
-    <height>500</height>
+    <width>1241</width>
+    <height>576</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,46 +19,6 @@
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="4" column="1">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Left Side IR Sensor</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="2">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>Right Side IR Sensor</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLabel" name="label_10">
-          <property name="text">
-           <string>Bottom Left IR Sensor</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>Top Middle IR Sensor</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="3">
          <widget class="QLabel" name="label_8">
           <property name="text">
@@ -69,34 +29,24 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="2">
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>Bottom Middle IR Sensor</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="2">
          <layout class="QHBoxLayout" name="horizontalLayout_7">
           <item>
-           <widget class="QLabel" name="labelBM">
+           <widget class="QLabel" name="labelUM">
             <property name="text">
              <string>Variance</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="valuesBM">
+           <widget class="QLabel" name="valuesUM">
             <property name="text">
              <string>0</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QTextBrowser" name="bottommiddleBrowser"/>
+           <widget class="QTextBrowser" name="ultraMiddleBrowser"/>
           </item>
          </layout>
         </item>
@@ -124,33 +74,23 @@
         <item row="3" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_6">
           <item>
-           <widget class="QLabel" name="labelBL">
+           <widget class="QLabel" name="labelUL">
             <property name="text">
              <string>Variance</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="valuesBL">
+           <widget class="QLabel" name="valuesUL">
             <property name="text">
              <string>0</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QTextBrowser" name="bottomleftBrowser"/>
+           <widget class="QTextBrowser" name="ultraLeftBrowser"/>
           </item>
          </layout>
-        </item>
-        <item row="2" column="3">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>Bottom Right IR Sensor</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
         </item>
         <item row="0" column="1">
          <widget class="QLabel" name="label_4">
@@ -192,28 +132,55 @@ p, li { white-space: pre-wrap; }
          </layout>
         </item>
         <item row="1" column="2">
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <layout class="QHBoxLayout" name="horizontalLayout_3"/>
+        </item>
+        <item row="3" column="3">
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
           <item>
-           <widget class="QLabel" name="labelTM">
+           <widget class="QLabel" name="labelUR">
             <property name="text">
              <string>Variance</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="valuesTM">
+           <widget class="QLabel" name="valuesUR">
             <property name="text">
              <string>0</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QTextBrowser" name="topmiddleBrowser"/>
+           <widget class="QTextBrowser" name="ultraRightBrowser"/>
           </item>
          </layout>
         </item>
-        <item row="3" column="3">
-         <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item row="5" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_10">
+          <item>
+           <widget class="QLabel" name="labelBL">
+            <property name="text">
+             <string>Variance</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="valuesBL">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTextBrowser" name="bottomleftBrowser"/>
+          </item>
+         </layout>
+        </item>
+        <item row="5" column="2">
+         <layout class="QHBoxLayout" name="horizontalLayout_11"/>
+        </item>
+        <item row="5" column="3">
+         <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
            <widget class="QLabel" name="labelBR">
             <property name="text">
@@ -233,10 +200,80 @@ p, li { white-space: pre-wrap; }
           </item>
          </layout>
         </item>
-        <item row="5" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout_10">
+        <item row="2" column="3">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Right Front Ultrasonic</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>Bottom Left IR Sensor</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>Middle Front Ultrasonic</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="3">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Bottom Right IR Sensor</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Left Front Ultrasonic</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Left Side Ultrasonic</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="4">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>Right Side Ultrasonic</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_9">
           <item>
-           <widget class="QLabel" name="labelLeftSide">
+           <widget class="QLabel" name="labelLS">
             <property name="text">
              <string>Variance</string>
             </property>
@@ -250,14 +287,22 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <widget class="QTextBrowser" name="leftsideBrowser"/>
+           <widget class="QTextBrowser" name="ultraLeftSideBrowser">
+            <property name="html">
+             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
-        <item row="5" column="2">
-         <layout class="QHBoxLayout" name="horizontalLayout_11">
+        <item row="3" column="4">
+         <layout class="QHBoxLayout" name="horizontalLayout_12">
           <item>
-           <widget class="QLabel" name="labelRightSide">
+           <widget class="QLabel" name="labelRS">
             <property name="text">
              <string>Variance</string>
             </property>
@@ -271,7 +316,15 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <widget class="QTextBrowser" name="rightsideBrowser"/>
+           <widget class="QTextBrowser" name="ultraRightSideBrowser">
+            <property name="html">
+             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -289,7 +342,7 @@ p, li { white-space: pre-wrap; }
         <item>
          <widget class="QLineEdit" name="serverIPAddressInput">
           <property name="text">
-           <string>192.168.0.197</string>
+           <string>192.168.0.36</string>
           </property>
          </widget>
         </item>

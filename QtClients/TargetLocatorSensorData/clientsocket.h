@@ -24,8 +24,8 @@ signals:
     void sendCommStatTargetLocator(QByteArray commStatTargetLocator);
     void serverIsConnectedSignal(bool connectedToServerBoolSignal);
     void sentCommStatSignal();
-
-    void sendUpdate(QString leftFTSensor, QString middleFTSensor, QString rightFTSensor, QString leftFBSensor, QString middleFBSensor, QString rightFBSensor, QString leftSDSensor, QString rightSDSensor);
+    void updateTime(QString time);
+    void sendUpdate(QString leftFTSensor, QString rightFTSensor, QString leftFBSensor, QString rightFBSensor, QString leftUltra, QString middleUltra, QString rightUltra, QString leftUltraSide, QString rightUltraSide);
 public slots:
     void connected();
     void disconnected();
