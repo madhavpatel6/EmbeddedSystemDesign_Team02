@@ -121,7 +121,7 @@ float SensorClass::readDistance(QVector<QPolygonF> objs) {
         case IRSENSOR: {
             QPointF absoluteIntersectionPoint = findFirstIntersectionIR(objs);
             if(absoluteIntersectionPoint == sensorPixelLocation) {
-                return -1;
+                return maximumDistanceCM;
             }
             else if (absoluteIntersectionPoint == QPointF(-1,-1)) {
                 return -2;
@@ -135,7 +135,7 @@ float SensorClass::readDistance(QVector<QPolygonF> objs) {
         case ULTRASONICSENSOR: {
             QPointF absoluteIntersectionPoint = findFirstIntersectionUltrasonic(objs);
             if(absoluteIntersectionPoint == sensorPixelLocation) {
-                return -1;
+                return maximumDistanceCM;
             }
             else if (absoluteIntersectionPoint == QPointF(-1,-1)) {
                 return -2;

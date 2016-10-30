@@ -39,5 +39,7 @@ RayTraceReturnType raytrace3(int x1, int y1, int x2, int y2, bool maximum, Grid:
 
 void updateOccupanyGrid(SensorDataContainerType sensorData, Grid::GridType grid);
 
+void updateOccupanyGrid2(SensorDataContainerType sensorData, Grid::GridType grid);
+
 }
 #endif // GRIDHELPER_H

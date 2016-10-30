@@ -315,7 +315,7 @@ void handleIRSensor(SensorData_t data, Grid::GridType grid) {
     bool maximum = false;
     if(data.distance == -2)
         return;
-    if(data.distance == -1) {
+    if(data.distance == data.maximumMeasuringDistance) {
         distancePoint = data.maxSensorLocation;
         maximum = true;
     }
@@ -343,7 +343,7 @@ void handleUltrasonicSensor(SensorData_t data, Grid::GridType grid) {
         return;
     // If we get -1 this indicates that the distance read was further than the maximum measuring distance
     //      In this case we need to just set the distance point to the maximum distance point
-    if(data.distance == -1) {
+    if(data.distance == data.maximumMeasuringDistance) {
         // Get the maximum distance point
         distancePoint = data.maxSensorLocation;
     }
@@ -373,4 +373,33 @@ void updateOccupanyGrid(SensorDataContainerType sensorData, Grid::GridType grid)
     handleUltrasonicSensor(sensorData.leftSideSensor, grid);
     handleUltrasonicSensor(sensorData.rightSideSensor, grid);
 }
+
+void updateOccupanyGrid2(SensorDataContainerType sensorData, Grid::GridType grid) {
+    SensorData_t minSensor, nonMinSensor;
+    int angleOffset;
+    if(sensorData.leftFrontSensor.distance <= sensorData.rightFrontSensor.distance) {
+        minSensor = sensorData.leftFrontSensor;
+        nonMinSensor = sensorData.rightFrontSensor;
+        angleOffset = -90;
+    }
+    else {
+        minSensor = sensorData.rightFrontSensor;
+        nonMinSensor = sensorData.leftFrontSensor;
+        angleOffset = 90;
+    }
+
+    int sensorDistanceBetween = 4;
+    QPointF minDistancePoint = QPointF(minSensor.sensorLocation.x() + minSensor.distance*cos(minSensor.orientation*M_PI/180),
+                            minSensor.sensorLocation.y() + minSensor.distance*sin(minSensor.orientation*M_PI/180));
+    float cosX = cos((sensorData.leftFrontSensor.orientation + angleOffset)*M_PI/180);
+    float sinY = sin((sensorData.leftFrontSensor.orientation + angleOffset)*M_PI/180);
+    for(int i = 0; i <= sensorDistanceBetween; i++) {
+        QPointF rayTracePoint(minDistancePoint.x() + i*cosX, minDistancePoint.y() + i*sinY);
+        QPointF rayTraceOrigin(sensorData.leftFrontSensor.sensorLocation.x() + i*cosX, sensorData.leftFrontSensor.sensorLocation.y() + i*sinY);
+
+        raytrace3(rayTraceOrigin.x(), rayTraceOrigin.y(), rayTracePoint.x(), rayTracePoint.y(), true, grid);
+    }
+
+}
+
 }

@@ -14,14 +14,14 @@ GridScene::GridScene(QWidget *parent) : QWidget(parent)
     this->setAutoFillBackground(true);
     this->setPalette(Pal);
     rover = new RoverClass();
-    middleFrontSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::MIDDLESENSOR, 2, 70, 30, 0,rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
-//    leftFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::LEFTSENSOR, 20, 70, 30, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
-//    rightFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::RIGHTSENSOR, 20, 70, 30, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
-    leftFrontSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::LEFTSENSOR, 2, 70, 30, 30, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
-    rightFrontSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::RIGHTSENSOR, 2, 70, 30, -30, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
+    middleFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::MIDDLESENSOR, 20, 70, 0, 0,rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
+    leftFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::LEFTSENSOR, 3, 30, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
+    rightFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::RIGHTSENSOR, 3, 30, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
+//    leftFrontSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::LEFTSENSOR, 2, 70, 30, 30, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
+//    rightFrontSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::RIGHTSENSOR, 2, 70, 30, -30, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
 
-    rightSideSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::RIGHTSIDESENSOR, 2, 70, 30, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
-    leftSideSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::LEFTSIDESENSOR, 2, 70, 30, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
+    rightSideSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::RIGHTSIDESENSOR, 2, 2, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
+    leftSideSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::LEFTSIDESENSOR, 2, 2, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
     this->setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
     showObjects = true;
@@ -102,7 +102,7 @@ void GridScene::addLine(double x1, double y1, double x2, double y2) {
 
 void GridScene::updateSensorReading() {
     SensorDataContainerType data = getSensorData();
-    GridHelper::updateOccupanyGrid(data, grid);
+    GridHelper::updateOccupanyGrid2(data, grid);
 //    addRayTrace(middleFrontSensor);
 //    addRayTrace(leftFrontSensor);
 //    addRayTrace(rightFrontSensor);
