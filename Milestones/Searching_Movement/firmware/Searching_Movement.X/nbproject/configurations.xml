@@ -12,10 +12,13 @@
                 <logicalFolder name="f1" displayName="adc" projectFiles="true">
                   <itemPath>../src/system_config/default/framework/driver/adc/drv_adc_static.h</itemPath>
                 </logicalFolder>
-                <logicalFolder name="f2" displayName="tmr" projectFiles="true">
+                <logicalFolder name="f2" displayName="oc" projectFiles="true">
+                  <itemPath>../src/system_config/default/framework/driver/oc/drv_oc_static.h</itemPath>
+                </logicalFolder>
+                <logicalFolder name="f3" displayName="tmr" projectFiles="true">
                   <itemPath>../src/system_config/default/framework/driver/tmr/drv_tmr_static.h</itemPath>
                 </logicalFolder>
-                <logicalFolder name="f3" displayName="usart" projectFiles="true">
+                <logicalFolder name="f4" displayName="usart" projectFiles="true">
                   <logicalFolder name="f1" displayName="src" projectFiles="true">
                     <itemPath>../src/system_config/default/framework/driver/usart/src/drv_usart_static_local.h</itemPath>
                   </logicalFolder>
@@ -34,7 +37,6 @@
           </logicalFolder>
         </logicalFolder>
         <itemPath>../src/adc_thread.h</itemPath>
-        <itemPath>../src/adc_thread_public.h</itemPath>
         <itemPath>../src/rx_thread.h</itemPath>
         <itemPath>../src/tx_thread.h</itemPath>
         <itemPath>../src/message_controller_thread.h</itemPath>
@@ -49,7 +51,10 @@
       </logicalFolder>
       <logicalFolder name="f1" displayName="framework" projectFiles="true">
         <logicalFolder name="f1" displayName="driver" projectFiles="true">
-          <logicalFolder name="f1" displayName="tmr" projectFiles="true">
+          <logicalFolder name="f1" displayName="oc" projectFiles="true">
+            <itemPath>../../../../../microchip/harmony/v1_08_01/framework/driver/oc/drv_oc.h</itemPath>
+          </logicalFolder>
+          <logicalFolder name="f2" displayName="tmr" projectFiles="true">
             <logicalFolder name="f1" displayName="src" projectFiles="true">
               <itemPath>../../../../../microchip/harmony/v1_08_01/framework/driver/tmr/src/drv_tmr_variant_mapping.h</itemPath>
             </logicalFolder>
@@ -137,6 +142,7 @@
       <itemPath>../src/rx_thread_public.h</itemPath>
       <itemPath>../src/tx_thread_public.h</itemPath>
       <itemPath>C:/ECE4534/Milestones/Searching_Movement/firmware/src/motor_controller_thread_public.h</itemPath>
+      <itemPath>../src/adc_thread_public.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -155,13 +161,19 @@
                     <itemPath>../src/system_config/default/framework/driver/adc/src/drv_adc_static.c</itemPath>
                   </logicalFolder>
                 </logicalFolder>
-                <logicalFolder name="f2" displayName="tmr" projectFiles="true">
+                <logicalFolder name="f2" displayName="oc" projectFiles="true">
+                  <logicalFolder name="f1" displayName="src" projectFiles="true">
+                    <itemPath>../src/system_config/default/framework/driver/oc/src/drv_oc_mapping.c</itemPath>
+                    <itemPath>../src/system_config/default/framework/driver/oc/src/drv_oc_static.c</itemPath>
+                  </logicalFolder>
+                </logicalFolder>
+                <logicalFolder name="f3" displayName="tmr" projectFiles="true">
                   <logicalFolder name="f1" displayName="src" projectFiles="true">
                     <itemPath>../src/system_config/default/framework/driver/tmr/src/drv_tmr_static.c</itemPath>
                     <itemPath>../src/system_config/default/framework/driver/tmr/src/drv_tmr_mapping.c</itemPath>
                   </logicalFolder>
                 </logicalFolder>
-                <logicalFolder name="f3" displayName="usart" projectFiles="true">
+                <logicalFolder name="f4" displayName="usart" projectFiles="true">
                   <logicalFolder name="f1" displayName="src" projectFiles="true">
                     <itemPath>../src/system_config/default/framework/driver/usart/src/drv_usart_mapping.c</itemPath>
                     <itemPath>../src/system_config/default/framework/driver/usart/src/drv_usart_static.c</itemPath>
@@ -306,7 +318,7 @@
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
         <property key="extra-include-directories"
-                  value="../src;../src/system_config/default;../src/default;../../../../../microchip/harmony/v1_08_01/framework;../src/system_config/default/framework;../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX;../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include"/>
+                  value=";../src;../src/system_config/default;../src/default;../../../../../microchip/harmony/v1_08_01/framework;../src/system_config/default/framework;../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX;../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="true"/>
@@ -331,7 +343,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="exclude-floating-point-library" value="false"/>
         <property key="expand-macros" value="false"/>
-        <property key="extra-include-directories-for-assembler" value=";"/>
+        <property key="extra-include-directories-for-assembler" value=""/>
         <property key="extra-include-directories-for-preprocessor"
                   value=";../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX;../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include;../src/system_config/default"/>
         <property key="false-conditionals" value="false"/>

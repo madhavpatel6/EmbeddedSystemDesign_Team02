@@ -96,15 +96,15 @@ void IntHandlerDrvAdc(void)
     
     dbgOutputLoc(ADDING_ADC_VAL_ISR);
     if (ANALOG) {
-        for (i = 0; i < 16; i += 2) {
-            lineObj.IR_0 = DRV_ADC_SamplesRead(i);
-            lineObj.IR_1 = DRV_ADC_SamplesRead(i+1);
-            lineObj.IR_2 = DRV_ADC_SamplesRead(i+2);
-            lineObj.IR_3 = DRV_ADC_SamplesRead(i+3);
-            lineObj.IR_4 = DRV_ADC_SamplesRead(i+4);
-            lineObj.IR_5 = DRV_ADC_SamplesRead(i+5);
-            lineObj.IR_6 = DRV_ADC_SamplesRead(i+6);
-            lineObj.IR_7 = DRV_ADC_SamplesRead(i+7);
+        for (i = 0; i < 16; i += 8) {
+            lineObj.IR_0 += DRV_ADC_SamplesRead(i);
+            lineObj.IR_1 += DRV_ADC_SamplesRead(i+1);
+            lineObj.IR_2 += DRV_ADC_SamplesRead(i+2);
+            lineObj.IR_3 += DRV_ADC_SamplesRead(i+3);
+            lineObj.IR_4 += DRV_ADC_SamplesRead(i+4);
+            lineObj.IR_5 += DRV_ADC_SamplesRead(i+5);
+            lineObj.IR_6 += DRV_ADC_SamplesRead(i+6);
+            lineObj.IR_7 += DRV_ADC_SamplesRead(i+7);
         }
     } else {
         lineObj.IR_0 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_F, 13);
@@ -124,6 +124,7 @@ void IntHandlerDrvAdc(void)
     }
     
     dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
+
     ADC_THREAD_SendToQueueISR(lineObj, &pxHigherPriorityTaskWoken);
     dbgOutputLoc(AFTER_SEND_TO_Q_ISR);
     dbgOutputLoc(LEAVE_ADC_ISR);
@@ -132,31 +133,31 @@ void IntHandlerDrvAdc(void)
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
 }
 
-/* This timer is for the ADC to fire every 50 ms */
+/* This timer is for the ADC to fire every 100 ms */
 // Timer 2
 void IntHandlerDrvTmrInstance0(void)
 {
     dbgOutputLoc(ENTER_TMR_INSTANCE_0_ISR);
-    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-    if(!PLIB_INT_SourceIsEnabled(INT_ID_0, INT_SOURCE_ADC_1)){
-        PLIB_ADC_SampleAutoStartEnable(ADC_ID_1);
-        PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
-        portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
-        PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
-    }
-    else{
-        portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
-        PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
-    }
+//    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
+//    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
 }
 
 uint16_t timerCount = 0;
 
-/* This timer is for the TX to fire every 200 ms */
+/* This timer is for the TX to fire every 50 ms */
 // Timer 5
 void IntHandlerDrvTmrInstance1(void)
 {
     dbgOutputLoc(ENTER_TMR_INSTANCE_1_ISR);
+    
+    if(!PLIB_INT_SourceIsEnabled(INT_ID_0, INT_SOURCE_ADC_1)){
+        PLIB_ADC_SampleAutoStartEnable(ADC_ID_1);
+        PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
+    }
+    
+    MOTOR_CONTROLLER_THREAD_CorrectSpeed();
+    
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     MessageObj obj;
     obj.Type = SEND_REQUEST;
@@ -184,21 +185,24 @@ void IntHandlerDrvTmrInstance1(void)
             break;
     }
     dbgOutputLoc(AFTER_SEND_TO_Q_TMR_INSTANCE_1_ISR);
+    
     incrementSystemClock();
     dbgOutputLoc(LEAVE_TMR_INSTANCE_1_ISR);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_5);
 }
 
-// Timer 3
+// Timer 3 - Motor 1
 void IntHandlerDrvTmrInstance2(void)
 {
+    MOTOR_CONTROLLER_THREAD_IncrementRight();
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
 }
 
-// Timer 4
+// Timer 4 - Motor 2
 void IntHandlerDrvTmrInstance3(void)
 {
+    MOTOR_CONTROLLER_THREAD_IncrementLeft();
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
 }
 
