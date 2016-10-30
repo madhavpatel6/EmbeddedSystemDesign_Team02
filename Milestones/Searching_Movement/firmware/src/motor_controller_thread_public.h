@@ -47,7 +47,7 @@ void MOTOR_CONTROLLER_THREAD_SendToQueue(MotorObj obj);
 
 void MOTOR_CONTROLLER_THREAD_SendToQueueISR(MotorObj obj, BaseType_t *pxHigherPriorityTaskWoken);
 
-void MOTOR_CONTROLLER_THREAD_CorrectSpeed(void);
+void MOTOR_CONTROLLER_THREAD_CorrectSpeed(int timer);
 
 void MOTOR_CONTROLLER_THREAD_IncrementRight(void);
 

@@ -399,7 +399,7 @@
       <Template>
         <Name>drv_tmr_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
-        <Checksum>EBE3F5D49932167298AD2B30A50191D4</Checksum>
+        <Checksum>4383D9A4EEDBA2E91389499E0A00DCC7</Checksum>
       </Template>
       <Template>
         <Name>rtos_hooks.c</Name>

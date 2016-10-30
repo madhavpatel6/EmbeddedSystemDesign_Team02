@@ -73,8 +73,8 @@ static QueueHandle_t _queue;
 static int rightCount = 0;
 static int leftCount = 0;
 
-static int rightSpeed = 28347;
-static int leftSpeed = 28347;
+static int rightSpeed = 25000;
+static int leftSpeed = 25000;
 
 static float totalDistance = 0;
 static float initialOrientation = 0;
@@ -172,7 +172,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                         leftSign = 1;
                         
                         // Stop if desired distance is traveled
-                        if (totalDistance > 10) {
+                        if (totalDistance > 100) {
                             completeMotion();
                         }
                         break;
@@ -304,21 +304,35 @@ void MOTOR_CONTROLLER_THREAD_SendToQueueISR(MotorObj obj, BaseType_t *pxHigherPr
     xQueueSendFromISR(_queue, &obj, pxHigherPriorityTaskWoken);
 }
 
-void MOTOR_CONTROLLER_THREAD_CorrectSpeed(void) {
+void MOTOR_CONTROLLER_THREAD_CorrectSpeed(int timer) {
     float error = 0;
     float output = 0;
-    float Kp = 1000;
-    float Ki = 100;
+    float Kp = 500;
+    float Ki = 50;
     
     error = rightCount - leftCount;
     integral += error;
-    output = rightSpeed + ((Kp*error) + (Ki*integral));
+    output = ((Kp*error) + (Ki*integral));
     
+    if (output < 0) {
+        output = 0;
+    }
     if (output > 31497) {
         output = 31497;
     }
     
     leftSpeed = (int)output;
+    
+    if(timer % 3 == 0) {
+            Tx_Thead_Queue_DataType tx_thread_obj;
+            memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
+            tx_thread_obj.Destination = PATHFINDER;
+            BaseType_t *ptr;
+            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"1\", \"vel\": \"%4d\", \"time\": \"%4d\", \"output\": \"%4f\", \"pwm\": \"%4d\"}", leftCount, timer, output, leftSpeed);
+            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"2\", \"vel\": \"%4d\", \"time\": \"%4d\"}", rightCount, timer);
+            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+    }
 }
 
 void MOTOR_CONTROLLER_THREAD_IncrementRight(void) {

@@ -145,47 +145,52 @@ void IntHandlerDrvTmrInstance0(void)
 
 uint16_t timerCount = 0;
 
-/* This timer is for the TX to fire every 50 ms */
+/* This timer is for the TX to fire every 10 ms */
 // Timer 5
 void IntHandlerDrvTmrInstance1(void)
 {
     dbgOutputLoc(ENTER_TMR_INSTANCE_1_ISR);
-    
-    if(!PLIB_INT_SourceIsEnabled(INT_ID_0, INT_SOURCE_ADC_1)){
-        PLIB_ADC_SampleAutoStartEnable(ADC_ID_1);
-        PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
-    }
-    
-    MOTOR_CONTROLLER_THREAD_CorrectSpeed();
-    
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     MessageObj obj;
     obj.Type = SEND_REQUEST;
-    dbgOutputLoc(BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR);
-    switch(MYMODULE){
-        case SEARCHERMOVER:
-            obj.Request = SMtoTL;
-//            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            break;
-        case TARGETLOCATOR:
-            obj.Request = TLtoSM;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            obj.Request = TLtoPF;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            break;
-        case PATHFINDER:
-            obj.Request = PFtoTL;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            obj.Request = PFtoTG;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            break;
-        case TARGETGRABBER:
-            obj.Request = TGtoPF;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            break;
-    }
-    dbgOutputLoc(AFTER_SEND_TO_Q_TMR_INSTANCE_1_ISR);
     
+    if (timerCount % 20 == 0) {
+        if(!PLIB_INT_SourceIsEnabled(INT_ID_0, INT_SOURCE_ADC_1)){
+            PLIB_ADC_SampleAutoStartEnable(ADC_ID_1);
+            PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
+        }
+    }
+    
+    MOTOR_CONTROLLER_THREAD_CorrectSpeed(timerCount);
+    
+    if (timerCount % 25 == 0) {
+        dbgOutputLoc(BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR);
+        switch(MYMODULE){
+            case SEARCHERMOVER:
+                obj.Request = SMtoTL;
+    //            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                break;
+            case TARGETLOCATOR:
+                obj.Request = TLtoSM;
+                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                obj.Request = TLtoPF;
+                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                break;
+            case PATHFINDER:
+                obj.Request = PFtoTL;
+                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                obj.Request = PFtoTG;
+                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                break;
+            case TARGETGRABBER:
+                obj.Request = TGtoPF;
+                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                break;
+        }
+    }
+    
+    dbgOutputLoc(AFTER_SEND_TO_Q_TMR_INSTANCE_1_ISR);
+    timerCount++;
     incrementSystemClock();
     dbgOutputLoc(LEAVE_TMR_INSTANCE_1_ISR);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
