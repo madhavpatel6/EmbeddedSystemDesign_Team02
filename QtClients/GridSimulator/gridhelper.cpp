@@ -387,15 +387,16 @@ void updateOccupanyGrid2(SensorDataContainerType sensorData, Grid::GridType grid
         nonMinSensor = sensorData.leftFrontSensor;
         angleOffset = 90;
     }
-
+    minSensor.distance -= 2;
     int sensorDistanceBetween = 4;
     QPointF minDistancePoint = QPointF(minSensor.sensorLocation.x() + minSensor.distance*cos(minSensor.orientation*M_PI/180),
                             minSensor.sensorLocation.y() + minSensor.distance*sin(minSensor.orientation*M_PI/180));
-    float cosX = cos((sensorData.leftFrontSensor.orientation + angleOffset)*M_PI/180);
-    float sinY = sin((sensorData.leftFrontSensor.orientation + angleOffset)*M_PI/180);
+    float cosX = cos((minSensor.orientation + angleOffset)*M_PI/180);
+    float sinY = sin((minSensor.orientation + angleOffset)*M_PI/180);
+//    qDebug() << cosX << sinY;
     for(int i = 0; i <= sensorDistanceBetween; i++) {
         QPointF rayTracePoint(minDistancePoint.x() + i*cosX, minDistancePoint.y() + i*sinY);
-        QPointF rayTraceOrigin(sensorData.leftFrontSensor.sensorLocation.x() + i*cosX, sensorData.leftFrontSensor.sensorLocation.y() + i*sinY);
+        QPointF rayTraceOrigin(minSensor.sensorLocation.x() + i*cosX, minSensor.sensorLocation.y() + i*sinY);
 
         raytrace3(rayTraceOrigin.x(), rayTraceOrigin.y(), rayTracePoint.x(), rayTracePoint.y(), true, grid);
     }

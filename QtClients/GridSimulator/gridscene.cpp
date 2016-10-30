@@ -65,9 +65,9 @@ void GridScene::paintEvent(QPaintEvent *) {
     QPen pen1(Qt::black,2, Qt::SolidLine, Qt::RoundCap);
     painter.setPen(pen1);
 
-    if(showObjects){
+//    if(showObjects){
         rover->draw(&painter, CELL_SIZE);
-    }
+//    }
     painter.setPen(Qt::blue);
     painter.setBrush(Qt::blue);
     if(showObjects){
