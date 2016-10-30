@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "QShortcut"
 
 #define REQUESTRATE_MS 200
 
@@ -33,6 +32,19 @@ MainWindow::~MainWindow()
     delete ui;
     delete requestTimer;
     delete tcpSocket;
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_A) {
+        tcpSocket->sendLeftCommand();
+    } else if (event->key() == Qt::Key_D) {
+        tcpSocket->sendRightCommand();
+    } else if (event->key() == Qt::Key_W) {
+        tcpSocket->sendForwardCommand();
+    } else if (event->key() == Qt::Key_S) {
+        tcpSocket->sendBackCommand();
+    }
 }
 
 
