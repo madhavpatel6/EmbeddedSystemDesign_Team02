@@ -6,160 +6,195 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>773</width>
-    <height>589</height>
+    <width>544</width>
+    <height>421</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QCheckBox" name="connectToServer">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>110</y>
-      <width>201</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>ConnectToServer</string>
-    </property>
-   </widget>
-   <widget class="QTextEdit" name="ipTextEdit">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>60</y>
-      <width>151</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="html">
-     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="2">
+     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1,1">
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1,0">
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Requests</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="requestsEnable">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,1,0">
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Responses</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="responsesEnable"/>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLabel" name="myModule">
+            <property name="text">
+             <string>MYMODULE:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="myModuleLabel">
+            <property name="text">
+             <string>LABEL</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QTextEdit" name="ipTextEdit">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="html">
+           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Noto Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;192.168.12.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>19</x>
-      <y>19</y>
-      <width>181</width>
-      <height>471</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="requestsEnable">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Requests</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="verticalLayoutWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>229</x>
-      <y>19</y>
-      <width>181</width>
-      <height>471</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="responsesEnable">
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Responses</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QCheckBox" name="shouldRequest">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>170</y>
-      <width>221</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>ShouldRequest</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="myModule">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>20</y>
-      <width>121</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>MYMODULE:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="myModuleLabel">
-    <property name="geometry">
-     <rect>
-      <x>580</x>
-      <y>20</y>
-      <width>90</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>LABEL</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>270</y>
-      <width>161</width>
-      <height>43</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Start Simulator</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_2">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>330</y>
-      <width>161</width>
-      <height>43</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Start PID Tuner</string>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>773</width>
-     <height>39</height>
-    </rect>
-   </property>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Noto Sans'; font-size:10pt;&quot;&gt;192.168.12.1&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="connectToServer">
+          <property name="text">
+           <string>ConnectToServer</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="shouldRequest">
+          <property name="text">
+           <string>ShouldRequest</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton">
+          <property name="text">
+           <string>Start Simulator</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_2">
+          <property name="text">
+           <string>Start PID Tuner</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
