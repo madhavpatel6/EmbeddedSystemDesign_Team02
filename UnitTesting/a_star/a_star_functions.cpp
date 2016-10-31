@@ -320,21 +320,21 @@ bool isOccupied(Point one){
 
 /* gets 4 points adjacent to the specified one */
 bool getAdjacent(Point target, Point *one, Point *two, Point *three, Point *four, int parentIndex){
-	one->x = target.x + 1;
+	one->x = target.x + ADJ_LEN;
 	one->y = target.y;
-	one->gScore = target.gScore + 1;
+	one->gScore = target.gScore + ADJ_LEN;
 	one->parent = parentIndex;
 	two->x = target.x;
-	two->y = target.y + 1;
-	two->gScore = target.gScore + 1;
+	two->y = target.y + ADJ_LEN;
+	two->gScore = target.gScore + ADJ_LEN;
 	two->parent = parentIndex;
-	three->x = target.x - 1;
+	three->x = target.x - ADJ_LEN;
 	three->y = target.y;
-	three->gScore = target.gScore + 1;
+	three->gScore = target.gScore + ADJ_LEN;
 	three->parent = parentIndex;
 	four->x = target.x;
-	four->y = target.y - 1;
-	four->gScore = target.gScore + 1;
+	four->y = target.y - ADJ_LEN;
+	four->gScore = target.gScore + ADJ_LEN;
 	four->parent = parentIndex;
 
 	return true;
@@ -522,7 +522,9 @@ bool findPath(Point start, Point stop){
 	int parentIndex = 0;
 
 	// while(destination is not in closed list)
-	while( !isInClosedList(stop) && count <= MAXLOOPCOUNT){
+	// while( !isInClosedList(stop) && count <= MAXLOOPCOUNT){
+	while( (abs(current.x - stop.x) > ADJ_LEN || abs(current.y - stop.y) > ADJ_LEN) && count <= MAXLOOPCOUNT){
+
 		// possible faster while condition (current.x != stop.x || current.y != stop.y) && count <= MAXLOOPCOUNT){
 
 		// add walkable locations to open list (calculating F = G + H scores for them)
