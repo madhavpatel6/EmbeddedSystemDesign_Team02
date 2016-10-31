@@ -39,7 +39,7 @@ void initParser(){
 }
 
 
-void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems){
+void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, int *value){
     int r, i;
     r = jsmn_parse(&p, JSON_STRING, strlen(JSON_STRING), t, sizeof(t)/sizeof(t[0]));
     for(i = 1; i < r; i++){
@@ -68,6 +68,13 @@ void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numI
                 for (l = 0; (l < (sizeof(Dictionary) / sizeof(*Dictionary))); l++) {
                     if (strcmp(buf, Dictionary[l].stringValue) == 0) {
                         items[k] = Dictionary[l].enumValue;
+                        if (strcmp(buf, "Forward") == 0 ||
+                                strcmp(buf, "Back") == 0 ||
+                                strcmp(buf, "Left") == 0 ||
+                                strcmp(buf, "Right") == 0) {
+                            sprintf(buf, "%.*s\0", t[i+j+3].end - t[i+j+3].start, JSON_STRING + t[i+j+3].start);
+                            *value = atof(buf);
+                        }
                         k++;
                         break;
                     }

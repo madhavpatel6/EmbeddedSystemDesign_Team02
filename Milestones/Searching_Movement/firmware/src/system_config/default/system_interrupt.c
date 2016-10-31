@@ -86,11 +86,8 @@ void IntHandlerDrvAdc(void)
     dbgOutputLoc(ENTER_ADC_ISR);
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     LineObj lineObj;
-    MotorObj motorObj;
     
     memset(&lineObj, 0, (size_t) sizeof(LineObj));
-    memset(&motorObj, 0, (size_t) sizeof(MotorObj));
-    //while(DRV_ADC_SamplesAvailable() != true);
     
     int i;
     
@@ -115,12 +112,6 @@ void IntHandlerDrvAdc(void)
         lineObj.IR_5 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_D, 14);
         lineObj.IR_6 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_A, 15);
         lineObj.IR_7 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_A, 14);
-        
-        motorObj.lineLocation = ((int)lineObj.IR_7 << 7) | ((int)lineObj.IR_6 << 6) | 
-                ((int)lineObj.IR_5 << 5) | ((int)lineObj.IR_4 << 4) | ((int)lineObj.IR_3 << 3) | 
-                ((int)lineObj.IR_2 << 2) | ((int)lineObj.IR_1 << 1) | ((int)lineObj.IR_0 << 0);
-        
-//        MOTOR_CONTROLLER_THREAD_SendToQueueISR(motorObj, &pxHigherPriorityTaskWoken);
     }
     
     dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
@@ -154,6 +145,10 @@ void IntHandlerDrvTmrInstance1(void)
     MessageObj obj;
     obj.Type = SEND_REQUEST;
     
+    // Run PID algorithm
+    MOTOR_CONTROLLER_THREAD_CorrectSpeed(timerCount);
+    
+    // Enable ADC auto sampling every 200 ms
     if (timerCount % 20 == 0) {
         if(!PLIB_INT_SourceIsEnabled(INT_ID_0, INT_SOURCE_ADC_1)){
             PLIB_ADC_SampleAutoStartEnable(ADC_ID_1);
@@ -161,8 +156,7 @@ void IntHandlerDrvTmrInstance1(void)
         }
     }
     
-    MOTOR_CONTROLLER_THREAD_CorrectSpeed(timerCount);
-    
+    // Issue requests every 250 ms
     if (timerCount % 25 == 0) {
         dbgOutputLoc(BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR);
         switch(MYMODULE){

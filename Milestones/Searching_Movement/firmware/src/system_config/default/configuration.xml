@@ -329,7 +329,7 @@
       <Template>
         <Name>drv_oc_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/oc/src</Path>
-        <Checksum>284154E5429E436A163440DBFA2E4DEE</Checksum>
+        <Checksum>3BB25D316AFD8C6A1569A52B317314BD</Checksum>
       </Template>
       <Template>
         <Name>drv_usart_static.c</Name>
@@ -399,7 +399,7 @@
       <Template>
         <Name>drv_tmr_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
-        <Checksum>4383D9A4EEDBA2E91389499E0A00DCC7</Checksum>
+        <Checksum>CDB07DFC08531669E782348BA93CA6F5</Checksum>
       </Template>
       <Template>
         <Name>rtos_hooks.c</Name>

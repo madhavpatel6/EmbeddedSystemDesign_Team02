@@ -61,8 +61,11 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "queue.h"
 #include "motor_controller_thread_public.h"
 
-#define ticksPerCm      38.7740556f
-#define circumference   32.016f
+#define TICKS_PER_CM    38.59255596f
+#define CIRCUMFERENCE   32.30997255f
+#define MAX_PWM         65534
+
+#define MODE            "Run"
     
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -156,7 +159,7 @@ void disableMotors(void);
 
 void setDirectionForward(void);
 
-void setDirectionBack(void);
+void setDirectionBackward(void);
 
 void setDirectionLeft(void);
 

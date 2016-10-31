@@ -129,8 +129,17 @@ void ADC_THREAD_Initialize ( void )
             averageData(&lineObj);
         }
         messageObj.Update.Data.lineLocation = lineObj;
+        motorObj.lineLocation = ~(((int)lineObj.IR_7 << 7) | ((int)lineObj.IR_6 << 6) | 
+                ((int)lineObj.IR_5 << 5) | ((int)lineObj.IR_4 << 4) | ((int)lineObj.IR_3 << 3) | 
+                ((int)lineObj.IR_2 << 2) | ((int)lineObj.IR_1 << 1) | ((int)lineObj.IR_0 << 0));
+
         // Sending to message controller queue for an update
         MESSAGE_CONTROLLER_THREAD_SendToQueue(messageObj);
+        
+        if (MODE != "Debug") {
+            MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
+        }
+        
         dbgOutputLoc(AFTER_RECEIVE_FROM_Q_ADC_THREAD);
     }
  }
