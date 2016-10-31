@@ -32,10 +32,10 @@ public slots:
     void readyRead();
     void positionRequested();
     void lineLocationRequested();
-    void sendForwardCommand();
-    void sendBackCommand();
-    void sendLeftCommand();
-    void sendRightCommand();
+    void sendForwardCommand(int distance);
+    void sendBackCommand(int distance);
+    void sendLeftCommand(int degrees);
+    void sendRightCommand(int degrees);
 
 private:
     void SendJSONRequestToSocket(QString request, char destination);

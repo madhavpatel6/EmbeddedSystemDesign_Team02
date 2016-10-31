@@ -21,10 +21,10 @@ public:
     void keyPressEvent(QKeyEvent *event);
 
 signals:
-    void pb_forwardClicked(void);
-    void pb_backClicked(void);
-    void pb_leftClicked(void);
-    void pb_rightClicked(void);
+    void pb_forwardClicked(int distance);
+    void pb_backClicked(int distance);
+    void pb_leftClicked(int degrees);
+    void pb_rightClicked(int degrees);
 
 public slots:
     void on_pb_connectToServer_clicked();
@@ -39,8 +39,15 @@ private slots:
     void on_pb_back_clicked();
     void on_pb_left_clicked();
     void on_pb_right_clicked();
-
     void on_pb_requestLineSensor_clicked();
+
+    void on_sl_distance_valueChanged(int value);
+
+    void on_sl_degrees_valueChanged(int value);
+
+    void on_sb_distance_valueChanged(int arg1);
+
+    void on_sb_degrees_valueChanged(int arg1);
 
 private:
     Ui::MainWindow *ui;
