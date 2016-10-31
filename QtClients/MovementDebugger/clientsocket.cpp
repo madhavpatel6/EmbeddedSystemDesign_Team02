@@ -40,29 +40,29 @@ void ClientSocket::lineLocationRequested(){
 void ClientSocket::sendForwardCommand(int distance){
     QString request_begin = "{\"type\":\"Request\",\"items\":[";
     QString request_end = "]}";
-    SendJSONRequestToSocket(request_begin + "\"Forward\":" + "\"" + QString::number(distance) +"\"" + request_end, SEARCHERMOVER);
-    qDebug() << request_begin + "\"Forward\":" + "\"" + QString::number(distance) +"\"" + request_end, SEARCHERMOVER;
+    SendJSONRequestToSocket(request_begin + "\"Forward\":" + "\"" + QString::number(distance) + "\"" + request_end, SEARCHERMOVER);
+    qDebug() << request_begin + "\"Forward\":" + "\"" + QString::number(distance) + "\"" + request_end;
 }
 
 void ClientSocket::sendBackCommand(int distance){
     QString request_begin = "{\"type\":\"Request\",\"items\":[";
     QString request_end = "]}";
-    SendJSONRequestToSocket(request_begin + "\"Back\":" + "\"" + QString::number(distance) +"\"" + request_end, SEARCHERMOVER);
-    qDebug() << request_begin + "\"Back\":" + "\"" + QString::number(distance) +"\"" + request_end, SEARCHERMOVER;
+    SendJSONRequestToSocket(request_begin + "\"Back\":" + "\"" + QString::number(distance) + "\"" + request_end, SEARCHERMOVER);
+    qDebug() << request_begin + "\"Back\":" + "\"" + QString::number(distance) + "\"" + request_end;
 }
 
 void ClientSocket::sendLeftCommand(int degrees){
     QString request_begin = "{\"type\":\"Request\",\"items\":[";
     QString request_end = "]}";
-    SendJSONRequestToSocket(request_begin + "\"Left\":" + "\"" + QString::number(degrees) +"\"" + request_end, SEARCHERMOVER);
-    qDebug() << request_begin + "\"Left\":" + "\"" + QString::number(degrees) +"\"" + request_end, SEARCHERMOVER;
+    SendJSONRequestToSocket(request_begin + "\"Left\":" + "\"" + QString::number(degrees) + "\"" + request_end, SEARCHERMOVER);
+    qDebug() << request_begin + "\"Left\":" + "\"" + QString::number(degrees) + "\"" + request_end;
 }
 
 void ClientSocket::sendRightCommand(int degrees){
     QString request_begin = "{\"type\":\"Request\",\"items\":[";
     QString request_end = "]}";
-    SendJSONRequestToSocket(request_begin + "\"Right\":" + "\"" + QString::number(degrees) +"\"" + request_end, SEARCHERMOVER);
-    qDebug() << request_begin + "\"Right\":" + "\"" + QString::number(degrees) +"\"" + request_end, SEARCHERMOVER;
+    SendJSONRequestToSocket(request_begin + "\"Right\":" + "\"" + QString::number(degrees) + "\"" + request_end, SEARCHERMOVER);
+    qDebug() << request_begin + "\"Right\":" + "\"" + QString::number(degrees) + "\"" + request_end;
 }
 
 void ClientSocket::connected()
@@ -124,7 +124,7 @@ void ClientSocket::SendJSONRequestToSocket(QString request, char destination) {
 
         // qDebug() << txMessage << endl;
 
-        int bytesSent = send(txMessage);
+        send(txMessage);
         //qDebug() << "bytesSent:" << bytesSent;
         //qDebug() << "Flushing Socket";
         socket->flush();
