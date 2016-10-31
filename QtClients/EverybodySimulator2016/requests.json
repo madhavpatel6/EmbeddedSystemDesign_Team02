@@ -5,15 +5,15 @@
     },
     "TLtoSM": {
         "destination" : "S",
-        "items": ["R1_Est_Location", "R1_Est_Orientation"]
+        "items": ["R1_Movement"]
     },
     "TLtoPF": {
         "destination": "P",
-        "items": ["R2_Est_Location", "R2_Est_Orientation"]
+        "items": ["R2_Movement"]
     },
     "PFtoTL": {
         "destination": "L",
-        "items": ["Obstacles", "Targets", "SafeRegions", "R2_Location", "R2_Orientation"]
+        "items": ["Obstacles", "Targets", "SafeRegions", "R2_Location"]
     },
     "PFtoTG": {
         "destination" : "G",
@@ -21,7 +21,7 @@
     },
     "TGtoPF": {
         "destination": "P",
-        "items": ["targetProximity", "outsideArena"]
+        "items": ["targetProximity", "outsideArena", "movementStopped"]
     }
 
 }
