@@ -72,5 +72,21 @@
             "Alignment_Info": "string",
             "Target_Distance": "float",
             "Target_Angle": "float"
+    },
+    "Vertices": [
+                    ["-100", "-100"],
+                    ["100", "-100"],
+                    ["100", "100"],
+                    ["-100", "100"]
+    ],
+    "R1_Start_Location": {
+        "x": "float",
+        "y": "float",
+        "orientation": "float"
+    },
+    "R2_Start_Location": {
+        "x": "float",
+        "y": "float",
+        "orientation": "float"
     }
 }

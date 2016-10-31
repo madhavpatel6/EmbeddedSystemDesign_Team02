@@ -173,7 +173,7 @@ void MainWindow::dataReadSlot(QByteArray data){
                            auto v =  responses.value(json["items"].toArray()[i].toString()).toArray();
                            QJsonObject outGoing;
                            outGoing[k] = v;
-                           jsonMessage += QString(QJsonDocument(outGoing).toJson()).remove('{').remove('}');
+                           jsonMessage += QString(QJsonDocument(outGoing).toJson()).remove('{').remove('}').remove('\n').remove('\t').remove(' ');
                            jsonMessage += ",";
                         }else{
                             value = "\"" + responses.value(json["items"].toArray()[i].toString()).toString() + "\"";
