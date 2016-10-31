@@ -111,7 +111,8 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
     memset(&statObject, 0, sizeof(StatObjectType));
     type_t type = unknown;
     items_t items[12];
-    int numItems;
+    int numItems = 0;
+    int value = 0;
     
     while(1) {
         initParser();
@@ -136,7 +137,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                 
                 statObject.GoodCount++;
                 
-                parseJSON(messageObj.External.Data, &type, items,  &numItems);
+                parseJSON(messageObj.External.Data, &type, items,  &numItems, &value);
                 
                 switch(type) {
                     case request: {
@@ -264,21 +265,25 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 }
                                 case Forward: {
                                     motorObj.direction = 'F';
+                                    motorObj.distance = value;
                                     MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                     break;
                                 }
                                 case Back: {
                                     motorObj.direction = 'B';
+                                    motorObj.distance = value;
                                     MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                     break;
                                 }
                                 case Left: {
                                     motorObj.direction = 'L';
+                                    motorObj.degrees = value;
                                     MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                     break;
                                 }
                                 case Right: {
                                     motorObj.direction = 'R';
+                                    motorObj.degrees = value;
                                     MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                     break;
                                 }

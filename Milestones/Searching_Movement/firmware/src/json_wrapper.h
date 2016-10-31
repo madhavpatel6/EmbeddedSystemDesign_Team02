@@ -67,7 +67,7 @@ int jsoneq(const char *json, jsmntok_t *tok, const char *s) ;
 
 void initParser();
 
-void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems);
+void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, int *value);
 
 #endif /* _EXAMPLE_FILE_NAME_H */
 
