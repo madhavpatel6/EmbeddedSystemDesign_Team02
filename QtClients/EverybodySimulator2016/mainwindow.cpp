@@ -123,7 +123,7 @@ void MainWindow::requestSlot(){
             }
         }
         request += "]}";
-        char message[512];
+        char message[2048];
         char destination = reqObjList[i].value("destination").toString().toLatin1()[0];
 
         int len = CreateMessage(message, request.toLatin1().data(), destination, 0);
@@ -167,16 +167,24 @@ void MainWindow::dataReadSlot(QByteArray data){
                         QString value;
                         if(responses.value(json["items"].toArray()[i].toString()).isObject()){
                             value = QJsonDocument(responses.value(json["items"].toArray()[i].toString()).toObject()).toJson();
+                            jsonMessage += key + ":" + value + ",";
+                        }else if (responses.value(json["items"].toArray()[i].toString()).isArray()){
+                           auto k = json["items"].toArray()[i].toString();
+                           auto v =  responses.value(json["items"].toArray()[i].toString()).toArray();
+                           QJsonObject outGoing;
+                           outGoing[k] = v;
+                           jsonMessage += QString(QJsonDocument(outGoing).toJson()).remove('{').remove('}');
+                           jsonMessage += ",";
                         }else{
                             value = "\"" + responses.value(json["items"].toArray()[i].toString()).toString() + "\"";
+                            jsonMessage += key + ":" + value + ",";
                         }
-                        jsonMessage += key + ":" + value + ",";
                     }
                 }
                 jsonMessage.chop(1); // this removes the extra comma at the end
                 jsonMessage += "}";
-                // qDebug() << jsonMessage;
-                char message[512];
+                qDebug() << jsonMessage;
+                char message[2048];
                 char destination = source;
 
                 int len = CreateMessage(message, jsonMessage.toLatin1().data(), destination, 0);
