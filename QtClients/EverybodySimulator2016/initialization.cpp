@@ -28,7 +28,7 @@ bool initialization::changeResponse(QJsonObject in){
         getConfig("responses.json");
     }
     for(auto j = in.begin(); j != in.end(); j++){
-        cache["responses.json"].insert(j.key(), j.value().toString());
+        cache["responses.json"].insert(j.key(), j.value());
     }
     return true;
 

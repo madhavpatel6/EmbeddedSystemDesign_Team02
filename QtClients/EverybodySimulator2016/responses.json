@@ -64,6 +64,9 @@
             "IR_0_bool": "bool",
             "IR_1_bool": "bool",
             "IR_2_bool": "bool",
-            "Grabber_Aligned": "bool"
+            "Grabber_Aligned": "bool",
+            "Alignment_Info": "string",
+            "Target_Distance": "float",
+            "Target_Angle": "float"
     }
 }

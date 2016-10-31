@@ -17,10 +17,12 @@ HEADERS += clientsocket.h \
            picCode/debug.h \
            picCode/communication/messages.h \
     pathsimulator.h \
-    pidtuner.h
+    pidtuner.h \
+    grippersimulator.h
 FORMS += mainwindow.ui \
     pathsimulator.ui \
-    pidtuner.ui
+    pidtuner.ui \
+    grippersimulator.ui
 SOURCES += clientsocket.cpp \
            initialization.cpp \
            main.cpp \
@@ -28,7 +30,8 @@ SOURCES += clientsocket.cpp \
            picCode/debug.c \
            picCode/communication/messages.c \
     pathsimulator.cpp \
-    pidtuner.cpp
+    pidtuner.cpp \
+    grippersimulator.cpp
 
 DISTFILES += \
     requests.json \

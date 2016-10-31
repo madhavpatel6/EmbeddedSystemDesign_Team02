@@ -8,6 +8,7 @@
 #include "initialization.h"
 #include "pathsimulator.h"
 #include "pidtuner.h"
+#include "grippersimulator.h"
 
 namespace Ui {
 class MainWindow;
@@ -44,7 +45,7 @@ private:
     QVector<QJsonObject> reqObjList;
     QStringList resEnabled;
     initialization* config;
-    PathSimulator *pSim;
+    QWidget *pSim;
     pidTuner *tuner;
 
 

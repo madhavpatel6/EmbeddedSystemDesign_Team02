@@ -206,7 +206,12 @@ void MainWindow::on_pushButton_clicked()
     switch(MYMODULE){
         case PATHFINDER:
             pSim = new PathSimulator();
-            pSim->setConfig(config);
+            ((PathSimulator*)pSim)->setConfig(config);
+            pSim->show();
+        break;
+        case TARGETGRABBER:
+            pSim = new grippersimulator();
+            ((grippersimulator*)pSim)->setConfig(config);
             pSim->show();
         break;
         default:

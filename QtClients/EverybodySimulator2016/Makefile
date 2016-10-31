@@ -33,7 +33,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = EverybodySimulator20161.0.0
-DISTDIR = /data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016/.tmp/EverybodySimulator20161.0.0
+DISTDIR = /c_drive/freshStart/Fall2016/ECE_4534_Embedded/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016/.tmp/EverybodySimulator20161.0.0
 LINK          = g++
 LFLAGS        = -Wl,-O1 -Wl,-O1,--sort-common,--as-needed,-z,relro
 LIBS          = $(SUBLIBS) -lQt5Widgets -lQt5Gui -lQt5Network -lQt5Core -lGL -lpthread 
@@ -55,10 +55,12 @@ SOURCES       = clientsocket.cpp \
 		picCode/debug.c \
 		picCode/communication/messages.c \
 		pathsimulator.cpp \
-		pidtuner.cpp moc_clientsocket.cpp \
+		pidtuner.cpp \
+		grippersimulator.cpp moc_clientsocket.cpp \
 		moc_mainwindow.cpp \
 		moc_pathsimulator.cpp \
-		moc_pidtuner.cpp
+		moc_pidtuner.cpp \
+		moc_grippersimulator.cpp
 OBJECTS       = clientsocket.o \
 		initialization.o \
 		main.o \
@@ -67,10 +69,12 @@ OBJECTS       = clientsocket.o \
 		messages.o \
 		pathsimulator.o \
 		pidtuner.o \
+		grippersimulator.o \
 		moc_clientsocket.o \
 		moc_mainwindow.o \
 		moc_pathsimulator.o \
-		moc_pidtuner.o
+		moc_pidtuner.o \
+		moc_grippersimulator.o
 DIST          = requests.json \
 		responses.json \
 		/usr/lib/qt/mkspecs/features/spec_pre.prf \
@@ -262,14 +266,16 @@ DIST          = requests.json \
 		picCode/debug.h \
 		picCode/communication/messages.h \
 		pathsimulator.h \
-		pidtuner.h clientsocket.cpp \
+		pidtuner.h \
+		grippersimulator.h clientsocket.cpp \
 		initialization.cpp \
 		main.cpp \
 		mainwindow.cpp \
 		picCode/debug.c \
 		picCode/communication/messages.c \
 		pathsimulator.cpp \
-		pidtuner.cpp
+		pidtuner.cpp \
+		grippersimulator.cpp
 QMAKE_TARGET  = EverybodySimulator2016
 DESTDIR       = 
 TARGET        = EverybodySimulator2016
@@ -278,7 +284,7 @@ TARGET        = EverybodySimulator2016
 first: all
 ####### Build rules
 
-$(TARGET): ui_mainwindow.h ui_pathsimulator.h ui_pidtuner.h $(OBJECTS)  
+$(TARGET): ui_mainwindow.h ui_pathsimulator.h ui_pidtuner.h ui_grippersimulator.h $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
 Makefile: EverybodySimulator2016.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf /usr/lib/qt/mkspecs/features/spec_pre.prf \
@@ -670,9 +676,9 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents clientsocket.h initialization.h mainwindow.h ui_mainwindow.h picCode/debug.h picCode/communication/messages.h pathsimulator.h pidtuner.h $(DISTDIR)/
-	$(COPY_FILE) --parents clientsocket.cpp initialization.cpp main.cpp mainwindow.cpp picCode/debug.c picCode/communication/messages.c pathsimulator.cpp pidtuner.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents mainwindow.ui pathsimulator.ui pidtuner.ui $(DISTDIR)/
+	$(COPY_FILE) --parents clientsocket.h initialization.h mainwindow.h ui_mainwindow.h picCode/debug.h picCode/communication/messages.h pathsimulator.h pidtuner.h grippersimulator.h $(DISTDIR)/
+	$(COPY_FILE) --parents clientsocket.cpp initialization.cpp main.cpp mainwindow.cpp picCode/debug.c picCode/communication/messages.c pathsimulator.cpp pidtuner.cpp grippersimulator.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents mainwindow.ui pathsimulator.ui pidtuner.ui grippersimulator.ui $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -698,37 +704,43 @@ benchmark: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_clientsocket.cpp moc_mainwindow.cpp moc_pathsimulator.cpp moc_pidtuner.cpp
+compiler_moc_header_make_all: moc_clientsocket.cpp moc_mainwindow.cpp moc_pathsimulator.cpp moc_pidtuner.cpp moc_grippersimulator.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_clientsocket.cpp moc_mainwindow.cpp moc_pathsimulator.cpp moc_pidtuner.cpp
+	-$(DEL_FILE) moc_clientsocket.cpp moc_mainwindow.cpp moc_pathsimulator.cpp moc_pidtuner.cpp moc_grippersimulator.cpp
 moc_clientsocket.cpp: picCode/communication/messages.h \
 		clientsocket.h \
 		/usr/lib/qt/bin/moc
-	/usr/lib/qt/bin/moc $(DEFINES) -I/usr/lib/qt/mkspecs/linux-g++ -I/data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/usr/include/qt -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include clientsocket.h -o moc_clientsocket.cpp
+	/usr/lib/qt/bin/moc $(DEFINES) -I/usr/lib/qt/mkspecs/linux-g++ -I/c_drive/freshStart/Fall2016/ECE_4534_Embedded/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/c_drive/freshStart/Fall2016/ECE_4534_Embedded/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/usr/include/qt -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include clientsocket.h -o moc_clientsocket.cpp
 
 moc_mainwindow.cpp: clientsocket.h \
 		picCode/communication/messages.h \
 		initialization.h \
 		pathsimulator.h \
 		pidtuner.h \
+		grippersimulator.h \
 		mainwindow.h \
 		/usr/lib/qt/bin/moc
-	/usr/lib/qt/bin/moc $(DEFINES) -I/usr/lib/qt/mkspecs/linux-g++ -I/data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/usr/include/qt -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include mainwindow.h -o moc_mainwindow.cpp
+	/usr/lib/qt/bin/moc $(DEFINES) -I/usr/lib/qt/mkspecs/linux-g++ -I/c_drive/freshStart/Fall2016/ECE_4534_Embedded/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/c_drive/freshStart/Fall2016/ECE_4534_Embedded/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/usr/include/qt -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include mainwindow.h -o moc_mainwindow.cpp
 
 moc_pathsimulator.cpp: initialization.h \
 		pathsimulator.h \
 		/usr/lib/qt/bin/moc
-	/usr/lib/qt/bin/moc $(DEFINES) -I/usr/lib/qt/mkspecs/linux-g++ -I/data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/usr/include/qt -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include pathsimulator.h -o moc_pathsimulator.cpp
+	/usr/lib/qt/bin/moc $(DEFINES) -I/usr/lib/qt/mkspecs/linux-g++ -I/c_drive/freshStart/Fall2016/ECE_4534_Embedded/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/c_drive/freshStart/Fall2016/ECE_4534_Embedded/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/usr/include/qt -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include pathsimulator.h -o moc_pathsimulator.cpp
 
 moc_pidtuner.cpp: pidtuner.h \
 		/usr/lib/qt/bin/moc
-	/usr/lib/qt/bin/moc $(DEFINES) -I/usr/lib/qt/mkspecs/linux-g++ -I/data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/usr/include/qt -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include pidtuner.h -o moc_pidtuner.cpp
+	/usr/lib/qt/bin/moc $(DEFINES) -I/usr/lib/qt/mkspecs/linux-g++ -I/c_drive/freshStart/Fall2016/ECE_4534_Embedded/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/c_drive/freshStart/Fall2016/ECE_4534_Embedded/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/usr/include/qt -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include pidtuner.h -o moc_pidtuner.cpp
+
+moc_grippersimulator.cpp: initialization.h \
+		grippersimulator.h \
+		/usr/lib/qt/bin/moc
+	/usr/lib/qt/bin/moc $(DEFINES) -I/usr/lib/qt/mkspecs/linux-g++ -I/c_drive/freshStart/Fall2016/ECE_4534_Embedded/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/c_drive/freshStart/Fall2016/ECE_4534_Embedded/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016 -I/usr/include/qt -I/usr/include/qt/QtWidgets -I/usr/include/qt/QtGui -I/usr/include/qt/QtNetwork -I/usr/include/qt/QtCore -I/usr/include/c++/6.2.1 -I/usr/include/c++/6.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/6.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/6.2.1/include-fixed -I/usr/include grippersimulator.h -o moc_grippersimulator.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
-compiler_uic_make_all: ui_mainwindow.h ui_pathsimulator.h ui_pidtuner.h
+compiler_uic_make_all: ui_mainwindow.h ui_pathsimulator.h ui_pidtuner.h ui_grippersimulator.h
 compiler_uic_clean:
-	-$(DEL_FILE) ui_mainwindow.h ui_pathsimulator.h ui_pidtuner.h
+	-$(DEL_FILE) ui_mainwindow.h ui_pathsimulator.h ui_pidtuner.h ui_grippersimulator.h
 ui_mainwindow.h: mainwindow.ui \
 		/usr/lib/qt/bin/uic
 	/usr/lib/qt/bin/uic mainwindow.ui -o ui_mainwindow.h
@@ -740,6 +752,10 @@ ui_pathsimulator.h: pathsimulator.ui \
 ui_pidtuner.h: pidtuner.ui \
 		/usr/lib/qt/bin/uic
 	/usr/lib/qt/bin/uic pidtuner.ui -o ui_pidtuner.h
+
+ui_grippersimulator.h: grippersimulator.ui \
+		/usr/lib/qt/bin/uic
+	/usr/lib/qt/bin/uic grippersimulator.ui -o ui_grippersimulator.h
 
 compiler_yacc_decl_make_all:
 compiler_yacc_decl_clean:
@@ -763,7 +779,8 @@ main.o: main.cpp mainwindow.h \
 		picCode/communication/messages.h \
 		initialization.h \
 		pathsimulator.h \
-		pidtuner.h
+		pidtuner.h \
+		grippersimulator.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
 
 mainwindow.o: mainwindow.cpp mainwindow.h \
@@ -772,6 +789,7 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		initialization.h \
 		pathsimulator.h \
 		pidtuner.h \
+		grippersimulator.h \
 		ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o mainwindow.cpp
 
@@ -791,6 +809,11 @@ pidtuner.o: pidtuner.cpp pidtuner.h \
 		ui_pidtuner.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o pidtuner.o pidtuner.cpp
 
+grippersimulator.o: grippersimulator.cpp grippersimulator.h \
+		initialization.h \
+		ui_grippersimulator.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o grippersimulator.o grippersimulator.cpp
+
 moc_clientsocket.o: moc_clientsocket.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_clientsocket.o moc_clientsocket.cpp
 
@@ -802,6 +825,9 @@ moc_pathsimulator.o: moc_pathsimulator.cpp
 
 moc_pidtuner.o: moc_pidtuner.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_pidtuner.o moc_pidtuner.cpp
+
+moc_grippersimulator.o: moc_grippersimulator.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_grippersimulator.o moc_grippersimulator.cpp
 
 ####### Install
 

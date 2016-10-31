@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.1.0, 2016-10-12T23:14:17. -->
+<!-- Written by QtCreator 4.1.0, 2016-10-30T20:17:20. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -303,8 +303,8 @@
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">EverybodySimulator2016</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016/EverybodySimulator2016.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">EverybodySimulator20162</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/c_drive/freshStart/Fall2016/ECE_4534_Embedded/EmbeddedSystemDesign_Team02/QtClients/EverybodySimulator2016/EverybodySimulator2016.pro</value>
     <value type="bool" key="QmakeProjectManager.QmakeRunConfiguration.UseLibrarySearchPath">true</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments"></value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">EverybodySimulator2016.pro</value>
