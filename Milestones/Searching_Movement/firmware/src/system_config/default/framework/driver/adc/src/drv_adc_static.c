@@ -67,7 +67,7 @@ void DRV_ADC_Initialize(void)
     /* Enable Auto Sample Mode */
     PLIB_ADC_SampleAutoStartEnable(DRV_ADC_ID_1);
     /* Sample Acquisition Time (Auto Sample Mode) */	
-    PLIB_ADC_SampleAcquisitionTimeSet(DRV_ADC_ID_1, 20);
+    PLIB_ADC_SampleAcquisitionTimeSet(DRV_ADC_ID_1, 31);
     /* Select Sampling Mode */
     PLIB_ADC_SamplingModeSelect(DRV_ADC_ID_1, ADC_SAMPLING_MODE_MUXA);
     /* Number of Samples Per Interrupt */

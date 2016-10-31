@@ -77,6 +77,10 @@
         <Path>Header Files/framework/system</Path>
       </File>
       <File>
+        <Name>drv_oc.h</Name>
+        <Path>Header Files/framework/driver/oc</Path>
+      </File>
+      <File>
         <Name>timers.h</Name>
         <Path>Header Files/FreeRTOS</Path>
       </File>
@@ -266,7 +270,7 @@
       <Template>
         <Name>drv_adc_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/adc/src</Path>
-        <Checksum>11024FB343BFEED07F76465437F5D276</Checksum>
+        <Checksum>0D46C15B329C42766811E54D515BB5FF</Checksum>
         <ProjectFileChecksum>6E96E409763E47F6A1694F64D86CEE2B</ProjectFileChecksum>
       </Template>
       <Template>
@@ -313,9 +317,19 @@
         <ProjectFileChecksum>93E484B6AE9A9B46C7B053D8AE7C4FC3</ProjectFileChecksum>
       </Template>
       <Template>
+        <Name>drv_oc_mapping.c</Name>
+        <Path>Source Files/app/system_config/default/framework/driver/oc/src</Path>
+        <Checksum>0172B391750A7EFB1836702C7EBC4F22</Checksum>
+      </Template>
+      <Template>
         <Name>sys_clk_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/system/clk/src</Path>
         <Checksum>E8C935BED4628875A8C3428DDD07355C</Checksum>
+      </Template>
+      <Template>
+        <Name>drv_oc_static.c</Name>
+        <Path>Source Files/app/system_config/default/framework/driver/oc/src</Path>
+        <Checksum>284154E5429E436A163440DBFA2E4DEE</Checksum>
       </Template>
       <Template>
         <Name>drv_usart_static.c</Name>
@@ -325,8 +339,13 @@
       <Template>
         <Name>system_init.c</Name>
         <Path>Source Files/app/system_config/default</Path>
-        <Checksum>6DB687B46F87ADE4F395AF703F257233</Checksum>
+        <Checksum>D5FDB86CCB0C53E86A2DF3C3888AD24E</Checksum>
         <ProjectFileChecksum>0CC8798239E351A0D039B00163E6CA87</ProjectFileChecksum>
+      </Template>
+      <Template>
+        <Name>drv_oc_static.h</Name>
+        <Path>Header Files/app/system_config/default/framework/driver/oc</Path>
+        <Checksum>E6CF04C7753F572A73A1D43BAB62E6A7</Checksum>
       </Template>
       <Template>
         <Name>main.c</Name>
@@ -343,7 +362,7 @@
       <Template>
         <Name>system_definitions.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>708D1928262D695912B79A3E081F218B</Checksum>
+        <Checksum>A525BC404F61015236AFF1C774976129</Checksum>
       </Template>
       <Template>
         <Name>system_exceptions.c</Name>
@@ -375,12 +394,12 @@
       <Template>
         <Name>system_config.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>15EFAB60A5862D04D473AA9342840FEC</Checksum>
+        <Checksum>1AB8AB71945B5E22E615FF1FE9134FB5</Checksum>
       </Template>
       <Template>
         <Name>drv_tmr_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
-        <Checksum>28F7B5ECACC3165469DA639BF06789D9</Checksum>
+        <Checksum>4383D9A4EEDBA2E91389499E0A00DCC7</Checksum>
       </Template>
       <Template>
         <Name>rtos_hooks.c</Name>

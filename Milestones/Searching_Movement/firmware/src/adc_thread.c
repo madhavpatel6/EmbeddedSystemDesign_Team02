@@ -126,7 +126,7 @@ void ADC_THREAD_Initialize ( void )
         dbgOutputLoc(BEFORE_RECEIVE_FROM_Q_ADC_THREAD);
         ADC_THREAD_ReadFromQueue(&lineObj);
         if (ANALOG) {
-//            averageData(&lineObj);
+            averageData(&lineObj);
         }
         messageObj.Update.Data.lineLocation = lineObj;
         // Sending to message controller queue for an update

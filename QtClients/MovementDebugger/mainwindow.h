@@ -5,6 +5,7 @@
 #include "clientsocket.h"
 #include "initialization.h"
 #include "QTimer"
+#include <QKeyEvent>
 
 namespace Ui {
 class MainWindow;
@@ -17,6 +18,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void keyPressEvent(QKeyEvent *event);
 
 signals:
     void pb_forwardClicked(void);
