@@ -25,6 +25,10 @@
 #include <string.h>
 #include <stdio.h>
 #include "communication/jsmn.h"
+#include "communication/messages.h"
+
+// this one is cuz stephen loves outputing to uart
+#include "tx_thread.h"
 
 typedef enum {request, response, unknown} type_t;
 typedef enum {CommStatsSearcherMover, CommStatsTargetLocator, CommStatsPathFinder, CommStatsTargetGrabber,
@@ -59,6 +63,8 @@ static const DictionaryType Dictionary[] = {
 
 static jsmn_parser p;
 static jsmntok_t t[128]; /* We expect no more than 128 tokens */
+static int r;
+static char stored_js_str[MAXMESSAGESIZE];
 
 static char buf[255];
 
@@ -67,6 +73,14 @@ int jsoneq(const char *json, jsmntok_t *tok, const char *s) ;
 void initParser();
 
 void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems);
+
+/* precondition for all these parseJSON must already be called and t filled*/
+bool extractResponse_Vertices(float xArr[], float yArr[]);
+bool extractResponse_Obstacles(float ***result);
+void extractResponse_Targets(float *result);
+void extractResponse_SafeRegions(float *result);
+void extractResponse_R2_Location(float x, float y, float orientation);
+  
 
 #endif /* _EXAMPLE_FILE_NAME_H */
 
