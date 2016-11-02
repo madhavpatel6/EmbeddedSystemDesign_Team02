@@ -79,9 +79,8 @@ void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numI
         }
     }
 }
-bool extractResponse_Vertices(float xArr[], float yArr[]){
+int extractResponse_Vertices(float xArr[], float yArr[]){
     int i;
-    bool result = false;
     for(i = 1; i < r; i++){
         if (jsoneq(stored_js_str, &t[i], "Vertices") == 0) {
             int j;
@@ -95,25 +94,63 @@ bool extractResponse_Vertices(float xArr[], float yArr[]){
                     sprintf(buf, "%.*s\0", t[i+1 + (j*3 + 3)].end-t[i+1 + (j*3 + 3)].start, stored_js_str + t[i+1 + (j*3 + 3)].start);
                     yArr[j] = atof(buf);
                 }
-                result = true;
+                return numVert;
             }
         }
     }
-    return result;
 }
-bool extractResponse_Obstacles(float ***obs){
+
+/* for now assuming 4 points to an object */
+int extractResponse_Obstacles(float arrX[10][4], float arrY[10][4]){
     int i;
-    bool result = false;
-    return result;
+        
+    int numVert = 0;
+    
+    for(i = 1; i < r; i++){
+        if (jsoneq(stored_js_str, &t[i], "Obstacles") == 0) {
+            int j, k;
+            if (t[i+1].type == JSMN_ARRAY) {
+                // lets loop thru the set of obstacles
+                for(j = 0; j < t[i+1].size; j++){
+                    numVert = 4;
+                    for(k = 0; k < numVert; k++){
+                        int xIndex = i+4+ (j*13) + k * 3;
+                        sprintf(buf, "%.*s\0", t[xIndex].end-t[xIndex].start, stored_js_str + t[xIndex].start);
+                        arrX[j][k] = atof(buf);
+                        sprintf(buf, "%.*s\0", t[xIndex+1].end-t[xIndex+1].start, stored_js_str + t[xIndex+1].start);
+                        arrY[j][k] = atof(buf);
+                    }
+                }
+                return t[i+1].size;
+            }
+        }
+    }
     
 }
-void extractResponse_Targets(float *result){
+int extractResponse_Targets(float arrX[10][4], float arrY[10][4]){
+    int i;
+        
+    int numVert = 0;
     
-}
-void extractResponse_SafeRegions(float *result){
-    
-}
-void extractResponse_R2_Location(float x, float y, float orientation){
+    for(i = 1; i < r; i++){
+        if (jsoneq(stored_js_str, &t[i], "Targets") == 0) {
+            int j, k;
+            if (t[i+1].type == JSMN_ARRAY) {
+                // lets loop thru the set of targets
+                for(j = 0; j < t[i+1].size; j++){
+                    numVert = 4;
+                    for(k = 0; k < numVert; k++){
+                        int xIndex = i+4+ (j*13) + k * 3;
+                        sprintf(buf, "%.*s\0", t[xIndex].end-t[xIndex].start, stored_js_str + t[xIndex].start);
+                        arrX[j][k] = atof(buf);
+                        sprintf(buf, "%.*s\0", t[xIndex+1].end-t[xIndex+1].start, stored_js_str + t[xIndex+1].start);
+                        arrY[j][k] = atof(buf);
+                    }
+                }
+                return t[i+1].size;
+            }
+        }
+    }
     
 }
 

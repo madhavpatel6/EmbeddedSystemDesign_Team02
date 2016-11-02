@@ -204,8 +204,6 @@ void MOTOR_CONTROLLER_THREAD_Tasks( void );
 
 void MOTOR_CONTROLLER_THREAD_InitializeQueue();
 
-void MOTOR_CONTROLLER_THREAD_ReadFromQueue(char* pvBuffer);
-
 void enableMotors( void );
 
 void disableMotors( void );

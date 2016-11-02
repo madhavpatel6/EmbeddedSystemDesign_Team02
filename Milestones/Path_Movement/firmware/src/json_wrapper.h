@@ -75,11 +75,9 @@ void initParser();
 void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems);
 
 /* precondition for all these parseJSON must already be called and t filled*/
-bool extractResponse_Vertices(float xArr[], float yArr[]);
-bool extractResponse_Obstacles(float ***result);
-void extractResponse_Targets(float *result);
-void extractResponse_SafeRegions(float *result);
-void extractResponse_R2_Location(float x, float y, float orientation);
+int extractResponse_Vertices(float xArr[], float yArr[]);
+int extractResponse_Obstacles(float arrX[10][4], float arrY[10][4]);
+int extractResponse_Targets(float arrX[10][4], float arrY[10][4]);
   
 
 #endif /* _EXAMPLE_FILE_NAME_H */

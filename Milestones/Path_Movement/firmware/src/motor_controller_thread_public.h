@@ -35,10 +35,21 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+    
+typedef enum {vertex, target, obstacle} coord_t;
 
-void MOTOR_CONTROLLER_THREAD_SendToQueue(char buffer);
+typedef struct {
+    float x[10];
+    float y[10];
+    int len;
+    coord_t type;
+} message_in_t;
 
-void MOTOR_CONTROLLER_THREAD_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken);
+void MOTOR_CONTROLLER_THREAD_SendToQueue(message_in_t buffer);
+
+void MOTOR_CONTROLLER_THREAD_SendToQueueISR(message_in_t buffer, BaseType_t *pxHigherPriorityTaskWoken);
+
+void MOTOR_CONTROLLER_THREAD_ReadFromQueue(message_in_t* pvBuffer);
 
 /* Provide C++ Compatibility */
 #ifdef __cplusplus

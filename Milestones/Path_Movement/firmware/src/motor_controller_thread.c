@@ -60,7 +60,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 static QueueHandle_t _queue;
 
-#define TYPEOFQUEUE char
+#define TYPEOFQUEUE message_in_t
 #define SIZEOFQUEUE 48
 
 // *****************************************************************************
@@ -136,6 +136,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
     float totalDistance = 0;
     float initialOrientation = 0;
     bool motionComplete = true;
+    message_in_t msg;
     
     obj.Type = UPDATE;
     obj.Update.Type = POSITION;
@@ -157,9 +158,10 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 // Read direction of travel from queue
                 if (motionComplete) {
                     dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
-                    MOTOR_CONTROLLER_THREAD_ReadFromQueue(&c);
+                    MOTOR_CONTROLLER_THREAD_ReadFromQueue(&msg);
                     dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
-                    motionComplete = false;
+                    // motionComplete = false;
+                    // lets get stuck here
                 }
                 
                 // setDirectionForward();
@@ -235,15 +237,15 @@ void MOTOR_CONTROLLER_THREAD_InitializeQueue() {
     }
 }
 
-void MOTOR_CONTROLLER_THREAD_ReadFromQueue(char* pvBuffer) {
+void MOTOR_CONTROLLER_THREAD_ReadFromQueue(message_in_t* pvBuffer) {
     xQueueReceive(_queue, pvBuffer, portMAX_DELAY);
 }
 
-void MOTOR_CONTROLLER_THREAD_SendToQueue(char buffer) {
+void MOTOR_CONTROLLER_THREAD_SendToQueue(message_in_t buffer) {
     xQueueSend(_queue, &buffer, portMAX_DELAY);
 }
 
-void MOTOR_CONTROLLER_THREAD_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken) {
+void MOTOR_CONTROLLER_THREAD_SendToQueueISR(message_in_t buffer, BaseType_t *pxHigherPriorityTaskWoken) {
     xQueueSendFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
 }
 

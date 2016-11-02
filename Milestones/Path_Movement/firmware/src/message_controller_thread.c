@@ -261,19 +261,19 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     break;
                                 }
                                 case Forward: {
-                                    MOTOR_CONTROLLER_THREAD_SendToQueue('F');
+                                    // MOTOR_CONTROLLER_THREAD_SendToQueue('F');
                                     break;
                                 }
                                 case Back: {
-                                    MOTOR_CONTROLLER_THREAD_SendToQueue('B');
+                                    // MOTOR_CONTROLLER_THREAD_SendToQueue('B');
                                     break;
                                 }
                                 case Left: {
-                                    MOTOR_CONTROLLER_THREAD_SendToQueue('L');
+                                    // MOTOR_CONTROLLER_THREAD_SendToQueue('L');
                                     break;
                                 }
                                 case Right: {
-                                    MOTOR_CONTROLLER_THREAD_SendToQueue('R');
+                                    // MOTOR_CONTROLLER_THREAD_SendToQueue('R');
                                     break;
                                 }
                                 case SensorData: {
@@ -341,14 +341,43 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                             }
                         }
                         float xArr[10], yArr[10];
-                        bool isValid = extractResponse_Vertices(xArr, yArr);
+                        int len = extractResponse_Vertices(xArr, yArr);
+                        message_in_t msg;
+                        int j;
+                        if(len > 0){
+                            msg.type = vertex;
+                            for(j = 0; j < len; j++){
+                                msg.x[j] = xArr[j];
+                                msg.y[j] = yArr[j];
+                            }
+                            msg.len = len;
+                            MOTOR_CONTROLLER_THREAD_SendToQueue(msg);
+                        }
                         
-                        Tx_Thead_Queue_DataType tx_thread_obj;
-                        memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
-                        tx_thread_obj.Destination = TARGETLOCATOR;
-                        sprintf(tx_thread_obj.Data, "{\"message\": %f, %f, %f, %f, %f, %f, %f, %f", xArr[0], xArr[1],xArr[2],xArr[3],yArr[0], yArr[1],yArr[2],yArr[3]);
-                        TX_THREAD_SendToQueue(tx_thread_obj);
+                        float obsXArr[10][4], obsYArr[10][4];
+                        len = extractResponse_Obstacles(obsXArr, obsYArr);
+                        int i;
+                        for(i = 0; i < len; i++){
+                            msg.type = obstacle;
+                            for(j = 0; j < 4; j++){
+                                msg.x[j] = obsXArr[i][j];
+                                msg.y[j] = obsYArr[i][j];
+                            }
+                            msg.len = 4;
+                            MOTOR_CONTROLLER_THREAD_SendToQueue(msg);
+                        }
                         
+                        float tarXArr[10][4], tarYArr[10][4];
+                        len = extractResponse_Targets(tarXArr, tarYArr);
+                        for(i = 0; i < len; i++){
+                            msg.type = target;
+                            for(j = 0; j < 4; j++){
+                                msg.x[j] = tarXArr[i][j];
+                                msg.y[j] = tarYArr[i][j];
+                            }
+                            msg.len = 4;
+                            MOTOR_CONTROLLER_THREAD_SendToQueue(msg);
+                        }
                         
                         break;
                     }
