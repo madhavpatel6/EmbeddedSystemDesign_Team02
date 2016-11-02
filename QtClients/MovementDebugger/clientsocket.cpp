@@ -25,10 +25,10 @@ QTcpSocket* ClientSocket::getClient(){
     return socket;
 }
 
-void ClientSocket::positionRequested(){
+void ClientSocket::movementRequested(){
     QString request_begin = "{\"type\":\"Request\",\"items\":[";
     QString request_end = "]}";
-    SendJSONRequestToSocket(request_begin + "\"R1_Est_Location\",\"R1_Est_Orientation\"" + request_end, SEARCHERMOVER);
+    SendJSONRequestToSocket(request_begin + "\"R1_Movement\"" + request_end, SEARCHERMOVER);
 }
 
 void ClientSocket::lineLocationRequested(){
@@ -97,8 +97,7 @@ void ClientSocket::readyRead()
             QJsonObject json = doc.object();
             QString type = json["type"].toString();
             if(type == QStringLiteral("Response")) {
-                if(json.contains(QStringLiteral("R1_Est_Location")) ||
-                        json.contains(QStringLiteral("R1_Est_Orientation")) ||
+                if(json.contains(QStringLiteral("R1_Movement")) ||
                         json.contains(QStringLiteral("LineLocation"))) {
                     HandleResponse(json);
                 }

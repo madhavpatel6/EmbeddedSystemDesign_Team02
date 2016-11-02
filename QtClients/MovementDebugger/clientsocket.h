@@ -29,7 +29,7 @@ public slots:
     void connected();
     void disconnected();
     void readyRead();
-    void positionRequested();
+    void movementRequested();
     void lineLocationRequested();
     void sendForwardCommand(int distance);
     void sendBackCommand(int distance);

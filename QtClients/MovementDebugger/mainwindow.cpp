@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     tcpSocket = new ClientSocket();
 
-    connect(requestTimer, SIGNAL(timeout()), tcpSocket, SLOT(positionRequested()));
+    connect(requestTimer, SIGNAL(timeout()), tcpSocket, SLOT(movementRequested()));
     connect(requestTimer2, SIGNAL(timeout()), tcpSocket, SLOT(lineLocationRequested()));
     connect(this, SIGNAL(pb_forwardClicked(int)), tcpSocket, SLOT(sendForwardCommand(int)));
     connect(this, SIGNAL(pb_backClicked(int)), tcpSocket, SLOT(sendBackCommand(int)));
