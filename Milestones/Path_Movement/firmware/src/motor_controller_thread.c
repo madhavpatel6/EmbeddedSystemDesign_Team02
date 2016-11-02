@@ -61,7 +61,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 static QueueHandle_t _queue;
 
 #define TYPEOFQUEUE message_in_t
-#define SIZEOFQUEUE 48
+#define SIZEOFQUEUE 36
 
 // *****************************************************************************
 // *****************************************************************************
@@ -121,25 +121,7 @@ void MOTOR_CONTROLLER_THREAD_Initialize ( void )
 
 void MOTOR_CONTROLLER_THREAD_Tasks ( void )
 {
-    char c;
-    MessageObj obj;
-    int leftCount = 0;
-    int rightCount = 0;
-    int tempCount = 0;
-    float x = 0;
-    float y = 0;
-    float orientation = 0;
-    int leftSign = 1;
-    int rightSign = 1;
-    float distance = 0;
-    int orientationCorrection = 0;
-    float totalDistance = 0;
-    float initialOrientation = 0;
-    bool motionComplete = true;
     message_in_t msg;
-    
-    obj.Type = UPDATE;
-    obj.Update.Type = POSITION;
     
     while(1) {
         /* Check the application's current state. */
@@ -150,75 +132,16 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
             {
                 disableMotors();
                 setDirectionForward();
+                initWorld();
                 motor_controller_threadData.state = MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS;
                 break;
             }
             case MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS:
             {
                 // Read direction of travel from queue
-                if (motionComplete) {
-                    dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
-                    MOTOR_CONTROLLER_THREAD_ReadFromQueue(&msg);
-                    dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
-                    // motionComplete = false;
-                    // lets get stuck here
-                }
+                MOTOR_CONTROLLER_THREAD_ReadFromQueue(&msg);
+                addToMap(msg);
                 
-                // setDirectionForward();
-                // enableMotors();
-                leftSign = 1;
-                rightSign = 1;
-//                if (totalDistance > 10) {
-//                    disableMotors();
-//                    motionComplete = true;
-//                    totalDistance = 0;
-//                }
-                
-                // Get encoder values from each motor
-                
-//                leftCount = PLIB_TMR_Counter16BitGet(TMR_ID_3) * leftSign;
-//                rightCount = PLIB_TMR_Counter16BitGet(TMR_ID_4) * rightSign;
-//                
-//                // Clear encoder counters
-//                PLIB_TMR_Counter16BitClear(TMR_ID_3);
-//                PLIB_TMR_Counter16BitClear(TMR_ID_4);
-//                
-//                Tx_Thead_Queue_DataType tx_thread_obj;
-//                memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
-//                tx_thread_obj.Destination = SERVER;
-//                sprintf(tx_thread_obj.Data, " %d, %d\n", leftCount, rightCount);
-//                TX_THREAD_SendToQueue(tx_thread_obj);
-                
-                switch(c) {
-                    case 'F': case 'B': {
-                        tempCount = (leftCount+rightCount)/2;
-                        leftCount = tempCount;
-                        rightCount = tempCount;
-                        break;
-                    }
-                    default: {
-                        break;
-                    }
-                }
-                
-                distance = (((leftCount+rightCount)/2.0)/ticksPerCm);
-                totalDistance += distance;
-                
-                x += distance*cos(orientation*2*M_PI/360);
-                y += distance*sin(orientation*2*M_PI/360);
-                
-                // Update position of rover
-                orientation += (((((rightCount-leftCount)/2.0)/ticksPerCm)/circumference)*360);
-                if (orientation > 360 || orientation < -360) {
-                    orientation -= ((int)orientation/360)*360;
-                    orientation *= 360;
-                }
-
-                obj.Update.Data.location.x = x;
-                obj.Update.Data.location.y = y;
-                obj.Update.Data.orientation = orientation;
-                
-                MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
                 break;
             }
             default:
@@ -228,6 +151,27 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
         }
     }
 }
+                /* the following commented out stuff is helpful stuff from eric add it back later maybe go check his project*/
+//                distance = (((leftCount+rightCount)/2.0)/ticksPerCm);
+//                totalDistance += distance;
+//                
+//                x += distance*cos(orientation*2*M_PI/360);
+//                y += distance*sin(orientation*2*M_PI/360);
+//                
+//                // Update position of rover
+//                orientation += (((((rightCount-leftCount)/2.0)/ticksPerCm)/circumference)*360);
+//                if (orientation > 360 || orientation < -360) {
+//                    orientation -= ((int)orientation/360)*360;
+//                    orientation *= 360;
+//                }
+//MessageObj obj;
+//obj.Type = UPDATE;
+//obj.Update.Type = POSITION;
+//                obj.Update.Data.location.x = x;
+//                obj.Update.Data.location.y = y;
+//                obj.Update.Data.orientation = orientation;
+//                
+//                MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
 
 void MOTOR_CONTROLLER_THREAD_InitializeQueue() {
     _queue = xQueueCreate(SIZEOFQUEUE, sizeof(TYPEOFQUEUE));
@@ -277,6 +221,47 @@ void setDirectionLeft( void ) {
 void setDirectionRight( void ) {
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, 14, 1); // right back
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 0); // left forward
+}
+void addVerticesToMap(float arrX[], float arrY[], int len){
+    int i;
+    Point temp;
+    for(i = 0; i < len; i++){
+        temp.x = arrX[i];
+        temp.y = arrY[i];
+        addVertex(temp);
+    }
+    
+    
+}
+void addObstacleToMap(float arrX[], float arrY[], int len){
+    // traverse the list of a_star obstacles
+    
+    // if this one is different from all of them add it
+}
+void addTargetToMap(float arrX[], float arrY[], int len){
+    // traverse the list of a_star vertices
+    
+    // if this on is new add it
+}
+
+void addToMap(message_in_t msg){
+    switch(msg.type){
+        case vertex:{
+            addVerticesToMap(msg.x, msg.y, msg.len);
+            break;
+        }
+        case obstacle:{
+            addObstacleToMap(msg.x, msg.y, msg.len);
+            break;
+        }
+        case target:{
+            addTargetToMap(msg.x, msg.y, msg.len);
+            break;
+        }
+        default:{
+            
+        }
+    }
 }
 
 /*******************************************************************************

@@ -271,7 +271,7 @@
         <Name>drv_adc_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/adc/src</Path>
         <Checksum>97D2F3AE688ECF1C1E980EDC76D0AC00</Checksum>
-        <ProjectFileChecksum>44708C07B298122FA37789A734A44F88</ProjectFileChecksum>
+        <ProjectFileChecksum>7BB452939ACB616612D1C7DB14633BC4</ProjectFileChecksum>
       </Template>
       <Template>
         <Name>tx_thread.c</Name>
@@ -293,13 +293,13 @@
       <Template>
         <Name>FreeRTOSConfig.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>4B8830C246227EC06BF88A9845BC3890</Checksum>
+        <Checksum>3D4B6FD90FAF952DBC4A261777AACBE8</Checksum>
       </Template>
       <Template>
         <Name>drv_usart_static_byte_model.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/usart/src</Path>
         <Checksum>E56B5A603F0427F96760518142226E69</Checksum>
-        <ProjectFileChecksum>2D556123AA19E299C5E9D0EB67D7DED3</ProjectFileChecksum>
+        <ProjectFileChecksum>7DB65767FDC3C18657521F699C572787</ProjectFileChecksum>
       </Template>
       <Template>
         <Name>adc_thread.h</Name>
@@ -314,7 +314,7 @@
         <Name>system_interrupt.c</Name>
         <Path>Source Files/app/system_config/default</Path>
         <Checksum>50A6AF4D5722B7659482FEB87F40C6B8</Checksum>
-        <ProjectFileChecksum>67896AE0D5F2C131729FE417F52AAE93</ProjectFileChecksum>
+        <ProjectFileChecksum>DE867E67AFF09E41810F1BFE88E7115D</ProjectFileChecksum>
       </Template>
       <Template>
         <Name>drv_oc_mapping.c</Name>
@@ -340,7 +340,7 @@
         <Name>system_init.c</Name>
         <Path>Source Files/app/system_config/default</Path>
         <Checksum>D5FDB86CCB0C53E86A2DF3C3888AD24E</Checksum>
-        <ProjectFileChecksum>E84F72AA55184466F8039DDCC4BABE8E</ProjectFileChecksum>
+        <ProjectFileChecksum>3AE3F388C426023CFEC7C70FA9DBD43B</ProjectFileChecksum>
       </Template>
       <Template>
         <Name>drv_oc_static.h</Name>
@@ -400,6 +400,7 @@
         <Name>drv_tmr_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/tmr/src</Path>
         <Checksum>7AF07A30121A9A8DCF8E4835015B34F1</Checksum>
+        <ProjectFileChecksum>B5B0CA7F6997E394986E64DDD1A320D8</ProjectFileChecksum>
       </Template>
       <Template>
         <Name>rtos_hooks.c</Name>
@@ -419,11 +420,11 @@
         <Include value="../src/system_config/default"/>
       </C32-AS>
       <C32>
-        <Include value="/data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/Milestones/Path_Movement/firmware/src"/>
-        <Include value="/data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/Milestones/Path_Movement/firmware/src/system_config/default"/>
-        <Include value="/data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/Milestones/Path_Movement/firmware/src/default"/>
+        <Include value="/c_drive/freshStart/Fall2016/ECE_4534_Embedded/EmbeddedSystemDesign_Team02/Milestones/Path_Movement/firmware/src"/>
+        <Include value="/c_drive/freshStart/Fall2016/ECE_4534_Embedded/EmbeddedSystemDesign_Team02/Milestones/Path_Movement/firmware/src/system_config/default"/>
+        <Include value="/c_drive/freshStart/Fall2016/ECE_4534_Embedded/EmbeddedSystemDesign_Team02/Milestones/Path_Movement/firmware/src/default"/>
         <Include value="/home/stephen/microchip/harmony/v1_08_01/framework"/>
-        <Include value="/data/Fall2016/ECE_4534_Embedded/git5/EmbeddedSystemDesign_Team02/Milestones/Path_Movement/firmware/src/system_config/default/framework"/>
+        <Include value="/c_drive/freshStart/Fall2016/ECE_4534_Embedded/EmbeddedSystemDesign_Team02/Milestones/Path_Movement/firmware/src/system_config/default/framework"/>
         <Include value="../../../../../../../../../home/stephen/microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX"/>
         <Include value="../../../../../../../../../home/stephen/microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include"/>
         <Include value="../src/system_config/default"/>

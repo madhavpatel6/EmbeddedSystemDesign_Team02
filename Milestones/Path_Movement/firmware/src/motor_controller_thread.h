@@ -59,6 +59,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "system_config.h"
 #include "system_definitions.h"
 #include "queue.h"
+#include "a_star/a_star_functions.h"
+#include "motor_controller_thread_public.h"
 
 #define ticksPerCm      45.0f
 #define circumference   58.0f
@@ -215,6 +217,8 @@ void setDirectionBack( void );
 void setDirectionLeft( void );
 
 void setDirectionRight( void );
+
+void addToMap(message_in_t msg);
 
 
 #endif /* _MOTOR_CONTROLLER_THREAD_H */

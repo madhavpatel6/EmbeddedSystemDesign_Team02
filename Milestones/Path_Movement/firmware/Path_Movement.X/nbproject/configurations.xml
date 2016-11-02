@@ -143,6 +143,7 @@
       <itemPath>../src/rx_thread_public.h</itemPath>
       <itemPath>../src/tx_thread_public.h</itemPath>
       <itemPath>../src/motor_controller_thread_public.h</itemPath>
+      <itemPath>../src/a_star/a_star_functions.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -256,6 +257,7 @@
         <itemPath>../../../../../../../../../home/stephen/microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/event_groups.c</itemPath>
       </logicalFolder>
       <itemPath>../src/debug.c</itemPath>
+      <itemPath>../src/a_star/a_star_functions.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -345,7 +347,7 @@
         <property key="enable-symbols" value="true"/>
         <property key="exclude-floating-point-library" value="false"/>
         <property key="expand-macros" value="false"/>
-        <property key="extra-include-directories-for-assembler" value=";"/>
+        <property key="extra-include-directories-for-assembler" value=""/>
         <property key="extra-include-directories-for-preprocessor"
                   value="../../../../../../../../../home/stephen/microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/portable/MPLAB/PIC32MX;../../../../../../../../../home/stephen/microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/include;../src/system_config/default;"/>
         <property key="false-conditionals" value="false"/>
