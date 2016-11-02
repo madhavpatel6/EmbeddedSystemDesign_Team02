@@ -61,8 +61,11 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "queue.h"
 #include "motor_controller_thread_public.h"
 
-#define ticksPerCm      42.5f
-#define circumference   58.0f
+#define TICKS_PER_CM    38.59255596f
+#define CIRCUMFERENCE   32.30997255f
+#define MAX_PWM         65534
+
+#define MODE            "Run"
     
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -72,65 +75,6 @@ extern "C" {
 #endif
 // DOM-IGNORE-END 
 
-// *****************************************************************************
-// *****************************************************************************
-// Section: Type Definitions
-// *****************************************************************************
-// *****************************************************************************
-
-// *****************************************************************************
-/* Application states
-
-  Summary:
-    Application states enumeration
-
-  Description:
-    This enumeration defines the valid application states.  These states
-    determine the behavior of the application at various times.
-*/
-
-typedef enum
-{
-	/* Application's state machine's initial state. */
-	MOTOR_CONTROLLER_THREAD_STATE_INIT=0,
-	MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS,
-
-	/* TODO: Define states used by the application state machine. */
-
-} MOTOR_CONTROLLER_THREAD_STATES;
-
-
-// *****************************************************************************
-/* Application Data
-
-  Summary:
-    Holds application data
-
-  Description:
-    This structure holds the application's data.
-
-  Remarks:
-    Application strings and buffers are be defined outside this structure.
- */
-
-typedef struct
-{
-    /* The application's current state */
-    MOTOR_CONTROLLER_THREAD_STATES state;
-
-    /* TODO: Define any additional data used by the application. */
-
-} MOTOR_CONTROLLER_THREAD_DATA;
-
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Application Callback Routines
-// *****************************************************************************
-// *****************************************************************************
-/* These routines are called by drivers when certain events occur.
-*/
-	
 // *****************************************************************************
 // *****************************************************************************
 // Section: Application Initialization and State Machine Functions
@@ -201,23 +145,25 @@ void MOTOR_CONTROLLER_THREAD_Initialize ( void );
     This routine must be called from SYS_Tasks() routine.
  */
 
-void MOTOR_CONTROLLER_THREAD_Tasks( void );
+void MOTOR_CONTROLLER_THREAD_Tasks(void);
 
 void MOTOR_CONTROLLER_THREAD_InitializeQueue();
 
 void MOTOR_CONTROLLER_THREAD_ReadFromQueue(MotorObj* obj);
 
-void enableMotors( void );
+void completeMotion(void);
 
-void disableMotors( void );
+void enableMotors(void);
 
-void setDirectionForward( void );
+void disableMotors(void);
 
-void setDirectionBack( void );
+void setDirectionForward(void);
 
-void setDirectionLeft( void );
+void setDirectionBackward(void);
 
-void setDirectionRight( void );
+void setDirectionLeft(void);
+
+void setDirectionRight(void);
 
 
 #endif /* _MOTOR_CONTROLLER_THREAD_H */

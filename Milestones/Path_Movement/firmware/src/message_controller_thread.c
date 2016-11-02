@@ -340,6 +340,14 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 break;
                             }
                         }
+                        float xArr[10], yArr[10];
+                        bool isValid = extractResponse_Vertices(xArr, yArr);
+                        
+                        Tx_Thead_Queue_DataType tx_thread_obj;
+                        memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
+                        tx_thread_obj.Destination = TARGETLOCATOR;
+                        sprintf(tx_thread_obj.Data, "{\"message\": %f, %f, %f, %f, %f, %f, %f, %f", xArr[0], xArr[1],xArr[2],xArr[3],yArr[0], yArr[1],yArr[2],yArr[3]);
+                        TX_THREAD_SendToQueue(tx_thread_obj);
                         
                         
                         break;
@@ -379,7 +387,8 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         break;
                     }
                     case PFtoTL: {
-                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"PFtoTL\"]}");
+                        // for now we are requesting vertices from the tl because i am lazy
+                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"Obstacles\", \"Targets\", \"SafeRegions\", \"R2_Location\", \"Vertices\"]}");
                         tx_thread_obj.Destination = TARGETLOCATOR;
                         tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
                         statObject.Req_To_TargetLocator++;

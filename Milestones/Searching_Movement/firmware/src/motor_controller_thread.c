@@ -57,11 +57,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "motor_controller_thread.h"
 #include "motor_controller_thread_public.h"
 #include "math.h"
-
-static QueueHandle_t _queue;
-
-#define TYPEOFQUEUE MotorObj
-#define SIZEOFQUEUE 32
+#include "peripheral/oc/plib_oc.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -69,22 +65,23 @@ static QueueHandle_t _queue;
 // *****************************************************************************
 // *****************************************************************************
 
-// *****************************************************************************
-/* Application Data
+static QueueHandle_t _queue;
 
-  Summary:
-    Holds application data
+#define TYPEOFQUEUE MotorObj
+#define SIZEOFQUEUE 32
 
-  Description:
-    This structure holds the application's data.
+static int rightCount = 0;
+static int leftCount = 0;
 
-  Remarks:
-    This structure should be initialized by the APP_Initialize function.
-    
-    Application strings and buffers are be defined outside this structure.
-*/
+static int rightSpeed = 52430;
+static int leftSpeed = 52430;
 
-MOTOR_CONTROLLER_THREAD_DATA motor_controller_threadData;
+static float totalDistance = 0;
+static float initialOrientation = 0;
+static float orientation = 0;
+static bool motionComplete = true;
+
+static float integralLeft = 0;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -105,7 +102,8 @@ void MOTOR_CONTROLLER_THREAD_Initialize ( void )
     MOTOR_CONTROLLER_THREAD_InitializeQueue();
     DRV_TMR2_Start();
     DRV_TMR3_Start();
-    motor_controller_threadData.state = MOTOR_CONTROLLER_THREAD_STATE_INIT;
+    DRV_OC0_Start();
+    DRV_OC1_Start();
 }
 
 /******************************************************************************
@@ -120,182 +118,259 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
 {
     MessageObj messageObj;
     MotorObj motorObj;
-    int leftCount = 0;
-    int rightCount = 0;
-    int tempCount = 0;
+    
+    int prevRightCount = 0;
+    int prevLeftCount = 0;
+    int deltaRight = 0;
+    int deltaLeft = 0;
+    int weightedDiff = 0;
     float x = 0;
     float y = 0;
-    float orientation = 0;
-    int leftSign = 1;
     int rightSign = 1;
+    int leftSign = 1;
     float distance = 0;
     int orientationCorrection = 0;
-    float totalDistance = 0;
-    float initialOrientation = 0;
-    bool motionComplete = true;
-    
+        
     messageObj.Type = UPDATE;
     messageObj.Update.Type = POSITION;
+
+    enum states {
+        forward, inchForward, inchBackward, turnRight, turnLeft, followLine
+    } state, prevState;
+
+    state = forward;
+    prevState = state;
+    disableMotors();
+    setDirectionForward();
     
     while(1) {
-        /* Check the application's current state. */
-        switch ( motor_controller_threadData.state )
-        {
-            /* Application's initial state. */
-            case MOTOR_CONTROLLER_THREAD_STATE_INIT:
-            {
-                // Initialize motors - OFF and FORWARD
-                disableMotors();
-                setDirectionForward();
-                motor_controller_threadData.state = MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS;
-                break;
+        if (MODE == "Debug") {
+            // Read direction of travel from queue
+            if (motionComplete) {
+                dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
+                MOTOR_CONTROLLER_THREAD_ReadFromQueue(&motorObj);
+                dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
+                motionComplete = false;
             }
-            case MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS:
-            {
-                // Read direction of travel from queue
-                if (motionComplete) {
-                    dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
-                    MOTOR_CONTROLLER_THREAD_ReadFromQueue(&motorObj);
-                    dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
-                    motionComplete = false;
+            
+            // Determine direction to travel
+            switch(motorObj.direction) {
+                case 'F': {
+                    setDirectionForward();
+                    enableMotors();
+                    rightSign = 1;
+                    leftSign = 1;
+                    
+                    // Stop if desired distance is traveled
+                    if (totalDistance > motorObj.distance) {
+                        completeMotion();
+                    }
+                    break;
                 }
-                
-                // Determine direction to travel
-                switch(motorObj.direction) {
-                    case 'F': {
+                case 'B': {
+                    setDirectionBackward();
+                    enableMotors();
+                    rightSign = -1;
+                    leftSign = -1;
+                    
+                    // Stop if desired distance is traveled
+                    if (totalDistance < -motorObj.distance) {
+                        completeMotion();
+                    }
+                    break;
+                }
+                case 'L': {
+                    setDirectionLeft();
+                    enableMotors();
+                    rightSign = 1;
+                    leftSign = -1;
+                    
+                    // Correct orientation if it becomes greater than 360
+                    if (orientation < initialOrientation) {
+                        orientationCorrection = 360;
+                    } else {
+                        orientationCorrection = 0;
+                    }
+                    
+                    // Stop rotating when desired angular displacement is achieved
+                    if ((orientation + orientationCorrection - initialOrientation) > motorObj.degrees) {
+                        completeMotion();
+                    }
+                    break;
+                }
+                case 'R': {
+                    setDirectionRight();
+                    enableMotors();
+                    rightSign = -1;
+                    leftSign = 1;
+                    
+                    // Correct orientation if it becomes less than 360
+                    if (orientation > initialOrientation) {
+                        orientationCorrection = -360;
+                    } else {
+                        orientationCorrection = 0;
+                    }
+                    
+                    // Stop rotating when desired angular displacement is achieved
+                    if ((orientation + orientationCorrection - initialOrientation) < -motorObj.degrees) {
+                        completeMotion();
+                    }
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+        } else {
+            dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
+            MOTOR_CONTROLLER_THREAD_ReadFromQueue(&motorObj);
+            dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
+            
+            switch (state) {
+                case forward: {
+                    if (motorObj.lineLocation == 0) {
                         setDirectionForward();
                         enableMotors();
-                        leftSign = 1;
                         rightSign = 1;
-                        
-                        // Stop if desired distance is traveled
-                        if (totalDistance > 10) {
-                            disableMotors();
-                            motionComplete = true;
-                            totalDistance = 0;
-                        }
-                        break;
-                    }
-                    case 'B': {
-                        setDirectionBack();
-                        enableMotors();
-                        leftSign = -1;
-                        rightSign = -1;
-                        
-                        // Stop if desired distance is traveled
-                        if (totalDistance < -10) {
-                            disableMotors();
-                            motionComplete = true;
-                            totalDistance = 0;
-                        }
-                        break;
-                    }
-                    case 'L': {
-                        setDirectionLeft();
-                        enableMotors();
-                        leftSign = -1;
-                        rightSign = 1;
-                        
-                        // Correct orientation if it becomes greater than 360
-                        if (orientation < initialOrientation) {
-                            orientationCorrection = 360;
-                        } else {
-                            orientationCorrection = 0;
-                        }
-                        
-                        // Stop rotating when desired angular displacement is achieved
-                        if ((orientation + orientationCorrection - initialOrientation) > 90) {
-                            disableMotors();
-                            motionComplete = true;
-                            initialOrientation = orientation;
-                        }
-                        break;
-                    }
-                    case 'R': {
-                        setDirectionRight();
-                        enableMotors();
                         leftSign = 1;
-                        rightSign = -1;
+                    } else {
+                        completeMotion();
+                        prevState = forward;
+                        state = inchBackward;
+                    }
+                    break;
+                }
+                case inchForward: {
+                    setDirectionForward();
+                    enableMotors();
+                    rightSign = 1;
+                    leftSign = 1;
+
+                    if (totalDistance > 15) {
+                        completeMotion();
                         
-                        // Correct orientation if it becomes less than 360
-                        if (orientation > initialOrientation) {
-                            orientationCorrection = -360;
-                        } else {
-                            orientationCorrection = 0;
+                        if (prevState == turnRight) {
+                            prevState = inchForward;
+                            state = turnRight;
+                        } else if (prevState == turnLeft) {
+                            prevState = inchForward;
+                            state = turnLeft;
                         }
                         
-                        // Stop rotating when desired angular displacement is achieved
-                        if ((orientation + orientationCorrection - initialOrientation) < -90) {
-                            disableMotors();
-                            motionComplete = true;
-                            initialOrientation = orientation;
+                    }
+                    break;
+                }
+                case inchBackward: {
+                    setDirectionBackward();
+                    enableMotors();
+                    rightSign = -1;
+                    leftSign = -1;
+
+                    if (totalDistance < -3) {
+                        completeMotion();
+                        prevState = inchBackward;
+                        state = turnRight;
+                    }
+                    break;
+                }
+                case turnRight: {
+                    setDirectionRight();
+                    enableMotors();
+                    rightSign = -1;
+                    leftSign = 1;
+
+                    // Correct orientation if it becomes less than 360
+                    if (orientation > initialOrientation) {
+                        orientationCorrection = -360;
+                    } else {
+                        orientationCorrection = 0;
+                    }
+                    
+                    // Stop rotating when desired angular displacement is achieved
+                    if ((orientation + orientationCorrection - initialOrientation) < -90) {
+                        completeMotion();
+                        if (prevState == inchBackward) {
+                            prevState = turnRight;
+                            state = inchForward;
+                        } else if (prevState == inchForward) {
+                            prevState = turnRight;
+                            state = forward;
                         }
-                        break;
                     }
-                    case 'S': {
-                        // Stop motors
-                        disableMotors();
-                        motionComplete = true;
-                        break;
-                    }
-                    default: {
-                        break;
-                    }
+                    break;
                 }
-                
-                // Get encoder values from each motor
-                leftCount = PLIB_TMR_Counter16BitGet(TMR_ID_3) * leftSign;
-                rightCount = PLIB_TMR_Counter16BitGet(TMR_ID_4) * rightSign;
-                
-                // Clear encoder counters
-                PLIB_TMR_Counter16BitClear(TMR_ID_3);
-                PLIB_TMR_Counter16BitClear(TMR_ID_4);
-                
-                // If the rover is supposed to travel straight, set encoder values equal to each other
-                switch(motorObj.direction) {
-                    case 'F': case 'B': {
-                        tempCount = (leftCount+rightCount)/2;
-                        leftCount = tempCount;
-                        rightCount = tempCount;
-                        break;
+                case turnLeft: {
+                    setDirectionLeft();
+                    enableMotors();
+                    rightSign = 1;
+                    leftSign = -1;
+
+                    // Correct orientation if it becomes less than 360
+                    if (orientation < initialOrientation) {
+                        orientationCorrection = 360;
+                    } else {
+                        orientationCorrection = 0;
                     }
-                    default: {
-                        break;
+                    
+                    // Stop rotating when desired angular displacement is achieved
+                    if ((orientation + orientationCorrection - initialOrientation) > 90) {
+                        completeMotion();
+                        if (prevState == inchBackward) {
+                            prevState = turnLeft;
+                            state = inchForward;
+                        } else if (prevState == inchForward) {
+                            prevState = turnLeft;
+                            state = forward;
+                        }
                     }
+                    break;
                 }
-                
-                // Calculate distance traveled
-                distance = (((leftCount+rightCount)/2.0)/ticksPerCm);
-                totalDistance += distance;
-                
-                // Update position of rover - location & orientation
-                x += distance*cos(orientation*2*M_PI/360);
-                y += distance*sin(orientation*2*M_PI/360);
-                
-                orientation += (((((rightCount-leftCount)/2.0)/ticksPerCm)/circumference)*360);
-                
-                // Roll over orientation if it is greater than 360
-                if (orientation > 360 || orientation < -360) {
-                    orientation -= ((int)orientation/360)*360;
-                    orientation *= 360;
+                default: {
+                    break;
                 }
-                
-                // Send updated position to message controller thread
-                messageObj.Update.Data.location.x = x;
-                messageObj.Update.Data.location.y = y;
-                messageObj.Update.Data.orientation = orientation;
-                MESSAGE_CONTROLLER_THREAD_SendToQueue(messageObj);
-                break;
             }
-            default:
-            {
+        }
+        
+        deltaRight = (rightCount - prevRightCount) * rightSign;
+        deltaLeft = (leftCount - prevLeftCount) * leftSign;
+        
+        prevRightCount = rightCount;
+        prevLeftCount = leftCount;
+        
+        switch(motorObj.direction) {
+            case 'F': case 'B': {
+                weightedDiff = (deltaRight - deltaLeft)/2.0;
+                deltaLeft = deltaRight - weightedDiff;
                 break;
             }
         }
+        
+        // Calculate distance traveled
+        distance = (((deltaRight+deltaLeft)/2.0)/TICKS_PER_CM);
+        totalDistance += distance;
+        
+        // Update position of rover - location & orientation
+        x += distance*cos(orientation*2*M_PI/360.0);
+        y += distance*sin(orientation*2*M_PI/360.0);
+        
+        orientation += (((((deltaRight-deltaLeft)/2.0)/TICKS_PER_CM)/CIRCUMFERENCE)*360.0);
+        
+        // Roll over orientation if it is greater than 360
+        if (orientation > 360) {
+            orientation -= 360;
+        } else if (orientation < -360) {
+            orientation += 360;
+        }
+        
+        // Send updated position to message controller thread
+        messageObj.Update.Data.location.x = x;
+        messageObj.Update.Data.location.y = y;
+        messageObj.Update.Data.orientation = orientation;
+        MESSAGE_CONTROLLER_THREAD_SendToQueue(messageObj);
     }
 }
 
-void MOTOR_CONTROLLER_THREAD_InitializeQueue() {
+void MOTOR_CONTROLLER_THREAD_InitializeQueue(void) {
     _queue = xQueueCreate(SIZEOFQUEUE, sizeof(TYPEOFQUEUE));
     if(_queue == 0) {
         /*Handle this Error*/
@@ -315,32 +390,86 @@ void MOTOR_CONTROLLER_THREAD_SendToQueueISR(MotorObj obj, BaseType_t *pxHigherPr
     xQueueSendFromISR(_queue, &obj, pxHigherPriorityTaskWoken);
 }
 
-void enableMotors( void ) {
-    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 0, 1);
-    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 1, 1);
+int prevRightPID = 0;
+int prevLeftPID = 0;
+
+void MOTOR_CONTROLLER_THREAD_CorrectSpeed(int timer) {
+    float errorLeft = 0;
+    float outputLeft = 0;
+    
+    float Kp_Left = 6000;
+    float Ki_Left = 2500;
+    
+    errorLeft = (rightCount - prevRightPID) - (leftCount - prevLeftPID);
+    integralLeft += errorLeft;
+    outputLeft = ((Kp_Left*errorLeft) + (Ki_Left*integralLeft));
+    
+    if (outputLeft < 0) {
+        outputLeft = 0;
+    }
+    if (outputLeft > MAX_PWM) {
+        outputLeft = MAX_PWM;
+    }
+    
+    leftSpeed = (int)outputLeft;
+    
+    if(timer % 10 == 0) {
+            Tx_Thead_Queue_DataType tx_thread_obj;
+            memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
+            tx_thread_obj.Destination = TARGETLOCATOR;
+            BaseType_t *ptr;
+            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"1\", \"vel\": \"%4d\", \"time\": \"%4d\", \"output\": \"%4f\", \"pwm\": \"%4d\"}", leftCount - prevLeftPID, timer, outputLeft, leftSpeed);
+            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"2\", \"vel\": \"%4d\", \"time\": \"%4d\"}", rightCount - prevRightPID, timer);
+            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+    }
+    
+    prevRightPID = rightCount;
+    prevLeftPID = leftCount;
 }
 
-void disableMotors( void ) {
-    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 0, 0);
-    SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 1, 0);
+void MOTOR_CONTROLLER_THREAD_IncrementRight(void) {
+    rightCount++;
 }
 
-void setDirectionForward( void ) {
+void MOTOR_CONTROLLER_THREAD_IncrementLeft(void) {
+    leftCount++;
+}
+
+void completeMotion(void) {
+    disableMotors();
+    motionComplete = true;
+    totalDistance = 0;
+    initialOrientation = orientation;
+    
+}
+
+void enableMotors(void) {
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, rightSpeed);
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, leftSpeed);
+}
+
+void disableMotors(void) {
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+}
+
+void setDirectionForward(void) {
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, 14, 0);
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 1);
 }
 
-void setDirectionBack( void ) {
+void setDirectionBackward(void) {
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, 14, 1);
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 0);
 }
 
-void setDirectionLeft( void ) {
+void setDirectionLeft(void) {
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, 14, 0);
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 0);
 }
 
-void setDirectionRight( void ) {
+void setDirectionRight(void) {
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, 14, 1);
     SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 1);
 }

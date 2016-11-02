@@ -40,7 +40,8 @@ void initParser(){
 
 
 void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems){
-    int r, i;
+    int i;
+    strcpy(stored_js_str, JSON_STRING);
     r = jsmn_parse(&p, JSON_STRING, strlen(JSON_STRING), t, sizeof(t)/sizeof(t[0]));
     for(i = 1; i < r; i++){
         if (jsoneq(JSON_STRING, &t[i], "type") == 0) {
@@ -78,6 +79,44 @@ void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numI
         }
     }
 }
+bool extractResponse_Vertices(float xArr[], float yArr[]){
+    int i;
+    bool result = false;
+    for(i = 1; i < r; i++){
+        if (jsoneq(stored_js_str, &t[i], "Vertices") == 0) {
+            int j;
+            if (t[i+1].type == JSMN_ARRAY) {
+                // lets loop thru the set of vertices
+                int j;
+                int numVert = t[i+1].size;
+                for(j = 0; j < numVert; j++){
+                    sprintf(buf, "%.*s\0", t[i+1 + (j*3 + 2)].end-t[i+1 + (j*3 + 2)].start, stored_js_str + t[i+1 + (j*3 + 2)].start);
+                    xArr[j] = atof(buf);
+                    sprintf(buf, "%.*s\0", t[i+1 + (j*3 + 3)].end-t[i+1 + (j*3 + 3)].start, stored_js_str + t[i+1 + (j*3 + 3)].start);
+                    yArr[j] = atof(buf);
+                }
+                result = true;
+            }
+        }
+    }
+    return result;
+}
+bool extractResponse_Obstacles(float ***obs){
+    int i;
+    bool result = false;
+    return result;
+    
+}
+void extractResponse_Targets(float *result){
+    
+}
+void extractResponse_SafeRegions(float *result){
+    
+}
+void extractResponse_R2_Location(float x, float y, float orientation){
+    
+}
+
 
 
 /* *****************************************************************************

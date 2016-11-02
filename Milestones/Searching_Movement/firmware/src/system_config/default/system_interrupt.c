@@ -86,25 +86,22 @@ void IntHandlerDrvAdc(void)
     dbgOutputLoc(ENTER_ADC_ISR);
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     LineObj lineObj;
-    MotorObj motorObj;
     
     memset(&lineObj, 0, (size_t) sizeof(LineObj));
-    memset(&motorObj, 0, (size_t) sizeof(MotorObj));
-    //while(DRV_ADC_SamplesAvailable() != true);
     
     int i;
     
     dbgOutputLoc(ADDING_ADC_VAL_ISR);
     if (ANALOG) {
-        for (i = 0; i < 16; i += 2) {
-            lineObj.IR_0 = DRV_ADC_SamplesRead(i);
-            lineObj.IR_1 = DRV_ADC_SamplesRead(i+1);
-            lineObj.IR_2 = DRV_ADC_SamplesRead(i+2);
-            lineObj.IR_3 = DRV_ADC_SamplesRead(i+3);
-            lineObj.IR_4 = DRV_ADC_SamplesRead(i+4);
-            lineObj.IR_5 = DRV_ADC_SamplesRead(i+5);
-            lineObj.IR_6 = DRV_ADC_SamplesRead(i+6);
-            lineObj.IR_7 = DRV_ADC_SamplesRead(i+7);
+        for (i = 0; i < 16; i += 8) {
+            lineObj.IR_0 += DRV_ADC_SamplesRead(i);
+            lineObj.IR_1 += DRV_ADC_SamplesRead(i+1);
+            lineObj.IR_2 += DRV_ADC_SamplesRead(i+2);
+            lineObj.IR_3 += DRV_ADC_SamplesRead(i+3);
+            lineObj.IR_4 += DRV_ADC_SamplesRead(i+4);
+            lineObj.IR_5 += DRV_ADC_SamplesRead(i+5);
+            lineObj.IR_6 += DRV_ADC_SamplesRead(i+6);
+            lineObj.IR_7 += DRV_ADC_SamplesRead(i+7);
         }
     } else {
         lineObj.IR_0 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_F, 13);
@@ -115,15 +112,10 @@ void IntHandlerDrvAdc(void)
         lineObj.IR_5 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_D, 14);
         lineObj.IR_6 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_A, 15);
         lineObj.IR_7 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_A, 14);
-        
-        motorObj.lineLocation = ((int)lineObj.IR_7 << 7) | ((int)lineObj.IR_6 << 6) | 
-                ((int)lineObj.IR_5 << 5) | ((int)lineObj.IR_4 << 4) | ((int)lineObj.IR_3 << 3) | 
-                ((int)lineObj.IR_2 << 2) | ((int)lineObj.IR_1 << 1) | ((int)lineObj.IR_0 << 0);
-        
-//        MOTOR_CONTROLLER_THREAD_SendToQueueISR(motorObj, &pxHigherPriorityTaskWoken);
     }
     
     dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
+
     ADC_THREAD_SendToQueueISR(lineObj, &pxHigherPriorityTaskWoken);
     dbgOutputLoc(AFTER_SEND_TO_Q_ISR);
     dbgOutputLoc(LEAVE_ADC_ISR);
@@ -132,27 +124,19 @@ void IntHandlerDrvAdc(void)
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
 }
 
-/* This timer is for the ADC to fire every 50 ms */
+/* This timer is for the ADC to fire every 100 ms */
 // Timer 2
 void IntHandlerDrvTmrInstance0(void)
 {
     dbgOutputLoc(ENTER_TMR_INSTANCE_0_ISR);
-    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-    if(!PLIB_INT_SourceIsEnabled(INT_ID_0, INT_SOURCE_ADC_1)){
-        PLIB_ADC_SampleAutoStartEnable(ADC_ID_1);
-        PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
-        portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
-        PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
-    }
-    else{
-        portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
-        PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
-    }
+//    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
+//    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
+    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
 }
 
 uint16_t timerCount = 0;
 
-/* This timer is for the TX to fire every 200 ms */
+/* This timer is for the TX to fire every 10 ms */
 // Timer 5
 void IntHandlerDrvTmrInstance1(void)
 {
@@ -160,45 +144,64 @@ void IntHandlerDrvTmrInstance1(void)
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     MessageObj obj;
     obj.Type = SEND_REQUEST;
-    dbgOutputLoc(BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR);
-    switch(MYMODULE){
-        case SEARCHERMOVER:
-            obj.Request = SMtoTL;
-//            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            break;
-        case TARGETLOCATOR:
-            obj.Request = TLtoSM;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            obj.Request = TLtoPF;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            break;
-        case PATHFINDER:
-            obj.Request = PFtoTL;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            obj.Request = PFtoTG;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            break;
-        case TARGETGRABBER:
-            obj.Request = TGtoPF;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            break;
+    
+    // Run PID algorithm
+    MOTOR_CONTROLLER_THREAD_CorrectSpeed(timerCount);
+    
+    // Enable ADC auto sampling every 200 ms
+    if (timerCount % 20 == 0) {
+        if(!PLIB_INT_SourceIsEnabled(INT_ID_0, INT_SOURCE_ADC_1)){
+            PLIB_ADC_SampleAutoStartEnable(ADC_ID_1);
+            PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
+        }
     }
+    
+    // Issue requests every 250 ms
+    if (timerCount % 25 == 0) {
+        dbgOutputLoc(BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR);
+        switch(MYMODULE){
+            case SEARCHERMOVER:
+                obj.Request = SMtoTL;
+    //            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                break;
+            case TARGETLOCATOR:
+                obj.Request = TLtoSM;
+                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                obj.Request = TLtoPF;
+                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                break;
+            case PATHFINDER:
+                obj.Request = PFtoTL;
+                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                obj.Request = PFtoTG;
+                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                break;
+            case TARGETGRABBER:
+                obj.Request = TGtoPF;
+                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                break;
+        }
+    }
+    
     dbgOutputLoc(AFTER_SEND_TO_Q_TMR_INSTANCE_1_ISR);
+    timerCount++;
     incrementSystemClock();
     dbgOutputLoc(LEAVE_TMR_INSTANCE_1_ISR);
     portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_5);
 }
 
-// Timer 3
+// Timer 3 - Motor 1
 void IntHandlerDrvTmrInstance2(void)
 {
+    MOTOR_CONTROLLER_THREAD_IncrementRight();
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
 }
 
-// Timer 4
+// Timer 4 - Motor 2
 void IntHandlerDrvTmrInstance3(void)
 {
+    MOTOR_CONTROLLER_THREAD_IncrementLeft();
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
 }
 

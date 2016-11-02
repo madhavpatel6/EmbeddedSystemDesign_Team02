@@ -152,7 +152,7 @@ void IntHandlerDrvTmrInstance1(void)
     obj.Type = SEND_REQUEST;
     dbgOutputLoc(BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR);
     // this is necissary cuz this goes of at 20ms now
-    if(time % 10 == 0){
+    if(time % 100 == 0){
         switch(MYMODULE){
             case SEARCHERMOVER:
                 obj.Request = SMtoTL;
@@ -166,9 +166,9 @@ void IntHandlerDrvTmrInstance1(void)
                 break;
             case PATHFINDER:
                 obj.Request = PFtoTL;
-                // MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
                 obj.Request = PFtoTG;
-                // MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                //MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
                 break;
             case TARGETGRABBER:
                 obj.Request = TGtoPF;
@@ -176,19 +176,8 @@ void IntHandlerDrvTmrInstance1(void)
                 break;
         }
     }  
-//    if (ISRcount == 16) {
-//        MOTOR_CONTROLLER_THREAD_SendToQueueISR(buf[bufCount], &pxHigherPriorityTaskWoken);
-//        if (bufCount < strlen(buf)-1) {
-//            bufCount++;
-//        } else {
-//            bufCount = 0;
-//        }
-//        ISRcount = 0;
-//    } else {
-//        ISRcount++;
-//    }
-    
-    if(time >= 50){
+    // && 0 to temporarily disable motors
+    if(time >= 50 && 0){
     
         setDirectionForward();
 

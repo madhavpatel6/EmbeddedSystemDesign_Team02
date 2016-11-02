@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "QShortcut"
 
 #define REQUESTRATE_MS 200
 
@@ -18,10 +17,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(requestTimer, SIGNAL(timeout()), tcpSocket, SLOT(positionRequested()));
     connect(requestTimer2, SIGNAL(timeout()), tcpSocket, SLOT(lineLocationRequested()));
-    connect(this, SIGNAL(pb_forwardClicked()), tcpSocket, SLOT(sendForwardCommand()));
-    connect(this, SIGNAL(pb_backClicked()), tcpSocket, SLOT(sendBackCommand()));
-    connect(this, SIGNAL(pb_leftClicked()), tcpSocket, SLOT(sendLeftCommand()));
-    connect(this, SIGNAL(pb_rightClicked()), tcpSocket, SLOT(sendRightCommand()));
+    connect(this, SIGNAL(pb_forwardClicked(int)), tcpSocket, SLOT(sendForwardCommand(int)));
+    connect(this, SIGNAL(pb_backClicked(int)), tcpSocket, SLOT(sendBackCommand(int)));
+    connect(this, SIGNAL(pb_leftClicked(int)), tcpSocket, SLOT(sendLeftCommand(int)));
+    connect(this, SIGNAL(pb_rightClicked(int)), tcpSocket, SLOT(sendRightCommand(int)));
     connect(tcpSocket, SIGNAL(serverIsConnectedSignal(bool)), this, SLOT(HostConnectionEvent(bool)));
     connect(tcpSocket, SIGNAL(sendLocation(char,QString,QString)), this, SLOT(updateLocation(char,QString,QString)));
     connect(tcpSocket, SIGNAL(sendOrientation(char,QString)), this, SLOT(updateOrientation(char,QString)));
@@ -35,6 +34,18 @@ MainWindow::~MainWindow()
     delete tcpSocket;
 }
 
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_A) {
+        tcpSocket->sendLeftCommand(ui->sl_degrees->value());
+    } else if (event->key() == Qt::Key_D) {
+        tcpSocket->sendRightCommand(ui->sl_degrees->value());
+    } else if (event->key() == Qt::Key_W) {
+        tcpSocket->sendForwardCommand(ui->sl_distance->value());
+    } else if (event->key() == Qt::Key_S) {
+        tcpSocket->sendBackCommand(ui->sl_distance->value());
+    }
+}
 
 void MainWindow::on_pb_connectToServer_clicked()
 {
@@ -104,22 +115,22 @@ void MainWindow::updateLineLocation(int location)
 
 void MainWindow::on_pb_forward_clicked()
 {
-    emit pb_forwardClicked();
+    emit pb_forwardClicked(ui->sl_distance->value());
 }
 
 void MainWindow::on_pb_back_clicked()
 {
-    emit pb_backClicked();
+    emit pb_backClicked(ui->sl_distance->value());
 }
 
 void MainWindow::on_pb_left_clicked()
 {
-    emit pb_leftClicked();
+    emit pb_leftClicked(ui->sl_degrees->value());
 }
 
 void MainWindow::on_pb_right_clicked()
 {
-    emit pb_rightClicked();
+    emit pb_rightClicked(ui->sl_degrees->value());
 }
 
 void MainWindow::on_pb_requestLineSensor_clicked()
@@ -132,4 +143,24 @@ void MainWindow::on_pb_requestLineSensor_clicked()
         ui->pb_requestLineSensor->setText(QString("Stop"));
         requestTimer2->start();
     }
+}
+
+void MainWindow::on_sl_distance_valueChanged(int value)
+{
+    ui->sb_distance->setValue(value);
+}
+
+void MainWindow::on_sl_degrees_valueChanged(int value)
+{
+    ui->sb_degrees->setValue(value);
+}
+
+void MainWindow::on_sb_distance_valueChanged(int arg1)
+{
+    ui->sl_distance->setValue(arg1);
+}
+
+void MainWindow::on_sb_degrees_valueChanged(int arg1)
+{
+    ui->sl_degrees->setValue(arg1);
 }

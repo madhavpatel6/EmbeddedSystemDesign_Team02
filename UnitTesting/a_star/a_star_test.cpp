@@ -335,14 +335,21 @@ void findPathTestsBigArenaSmallPath(){
 
 	resetPath();
 
+	Point o1 = {.x = 10, .y = 10};
+	Point o2   = {.x =18, .y = 10};
+	Point o3 = {.x = 18, .y =18};
+	Point o4  = {.x = 10, .y = 18};
+
+	addObstacle(o1, o2, o3, o4);
+
 	Point sta4 = {.x = -1, .y = -1};
-	Point sto4 = {.x = 1, .y = 1};
+	Point sto4 = {.x = 14, .y = 14};
 	cout << passFail(findPath(sta4, sto4) == false) << " impossible reported as rejected" << endl;
 
 	resetPath();
 
 	Point sta5 = {.x = -1, .y = -1};
-	Point sto5 = {.x = 99, .y = 99};
+	Point sto5 = {.x = 105, .y = 105};
 	cout << passFail(findPath(sta5, sto5) == false) << " impossible reported as rejected" << endl;
 
 
@@ -358,14 +365,14 @@ void findFarPathsTests(){
 	Point t3 = {.x = 2, .y = 2};
 	Point t4  = {.x = 0, .y = 2};
 
-	// addObstacle(t1, t2, t3, t4);
+	addObstacle(t1, t2, t3, t4);
 
 	Point t12 = {.x = 4, .y = -1};
 	Point t22   = {.x =6, .y = -1};
 	Point t32 = {.x = 6, .y =1};
 	Point t42  = {.x = 4, .y = 1};
 
-	// addObstacle(t12, t22, t32, t42);
+	addObstacle(t12, t22, t32, t42);
 
 	Point v1 = {.x = -100, .y = -100};
 	Point v2   = {.x = 100, .y = -100};

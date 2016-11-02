@@ -2,6 +2,8 @@
 #include <climits>
 #include <tgmath.h>
 
+#define ADJ_LEN 3
+
 typedef struct Point{
 	float x;
 	float y;
@@ -63,6 +65,8 @@ void openHeapAdd(Point one);
 Point openHeapRemove();
 void printOpenHeap();
 int indexSmallerChild(int index);
+
+
 
 
 /* steps for A_Star */
