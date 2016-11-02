@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>671</width>
-    <height>371</height>
+    <height>375</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -271,9 +271,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="pb_requestPosition">
+             <widget class="QPushButton" name="pb_requestMovement">
               <property name="text">
-               <string>Request Position</string>
+               <string>Request Movement</string>
               </property>
              </widget>
             </item>
@@ -301,7 +301,7 @@
                </font>
               </property>
               <property name="text">
-               <string>0.0</string>
+               <string>0.00</string>
               </property>
              </widget>
             </item>
@@ -325,7 +325,7 @@
                </font>
               </property>
               <property name="text">
-               <string>0.0</string>
+               <string>0.00</string>
               </property>
              </widget>
             </item>
@@ -379,20 +379,59 @@
            </layout>
           </item>
           <item>
-           <spacer name="verticalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <property name="topMargin">
+             <number>0</number>
             </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
+            <item>
+             <widget class="QLabel" name="lbl_action">
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Action:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lbl_actionVal">
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>0</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lbl_amount">
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Amount:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lbl_amountVal">
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>0.00</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_6">
