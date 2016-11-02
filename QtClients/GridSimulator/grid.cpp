@@ -3,11 +3,6 @@
 #include <QPainter>
 namespace Grid {
 
-//void draw(QPainter *painter) {
-//    int colorVal = (-1.0*count/MAXIMUM*127 + 127);
-//    painter->fillRect(box, QBrush(QColor(colorVal, colorVal, colorVal)));
-//}
-
 bool checkBounds(int x, int y) {
     return y < HEIGHT && x < WIDTH && y >= 0 && x >= 0;
 }

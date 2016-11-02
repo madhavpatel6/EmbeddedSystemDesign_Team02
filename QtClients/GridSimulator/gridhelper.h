@@ -5,14 +5,27 @@
 #include <QPoint>
 #include "grid.h"
 
+
+
+typedef struct PointF {
+    PointF() : xVal(0), yVal(0) {}
+    PointF(float _x, float _y) : xVal(_x), yVal(_y) {}
+    float x() { return xVal; }
+    float y() { return yVal; }
+    float xVal;
+    float yVal;
+} PointF;
+
+typedef QPointF point_t;
+
 typedef struct {
     float minimumMeasuringDistance;
     float maximumMeasuringDistance;
     float distance;
     float orientation;
     float coneAngle;
-    QPointF sensorLocation;
-    QPointF maxSensorLocation;
+    point_t sensorLocation;
+    point_t maxSensorLocation;
 } SensorData_t;
 
 typedef struct {

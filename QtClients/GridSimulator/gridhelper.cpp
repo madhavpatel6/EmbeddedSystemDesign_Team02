@@ -296,11 +296,11 @@ RayTraceReturnType raytrace3(int x1, int y1, int x2, int y2, bool maximum, Grid:
   // assert ((y == y2) && (x == x2));  // the last point (y2,x2) has to be the same with the last point of the algorithm
 }
 
-QPointF rotatePoint(float originX, float originY, float pointX, float pointY, double rotationAngle) {
+point_t rotatePoint(float originX, float originY, float pointX, float pointY, double rotationAngle) {
     int translatedX = pointX - originX;
     int translatedY = pointY - originY;
     rotationAngle = rotationAngle*M_PI/180.0;
-    QPointF point = QPointF(translatedX * cos(rotationAngle) - translatedY * sin(rotationAngle) + originX,
+    point_t point = point_t(translatedX * cos(rotationAngle) - translatedY * sin(rotationAngle) + originX,
                   translatedX * sin(rotationAngle) + translatedY * cos(rotationAngle) + originY);
     return point;
 }
@@ -311,7 +311,7 @@ QPointF rotatePoint(float originX, float originY, float pointX, float pointY, do
  * @param grid
  */
 void handleIRSensor(SensorData_t data, Grid::GridType grid) {
-    QPointF distancePoint;
+    point_t distancePoint;
     bool maximum = false;
     if(data.distance == -2)
         return;
@@ -320,7 +320,7 @@ void handleIRSensor(SensorData_t data, Grid::GridType grid) {
         maximum = true;
     }
     else {
-        distancePoint = QPointF(data.sensorLocation.x() + data.distance*cos(data.orientation*M_PI/180), data.sensorLocation.y() + data.distance*sin(data.orientation*M_PI/180));
+        distancePoint = point_t(data.sensorLocation.x() + data.distance*cos(data.orientation*M_PI/180), data.sensorLocation.y() + data.distance*sin(data.orientation*M_PI/180));
     }
     raytrace3(data.sensorLocation.x(), data.sensorLocation.y(), distancePoint.x(), distancePoint.y(), maximum, grid);
 }
@@ -336,7 +336,7 @@ void handleIRSensor(SensorData_t data, Grid::GridType grid) {
  *          the occupany grid
  */
 void handleUltrasonicSensor(SensorData_t data, Grid::GridType grid) {
-    QPointF distancePoint;
+    point_t distancePoint;
     bool maximum = true;
     // If we get negative 2 this indicates that the distance read was below the minimum measuring distance
     if(data.distance == -2)
@@ -351,11 +351,11 @@ void handleUltrasonicSensor(SensorData_t data, Grid::GridType grid) {
         // If we get any other number then we update the occupany grid by decrementing all the cells within the cone up to the distance measured
         // Decrease the distance point so that we only decrement the cells up to the distance measured
         data.distance -= 2;
-        distancePoint = QPointF(data.sensorLocation.x() + data.distance*cos(data.orientation*M_PI/180), data.sensorLocation.y() + data.distance*sin(data.orientation*M_PI/180));
+        distancePoint = point_t(data.sensorLocation.x() + data.distance*cos(data.orientation*M_PI/180), data.sensorLocation.y() + data.distance*sin(data.orientation*M_PI/180));
     }
     for(float angle = -data.coneAngle/2.0; angle < data.coneAngle/2.0; angle++) {
-        //distancePoint = QPointF(data.sensorLocation.x() + data.distance*cos((data.orientation + angle)*M_PI/180), data.sensorLocation.y() + data.distance*sin((data.orientation + angle)*M_PI/180));
-        QPointF rotatedDistancePoint = rotatePoint(data.sensorLocation.x(), data.sensorLocation.y(), distancePoint.x(), distancePoint.y(), angle);
+        //distancePoint = PointF(data.sensorLocation.x() + data.distance*cos((data.orientation + angle)*M_PI/180), data.sensorLocation.y() + data.distance*sin((data.orientation + angle)*M_PI/180));
+        point_t rotatedDistancePoint = rotatePoint(data.sensorLocation.x(), data.sensorLocation.y(), distancePoint.x(), distancePoint.y(), angle);
         raytrace3(data.sensorLocation.x(), data.sensorLocation.y(), rotatedDistancePoint.x(), rotatedDistancePoint.y(), maximum, grid);
     }
 
@@ -387,18 +387,21 @@ void updateOccupanyGrid2(SensorDataContainerType sensorData, Grid::GridType grid
         nonMinSensor = sensorData.leftFrontSensor;
         angleOffset = 90;
     }
-    minSensor.distance -= 2;
-    int sensorDistanceBetween = 4;
-    QPointF minDistancePoint = QPointF(minSensor.sensorLocation.x() + minSensor.distance*cos(minSensor.orientation*M_PI/180),
-                            minSensor.sensorLocation.y() + minSensor.distance*sin(minSensor.orientation*M_PI/180));
-    float cosX = cos((minSensor.orientation + angleOffset)*M_PI/180);
-    float sinY = sin((minSensor.orientation + angleOffset)*M_PI/180);
-//    qDebug() << cosX << sinY;
-    for(int i = 0; i <= sensorDistanceBetween; i++) {
-        QPointF rayTracePoint(minDistancePoint.x() + i*cosX, minDistancePoint.y() + i*sinY);
-        QPointF rayTraceOrigin(minSensor.sensorLocation.x() + i*cosX, minSensor.sensorLocation.y() + i*sinY);
+    if(minSensor.distance > 0 && nonMinSensor.distance > 0) {
+        qDebug() << minSensor.distance << nonMinSensor.distance;
+        minSensor.distance -= 2;
+        int sensorDistanceBetween = 4;
+        point_t minDistancePoint = point_t(minSensor.sensorLocation.x() + minSensor.distance*cos(minSensor.orientation*M_PI/180),
+                                minSensor.sensorLocation.y() + minSensor.distance*sin(minSensor.orientation*M_PI/180));
+        float cosX = cos((minSensor.orientation + angleOffset)*M_PI/180);
+        float sinY = sin((minSensor.orientation + angleOffset)*M_PI/180);
+        // We are going to walk along the rover's front face from the sensor that returned the minimum distance to the other one
+        for(int i = 0; i <= sensorDistanceBetween; i++) {
+            point_t rayTracePoint(minDistancePoint.x() + i*cosX, minDistancePoint.y() + i*sinY);
+            point_t  rayTraceOrigin(minSensor.sensorLocation.x() + i*cosX, minSensor.sensorLocation.y() + i*sinY);
 
-        raytrace3(rayTraceOrigin.x(), rayTraceOrigin.y(), rayTracePoint.x(), rayTracePoint.y(), true, grid);
+            raytrace3(rayTraceOrigin.x(), rayTraceOrigin.y(), rayTracePoint.x(), rayTracePoint.y(), true, grid);
+        }
     }
 
 }
