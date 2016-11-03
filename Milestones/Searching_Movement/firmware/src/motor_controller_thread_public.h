@@ -37,6 +37,7 @@ extern "C" {
 #endif
 
 typedef struct {
+    char mode;
     char direction;
     float distance;
     float degrees;

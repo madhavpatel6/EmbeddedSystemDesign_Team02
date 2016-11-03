@@ -39,7 +39,7 @@ void initParser(){
 }
 
 
-void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, int *value){
+void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, int *value, char *mode){
     int r, i;
     r = jsmn_parse(&p, JSON_STRING, strlen(JSON_STRING), t, sizeof(t)/sizeof(t[0]));
     for(i = 1; i < r; i++){
@@ -55,7 +55,7 @@ void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numI
             }else{
                 *type = unknown;
             }
-        }else if (jsoneq(JSON_STRING, &t[i], "items") == 0) {
+        } else if (jsoneq(JSON_STRING, &t[i], "items") == 0) {
             int j;
             int k = 0;
             if (t[i+1].type != JSMN_ARRAY) {
@@ -82,6 +82,19 @@ void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numI
                 *numItems = k;
             }
             i += t[i+1].size + 1;
+        } else if (jsoneq(JSON_STRING, &t[i], "InitialData") == 0) {
+            int l = 0;
+            int k = 0;
+            for (l = 0; (l < (sizeof(Dictionary) / sizeof(*Dictionary))); l++) {
+                if (strcmp("InitialData", Dictionary[l].stringValue) == 0) {
+                    items[k] = Dictionary[l].enumValue;
+                    sprintf(buf, "%.*s\0", t[i+3].end - t[i+2].start, JSON_STRING + t[i+3].start);
+                    *mode = buf[0];
+                    k++;
+                    break;
+                }
+            }
+            *numItems = k;
         }
     }
 }

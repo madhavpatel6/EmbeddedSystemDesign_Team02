@@ -27,10 +27,11 @@
 #include "communication/jsmn.h"
 
 typedef enum {request, response, unknown} type_t;
-typedef enum {CommStatsSearcherMover, CommStatsTargetLocator, CommStatsPathFinder, CommStatsTargetGrabber,
-       DetailedCommStatsSearcherMover, DetailedCommStatsTargetLocator, DetailedCommStatsPathFinder,
-       DetailedCommStatsTargetGrabber, R1_Est_Location, R1_Est_Orientation, Forward, Back, Left, 
-       Right, SensorData, LineLocation, msLocalTime} items_t;
+typedef enum {CommStatsSearcherMover, CommStatsTargetLocator, CommStatsPathFinder, 
+            CommStatsTargetGrabber, DetailedCommStatsSearcherMover, 
+            DetailedCommStatsTargetLocator, DetailedCommStatsPathFinder,
+            DetailedCommStatsTargetGrabber, R1_Movement, Forward, Back, Left, Right, 
+            Mode, InitialData, SensorData, LineLocation, msLocalTime} items_t;
 
 typedef struct {
   char stringValue[512];
@@ -47,12 +48,13 @@ static const DictionaryType Dictionary[] = {
     {"DetailedCommStatsPathFinder", DetailedCommStatsPathFinder},
     {"DetailedCommStatsTargetGrabber", DetailedCommStatsTargetGrabber},
     {"DetailedCommStatsTargetLocator", DetailedCommStatsTargetLocator},
-    {"R1_Est_Location", R1_Est_Location},
-    {"R1_Est_Orientation", R1_Est_Orientation},
+    {"R1_Movement", R1_Movement},
     {"Forward", Forward},
     {"Back", Back},
     {"Left", Left},
     {"Right", Right},
+    {"Mode", Mode},
+    {"InitialData", InitialData},
     {"SensorData", SensorData},
     {"LineLocation", LineLocation},
     {"msLocalTime", msLocalTime}
@@ -67,7 +69,7 @@ int jsoneq(const char *json, jsmntok_t *tok, const char *s) ;
 
 void initParser();
 
-void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, int *value);
+void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, int *value, char *mode);
 
 #endif /* _EXAMPLE_FILE_NAME_H */
 
