@@ -86,12 +86,11 @@ typedef struct {
     Coordinates location;
     float orientation;
     Movement movement;
-    float sensordata;
     LineObj lineLocation;
 }InternalData;
 
 //This should include a new enum for anything in the InternalData
-typedef enum UpdateType_enum { MOVEMENT, SENSORDATA, LINELOCATION } UpdateType;
+typedef enum UpdateType_enum { MOVEMENT, LINELOCATION } UpdateType;
 
 //This is any request that you would want to ... well ... request
 // these are really the categories of requests. the specific objects in them is added later

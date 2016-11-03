@@ -58,7 +58,6 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "motor_controller_thread_public.h"
 #include "math.h"
 #include "peripheral/oc/plib_oc.h"
-#include <time.h>
 #include <stdlib.h>
 
 // *****************************************************************************
@@ -75,8 +74,8 @@ static QueueHandle_t _queue;
 static int rightCount = 0;
 static int leftCount = 0;
 
-static int rightSpeed = (int)MAX_PWM*0.5;
-static int leftSpeed = (int)MAX_PWM*0.5;
+static int rightSpeed = (int)MAX_PWM*0.8;
+static int leftSpeed = (int)MAX_PWM*0.8;
 
 static float totalDistance = 0;
 static float initialOrientation = 0;
@@ -147,7 +146,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
     prevState = turnRight;
     disableMotors();
     setDirectionForward();
-    srand(time(NULL));
+    srand(PLIB_TMR_Counter16BitGet(TMR_ID_1));
     
     while(1) {
         if (!initialized) {
@@ -241,7 +240,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 
                 switch (state) {
                     case forward: {
-                        if (motorObj.lineLocation == 0) {
+                        if ((motorObj.lineLocation == 0) && (motorObj.sensorData == 0)) {
                             setDirectionForward();
                             enableMotors(0);
                             movement.action = FORWARD;
@@ -255,7 +254,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                         break;
                     }
                     case inchForward: {
-                        if (motorObj.lineLocation == 0) {
+                        if ((motorObj.lineLocation == 0) && (motorObj.sensorData == 0)) {
                             setDirectionForward();
                             enableMotors(0);
                             movement.action = FORWARD;
@@ -356,7 +355,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 
                 switch (state) {
                     case forward: {
-                        if (motorObj.lineLocation == 0) {
+                        if ((motorObj.lineLocation == 0) && (motorObj.sensorData == 0)) {
                             setDirectionForward();
                             enableMotors(0);
                             movement.action = FORWARD;
@@ -386,7 +385,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                     }
                     case turnRight: {
                         setDirectionRight();
-                        enableMotors(0);
+                        enableMotors(1);
                         movement.action = RIGHT;
                         movement.amount = (orientation - initialOrientation);
                         rightSign = -1;
@@ -473,8 +472,11 @@ void MOTOR_CONTROLLER_THREAD_CorrectSpeed(int timer) {
     int errorLeft = 0;
     int outputLeft = 0;
     
-    int Kp_Left = 5500;
-    int Ki_Left = 2250;
+//    int Kp_Left = 5500;
+//    int Ki_Left = 2250;
+    
+    int Kp_Left = 55;
+    int Ki_Left = 25;
     
     errorLeft = (rightCount-prevRightPID)-(leftCount-prevLeftPID);
     integralLeft += errorLeft;

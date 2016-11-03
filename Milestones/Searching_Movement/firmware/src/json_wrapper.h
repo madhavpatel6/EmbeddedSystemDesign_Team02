@@ -31,7 +31,7 @@ typedef enum {CommStatsSearcherMover, CommStatsTargetLocator, CommStatsPathFinde
             CommStatsTargetGrabber, DetailedCommStatsSearcherMover, 
             DetailedCommStatsTargetLocator, DetailedCommStatsPathFinder,
             DetailedCommStatsTargetGrabber, R1_Movement, Forward, Back, Left, Right, 
-            Mode, InitialData, SensorData, LineLocation, msLocalTime} items_t;
+            InitialData, SensorData, LineLocation, msLocalTime} items_t;
 
 typedef struct {
   char stringValue[512];
@@ -53,7 +53,6 @@ static const DictionaryType Dictionary[] = {
     {"Back", Back},
     {"Left", Left},
     {"Right", Right},
-    {"Mode", Mode},
     {"InitialData", InitialData},
     {"SensorData", SensorData},
     {"LineLocation", LineLocation},
@@ -69,7 +68,7 @@ int jsoneq(const char *json, jsmntok_t *tok, const char *s) ;
 
 void initParser();
 
-void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, int *value, char *mode);
+void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, int *value, char *mode, uint8_t *data);
 
 #endif /* _EXAMPLE_FILE_NAME_H */
 

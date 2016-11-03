@@ -42,6 +42,7 @@ typedef struct {
     float distance;
     float degrees;
     uint8_t lineLocation;
+    uint8_t sensorData;
 } MotorObj;
     
 void MOTOR_CONTROLLER_THREAD_SendToQueue(MotorObj obj);

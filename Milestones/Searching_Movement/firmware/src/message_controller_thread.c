@@ -114,6 +114,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
     int numItems = 0;
     int value = 0;
     char mode;
+    uint8_t data;
     bool initialized = false;
     
     while(1) {
@@ -139,7 +140,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                 
                 statObject.GoodCount++;
                 
-                parseJSON(messageObj.External.Data, &type, items,  &numItems, &value, &mode);
+                parseJSON(messageObj.External.Data, &type, items,  &numItems, &value, &mode, &data);
                 
                 switch(type) {
                     case request: {
@@ -293,13 +294,6 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                     break;
                                 }
-                                case Mode: {
-                                    break;
-                                }
-                                case SensorData: {
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"SensorData\":\"%0.02f\"", internalData.sensordata);
-                                    break;
-                                }
                                 case LineLocation: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"LineLocation\":{\"0\":\"%0.02f\",\"1\":\"%0.02f\",\"2\":\"%0.02f\","
                                             "\"3\":\"%0.02f\",\"4\":\"%0.02f\",\"5\":\"%0.02f\",\"6\":\"%0.02f\",\"7\":\"%0.02f\"}", 
@@ -376,6 +370,11 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                         case InitialData: {
                                             initialized = true;
                                             motorObj.mode = mode;
+                                            MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
+                                            break;
+                                        }
+                                        case SensorData: {
+                                            motorObj.sensorData = data;
                                             MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                             break;
                                         }
@@ -474,10 +473,6 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         internalData.orientation = (initialData.orientation + messageObj.Update.Data.orientation);
                         internalData.movement.action = messageObj.Update.Data.movement.action;
                         internalData.movement.amount = messageObj.Update.Data.movement.amount;
-                        break;
-                    }
-                    case SENSORDATA: {
-                        internalData.sensordata = messageObj.Update.Data.sensordata;
                         break;
                     }
                     case LINELOCATION: {
