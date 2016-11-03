@@ -25,6 +25,7 @@ signals:
     void pb_backClicked(int distance);
     void pb_leftClicked(int degrees);
     void pb_rightClicked(int degrees);
+    void sendInitialData(char mode);
 
 public slots:
     void on_pb_connectToServer_clicked();
@@ -32,6 +33,7 @@ public slots:
     void updateMovement(char source, QString x, QString y, QString orientation,
                         QString action, QString amount);
     void updateLineLocation(int location);
+    void sendInitialResponse();
 
 private slots:
     void on_pb_forward_clicked();
@@ -42,8 +44,9 @@ private slots:
     void on_pb_requestLineSensor_clicked();
     void on_sl_distance_valueChanged(int value);
     void on_sl_degrees_valueChanged(int value);
-    void on_sb_distance_valueChanged(int arg1);
-    void on_sb_degrees_valueChanged(int arg1);
+    void on_sb_distance_valueChanged(int value);
+    void on_sb_degrees_valueChanged(int value);
+    void on_sb_numVertices_valueChanged(int value);
 
 private:
     Ui::MainWindow *ui;
