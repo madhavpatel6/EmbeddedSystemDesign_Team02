@@ -27,6 +27,7 @@ signals:
     void sendMovement(char source, QString x, QString y, QString orientation, QString action, QString amount);
     void sendLineLocation(int);
     void initialRequest();
+
 public slots:
     void connected();
     void disconnected();
@@ -38,6 +39,8 @@ public slots:
     void sendLeftCommand(int degrees);
     void sendRightCommand(int degrees);
     void sendInitialData(char mode);
+    void sendClear(bool send);
+    void sendObstacle(bool send);
 
 private:
     void SendJSONRequestToSocket(QString request, char destination);
@@ -45,6 +48,8 @@ private:
     void HandleResponse(QJsonObject obj);
     void HandleRequest(QJsonArray array);
     int numOfErrors;
+    bool isClear;
+    bool sendData;
     QTcpSocket *socket;
 
 };

@@ -21,6 +21,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(pb_backClicked(int)), tcpSocket, SLOT(sendBackCommand(int)));
     connect(this, SIGNAL(pb_leftClicked(int)), tcpSocket, SLOT(sendLeftCommand(int)));
     connect(this, SIGNAL(pb_rightClicked(int)), tcpSocket, SLOT(sendRightCommand(int)));
+    connect(this, SIGNAL(pb_clearClicked(bool)), tcpSocket, SLOT(sendClear(bool)));
+    connect(this, SIGNAL(pb_obstacleClicked(bool)), tcpSocket, SLOT(sendObstacle(bool)));
     connect(tcpSocket, SIGNAL(serverIsConnectedSignal(bool)), this, SLOT(HostConnectionEvent(bool)));
     connect(tcpSocket, SIGNAL(sendMovement(char,QString,QString,QString,QString,QString)),
             this, SLOT(updateMovement(char,QString,QString,QString,QString,QString)));
@@ -195,6 +197,28 @@ void MainWindow::on_sb_distance_valueChanged(int value)
 void MainWindow::on_sb_degrees_valueChanged(int value)
 {
     ui->sl_degrees->setValue(value);
+}
+
+void MainWindow::on_pb_clear_clicked()
+{
+    ui->pb_obstacle->setChecked(false);
+
+    if (ui->pb_clear->isChecked()) {
+        emit pb_clearClicked(true);
+    } else {
+        emit pb_clearClicked(false);
+    }
+}
+
+void MainWindow::on_pb_obstacle_clicked()
+{
+    ui->pb_clear->setChecked(false);
+
+    if (ui->pb_obstacle->isChecked()) {
+        emit pb_obstacleClicked(true);
+    } else {
+        emit pb_obstacleClicked(false);
+    }
 }
 
 void MainWindow::on_sb_numVertices_valueChanged(int value)

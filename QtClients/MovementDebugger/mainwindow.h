@@ -25,6 +25,8 @@ signals:
     void pb_backClicked(int distance);
     void pb_leftClicked(int degrees);
     void pb_rightClicked(int degrees);
+    void pb_obstacleClicked(bool send);
+    void pb_clearClicked(bool send);
     void sendInitialData(char mode);
 
 public slots:
@@ -40,6 +42,8 @@ private slots:
     void on_pb_back_clicked();
     void on_pb_left_clicked();
     void on_pb_right_clicked();
+    void on_pb_clear_clicked();
+    void on_pb_obstacle_clicked();
     void on_pb_requestMovement_clicked();
     void on_pb_requestLineSensor_clicked();
     void on_sl_distance_valueChanged(int value);

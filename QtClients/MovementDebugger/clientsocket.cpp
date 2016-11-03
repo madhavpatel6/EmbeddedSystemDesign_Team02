@@ -13,6 +13,8 @@ ClientSocket::ClientSocket(QObject *parent) :
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     isConnected = false;
+    isClear = true;
+    sendData = true;
 }
 
 
@@ -73,6 +75,16 @@ void ClientSocket::sendInitialData(char mode){
     QString response_begin = "{\"type\":\"Response\",";
     QString response_end = "}";
     SendJSONResponseToSocket(response_begin + "\"InitialData\":{\"mode\":\"" + mode + "\"}" + response_end, SEARCHERMOVER);
+}
+
+void ClientSocket::sendClear(bool send){
+    sendData = send;
+    isClear = true;
+}
+
+void ClientSocket::sendObstacle(bool send){
+    sendData = send;
+    isClear = false;
 }
 
 void ClientSocket::connected()
@@ -196,7 +208,21 @@ void ClientSocket::HandleResponse(QJsonObject obj) {
 
 void ClientSocket::HandleRequest(QJsonArray array)
 {
-    if(array.contains(QStringLiteral("InitialData"))) {
+    if (array.contains(QStringLiteral("InitialData"))) {
         emit initialRequest();
+    }
+    if (array.contains(QStringLiteral("SensorData"))) {
+        QString response_begin = "{\"type\":\"Response\",";
+        QString response_end = "}";
+        QString data;
+
+        if (sendData) {
+            if (isClear) {
+                data = "[\"0\",\"0\",\"0\"]";
+            } else {
+                data = "[\"1\",\"1\",\"1\"]";
+            }
+            SendJSONResponseToSocket(response_begin + "\"SensorData\":" + data + response_end, SEARCHERMOVER);
+        }
     }
 }
