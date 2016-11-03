@@ -15,15 +15,15 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     tcpSocket = new ClientSocket();
 
-    connect(requestTimer, SIGNAL(timeout()), tcpSocket, SLOT(positionRequested()));
+    connect(requestTimer, SIGNAL(timeout()), tcpSocket, SLOT(movementRequested()));
     connect(requestTimer2, SIGNAL(timeout()), tcpSocket, SLOT(lineLocationRequested()));
     connect(this, SIGNAL(pb_forwardClicked(int)), tcpSocket, SLOT(sendForwardCommand(int)));
     connect(this, SIGNAL(pb_backClicked(int)), tcpSocket, SLOT(sendBackCommand(int)));
     connect(this, SIGNAL(pb_leftClicked(int)), tcpSocket, SLOT(sendLeftCommand(int)));
     connect(this, SIGNAL(pb_rightClicked(int)), tcpSocket, SLOT(sendRightCommand(int)));
     connect(tcpSocket, SIGNAL(serverIsConnectedSignal(bool)), this, SLOT(HostConnectionEvent(bool)));
-    connect(tcpSocket, SIGNAL(sendLocation(char,QString,QString)), this, SLOT(updateLocation(char,QString,QString)));
-    connect(tcpSocket, SIGNAL(sendOrientation(char,QString)), this, SLOT(updateOrientation(char,QString)));
+    connect(tcpSocket, SIGNAL(sendMovement(char,QString,QString,QString,QString,QString)),
+            this, SLOT(updateMovement(char,QString,QString,QString,QString,QString)));
     connect(tcpSocket, SIGNAL(sendLineLocation(int)), this, SLOT(updateLineLocation(int)));
 }
 
@@ -52,14 +52,14 @@ void MainWindow::on_pb_connectToServer_clicked()
     tcpSocket->connectToHost(ui->le_IPAddress->text(), ui->le_port->text().toInt());
 }
 
-void MainWindow::on_pb_requestPosition_clicked()
+void MainWindow::on_pb_requestMovement_clicked()
 {
     if(requestTimer->isActive()) {
-        ui->pb_requestPosition->setText(QString("Request Position"));
+        ui->pb_requestMovement->setText(QString("Request Position"));
         requestTimer->stop();
     }
     else {
-        ui->pb_requestPosition->setText(QString("Stop Requesting Position"));
+        ui->pb_requestMovement->setText(QString("Stop Requesting Position"));
         requestTimer->start();
     }
 }
@@ -74,25 +74,16 @@ void MainWindow::HostConnectionEvent(bool connected) {
     }
 }
 
-void MainWindow::updateLocation(char source, QString x, QString y)
+void MainWindow::updateMovement(char source, QString x, QString y, QString orientation,
+                                QString action, QString amount)
 {
     switch(source) {
         case SEARCHERMOVER: {
             ui->lbl_x_positionVal->setText(x);
             ui->lbl_y_positionVal->setText(y);
-            break;
-        }
-        default: {
-            break;
-        }
-    }
-}
-
-void MainWindow::updateOrientation(char source, QString orientation)
-{
-    switch(source) {
-        case SEARCHERMOVER: {
             ui->lbl_orientationVal->setText(orientation);
+            ui->lbl_actionVal->setText(action);
+            ui->lbl_amountVal->setText(amount);
             break;
         }
         default: {

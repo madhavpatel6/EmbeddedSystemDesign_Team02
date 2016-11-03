@@ -25,10 +25,10 @@ QTcpSocket* ClientSocket::getClient(){
     return socket;
 }
 
-void ClientSocket::positionRequested(){
+void ClientSocket::movementRequested(){
     QString request_begin = "{\"type\":\"Request\",\"items\":[";
     QString request_end = "]}";
-    SendJSONRequestToSocket(request_begin + "\"R1_Est_Location\",\"R1_Est_Orientation\"" + request_end, SEARCHERMOVER);
+    SendJSONRequestToSocket(request_begin + "\"R1_Movement\"" + request_end, SEARCHERMOVER);
 }
 
 void ClientSocket::lineLocationRequested(){
@@ -97,8 +97,7 @@ void ClientSocket::readyRead()
             QJsonObject json = doc.object();
             QString type = json["type"].toString();
             if(type == QStringLiteral("Response")) {
-                if(json.contains(QStringLiteral("R1_Est_Location")) ||
-                        json.contains(QStringLiteral("R1_Est_Orientation")) ||
+                if(json.contains(QStringLiteral("R1_Movement")) ||
                         json.contains(QStringLiteral("LineLocation"))) {
                     HandleResponse(json);
                 }
@@ -137,13 +136,12 @@ void ClientSocket::SendJSONRequestToSocket(QString request, char destination) {
 
 void ClientSocket::HandleResponse(QJsonObject obj) {
     QJsonObject response;
-    if(obj.contains(QStringLiteral("R1_Est_Location"))) {
-        response = obj["R1_Est_Location"].toObject();
-        emit sendLocation(SEARCHERMOVER, response["x"].toString(), response["y"].toString());
-    }
-    if(obj.contains(QStringLiteral("R1_Est_Orientation"))) {
-        emit sendOrientation(SEARCHERMOVER, obj["R1_Est_Orientation"].toString());
-        qDebug() << obj["R1_Est_Orientation"];
+    if(obj.contains(QStringLiteral("R1_Movement"))) {
+        response = obj["R1_Movement"].toObject();
+        emit sendMovement(SEARCHERMOVER, response["x"].toString(), response["y"].toString(),
+                response["orientation"].toString(), response["action"].toString(),
+                response["amount"].toString());
+//        qDebug() << obj["R1_Movement"];
     }
     if(obj.contains(QStringLiteral("LineLocation"))) {
         int location = 0;

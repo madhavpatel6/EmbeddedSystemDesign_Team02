@@ -23,14 +23,13 @@ public:
 signals:
     void sendCommStatTargetLocator(QByteArray commStatTargetLocator);
     void serverIsConnectedSignal(bool connectedToServerBoolSignal);
-    void sendLocation(char source, QString x, QString y);
-    void sendOrientation(char source, QString orientation);
+    void sendMovement(char source, QString x, QString y, QString orientation, QString action, QString amount);
     void sendLineLocation(int);
 public slots:
     void connected();
     void disconnected();
     void readyRead();
-    void positionRequested();
+    void movementRequested();
     void lineLocationRequested();
     void sendForwardCommand(int distance);
     void sendBackCommand(int distance);
