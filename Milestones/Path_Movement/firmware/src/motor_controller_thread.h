@@ -61,6 +61,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "queue.h"
 #include "a_star/a_star_functions.h"
 #include "motor_controller_thread_public.h"
+#include "system_interrupt_public.h"
 
 #define ticksPerCm      45.0f
 #define circumference   58.0f
@@ -95,6 +96,9 @@ typedef enum
 	/* Application's state machine's initial state. */
 	MOTOR_CONTROLLER_THREAD_STATE_INIT=0,
 	MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS,
+            wait_calc_path, 
+            exec_path, 
+            fine_tune
 
 	/* TODO: Define states used by the application state machine. */
 

@@ -141,6 +141,12 @@ static int leftSign = 1;
 static int time = 0;
 static int timeOut = 0;
 
+static int desiredTicks = 0;
+static int ticksSoFar = 0;
+
+static int cacheType = 0;
+static int cacheDistance = 0;
+
 
 /* This timer is for the TX to fire every 200 ms */
 // Timer 5
@@ -176,6 +182,26 @@ void IntHandlerDrvTmrInstance1(void)
                 break;
         }
     }  
+    
+    if(desiredTicks != 0){
+        ticksSoFar += PLIB_TMR_Counter16BitGet(TMR_ID_3);
+        PLIB_TMR_Counter16BitClear(TMR_ID_3);
+        if(ticksSoFar >= desiredTicks){
+            message_in_t buffer;
+            buffer.type = update;
+            buffer.cacheType = cacheType;
+            buffer.cacheDistance = cacheDistance;
+            BaseType_t *temp1;
+            MOTOR_CONTROLLER_THREAD_SendToQueueISR(buffer, temp1);
+            PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+            PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+            desiredTicks = 0;
+        }
+    }
+    
+    
+    
+    
     // && 0 to temporarily disable motors
     if(time >= 50 && 0){
     
@@ -239,7 +265,7 @@ void IntHandlerDrvTmrInstance1(void)
         PLIB_TMR_Counter16BitClear(TMR_ID_4);
 
     }else{
-        disableMotors();
+        // disableMotors();
     }
     timeOut++;
     time++;
@@ -317,6 +343,38 @@ void IntHandlerDrvUsartInstance0(void)
 
 void InitializeISRQueues() {
     Usart0_InitializeQueue();
+}
+
+void addMotorTask(int type, int distance){
+    cacheType = type;
+    cacheDistance = distance;
+    
+    ticksSoFar = 0;
+    
+    if(type == 0){
+        // straight
+        if(distance > 0){
+            setDirectionForward();
+        }else{
+            setDirectionBack();
+            distance *= -1;
+        }
+        desiredTicks = 250 * distance;
+    }else{
+        // turn
+        if(distance > 0){
+            setDirectionLeft();
+            desiredTicks = distance * 7.7;
+        }else{
+            setDirectionRight();
+            distance *= -1;
+            desiredTicks = distance * 7.7;
+        }
+        // desiredTicks = 9 * distance;
+    }
+    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/2);
+    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/2);
+    
 }
   
 /*******************************************************************************

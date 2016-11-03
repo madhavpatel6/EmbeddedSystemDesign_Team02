@@ -36,7 +36,18 @@ void initWorld(){
 
 /* add a target to the world */
 void addTarget(Point one, Point two, Point three, Point four){
-	targets[targetLen][0] = one;
+	int i;
+    for(i= 0; i < targetLen; i++){
+        if(targets[i][0].x == one.x && targets[i][0].y == one.y &&
+                targets[i][1].x == two.x && targets[i][1].y == two.y && 
+                targets[i][2].x == three.x && targets[i][2].y == three.y && 
+                targets[i][3].x == four.x && targets[i][3].y == four.y){
+            // if we find our object dont add it again
+            return;
+        }
+    }
+    
+    targets[targetLen][0] = one;
 	targets[targetLen][1] = two;
 	targets[targetLen][2] = three;
 	targets[targetLen][3] = four;
@@ -46,7 +57,18 @@ void addTarget(Point one, Point two, Point three, Point four){
 
 /* add an obstacle to the world */
 void addObstacle(Point one, Point two, Point three, Point four){
-	obstacles[obstacleLen][0] = one;
+	int i;
+    for(i= 0; i < obstacleLen; i++){
+        if(obstacles[i][0].x == one.x && obstacles[i][0].y == one.y &&
+                obstacles[i][1].x == two.x && obstacles[i][1].y == two.y && 
+                obstacles[i][2].x == three.x && obstacles[i][2].y == three.y && 
+                obstacles[i][3].x == four.x && obstacles[i][3].y == four.y){
+            // if we find our object dont add it again
+            return;
+        }
+    }
+    
+    obstacles[obstacleLen][0] = one;
 	obstacles[obstacleLen][1] = two;
 	obstacles[obstacleLen][2] = three;
 	obstacles[obstacleLen][3] = four;
@@ -582,3 +604,37 @@ void resetPath(){
 //		cout <<endl;
 //	}
 //}
+
+bool can_I_go_targ(Point start){
+    int i, j;
+    
+    int minPath = INT_MAX;
+    Point destination;
+    
+    bool res = false;
+    
+    for(i = 0; i < targetLen; i++){
+        for( j = 0; j < pointsToObject; j++){
+            if(findPath(start, targets[i][j])){
+                if(finalLen < minPath){
+                    minPath = finalLen;
+                    destination = targets[i][j];
+                    res =  true;
+                }
+            }
+        }
+    }
+    
+    if(res){
+        findPath(start, destination);
+    }
+    return res;
+}
+
+void getPath(Point path[], int* len){
+    *len = finalLen;
+    int i;
+    for(i = 0; i < finalLen; i++){
+        path[i] = finalPath[finalLen - i -1];
+    }
+}

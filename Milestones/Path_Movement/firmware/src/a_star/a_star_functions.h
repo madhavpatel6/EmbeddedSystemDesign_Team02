@@ -15,6 +15,15 @@ typedef struct Point{
 	unsigned short parent;
 } Point;
 
+//typedef enum {
+//    forward, back, left, right;    
+//}Direction;
+//
+//typedef struct Move{
+//	Direction dir;
+//    float distance;
+//} Move;
+
 
 /* initializes grid and open, closed, and final point lists */
 void initWorld();
@@ -68,6 +77,9 @@ void openHeapAdd(Point one);
 Point openHeapRemove();
 void printOpenHeap();
 int indexSmallerChild(int index);
+
+bool can_I_go_targ(Point start);
+Point getNextLoc(Point start);
 
 
 

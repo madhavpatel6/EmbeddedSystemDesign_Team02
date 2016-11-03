@@ -58,6 +58,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "motor_controller_thread_public.h"
 #include "math.h"
 
+
 static QueueHandle_t _queue;
 
 #define TYPEOFQUEUE message_in_t
@@ -123,7 +124,20 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
 {
     message_in_t msg;
     
+    initWorld();
+    Point myLoc;
+    myLoc.x = 0;
+    myLoc.y = 0;
+    int myDir = 0;
+    int desiredDir = 0;
+    
+    Point path[100];
+    int pathLen = 0;
+    int pathIndex = 0;
+    bool inProg = false;
+    
     while(1) {
+        
         /* Check the application's current state. */
         switch ( motor_controller_threadData.state )
         {
@@ -132,16 +146,100 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
             {
                 disableMotors();
                 setDirectionForward();
-                initWorld();
-                motor_controller_threadData.state = MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS;
+                motor_controller_threadData.state = wait_calc_path;
+                Nop();
                 break;
             }
-            case MOTOR_CONTROLLER_THREAD_STATE_SERVICE_TASKS:
+            case wait_calc_path:
             {
-                // Read direction of travel from queue
+                MOTOR_CONTROLLER_THREAD_ReadFromQueue(&msg);
+                addToMap(msg);
+                if(can_I_go_targ(myLoc)){
+                    motor_controller_threadData.state = exec_path;
+                    getPath(path, &pathLen);
+                    pathIndex = 0;
+                }
+                Nop();
+                
+                break;
+            }
+            case exec_path:
+            {   
+                Nop();
                 MOTOR_CONTROLLER_THREAD_ReadFromQueue(&msg);
                 addToMap(msg);
                 
+                if(pathIndex >= pathLen){
+                    motor_controller_threadData.state = fine_tune;
+                }
+                
+                if (msg.type == update && msg.cacheType == 1){
+                    myDir += msg.cacheDistance;
+                    myDir %= 360;
+                    inProg = false;
+                }else if( msg.type  == update && msg.cacheType == 0){
+                     if(myDir == 0){
+                         myLoc.x += msg.cacheDistance;
+                     }else if(myDir == 90){
+                         myLoc.y += msg.cacheDistance;
+                     }else if(myDir == 180){
+                         myLoc.x += msg.cacheDistance;
+                     }else if(myDir == 270){
+                         myLoc.y += msg.cacheDistance;
+                     }
+                     inProg = false;
+                }
+                
+                int deltaX = path[pathIndex].x - myLoc.x;
+                int deltaY = path[pathIndex].y - myLoc.y;
+                
+                if (deltaX == 0 && deltaY == 0){
+                    // move on cuz we there
+                    pathIndex++;
+                    continue;
+                }else if (deltaX == 0){
+                    if(deltaY > 0){
+                        desiredDir = 90;
+                    }else{
+                        desiredDir = 270;
+                    }
+                }else if (deltaY == 0){
+                    if(deltaX > 0){
+                        desiredDir = 0;
+                    }else{
+                        desiredDir = 180;
+                    }
+                }
+                
+                if( !inProg && 
+                        desiredDir != myDir && desiredDir != ((myDir + 180) % 360)){
+                    if(desiredDir - myDir < 180 & desiredDir - myDir > 0){
+                        // turn left
+                        addMotorTask(1, 90);
+                    }else{
+                        // turn right
+                        addMotorTask(1, -90);
+                        
+                    }
+                    inProg = true;
+                }else if( !inProg){
+                    int distance = (deltaX == 0 ? deltaY: deltaX) ;
+                    addMotorTask(0, distance);
+                    inProg = true;
+                }
+                
+                
+                 
+                // freak out if something breaks your path, we can block on queue
+                Nop();
+                break;
+                
+            }
+            case fine_tune:
+            {
+                // talk to chris, find stuff, be fast and adaptive
+                disableMotors();
+                Nop();
                 break;
             }
             default:
@@ -234,14 +332,34 @@ void addVerticesToMap(float arrX[], float arrY[], int len){
     
 }
 void addObstacleToMap(float arrX[], float arrY[], int len){
-    // traverse the list of a_star obstacles
-    
-    // if this one is different from all of them add it
+    Point one;
+    one.x = arrX[0];
+    one.y = arrY[0];
+    Point two;
+    two.x = arrX[1];
+    two.y = arrY[1];
+    Point three;
+    three.x = arrX[2];
+    three.y = arrY[2];
+    Point four;
+    four.x = arrX[3];
+    four.y = arrY[3];
+    addObstacle(one, two, three, four);
 }
 void addTargetToMap(float arrX[], float arrY[], int len){
-    // traverse the list of a_star vertices
-    
-    // if this on is new add it
+    Point one;
+    one.x = arrX[0];
+    one.y = arrY[0];
+    Point two;
+    two.x = arrX[1];
+    two.y = arrY[1];
+    Point three;
+    three.x = arrX[2];
+    three.y = arrY[2];
+    Point four;
+    four.x = arrX[3];
+    four.y = arrY[3];
+    addTarget(one, two, three, four);
 }
 
 void addToMap(message_in_t msg){
