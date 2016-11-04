@@ -129,14 +129,12 @@ void IntHandlerDrvAdc(void)
 void IntHandlerDrvTmrInstance0(void)
 {
     dbgOutputLoc(ENTER_TMR_INSTANCE_0_ISR);
-//    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-//    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_2);
 }
 
 uint16_t timerCount = 0;
 
-/* This timer is for the TX to fire every 10 ms */
+/* This timer is for the TX to fire every 20 ms */
 // Timer 5
 void IntHandlerDrvTmrInstance1(void)
 {
@@ -149,20 +147,20 @@ void IntHandlerDrvTmrInstance1(void)
     MOTOR_CONTROLLER_THREAD_CorrectSpeed(timerCount);
     
     // Enable ADC auto sampling every 200 ms
-    if (timerCount % 20 == 0) {
+    if (timerCount % 10 == 0) {
         if(!PLIB_INT_SourceIsEnabled(INT_ID_0, INT_SOURCE_ADC_1)){
             PLIB_ADC_SampleAutoStartEnable(ADC_ID_1);
             PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
         }
     }
     
-    // Issue requests every 250 ms
-    if (timerCount % 25 == 0) {
+    // Issue requests every 260 ms
+    if (timerCount % 15 == 0) {
         dbgOutputLoc(BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR);
         switch(MYMODULE){
             case SEARCHERMOVER:
                 obj.Request = SMtoTL;
-    //            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
                 break;
             case TARGETLOCATOR:
                 obj.Request = TLtoSM;

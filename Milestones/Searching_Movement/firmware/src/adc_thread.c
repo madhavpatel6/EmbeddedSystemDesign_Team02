@@ -136,9 +136,7 @@ void ADC_THREAD_Initialize ( void )
         // Sending to message controller queue for an update
         MESSAGE_CONTROLLER_THREAD_SendToQueue(messageObj);
         
-        if (MODE != "Debug") {
-            MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
-        }
+        MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
         
         dbgOutputLoc(AFTER_RECEIVE_FROM_Q_ADC_THREAD);
     }

@@ -61,12 +61,14 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "queue.h"
 #include "motor_controller_thread_public.h"
 
-#define TICKS_PER_CM    38.59255596f
-#define CIRCUMFERENCE   32.30997255f
-#define MAX_PWM         65534
+#define TICKS_PER_CM    36.7548152f
+#define CIRCUMFERENCE   34.09871912f
+#define MAX_PWM         655
 
-#define MODE            "Run"
-    
+#define DEBUG           'D'
+#define LAWNMOWER       'L'
+#define RANDOM          'R'
+
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
@@ -153,7 +155,7 @@ void MOTOR_CONTROLLER_THREAD_ReadFromQueue(MotorObj* obj);
 
 void completeMotion(void);
 
-void enableMotors(void);
+void enableMotors(int mode);
 
 void disableMotors(void);
 

@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QThreadPool>
 #include "picCode/communication/messages.h"
+#include <QJsonArray>
 
 #define ANALOG 0
 
@@ -25,6 +26,8 @@ signals:
     void serverIsConnectedSignal(bool connectedToServerBoolSignal);
     void sendMovement(char source, QString x, QString y, QString orientation, QString action, QString amount);
     void sendLineLocation(int);
+    void initialRequest();
+
 public slots:
     void connected();
     void disconnected();
@@ -35,11 +38,18 @@ public slots:
     void sendBackCommand(int distance);
     void sendLeftCommand(int degrees);
     void sendRightCommand(int degrees);
+    void sendInitialData(char mode);
+    void sendClear(bool send);
+    void sendObstacle(bool send);
 
 private:
     void SendJSONRequestToSocket(QString request, char destination);
+    void SendJSONResponseToSocket(QString response, char destination);
     void HandleResponse(QJsonObject obj);
+    void HandleRequest(QJsonArray array);
     int numOfErrors;
+    bool isClear;
+    bool sendData;
     QTcpSocket *socket;
 
 };

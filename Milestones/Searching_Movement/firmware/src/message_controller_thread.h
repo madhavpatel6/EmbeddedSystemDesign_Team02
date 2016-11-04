@@ -74,16 +74,23 @@ typedef struct {
     float y;
 } Coordinates;
 
+typedef enum ActionType { FORWARD, BACKWARD, RIGHT, LEFT } Action;
+
+typedef struct {
+    Action action;
+    float amount;
+} Movement;
+
 //This is any data that someone else might request for
 typedef struct {
     Coordinates location;
     float orientation;
-    float sensordata;
+    Movement movement;
     LineObj lineLocation;
 }InternalData;
 
 //This should include a new enum for anything in the InternalData
-typedef enum UpdateType_enum { POSITION, SENSORDATA, LINELOCATION } UpdateType;
+typedef enum UpdateType_enum { MOVEMENT, LINELOCATION } UpdateType;
 
 //This is any request that you would want to ... well ... request
 // these are really the categories of requests. the specific objects in them is added later

@@ -13,12 +13,18 @@ ClientSocket::ClientSocket(QObject *parent) :
     connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     isConnected = false;
+    isClear = true;
+    sendData = true;
 }
 
 
 void ClientSocket::connectToHost(QString ip,int port){
-    socket->disconnectFromHost();
-    socket->connectToHost(ip,port);
+    if (isConnected) {
+        socket->disconnectFromHost();
+    } else {
+        socket->disconnectFromHost();
+        socket->connectToHost(ip,port);
+    }
 }
 
 QTcpSocket* ClientSocket::getClient(){
@@ -65,6 +71,22 @@ void ClientSocket::sendRightCommand(int degrees){
     qDebug() << request_begin + "\"Right\":" + "\"" + QString::number(degrees) + "\"" + request_end;
 }
 
+void ClientSocket::sendInitialData(char mode){
+    QString response_begin = "{\"type\":\"Response\",";
+    QString response_end = "}";
+    SendJSONResponseToSocket(response_begin + "\"InitialData\":{\"mode\":\"" + mode + "\"}" + response_end, SEARCHERMOVER);
+}
+
+void ClientSocket::sendClear(bool send){
+    sendData = send;
+    isClear = true;
+}
+
+void ClientSocket::sendObstacle(bool send){
+    sendData = send;
+    isClear = false;
+}
+
 void ClientSocket::connected()
 {
     qDebug() << "Client connected event";
@@ -96,6 +118,7 @@ void ClientSocket::readyRead()
             QJsonDocument doc(QJsonDocument::fromJson(buffer));
             QJsonObject json = doc.object();
             QString type = json["type"].toString();
+
             if(type == QStringLiteral("Response")) {
                 if(json.contains(QStringLiteral("R1_Movement")) ||
                         json.contains(QStringLiteral("LineLocation"))) {
@@ -103,7 +126,9 @@ void ClientSocket::readyRead()
                 }
             }
             else if(type == QStringLiteral("Request")){
-                //qDebug() << "Request: " << buffer;
+                if(json.contains(QStringLiteral("items"))) {
+                    HandleRequest(json["items"].toArray());
+                }
             }
         }
         else if(isError){
@@ -117,6 +142,28 @@ void ClientSocket::SendJSONRequestToSocket(QString request, char destination) {
         //qDebug() << "Sending Request: " << request;
         char message[512];
         int len = CreateMessage(message, request.toLatin1().data(), destination, 0);
+
+        QByteArray txMessage;
+        txMessage.setRawData(message, len);
+
+        // qDebug() << txMessage << endl;
+
+        send(txMessage);
+        //qDebug() << "bytesSent:" << bytesSent;
+        //qDebug() << "Flushing Socket";
+        socket->flush();
+        //qDebug() << "Flushed Socket";
+    }
+    else{
+        qDebug() << "Client is not connected to the server. \n";
+    }
+}
+
+void ClientSocket::SendJSONResponseToSocket(QString response, char destination) {
+    if(isConnected == true){
+        //qDebug() << "Sending Request: " << request;
+        char message[512];
+        int len = CreateMessage(message, response.toLatin1().data(), destination, 0);
 
         QByteArray txMessage;
         txMessage.setRawData(message, len);
@@ -152,10 +199,30 @@ void ClientSocket::HandleResponse(QJsonObject obj) {
             } else {
                 location |= !(response[QString::number(i)].toString().toFloat()) << i;
             }
-
         }
         emit sendLineLocation(location);
 //        qDebug() << obj["LineLocation"];
     }
 
+}
+
+void ClientSocket::HandleRequest(QJsonArray array)
+{
+    if (array.contains(QStringLiteral("InitialData"))) {
+        emit initialRequest();
+    }
+    if (array.contains(QStringLiteral("SensorData"))) {
+        QString response_begin = "{\"type\":\"Response\",";
+        QString response_end = "}";
+        QString data;
+
+        if (sendData) {
+            if (isClear) {
+                data = "[\"0\",\"0\",\"0\"]";
+            } else {
+                data = "[\"1\",\"1\",\"1\"]";
+            }
+            SendJSONResponseToSocket(response_begin + "\"SensorData\":" + data + response_end, SEARCHERMOVER);
+        }
+    }
 }

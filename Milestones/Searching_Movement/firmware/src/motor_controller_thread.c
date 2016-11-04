@@ -58,6 +58,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "motor_controller_thread_public.h"
 #include "math.h"
 #include "peripheral/oc/plib_oc.h"
+#include <stdlib.h>
 
 // *****************************************************************************
 // *****************************************************************************
@@ -73,15 +74,15 @@ static QueueHandle_t _queue;
 static int rightCount = 0;
 static int leftCount = 0;
 
-static int rightSpeed = 52430;
-static int leftSpeed = 52430;
+static int rightSpeed = (int)MAX_PWM*0.8;
+static int leftSpeed = (int)MAX_PWM*0.8;
 
 static float totalDistance = 0;
 static float initialOrientation = 0;
 static float orientation = 0;
 static bool motionComplete = true;
 
-static float integralLeft = 0;
+static int integralLeft = 0;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -118,7 +119,9 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
 {
     MessageObj messageObj;
     MotorObj motorObj;
+    Movement movement;
     
+    char mode;
     int prevRightCount = 0;
     int prevLeftCount = 0;
     int deltaRight = 0;
@@ -129,244 +132,315 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
     int rightSign = 1;
     int leftSign = 1;
     float distance = 0;
-    int orientationCorrection = 0;
-        
-    messageObj.Type = UPDATE;
-    messageObj.Update.Type = POSITION;
-
+    int angle = 0;
+    bool initialized = false;
+    
     enum states {
         forward, inchForward, inchBackward, turnRight, turnLeft, followLine
     } state, prevState;
+    
+    messageObj.Type = UPDATE;
+    messageObj.Update.Type = MOVEMENT;
 
     state = forward;
-    prevState = state;
+    prevState = turnRight;
     disableMotors();
     setDirectionForward();
+    srand(PLIB_TMR_Counter16BitGet(TMR_ID_1));
     
     while(1) {
-        if (MODE == "Debug") {
-            // Read direction of travel from queue
-            if (motionComplete) {
-                dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
-                MOTOR_CONTROLLER_THREAD_ReadFromQueue(&motorObj);
-                dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
-                motionComplete = false;
-            }
-            
-            // Determine direction to travel
-            switch(motorObj.direction) {
-                case 'F': {
-                    setDirectionForward();
-                    enableMotors();
-                    rightSign = 1;
-                    leftSign = 1;
-                    
-                    // Stop if desired distance is traveled
-                    if (totalDistance > motorObj.distance) {
-                        completeMotion();
-                    }
-                    break;
-                }
-                case 'B': {
-                    setDirectionBackward();
-                    enableMotors();
-                    rightSign = -1;
-                    leftSign = -1;
-                    
-                    // Stop if desired distance is traveled
-                    if (totalDistance < -motorObj.distance) {
-                        completeMotion();
-                    }
-                    break;
-                }
-                case 'L': {
-                    setDirectionLeft();
-                    enableMotors();
-                    rightSign = 1;
-                    leftSign = -1;
-                    
-                    // Correct orientation if it becomes greater than 360
-                    if (orientation < initialOrientation) {
-                        orientationCorrection = 360;
-                    } else {
-                        orientationCorrection = 0;
-                    }
-                    
-                    // Stop rotating when desired angular displacement is achieved
-                    if ((orientation + orientationCorrection - initialOrientation) > motorObj.degrees) {
-                        completeMotion();
-                    }
-                    break;
-                }
-                case 'R': {
-                    setDirectionRight();
-                    enableMotors();
-                    rightSign = -1;
-                    leftSign = 1;
-                    
-                    // Correct orientation if it becomes less than 360
-                    if (orientation > initialOrientation) {
-                        orientationCorrection = -360;
-                    } else {
-                        orientationCorrection = 0;
-                    }
-                    
-                    // Stop rotating when desired angular displacement is achieved
-                    if ((orientation + orientationCorrection - initialOrientation) < -motorObj.degrees) {
-                        completeMotion();
-                    }
-                    break;
-                }
-                default: {
-                    break;
-                }
-            }
-        } else {
+        if (!initialized) {
             dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
             MOTOR_CONTROLLER_THREAD_ReadFromQueue(&motorObj);
             dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
-            
-            switch (state) {
-                case forward: {
-                    if (motorObj.lineLocation == 0) {
+
+            if (motorObj.mode != NULL) {
+                mode = motorObj.mode;
+                initialized = true;
+            }
+        } else {
+            if (mode == DEBUG) {
+                // Read direction of travel from queue
+                if (motionComplete) {
+                    dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
+                    MOTOR_CONTROLLER_THREAD_ReadFromQueue(&motorObj);
+                    dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
+                    motionComplete = false;
+                }
+                
+                // Determine direction to travel
+                switch(motorObj.direction) {
+                    case 'F': {
                         setDirectionForward();
-                        enableMotors();
+                        enableMotors(0);
+                        movement.action = FORWARD;
+                        movement.amount = totalDistance;
                         rightSign = 1;
                         leftSign = 1;
-                    } else {
-                        completeMotion();
-                        prevState = forward;
-                        state = inchBackward;
-                    }
-                    break;
-                }
-                case inchForward: {
-                    setDirectionForward();
-                    enableMotors();
-                    rightSign = 1;
-                    leftSign = 1;
-
-                    if (totalDistance > 15) {
-                        completeMotion();
                         
-                        if (prevState == turnRight) {
-                            prevState = inchForward;
+                        // Stop if desired distance is traveled
+                        if (totalDistance > motorObj.distance) {
+                            completeMotion();
+                        }
+                        break;
+                    }
+                    case 'B': {
+                        setDirectionBackward();
+                        enableMotors(0);
+                        movement.action = BACKWARD;
+                        movement.amount = totalDistance;
+                        rightSign = -1;
+                        leftSign = -1;
+                        
+                        // Stop if desired distance is traveled
+                        if (totalDistance < -motorObj.distance) {
+                            completeMotion();
+                        }
+                        break;
+                    }
+                    case 'L': {
+                        setDirectionLeft();
+                        enableMotors(1);
+                        movement.action = LEFT;
+                        movement.amount = (orientation - initialOrientation);
+                        rightSign = 1;
+                        leftSign = -1;
+                        
+                        // Stop rotating when desired angular displacement is achieved
+                        if ((orientation - initialOrientation) > motorObj.degrees) {
+                            completeMotion();
+                        }
+                        break;
+                    }
+                    case 'R': {
+                        setDirectionRight();
+                        enableMotors(1);
+                        movement.action = LEFT;
+                        movement.amount = (orientation - initialOrientation);
+                        rightSign = -1;
+                        leftSign = 1;
+                        
+                        // Stop rotating when desired angular displacement is achieved
+                        if ((orientation - initialOrientation) < -motorObj.degrees) {
+                            completeMotion();
+                        }
+                        break;
+                    }
+                    default: {
+                        completeMotion();
+                        movement.action = FORWARD;
+                        movement.amount = totalDistance;
+                        break;
+                    }
+                }
+            } else if (mode == LAWNMOWER) {
+                dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
+                MOTOR_CONTROLLER_THREAD_ReadFromQueue(&motorObj);
+                dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
+                
+                switch (state) {
+                    case forward: {
+                        if ((motorObj.lineLocation == 0) && (motorObj.sensorData == 0)) {
+                            setDirectionForward();
+                            enableMotors(0);
+                            movement.action = FORWARD;
+                            movement.amount = totalDistance;
+                            rightSign = 1;
+                            leftSign = 1;
+                        } else {
+                            completeMotion();
+                            state = inchBackward;
+                        }
+                        break;
+                    }
+                    case inchForward: {
+                        if ((motorObj.lineLocation == 0) && (motorObj.sensorData == 0)) {
+                            setDirectionForward();
+                            enableMotors(0);
+                            movement.action = FORWARD;
+                            movement.amount = totalDistance;
+                            rightSign = 1;
+                            leftSign = 1;
+
+                            if (totalDistance > 15) {
+                                completeMotion();
+
+                                if (prevState == turnRight) {
+                                    prevState = inchForward;
+                                    state = turnRight;
+                                } else if (prevState == turnLeft) {
+                                    prevState = inchForward;
+                                    state = turnLeft;
+                                }
+                            }
+                        } else {
+                            /*  This is where you should follow the line to achieve
+                                the desired displacement
+                             */
+                            completeMotion();
+                        }
+                        break;
+                    }
+                    case inchBackward: {
+                        setDirectionBackward();
+                        enableMotors(0);
+                        movement.action = BACKWARD;
+                        movement.amount = totalDistance;
+                        rightSign = -1;
+                        leftSign = -1;
+
+                        if (totalDistance < -3) {
+                            completeMotion();
+                            
+                            if (prevState == turnRight) {
+                                state = turnLeft;
+                            } else if (prevState == turnLeft) {
+                                state = turnRight;
+                            }
+                            prevState = inchBackward;
+                        }
+                        break;
+                    }
+                    case turnRight: {
+                        setDirectionRight();
+                        enableMotors(1);
+                        movement.action = RIGHT;
+                        movement.amount = (orientation - initialOrientation);
+                        rightSign = -1;
+                        leftSign = 1;
+                        
+                        // Stop rotating when desired angular displacement is achieved
+                        if ((orientation - initialOrientation) < -90) {
+                            completeMotion();
+                            if (prevState == inchBackward) {
+                                prevState = turnRight;
+                                state = inchForward;
+                            } else if (prevState == inchForward) {
+                                prevState = turnRight;
+                                state = forward;
+                            }
+                        }
+                        break;
+                    }
+                    case turnLeft: {
+                        setDirectionLeft();
+                        enableMotors(1);
+                        movement.action = LEFT;
+                        movement.amount = (orientation - initialOrientation);
+                        rightSign = 1;
+                        leftSign = -1;
+
+                        // Stop rotating when desired angular displacement is achieved
+                        if ((orientation - initialOrientation) > 90) {
+                            completeMotion();
+                            if (prevState == inchBackward) {
+                                prevState = turnLeft;
+                                state = inchForward;
+                            } else if (prevState == inchForward) {
+                                prevState = turnLeft;
+                                state = forward;
+                            }
+                        }
+                        break;
+                    }
+                    default: {
+                        completeMotion();
+                        break;
+                    }
+                }
+            } else if (mode == RANDOM) {
+                dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
+                MOTOR_CONTROLLER_THREAD_ReadFromQueue(&motorObj);
+                dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
+                
+                switch (state) {
+                    case forward: {
+                        if ((motorObj.lineLocation == 0) && (motorObj.sensorData == 0)) {
+                            setDirectionForward();
+                            enableMotors(0);
+                            movement.action = FORWARD;
+                            movement.amount = totalDistance;
+                            rightSign = 1;
+                            leftSign = 1;
+                        } else {
+                            completeMotion();
+                            state = inchBackward;
+                        }
+                        break;
+                    }
+                    case inchBackward: {
+                        setDirectionBackward();
+                        enableMotors(0);
+                        movement.action = BACKWARD;
+                        movement.amount = totalDistance;
+                        rightSign = -1;
+                        leftSign = -1;
+
+                        if (totalDistance < -3) {
+                            completeMotion();
                             state = turnRight;
-                        } else if (prevState == turnLeft) {
-                            prevState = inchForward;
-                            state = turnLeft;
+                            angle = rand() % 360;
                         }
+                        break;
+                    }
+                    case turnRight: {
+                        setDirectionRight();
+                        enableMotors(1);
+                        movement.action = RIGHT;
+                        movement.amount = (orientation - initialOrientation);
+                        rightSign = -1;
+                        leftSign = 1;
                         
-                    }
-                    break;
-                }
-                case inchBackward: {
-                    setDirectionBackward();
-                    enableMotors();
-                    rightSign = -1;
-                    leftSign = -1;
-
-                    if (totalDistance < -3) {
-                        completeMotion();
-                        prevState = inchBackward;
-                        state = turnRight;
-                    }
-                    break;
-                }
-                case turnRight: {
-                    setDirectionRight();
-                    enableMotors();
-                    rightSign = -1;
-                    leftSign = 1;
-
-                    // Correct orientation if it becomes less than 360
-                    if (orientation > initialOrientation) {
-                        orientationCorrection = -360;
-                    } else {
-                        orientationCorrection = 0;
-                    }
-                    
-                    // Stop rotating when desired angular displacement is achieved
-                    if ((orientation + orientationCorrection - initialOrientation) < -90) {
-                        completeMotion();
-                        if (prevState == inchBackward) {
-                            prevState = turnRight;
-                            state = inchForward;
-                        } else if (prevState == inchForward) {
-                            prevState = turnRight;
+                        // Stop rotating when desired angular displacement is achieved
+                        if ((orientation - initialOrientation) < -angle) {
+                            completeMotion();
                             state = forward;
                         }
+                        break;
                     }
-                    break;
-                }
-                case turnLeft: {
-                    setDirectionLeft();
-                    enableMotors();
-                    rightSign = 1;
-                    leftSign = -1;
-
-                    // Correct orientation if it becomes less than 360
-                    if (orientation < initialOrientation) {
-                        orientationCorrection = 360;
-                    } else {
-                        orientationCorrection = 0;
-                    }
-                    
-                    // Stop rotating when desired angular displacement is achieved
-                    if ((orientation + orientationCorrection - initialOrientation) > 90) {
+                    default: {
                         completeMotion();
-                        if (prevState == inchBackward) {
-                            prevState = turnLeft;
-                            state = inchForward;
-                        } else if (prevState == inchForward) {
-                            prevState = turnLeft;
-                            state = forward;
-                        }
+                        break;
                     }
-                    break;
                 }
-                default: {
+            }
+            
+            deltaRight = (rightCount - prevRightCount) * rightSign;
+            deltaLeft = (leftCount - prevLeftCount) * leftSign;
+            
+            prevRightCount = rightCount;
+            prevLeftCount = leftCount;
+            
+            // Orientation correction for mismatched ticks when going straight
+            switch(movement.action) {
+                case FORWARD: case BACKWARD: {
+                    weightedDiff = (deltaRight - deltaLeft)/2;
+                    deltaLeft = deltaRight - weightedDiff;
+    //                weightedDiff = (deltaRight + deltaLeft)/2;
+    //                deltaRight = weightedDiff;
+    //                deltaLeft = weightedDiff;
                     break;
                 }
             }
+            
+            // Calculate distance traveled
+            distance = (((deltaRight+deltaLeft)/2.0)/TICKS_PER_CM);
+            totalDistance += distance;
+
+            orientation += (((((deltaRight-deltaLeft)/2.0)/TICKS_PER_CM)/CIRCUMFERENCE)*360.0);
+
+            // Update position of rover - location & orientation
+            x += distance*cos(orientation*2*M_PI/360.0);
+            y += distance*sin(orientation*2*M_PI/360.0);
+            
+            // Send updated position to message controller thread
+            messageObj.Update.Data.location.x = x;
+            messageObj.Update.Data.location.y = y;
+            messageObj.Update.Data.orientation = orientation;
+            messageObj.Update.Data.movement.action = movement.action;
+            messageObj.Update.Data.movement.amount = movement.amount;
+            MESSAGE_CONTROLLER_THREAD_SendToQueue(messageObj);
         }
-        
-        deltaRight = (rightCount - prevRightCount) * rightSign;
-        deltaLeft = (leftCount - prevLeftCount) * leftSign;
-        
-        prevRightCount = rightCount;
-        prevLeftCount = leftCount;
-        
-        switch(motorObj.direction) {
-            case 'F': case 'B': {
-                weightedDiff = (deltaRight - deltaLeft)/2.0;
-                deltaLeft = deltaRight - weightedDiff;
-                break;
-            }
-        }
-        
-        // Calculate distance traveled
-        distance = (((deltaRight+deltaLeft)/2.0)/TICKS_PER_CM);
-        totalDistance += distance;
-        
-        // Update position of rover - location & orientation
-        x += distance*cos(orientation*2*M_PI/360.0);
-        y += distance*sin(orientation*2*M_PI/360.0);
-        
-        orientation += (((((deltaRight-deltaLeft)/2.0)/TICKS_PER_CM)/CIRCUMFERENCE)*360.0);
-        
-        // Roll over orientation if it is greater than 360
-        if (orientation > 360) {
-            orientation -= 360;
-        } else if (orientation < -360) {
-            orientation += 360;
-        }
-        
-        // Send updated position to message controller thread
-        messageObj.Update.Data.location.x = x;
-        messageObj.Update.Data.location.y = y;
-        messageObj.Update.Data.orientation = orientation;
-        MESSAGE_CONTROLLER_THREAD_SendToQueue(messageObj);
     }
 }
 
@@ -393,16 +467,20 @@ void MOTOR_CONTROLLER_THREAD_SendToQueueISR(MotorObj obj, BaseType_t *pxHigherPr
 int prevRightPID = 0;
 int prevLeftPID = 0;
 
+// PID algorithm to match left motor speed to right motor
 void MOTOR_CONTROLLER_THREAD_CorrectSpeed(int timer) {
-    float errorLeft = 0;
-    float outputLeft = 0;
+    int errorLeft = 0;
+    int outputLeft = 0;
     
-    float Kp_Left = 6000;
-    float Ki_Left = 2500;
+//    int Kp_Left = 5500;
+//    int Ki_Left = 2250;
     
-    errorLeft = (rightCount - prevRightPID) - (leftCount - prevLeftPID);
+    int Kp_Left = 55;
+    int Ki_Left = 25;
+    
+    errorLeft = (rightCount-prevRightPID)-(leftCount-prevLeftPID);
     integralLeft += errorLeft;
-    outputLeft = ((Kp_Left*errorLeft) + (Ki_Left*integralLeft));
+    outputLeft = ((Kp_Left*errorLeft)+(Ki_Left*integralLeft));
     
     if (outputLeft < 0) {
         outputLeft = 0;
@@ -411,44 +489,56 @@ void MOTOR_CONTROLLER_THREAD_CorrectSpeed(int timer) {
         outputLeft = MAX_PWM;
     }
     
-    leftSpeed = (int)outputLeft;
+    leftSpeed = outputLeft;
     
-    if(timer % 10 == 0) {
+    if(timer % 2 == 0) {
             Tx_Thead_Queue_DataType tx_thread_obj;
             memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
             tx_thread_obj.Destination = TARGETLOCATOR;
             BaseType_t *ptr;
-            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"1\", \"vel\": \"%4d\", \"time\": \"%4d\", \"output\": \"%4f\", \"pwm\": \"%4d\"}", leftCount - prevLeftPID, timer, outputLeft, leftSpeed);
-            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
-            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"2\", \"vel\": \"%4d\", \"time\": \"%4d\"}", rightCount - prevRightPID, timer);
-            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"1\", \"vel\": \"%4d\", \"time\": \"%4d\", \"output\": \"%4f\", \"pwm\": \"%4d\"}", leftCount-prevLeftPID, timer, outputLeft, leftSpeed);
+//            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"2\", \"vel\": \"%4d\", \"time\": \"%4d\"}", rightCount-prevRightPID, timer);
+//            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
     }
     
     prevRightPID = rightCount;
     prevLeftPID = leftCount;
 }
 
+// Increment the number of ticks for the right motor
+// Called in the ISR
 void MOTOR_CONTROLLER_THREAD_IncrementRight(void) {
     rightCount++;
 }
 
+//Increment the number of ticks for the left motor
+// Called in the ISR
 void MOTOR_CONTROLLER_THREAD_IncrementLeft(void) {
     leftCount++;
 }
 
+// Disable motors and reset all values
 void completeMotion(void) {
     disableMotors();
     motionComplete = true;
     totalDistance = 0;
     initialOrientation = orientation;
-    
 }
 
-void enableMotors(void) {
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, rightSpeed);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, leftSpeed);
+// Enable the motors with current pulse width values
+// Takes mode as an input: 0 - full speed, 1 - half speed
+void enableMotors(int mode) {
+    if (!mode) {
+        PLIB_OC_PulseWidth16BitSet(OC_ID_1, rightSpeed);
+        PLIB_OC_PulseWidth16BitSet(OC_ID_2, leftSpeed);
+    } else {
+        PLIB_OC_PulseWidth16BitSet(OC_ID_1, rightSpeed/2);
+        PLIB_OC_PulseWidth16BitSet(OC_ID_2, leftSpeed/2);
+    }
 }
 
+// Set pulse width for both motors to 0
 void disableMotors(void) {
     PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
     PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);

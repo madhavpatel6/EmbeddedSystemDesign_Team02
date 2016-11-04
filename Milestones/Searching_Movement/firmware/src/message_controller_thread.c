@@ -68,7 +68,7 @@ static QueueHandle_t _queue;
 static int systemClock;
 
 #define TYPEOFQUEUE MessageObj
-#define SIZEOFQUEUE 200
+#define SIZEOFQUEUE 150
 
 /*******************************************************************************
   Function:
@@ -113,6 +113,9 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
     items_t items[12];
     int numItems = 0;
     int value = 0;
+    char mode;
+    uint8_t data;
+    bool initialized = false;
     
     while(1) {
         initParser();
@@ -137,10 +140,13 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                 
                 statObject.GoodCount++;
                 
-                parseJSON(messageObj.External.Data, &type, items,  &numItems, &value);
+                parseJSON(messageObj.External.Data, &type, items,  &numItems, &value, &mode, &data);
                 
                 switch(type) {
                     case request: {
+                        if (!initialized) {
+                            continue;
+                        }
                         switch(messageObj.External.Source) {
                             case SEARCHERMOVER:
                                 if ((messageObj.External.MessageCount - statObject.Req_From_SearcherMover) < 0) {
@@ -255,12 +261,13 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     tx_thread_obj.Destination = SERVER;
                                     break;
                                 }
-                                case R1_Est_Location: {
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"R1_Est_Location\":{\"x\":\"%0.02f\",\"y\":\"%0.02f\"}", internalData.location.x, internalData.location.y);
-                                    break;
-                                }
-                                case R1_Est_Orientation: {
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"R1_Est_Orientation\":\"%0.02f\"", internalData.orientation);
+                                case R1_Movement: {
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), 
+                                            ",\"R1_Movement\":{\"x\":\"%0.02f\",\"y\":\"%0.02f\",\"orientation\":\"%0.02f\","
+                                            "\"action\":\"%i\",\"amount\":\"%0.02f\"}",
+                                            internalData.location.x, internalData.location.y, internalData.orientation,
+                                            internalData.movement.action, internalData.movement.amount
+                                            );
                                     break;
                                 }
                                 case Forward: {
@@ -285,10 +292,6 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     motorObj.direction = 'R';
                                     motorObj.degrees = value;
                                     MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
-                                    break;
-                                }
-                                case SensorData: {
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"SensorData\":\"%0.02f\"", internalData.sensordata);
                                     break;
                                 }
                                 case LineLocation: {
@@ -360,12 +363,31 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 statObject.Res_From_TargetGrabber++;
                                 break;
                             }
+                            case SERVER: {
+                                int i = 0;
+                                for(i = 0; i < numItems; i++) {
+                                    switch(items[i]) {
+                                        case InitialData: {
+                                            initialized = true;
+                                            motorObj.mode = mode;
+                                            MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
+                                            break;
+                                        }
+                                        case SensorData: {
+                                            motorObj.sensorData = data;
+                                            MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
+                                            break;
+                                        }
+                                        default: {
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
                             default: {
                                 break;
                             }
                         }
-                        
-                        
                         break;
                     }
                     case unknown: {
@@ -379,59 +401,64 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
             }
             case SEND_REQUEST: {
                 dbgOutputLoc(CASE_SEND_REQUEST_MESSAGE_CONTROLLER_THREAD);
-                // We will only need to have a new case for something we are requesting from another PIC
-                switch(messageObj.Request) {
-                    case SMtoTL: {
-                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"Obstacles\",\"R1_Location\",\"R1_Orientation\"]}");
-                        tx_thread_obj.Destination = TARGETLOCATOR;
-                        tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
-                        statObject.Req_To_TargetLocator++;
-                        break;
-                    }
-                    case TLtoSM: {
-                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"TLtoSM\"]}");
-                        tx_thread_obj.Destination = SEARCHERMOVER;
-                        tx_thread_obj.MessageCount = statObject.Req_To_SearcherMover;
-                        statObject.Req_To_SearcherMover++;
-                        break;
-                    }
-                    case TLtoPF: {
-                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"TLtoPF\"]}");
-                        tx_thread_obj.Destination = PATHFINDER;
-                        tx_thread_obj.MessageCount = statObject.Req_To_PathFinder;
-                        statObject.Req_To_PathFinder++;
-                        break;
-                    }
-                    case PFtoTL: {
-                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"PFtoTL\"]}");
-                        tx_thread_obj.Destination = TARGETLOCATOR;
-                        tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
-                        statObject.Req_To_TargetLocator++;
-                        break;
-                    }
-                    case PFtoTG: {
-                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"PFtoTG\"]}");
-                        tx_thread_obj.Destination = TARGETGRABBER;
-                        tx_thread_obj.MessageCount = statObject.Req_To_TargetGrabber;
-                        statObject.Req_To_TargetGrabber++;
-                        break;
-                    }
-                    case TGtoPF: {
-                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"TGtoPF\"]}");
-                        tx_thread_obj.Destination = PATHFINDER;
-                        tx_thread_obj.MessageCount = statObject.Req_To_PathFinder;
-                        statObject.Req_To_PathFinder++;
-                        break;
-                    }
-                    case SD: {
-                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"SensorData\"]}");
-                        tx_thread_obj.Destination = TARGETLOCATOR;
-                        tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
-                        statObject.Req_To_TargetLocator++;
-                        break;
-                    }
-                    default: {
-                        continue;
+                if (!initialized) {
+                    sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"InitialData\"]}");
+                    tx_thread_obj.Destination = SERVER;
+                } else {
+                    // We will only need to have a new case for something we are requesting from another PIC
+                    switch(messageObj.Request) {
+                        case SMtoTL: {
+                            sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"SensorData\",\"R1_Location\"]}");
+                            tx_thread_obj.Destination = TARGETLOCATOR;
+                            tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
+                            statObject.Req_To_TargetLocator++;
+                            break;
+                        }
+                        case TLtoSM: {
+                            sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"TLtoSM\"]}");
+                            tx_thread_obj.Destination = SEARCHERMOVER;
+                            tx_thread_obj.MessageCount = statObject.Req_To_SearcherMover;
+                            statObject.Req_To_SearcherMover++;
+                            break;
+                        }
+                        case TLtoPF: {
+                            sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"TLtoPF\"]}");
+                            tx_thread_obj.Destination = PATHFINDER;
+                            tx_thread_obj.MessageCount = statObject.Req_To_PathFinder;
+                            statObject.Req_To_PathFinder++;
+                            break;
+                        }
+                        case PFtoTL: {
+                            sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"PFtoTL\"]}");
+                            tx_thread_obj.Destination = TARGETLOCATOR;
+                            tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
+                            statObject.Req_To_TargetLocator++;
+                            break;
+                        }
+                        case PFtoTG: {
+                            sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"PFtoTG\"]}");
+                            tx_thread_obj.Destination = TARGETGRABBER;
+                            tx_thread_obj.MessageCount = statObject.Req_To_TargetGrabber;
+                            statObject.Req_To_TargetGrabber++;
+                            break;
+                        }
+                        case TGtoPF: {
+                            sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"TGtoPF\"]}");
+                            tx_thread_obj.Destination = PATHFINDER;
+                            tx_thread_obj.MessageCount = statObject.Req_To_PathFinder;
+                            statObject.Req_To_PathFinder++;
+                            break;
+                        }
+                        case SD: {
+                            sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"SensorData\"]}");
+                            tx_thread_obj.Destination = TARGETLOCATOR;
+                            tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
+                            statObject.Req_To_TargetLocator++;
+                            break;
+                        }
+                        default: {
+                            continue;
+                        }
                     }
                 }
                 TX_THREAD_SendToQueue(tx_thread_obj);
@@ -440,14 +467,12 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
             case UPDATE: {
                 dbgOutputLoc(CASE_UPDATE_MESSAGE_CONTROLLER_THREAD);
                 switch(messageObj.Update.Type) {
-                    case POSITION: {
+                    case MOVEMENT: {
                         internalData.location.x = initialData.location.x + messageObj.Update.Data.location.x;
                         internalData.location.y = initialData.location.y + messageObj.Update.Data.location.y;
                         internalData.orientation = (initialData.orientation + messageObj.Update.Data.orientation);
-                        break;
-                    }
-                    case SENSORDATA: {
-                        internalData.sensordata = messageObj.Update.Data.sensordata;
+                        internalData.movement.action = messageObj.Update.Data.movement.action;
+                        internalData.movement.amount = messageObj.Update.Data.movement.amount;
                         break;
                     }
                     case LINELOCATION: {
