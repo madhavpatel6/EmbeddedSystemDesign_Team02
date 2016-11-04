@@ -82,14 +82,6 @@ static QueueHandle_t _usartqueue;
 #define USARTSIZEOFQUEUE 400
 
 
-static TimerHandle_t timer;
-static bool mode0 = true;
-static bool mode1 = true;
-static bool mode2 = true;
-static bool mode3 = true;
-static bool mode4 = true;
-
-
 void IntHandlerDrvAdc(void)
 {
     dbgOutputLoc(ENTER_ADC_ISR);
@@ -153,7 +145,7 @@ void IntHandlerDrvTmrInstance1(void)
             break;
         case TARGETLOCATOR:
             obj.message.Request = TLtoSM;
-//            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             obj.message.Request = TLtoPF;
 //            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             break;

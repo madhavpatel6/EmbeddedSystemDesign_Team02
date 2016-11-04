@@ -38,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(socket, SIGNAL(serverIsConnectedSignal(bool)), this, SLOT(HostConnectionEvent(bool)));
     connect(socket, SIGNAL(updateGrid(int,QVector<char>)), gridwidget, SLOT(handleUpdate(int,QVector<char>)));
     connect(socket, SIGNAL(updateRoverPosition(float,float,float)), gridwidget, SLOT(updateRoverPosition(float,float,float)));
+    connect(sendResponse, SIGNAL(released()), this, SLOT(handlePICPositionUpdate()));
     middleFIRDistance->setText(QString::number(20));
     rightFIRDistance->setText(QString::number(20));
     leftFIRDistance->setText(QString::number(20));
@@ -73,9 +74,9 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     simulateButton->setText("Update Map");
     clearOccupanyGridButton->setText("Clear Occupany Grid");
 
-    xRoverLoc = new QLineEdit();
-    yRoverLoc = new QLineEdit();
-    roverAngle = new QLineEdit();
+    xRoverLoc = new QLineEdit("0");
+    yRoverLoc = new QLineEdit("0");
+    roverAngle = new QLineEdit("0");
     roverLocXLabel = new QLabel("X Location");
     roverLocYLabel = new QLabel("Y Location");
     roverAngleLabel = new QLabel("Angle");
@@ -90,6 +91,7 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     requestOccupanyGridButton = new QPushButton("Request Occupany Grid");
     loadSimulationButton = new QPushButton("Load Simulation");
     saveSimulationButton = new QPushButton("Save Simulation");
+    sendResponse = new QPushButton("Update PIC Position");
     ipaddress = new QLineEdit("192.168.1.4");
     connectToServer = new QPushButton("Connect to Server");
     resetButton = new QPushButton("Reset Simulator");
@@ -102,6 +104,7 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     verticalLayout1->addWidget(yRoverLoc);
     verticalLayout1->addWidget(roverAngleLabel);
     verticalLayout1->addWidget(roverAngle);
+    verticalLayout1->addWidget(sendResponse);
     verticalLayout1->addWidget(clearOccupanyGridButton);
     verticalLayout1->addWidget(simulateButton);
     verticalLayout1->addWidget(showObjects);
@@ -122,6 +125,7 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     leftFIRDistance = new QLineEdit();
     verticalLayout2->addItem(verticalSpacer2);
     setFocusProxy(gridwidget);
+    requestMode->setChecked(true);
 }
 
 void MainWindow::handleGridClear() {

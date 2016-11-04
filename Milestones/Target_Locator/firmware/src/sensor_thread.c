@@ -53,11 +53,14 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 
-
+#include "stddef.h"
+#include "stdbool.h"
+#include "myqueue.h"
 #include "system_config.h"
 #include "system_definitions.h"
 #include <math.h>
 #include "sensor_thread.h"
+
 static QueueHandle_t _queue;
 
 #define TYPEOFQUEUE TL_Queue_t
@@ -89,12 +92,12 @@ void SENSOR_THREAD_Initialize ( void )
 
 void SENSOR_THREAD_Tasks ( void )
 {
+    Queue sensorDataQ;
+    initializeQueue(&sensorDataQ);
     TL_Queue_t objRecv;
     MessageObj objSend;
     objSend.type = UPDATE;
     objSend.message.Update.Type = SENSORDATA;
-    UltrasonicContainer ultraDistances;
-    memset(&ultraDistances, 0, sizeof(UltrasonicContainer));
     SensorDataContainerType sensorInformation;
     sensorInformation.middleFrontSensor.minimumMeasuringDistance = 20;
     sensorInformation.rightFrontSensor.maximumMeasuringDistance = 70;
@@ -108,23 +111,73 @@ void SENSOR_THREAD_Tasks ( void )
     sensorInformation.middleFrontSensor.orientation = 0;
     GridType grid;
     initializeGrid(grid);
-    
+    Movement_t previousAction;
+    bool previousActionIsSet = false;
     while(1) {
         memset(&objRecv, 0, sizeof(TL_Queue_t));
         SENSOR_THREAD_ReadFromQueue(&objRecv);
         switch(objRecv.type) {
             case SENSORADC: {
                 ConvertSensorADCToDistance(&objSend.message.Update.Data.sensordata, objRecv.sensors);
-                point_t location;
-                location.x = 10;
-                location.y = 10;
-
-                UpdateSensorLocations(&sensorInformation, objSend.message.Update.Data.sensordata, location, 90+45);
-                updateOccupanyGrid2(sensorInformation, grid);
+                /* Queue up the sensor data */
+                if(isFull(&sensorDataQ)) {
+                    removeData(&sensorDataQ);
+                    insertData(&sensorDataQ, objSend.message.Update.Data.sensordata);
+                }
+                else {
+                    insertData(&sensorDataQ, objSend.message.Update.Data.sensordata);
+                }
+//                point_t location;
+//                location.x = 10;
+//                location.y = 10;
+//                
+//                UpdateSensorLocations(&sensorInformation, objSend.message.Update.Data.sensordata, location, 90+45);
+//                updateOccupanyGrid2(sensorInformation, grid);
                 objSend.message.Update.Data.sensorInformation = sensorInformation;
                 break;
             }
             case RV1_POSUPDATE: {
+                SensorDataType data = removeData(&sensorDataQ);
+                point_t loc;
+                loc.x = objRecv.r1_movement.x;
+                loc.y = objRecv.r1_movement.y;
+                UpdateSensorLocations(&sensorInformation, data, loc, objRecv.r1_movement.orientation);
+                updateOccupanyGrid2(sensorInformation, grid);
+                /*if(previousActionIsSet) {
+                    SensorDataContainerType sI;
+                    sI.middleFrontSensor.minimumMeasuringDistance = 20;
+                    sI.rightFrontSensor.maximumMeasuringDistance = 70;
+                    sI.rightFrontSensor.minimumMeasuringDistance = 20;
+                    sI.rightFrontSensor.orientation = 0;
+                    sI.leftFrontSensor.maximumMeasuringDistance = 70;
+                    sI.leftFrontSensor.minimumMeasuringDistance = 20;
+                    sI.leftFrontSensor.orientation = 0;
+                    sI.middleFrontSensor.maximumMeasuringDistance = 30;
+                    sI.middleFrontSensor.minimumMeasuringDistance = 7;
+                    sI.middleFrontSensor.orientation = 0;
+                    point_t deltaPosition;
+                    deltaPosition.x = previousAction.x - objRecv.r1_movement.x;
+                    deltaPosition.y = previousAction.y - objRecv.r1_movement.y;
+                    float dtheta = previousAction.orientation - objRecv.r1_movement.orientation;
+                    float distance = sqrt(pow(deltaPosition.x,2) + pow(deltaPosition.y,2));
+                    float increment = distance ;///(size(&sensorDataQ) + 1);
+                    float cosX = cos(objRecv.r1_movement.orientation)*increment;
+                    float sinY = sin(objRecv.r1_movement.orientation)*increment;
+                    int i = 0;
+//                    for(i = 1; i <= size(&sensorDataQ) + 1; i++) {
+                        SensorDataType data = removeData(&sensorDataQ);
+                        point_t location;
+                        location.x = cosX*i+previousAction.x;
+                        location.y = sinY*i+previousAction.y;
+                        UpdateSensorLocations(&sI, data, location, 0);
+                        updateOccupanyGrid2(sensorInformation, grid);
+//                    }
+                }
+                else {
+//                    clearQueue(&sensorDataQ);
+                    previousActionIsSet = true;
+                }
+                previousAction = objRecv.r1_movement;*/
                 break;
             }
             case REQUESTOCCUPANYGRID: {

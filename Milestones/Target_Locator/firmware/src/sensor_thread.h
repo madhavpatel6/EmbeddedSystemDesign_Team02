@@ -97,10 +97,20 @@ typedef struct {
 typedef enum { SENSORADC, RV1_POSUPDATE, REQUESTOCCUPANYGRID} TLUpdate_t;
 
 typedef struct {
+    float x;
+    float y;
+    float orientation;
+    char action;
+    float amount;
+} Movement_t;
+
+typedef struct {
     TLUpdate_t type;
     SensorADC_t sensors;
-    
+    Movement_t r1_movement;
 } TL_Queue_t;
+
+
 
 typedef struct {
     bool leftfront;
@@ -110,10 +120,10 @@ typedef struct {
     bool rightside;
 } UltrasonicIsSet_t;
 
-typedef struct {
-    UltrasonicIsSet_t isSet;
-    UltrasonicSensorDistance_t distance;
-} UltrasonicContainer;
+//typedef struct {
+//    UltrasonicIsSet_t isSet;
+////    UltrasonicSensorDistance_t distance;
+//} UltrasonicContainer;
 
 /*******************************************************************************
   Function:

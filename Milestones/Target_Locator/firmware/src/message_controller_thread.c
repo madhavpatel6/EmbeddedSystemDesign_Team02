@@ -102,14 +102,15 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
     type_t type = unknown;
     items_t items[12];
     int numItems;
+    TL_Queue_t sendTL;
     while(1) {
         initParser();
         MessageObj obj;
         memset(&obj, 0, sizeof(MessageObj));
-
+        memset(&sendTL, 0, sizeof(TL_Queue_t));
         Tx_Thead_Queue_DataType tx_thread_obj;
         memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
-
+        Movement_t r1_movement;
         dbgOutputLoc(BEFORE_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD);
         MESSAGE_CONTROLLER_THREAD_ReadFromQueue(&obj);
         dbgOutputLoc(AFTER_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD);
@@ -123,7 +124,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
 
                 statObject.GoodCount++;
 
-                parseJSON(obj.message.External.Data, &type, items,  &numItems);
+                parseJSON(obj.message.External.Data, &type, items,  &numItems, &r1_movement);
 
                 switch(type) {
                     case request: {
@@ -271,21 +272,14 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     tx_thread_obj.Destination = SERVER;
                                     break;
                                 }
-                                case TimerTickCount: {
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"TimerTickCount\": \"%d\"",
-                                        internalData.difftickCount
-                                        );
-                                    break;
-                                }
                                 case msLocalTime:{
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"msLocalTime\":\"%d\"", getSystemClock() * 200);
                                     tx_thread_obj.Destination = obj.message.External.Source;
                                     break;
                                 }
                                 case OccupancyGrid: {
-                                    TL_Queue_t send;
-                                    send.type = REQUESTOCCUPANYGRID;
-                                    SENSOR_THREAD_SendToQueue(send);
+                                    sendTL.type = REQUESTOCCUPANYGRID;
+                                    SENSOR_THREAD_SendToQueue(sendTL);
                                     break;
                                 }
                                 case LocationInformation: {
@@ -348,6 +342,12 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 statObject.Res_From_TargetGrabber++;
                                 break;
                             }
+                            case SERVER: {
+                                sendTL.type = RV1_POSUPDATE;
+                                sendTL.r1_movement = r1_movement;
+                                SENSOR_THREAD_SendToQueue(sendTL);
+                                break;
+                            }
                             default: {
                                 break;
                             }
@@ -375,7 +375,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         break;
                     }
                     case TLtoSM: {
-                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"TLtoSM\"]}");
+                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"R1_Movement\"]}");
                         tx_thread_obj.Destination = SEARCHERMOVER;
                         tx_thread_obj.MessageCount = statObject.Req_To_SearcherMover;
                         statObject.Req_To_SearcherMover++;
@@ -426,21 +426,9 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
             case UPDATE: {
                 dbgOutputLoc(CASE_UPDATE_MESSAGE_CONTROLLER_THREAD);
                 switch(obj.message.Update.Type) {
-                    case LOCATION:{
-                        internalData.location = obj.message.Update.Data.location;
-                        break;
-                    }
-                    case ORIENTATION: {
-                        internalData.orientation = obj.message.Update.Data.orientation;
-                        break;
-                    }
                     case SENSORDATA: {
                         internalData.sensordata = obj.message.Update.Data.sensordata;
                         internalData.sensorInformation = obj.message.Update.Data.sensorInformation;
-                        break;
-                    }
-                    case TIMERTICK: {
-                        internalData.difftickCount = obj.message.Update.Data.difftickCount;
                         break;
                     }
                     default: {

@@ -35,6 +35,7 @@ public:
     QLineEdit* middleFIRDistance;
     QLineEdit* rightFIRDistance;
     QLineEdit* leftFIRDistance;
+    QPushButton* sendResponse;
     QRadioButton* simulationMode;
     QRadioButton* requestMode;
     QPushButton* requestOccupanyGridButton;
@@ -79,6 +80,14 @@ public slots:
     void handleRequestOccupanyGrid() {
         if(requestMode->isChecked()) {
             socket->sendRequest();
+        }
+    }
+
+    void handlePICPositionUpdate() {
+
+        if(requestMode->isChecked()) {
+            qDebug() << "clicked";
+            socket->sendResponse(xRoverLoc->text(), yRoverLoc->text(), roverAngle->text());
         }
     }
 

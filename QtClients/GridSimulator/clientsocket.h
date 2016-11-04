@@ -18,7 +18,15 @@ public:
     QTcpSocket* getClient();
 
     bool isConnected;
-
+    void sendResponse(QString x, QString y, QString theta) {
+        QString response = "{\"type\":\"Response\",\"R1_Movement\":["
+                                    "\""+x+"\","
+                                    "\""+y+"\","
+                                    "\""+theta+"\","
+                                    "\"F\","
+                                    "\"0\"]}";
+        SendJSONRequestToSocket(response, TARGETLOCATOR);
+    }
 signals:
     void updateError(int val);
     void sendCommStatTargetLocator(QByteArray commStatTargetLocator);
@@ -28,6 +36,8 @@ signals:
     void sendUpdate(QString leftFTSensor, QString rightFTSensor, QString leftFBSensor, QString middleFBSensor, QString rightFBSensor, QString leftUltra, QString middleUltra, QString rightUltra, QString leftUltraSide, QString rightUltraSide);
     void updateGrid(int row, QVector<char> vec);
     void updateRoverPosition(float x, float y, float orientation);
+
+
 public slots:
     void connected();
     void disconnected();

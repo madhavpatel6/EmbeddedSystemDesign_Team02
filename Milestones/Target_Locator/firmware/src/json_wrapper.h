@@ -25,11 +25,12 @@
 #include <string.h>
 #include <stdio.h>
 #include "communication/jsmn.h"
+#include "sensor_thread.h"
 
 typedef enum {request, response, unknown} type_t;
 typedef enum {CommStatsSearcherMover, CommStatsTargetLocator, CommStatsPathFinder, CommStatsTargetGrabber,
        DetailedCommStatsSearcherMover, DetailedCommStatsTargetLocator, DetailedCommStatsPathFinder,
-       DetailedCommStatsTargetGrabber, TargetLocatorSensorData, TimerTickCount, msLocalTime, OccupancyGrid, LocationInformation} items_t;
+       DetailedCommStatsTargetGrabber, TargetLocatorSensorData, msLocalTime, OccupancyGrid, LocationInformation} items_t;
 
 typedef struct {
   char stringValue[512];
@@ -47,7 +48,6 @@ static const DictionaryType Dictionary[] = {
     {"DetailedCommStatsTargetGrabber", DetailedCommStatsTargetGrabber},
     {"DetailedCommStatsTargetLocator", DetailedCommStatsTargetLocator},
     {"TargetLocatorSensorData", TargetLocatorSensorData},
-    {"TimerTickCount", TimerTickCount},
     {"msLocalTime", msLocalTime},
     {"OccupancyGrid", OccupancyGrid},
     {"LocationInformation", LocationInformation}
@@ -62,7 +62,7 @@ int jsoneq(const char *json, jsmntok_t *tok, const char *s) ;
 
 void initParser();
 
-void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems);
+void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, Movement_t* r1_movement);
 
 #endif /* _EXAMPLE_FILE_NAME_H */
 

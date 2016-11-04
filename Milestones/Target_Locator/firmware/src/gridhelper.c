@@ -105,9 +105,9 @@ void raytrace3(int x1, int y1, int x2, int y2, bool maximum, GridType grid)
 void rotatePoint(point_t* point, float originX, float originY, float pointX, float pointY, double rotationAngle) {
     float translatedX = pointX - originX;
     float translatedY = pointY - originY;
-    rotationAngle = rotationAngle*M_PI/180.0;
-    point->x = translatedX * cos(rotationAngle) - translatedY * sin(rotationAngle) + originX;
-    point->y = translatedX * sin(rotationAngle) + translatedY * cos(rotationAngle) + originY;
+    float rot = rotationAngle*M_PI/180.0;
+    point->x = translatedX * cos(rot) - translatedY * sin(rot) + originX;
+    point->y = translatedX * sin(rot) + translatedY * cos(rot) + originY;
 }
 
 void updateOccupanyGrid2(SensorDataContainerType sensorData, GridType grid) {

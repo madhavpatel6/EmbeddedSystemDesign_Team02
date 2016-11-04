@@ -31,11 +31,13 @@ QTcpSocket* ClientSocket::getClient(){
 }
 
 void ClientSocket::sendRequest(){
+    {
     QString request_begin = "{\"type\":\"Request\",\"items\":[\"";
     QString request_end = "\"]}";
     SendJSONRequestToSocket(request_begin + "OccupancyGrid" + request_end, TARGETLOCATOR);
     SendJSONRequestToSocket(request_begin + "LocationInformation" + request_end, TARGETLOCATOR);
 //    SendJSONRequestToSocket(request_begin + "TimerTickCount" + request_end, TARGETLOCATOR);
+    }
 }
 
 void ClientSocket::connected()
@@ -112,6 +114,30 @@ void ClientSocket::readyRead()
                         QString a2 = arry[2].toString();
                         qDebug() << a0 << " " << a1 << " " <<a2;
                         emit updateRoverPosition(a0.toFloat(), a1.toFloat(), a2.toFloat());
+                    }
+                }
+                else if(type == QStringLiteral("Request")) {
+                    if(json.contains("items")) {
+                        QJsonArray arry = json["items"].toArray();
+                        for(int i = 0; i < arry.size(); i++) {
+                            QString str = arry[i].toString();
+                            if(str == "R1_Movement") {
+                                QString response = "{\"type\":\"Response\",\"R1_Movement\":["
+                                                            "\"12\","
+                                                            "\"13\","
+                                                            "\"0\","
+                                                            "\"F\","
+                                                            "\"10\"]}";
+//                                QString response = "{\"type\":\"Response\",\"R1_Movement\":{"
+//                                                        "\"x\":\"12\","
+//                                                        "\"y\":\"13\","
+//                                                        "\"orientation\":\"5\""
+//                                                        "\"action\":\"F\""
+//                                                        "\"amount\":\"10\"}}";
+//                                qDebug() << response;
+//                                SendJSONRequestToSocket(response, TARGETLOCATOR);
+                            }
+                        }
                     }
                 }
              }
