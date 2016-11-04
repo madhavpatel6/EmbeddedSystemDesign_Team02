@@ -36,6 +36,15 @@ public:
     QVector<int> keys;
     bool showObjects;
     bool recordKeys;
+public slots:
+    void handleUpdate(int row, QVector<char> vec) {
+        qDebug() << "Row " << row << " value " << vec;
+        for(int i = 0; i < vec.size(); i++) {
+            grid[row][i] = vec[i];
+        }
+        this->update();
+    }
+
 signals:
     void updateCursorPosition(int x, int y);
     void updateRoverPosition(float x, float y, float newRectAngle);

@@ -388,7 +388,6 @@ void updateOccupanyGrid2(SensorDataContainerType sensorData, Grid::GridType grid
         angleOffset = 90;
     }
     if(minSensor.distance > 0 && nonMinSensor.distance > 0) {
-        qDebug() << minSensor.distance << nonMinSensor.distance;
         minSensor.distance -= 2;
         int sensorDistanceBetween = 4;
         point_t minDistancePoint = point_t(minSensor.sensorLocation.x() + minSensor.distance*cos(minSensor.orientation*M_PI/180),

@@ -14,9 +14,9 @@ GridScene::GridScene(QWidget *parent) : QWidget(parent)
     this->setAutoFillBackground(true);
     this->setPalette(Pal);
     rover = new RoverClass();
-    middleFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::MIDDLESENSOR, 20, 70, 0, 0,rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
-    leftFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::LEFTSENSOR, 3, 30, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
-    rightFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::RIGHTSENSOR, 3, 30, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
+    middleFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::MIDDLESENSOR, 7, 25, 0, 0,rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
+    leftFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::LEFTSENSOR, 20, 70, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
+    rightFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::RIGHTSENSOR, 20, 70, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
 //    leftFrontSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::LEFTSENSOR, 2, 70, 30, 30, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
 //    rightFrontSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::RIGHTSENSOR, 2, 70, 30, -30, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
 

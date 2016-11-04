@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -18,7 +18,10 @@ SOURCES += main.cpp\
     sensorclass.cpp \
     roverclass.cpp \
     gridhelper.cpp \
-    grid.cpp
+    grid.cpp \
+    clientsocket.cpp \
+    picCode/communication/messages.c \
+    picCode/debug.c
 
 HEADERS  += mainwindow.h \
     gridscene.h \
@@ -26,4 +29,7 @@ HEADERS  += mainwindow.h \
     sensorclass.h \
     roverclass.h \
     gridhelper.h \
-    grid.h
+    grid.h \
+    clientsocket.h \
+    picCode/communication/messages.h \
+    picCode/debug.h
