@@ -120,21 +120,30 @@ void MOTOR_CONTROLLER_THREAD_Initialize ( void )
     See prototype in motor_controller_thread.h.
  */
 
+
+static Point myLoc;
+static Point path[100];
+static int pathLen = 0;
+static int pathIndex = 0;
+static bool inProg = false;
+static bool holdingTarg = false;
+   static  int myDir = 0;
+    static int desiredDir = 0;
 void MOTOR_CONTROLLER_THREAD_Tasks ( void )
 {
     message_in_t msg;
     
     initWorld();
-    Point myLoc;
     myLoc.x = 0;
     myLoc.y = 0;
-    int myDir = 0;
-    int desiredDir = 0;
+//    int myDir = 0;
+//    int desiredDir = 0;
     
-    Point path[100];
-    int pathLen = 0;
-    int pathIndex = 0;
-    bool inProg = false;
+//    Point path[100];
+//    int pathLen = 0;
+//    int pathIndex = 0;
+//    bool inProg = false;
+//    bool holdingTarg = false;
     
     while(1) {
         
@@ -154,10 +163,20 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
             {
                 MOTOR_CONTROLLER_THREAD_ReadFromQueue(&msg);
                 addToMap(msg);
-                if(can_I_go_targ(myLoc)){
-                    motor_controller_threadData.state = exec_path;
-                    getPath(path, &pathLen);
-                    pathIndex = 0;
+                if(holdingTarg == false){
+                    if(can_I_go_targ(myLoc)){
+                        motor_controller_threadData.state = exec_path;
+                        getPath(path, &pathLen);
+                        pathIndex = 0;
+                        inProg = false;
+                    }
+                }else{
+                    if(can_I_go_home(myLoc)){
+                        motor_controller_threadData.state = exec_path;
+                        getPath(path, &pathLen);
+                        pathIndex = 0;
+                        inProg = false;
+                    }
                 }
                 Nop();
                 
@@ -170,28 +189,32 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 addToMap(msg);
                 
                 if(pathIndex >= pathLen){
-                    motor_controller_threadData.state = fine_tune;
+                    if(holdingTarg == true){
+                        motor_controller_threadData.state = waitAcquired;
+                    }else{
+                        motor_controller_threadData.state = tuneDir;
+                    }
                 }
                 
-                if (msg.type == update && msg.cacheType == 1){
-                    myDir += msg.cacheDistance;
-                    myDir %= 360;
-                    inProg = false;
-                }else if( msg.type  == update && msg.cacheType == 0){
-                     if(myDir == 0){
-                         myLoc.x += msg.cacheDistance;
-                     }else if(myDir == 90){
-                         myLoc.y += msg.cacheDistance;
-                     }else if(myDir == 180){
-                         myLoc.x += msg.cacheDistance;
-                     }else if(myDir == 270){
-                         myLoc.y += msg.cacheDistance;
-                     }
-                     inProg = false;
-                }
+//                if (msg.type == update && msg.cacheType == 1){
+//                    myDir += msg.cacheDistance;
+//                    myDir %= 360;
+//                    inProg = false;
+//                }else if( msg.type  == update && msg.cacheType == 0){
+//                     if(myDir == 0){
+//                         myLoc.x += msg.cacheDistance;
+//                     }else if(myDir == 90){
+//                         myLoc.y += msg.cacheDistance;
+//                     }else if(myDir == 180){
+//                         myLoc.x += msg.cacheDistance;
+//                     }else if(myDir == 270){
+//                         myLoc.y += msg.cacheDistance;
+//                     }
+//                     inProg = false;
+//                }
                 
-                int deltaX = path[pathIndex].x - myLoc.x;
-                int deltaY = path[pathIndex].y - myLoc.y;
+                float deltaX = path[pathIndex].x - myLoc.x;
+                float deltaY = path[pathIndex].y - myLoc.y;
                 
                 if (deltaX == 0 && deltaY == 0){
                     // move on cuz we there
@@ -224,6 +247,10 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                     inProg = true;
                 }else if( !inProg){
                     int distance = (deltaX == 0 ? deltaY: deltaX) ;
+                    distance = abs(distance);
+                    if( desiredDir != myDir){
+                        distance *= -1;
+                    }
                     addMotorTask(0, distance);
                     inProg = true;
                 }
@@ -235,15 +262,83 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 break;
                 
             }
-            case fine_tune:
+            case tuneDir:
             {
-                // talk to chris, find stuff, be fast and adaptive
-                disableMotors();
-                Nop();
+                // talk to warthog 1, find stuff, be fast and adaptive
+                MOTOR_CONTROLLER_THREAD_ReadFromQueue(&msg);
+                addToMap(msg);
+                if(msg.type == targetAlignment){
+                    if(msg.targetAngle > 20){
+                        setDirectionLeft();
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/2);
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/2);
+                    }else if (msg.targetAngle < -20){
+                        setDirectionRight();
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/2);
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/2);
+                    }else{
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+                        motor_controller_threadData.state = tuneDist;
+                    }
+                    
+                }
+                break;
+            }
+            case tuneDist:
+            {
+                MOTOR_CONTROLLER_THREAD_ReadFromQueue(&msg);
+                addToMap(msg);
+                if(msg.type == targetAlignment){
+                    if(msg.targetAngle > 20 || msg.targetAngle < -20){
+                        motor_controller_threadData.state = tuneDir;                    
+                    }
+                    
+                    if(msg.targetDistance > 5){
+                        setDirectionForward();
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/2);
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/2);                  
+                    } else if(msg.targetDistance > 1){
+                        setDirectionForward();
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/3);
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/3);                  
+                    } else{
+                        setDirectionForward();
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);  
+                        motor_controller_threadData.state = waitAcquired;
+                    } 
+                }
+                break;
+            }
+            case waitAcquired:
+            {
+                MOTOR_CONTROLLER_THREAD_ReadFromQueue(&msg);
+                addToMap(msg);
+                if(holdingTarg == false && msg.type == targetAlignment){
+                    if(msg.targetAngle > 20 || msg.targetAngle < -20){
+                        motor_controller_threadData.state = tuneDir;                    
+                    }else if(msg.targetDistance > 1){
+                        motor_controller_threadData.state = tuneDist;                    
+                    }else if(msg.targetAcquired == true){
+                        motor_controller_threadData.state = wait_calc_path;
+                        holdingTarg = true;
+                    }
+                    
+                }else if (msg.type == targetAlignment){
+                    if(msg.targetAcquired == false){
+                        holdingTarg = false;
+                        motor_controller_threadData.state = wait_calc_path;
+                    }
+                }
                 break;
             }
             default:
             {
+                PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+                PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);  
+                Nop();
+                
                 break;
             }
         }
@@ -379,6 +474,23 @@ void addToMap(message_in_t msg){
         default:{
             
         }
+    }
+    
+    if (msg.type == update && msg.cacheType == 1){
+        myDir += msg.cacheDistance;
+        myDir %= 360;
+        inProg = false;
+    }else if( msg.type  == update && msg.cacheType == 0){
+         if(myDir == 0){
+             myLoc.x += msg.cacheDistance;
+         }else if(myDir == 90){
+             myLoc.y += msg.cacheDistance;
+         }else if(myDir == 180){
+             myLoc.x -= msg.cacheDistance;
+         }else if(myDir == 270){
+             myLoc.y -= msg.cacheDistance;
+         }
+         inProg = false;
     }
 }
 

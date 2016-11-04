@@ -36,7 +36,7 @@
 extern "C" {
 #endif
     
-typedef enum {vertex, target, obstacle, update} coord_t;
+typedef enum {vertex, target, obstacle, update, targetAlignment} coord_t;
 
 typedef struct {
     float x[10];
@@ -46,6 +46,10 @@ typedef struct {
     coord_t type;
     int cacheType;
     int cacheDistance;
+    float targetDistance;
+    float targetAngle;
+    bool targetAligned;
+    bool targetAcquired;
 } message_in_t;
 
 void MOTOR_CONTROLLER_THREAD_SendToQueue(message_in_t buffer);

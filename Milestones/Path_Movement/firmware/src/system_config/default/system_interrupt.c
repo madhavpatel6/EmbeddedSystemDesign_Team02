@@ -174,7 +174,7 @@ void IntHandlerDrvTmrInstance1(void)
                 obj.Request = PFtoTL;
                 MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
                 obj.Request = PFtoTG;
-                //MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
                 break;
             case TARGETGRABBER:
                 obj.Request = TGtoPF;
@@ -182,6 +182,10 @@ void IntHandlerDrvTmrInstance1(void)
                 break;
         }
     }  
+    if(time % 10 == 0){
+        obj.Request = PFtoTG;
+        MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+    }
     
     if(desiredTicks != 0){
         ticksSoFar += PLIB_TMR_Counter16BitGet(TMR_ID_3);
