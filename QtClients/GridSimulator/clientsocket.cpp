@@ -3,6 +3,7 @@
 #include "clientsocket.h"
 #include "mainwindow.h"
 #include <QJsonDocument>
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QFile>
 
@@ -33,6 +34,7 @@ void ClientSocket::sendRequest(){
     QString request_begin = "{\"type\":\"Request\",\"items\":[\"";
     QString request_end = "\"]}";
     SendJSONRequestToSocket(request_begin + "OccupancyGrid" + request_end, TARGETLOCATOR);
+    SendJSONRequestToSocket(request_begin + "LocationInformation" + request_end, TARGETLOCATOR);
 //    SendJSONRequestToSocket(request_begin + "TimerTickCount" + request_end, TARGETLOCATOR);
 }
 
@@ -99,7 +101,19 @@ void ClientSocket::readyRead()
              }                                  // index of "hassasin" in buff can be found by pointer subtraction
              else
              {
-
+                QJsonDocument doc(QJsonDocument::fromJson(buffer));
+                QJsonObject json = doc.object();
+                QString type = json["type"].toString();
+                if(type == QStringLiteral("Response")) {
+                    if(json.contains("LocationInformation")) {
+                        QJsonArray arry = json["LocationInformation"].toArray();
+                        QString a0 = arry[0].toString();
+                        QString a1 = arry[1].toString();
+                        QString a2 = arry[2].toString();
+                        qDebug() << a0 << " " << a1 << " " <<a2;
+                        emit updateRoverPosition(a0.toFloat(), a1.toFloat(), a2.toFloat());
+                    }
+                }
              }
 //            QJsonDocument doc(QJsonDocument::fromJson(buffer));
 //            QJsonObject json = doc.object();

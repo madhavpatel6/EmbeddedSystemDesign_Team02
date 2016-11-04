@@ -38,16 +38,27 @@ public:
     bool recordKeys;
 public slots:
     void handleUpdate(int row, QVector<char> vec) {
-        qDebug() << "Row " << row << " value " << vec;
+//        qDebug() << "Row " << row << " value " << vec;
         for(int i = 0; i < vec.size(); i++) {
             grid[row][i] = vec[i];
         }
         this->update();
     }
 
+    void updateRoverPosition(float x, float y, float orientation) {
+        rover->realLocationInformation.center.setX(x);
+        rover->realLocationInformation.center.setY(y);
+        rover->realLocationInformation.orientation = orientation;
+        rover->estimatedLocationInformation = rover->realLocationInformation;
+        middleFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+        leftFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+        rightFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+        rightSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+        leftSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+        this->update();
+    }
 signals:
     void updateCursorPosition(int x, int y);
-    void updateRoverPosition(float x, float y, float newRectAngle);
 private:
     void addRayTrace(SensorClass* impl);
     void addLine(double x1, double y1, double x2, double y2);

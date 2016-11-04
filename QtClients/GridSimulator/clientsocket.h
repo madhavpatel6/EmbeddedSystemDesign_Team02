@@ -27,6 +27,7 @@ signals:
     void updateTime(QString time);
     void sendUpdate(QString leftFTSensor, QString rightFTSensor, QString leftFBSensor, QString middleFBSensor, QString rightFBSensor, QString leftUltra, QString middleUltra, QString rightUltra, QString leftUltraSide, QString rightUltraSide);
     void updateGrid(int row, QVector<char> vec);
+    void updateRoverPosition(float x, float y, float orientation);
 public slots:
     void connected();
     void disconnected();

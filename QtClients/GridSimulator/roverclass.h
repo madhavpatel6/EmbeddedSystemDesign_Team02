@@ -44,12 +44,12 @@ public:
     RoverLocation getRealLocationInformation() {
         return realLocationInformation;
     }
-
+    RoverLocation estimatedLocationInformation;
+    RoverLocation realLocationInformation;
 private:
     ErrorType movementError;
     ErrorType rotationError;
-    RoverLocation estimatedLocationInformation;
-    RoverLocation realLocationInformation;
+
 };
 
 #endif // ROVERCLASS_H

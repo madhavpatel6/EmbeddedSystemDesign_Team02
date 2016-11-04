@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(connectToServer, SIGNAL(released()), this, SLOT(handleConnect()));
     connect(socket, SIGNAL(serverIsConnectedSignal(bool)), this, SLOT(HostConnectionEvent(bool)));
     connect(socket, SIGNAL(updateGrid(int,QVector<char>)), gridwidget, SLOT(handleUpdate(int,QVector<char>)));
+    connect(socket, SIGNAL(updateRoverPosition(float,float,float)), gridwidget, SLOT(updateRoverPosition(float,float,float)));
     middleFIRDistance->setText(QString::number(20));
     rightFIRDistance->setText(QString::number(20));
     leftFIRDistance->setText(QString::number(20));
@@ -89,7 +90,7 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     requestOccupanyGridButton = new QPushButton("Request Occupany Grid");
     loadSimulationButton = new QPushButton("Load Simulation");
     saveSimulationButton = new QPushButton("Save Simulation");
-    ipaddress = new QLineEdit("192.168.1.126");
+    ipaddress = new QLineEdit("192.168.1.4");
     connectToServer = new QPushButton("Connect to Server");
     resetButton = new QPushButton("Reset Simulator");
     simulateMap = new QPushButton("Start Simulation");
