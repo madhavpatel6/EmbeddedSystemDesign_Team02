@@ -95,32 +95,33 @@ void SENSOR_THREAD_Tasks ( void )
     objSend.message.Update.Type = SENSORDATA;
     UltrasonicContainer ultraDistances;
     memset(&ultraDistances, 0, sizeof(UltrasonicContainer));
-
+    SensorDataContainerType sensorInformation;
+    sensorInformation.middleFrontSensor.minimumMeasuringDistance = 20;
+    sensorInformation.rightFrontSensor.maximumMeasuringDistance = 70;
+    sensorInformation.rightFrontSensor.minimumMeasuringDistance = 20;
+    sensorInformation.rightFrontSensor.orientation = 0;
+    sensorInformation.leftFrontSensor.maximumMeasuringDistance = 70;
+    sensorInformation.leftFrontSensor.minimumMeasuringDistance = 20;
+    sensorInformation.leftFrontSensor.orientation = 0;
+    sensorInformation.middleFrontSensor.maximumMeasuringDistance = 30;
+    sensorInformation.middleFrontSensor.minimumMeasuringDistance = 7;
+    sensorInformation.middleFrontSensor.orientation = 0;
     GridType grid;
     initializeGrid(grid);
     
     while(1) {
-        SensorDataContainerType sensorInformation;
-//        sensorInformation.middleFrontSensor.minimumMeasuringDistance = 20;
-//        sensorInformation.rightFrontSensor.maximumMeasuringDistance = 70;
-//        sensorInformation.rightFrontSensor.minimumMeasuringDistance = 20;
-//        sensorInformation.rightFrontSensor.orientation = 0;
-//        sensorInformation.leftFrontSensor.maximumMeasuringDistance = 70;
-//        sensorInformation.leftFrontSensor.minimumMeasuringDistance = 20;
-//        sensorInformation.leftFrontSensor.orientation = 0;
-//        sensorInformation.middleFrontSensor.maximumMeasuringDistance = 30;
-//        sensorInformation.middleFrontSensor.minimumMeasuringDistance = 7;
         memset(&objRecv, 0, sizeof(TL_Queue_t));
         SENSOR_THREAD_ReadFromQueue(&objRecv);
         switch(objRecv.type) {
             case SENSORADC: {
                 ConvertSensorADCToDistance(&objSend.message.Update.Data.sensordata, objRecv.sensors);
                 point_t location;
-                location.x = 0;
-                location.y = 0;
+                location.x = 10;
+                location.y = 10;
 
-                UpdateSensorLocations(&sensorInformation, objSend.message.Update.Data.sensordata, location, 0);
-//                objSend.Update.Data.sensorInformation = sensorInformation;
+                UpdateSensorLocations(&sensorInformation, objSend.message.Update.Data.sensordata, location, 90+45);
+                updateOccupanyGrid2(sensorInformation, grid);
+                objSend.message.Update.Data.sensorInformation = sensorInformation;
                 break;
             }
             case RV1_POSUPDATE: {
@@ -156,21 +157,20 @@ void ConvertSensorADCToDistance(SensorDataType* distances, SensorADC_t adcValues
 
 void UpdateSensorLocations(SensorDataContainerType* sensors, SensorDataType distances, point_t roverLocation, int orientation) {
     /* Update the distances */
-//    sensors->leftFrontSensor.distance = distances.ir.leftFBSensor;
-//    sensors->middleFrontSensor.distance = distances.ir.middleFBSensor;
-//    sensors->rightFrontSensor.distance = distances.ir.rightFBSensor;
-    
+    sensors->leftFrontSensor.distance = distances.ir.leftFBSensor;
+    sensors->middleFrontSensor.distance = distances.ir.middleFBSensor;
+    sensors->rightFrontSensor.distance = distances.ir.rightFBSensor;
+    sensors->leftFrontSensor.orientation = orientation;
+    sensors->middleFrontSensor.orientation = orientation;
+    sensors->rightFrontSensor.orientation = orientation;
     /* Compute a new sensor location */
-    point_t val;
-    rotatePoint(&val, roverLocation.x, roverLocation.y, roverLocation.x + 5, roverLocation.y + 3, orientation);
-//    sensors->leftFrontSensor.sensorLocation = val;
-//  sensors->leftFrontSensor.sensorLocation =     sensors->middleFrontSensor.sensorLocation = rotatePoint(roverLocation.x, roverLocation.y, roverLocation.x + 5, roverLocation.y, orientation);
-//    sensors->rightFrontSensor.sensorLocation =  rotatePoint(roverLocation.x, roverLocation.y, roverLocation.x + 5, roverLocation.y - 3, orientation);
+    sensors->roverLocation = roverLocation;
+    sensors->orientation = orientation;
+    rotatePoint(&sensors->leftFrontSensor.sensorLocation, roverLocation.x, roverLocation.y, roverLocation.x + 5, roverLocation.y + 3, orientation);
+    rotatePoint(&sensors->middleFrontSensor.sensorLocation, roverLocation.x, roverLocation.y, roverLocation.x + 5, roverLocation.y, orientation);
+    rotatePoint(&sensors->rightFrontSensor.sensorLocation, roverLocation.x, roverLocation.y, roverLocation.x + 5, roverLocation.y - 3, orientation);
 }
 
-void UpdateOccupanyGrid(SensorDataContainerType* sensors, SensorDataType distances, GridType grid) {
-    
-}
 void SENSOR_THREAD_InitializeQueue() {
     _queue = xQueueCreate(SIZEOFQUEUE, sizeof(TYPEOFQUEUE));
 }

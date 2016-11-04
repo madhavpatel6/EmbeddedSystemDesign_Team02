@@ -28,6 +28,8 @@ typedef struct {
     SensorData_t leftFrontSensor;
 //    SensorData_t rightSideSensor;
 //    SensorData_t leftSideSensor;
+    point_t roverLocation;
+    float orientation;
 } SensorDataContainerType;
 
 void rotatePoint(point_t* point, float originX, float originY, float pointX, float pointY, double rotationAngle);

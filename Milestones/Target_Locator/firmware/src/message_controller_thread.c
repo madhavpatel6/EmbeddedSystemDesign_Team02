@@ -244,21 +244,29 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 case TargetLocatorSensorData: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"TargetLocatorSensorData\": {"
                                             "\"IR\":{"
-                                            "\"leftFT\":\"%.3f\","
-                                            "\"rightFT\":\"%.3f\","
-                                            "\"leftFB\":\"%.3f\","
-                                            "\"middleFB\":\"%.3f\","
-                                            "\"rightFB\":\"%.3f\"},"
-                                            "\"leftFT\":[\"0\",\"0\",\"0\"]"
+                                            "\"leftFT\":\"%.2f\","
+                                            "\"rightFT\":\"%.2f\","
+                                            "\"leftFB\":\"%.2f\","
+                                            "\"middleFB\":\"%.2f\","
+                                            "\"rightFB\":\"%.2f\"},"
+                                            "\"leftFT\":[\"%.1f\",\"%.1f\",\"%.1f\"],"
+                                            "\"middleFT\":[\"%.1f\",\"%.1f\",\"%.1f\"],"
+                                            "\"rightFT\":[\"%.1f\",\"%.1f\",\"%.1f\"]"
                                             "}",
                                             internalData.sensordata.ir.leftFTSensor,
                                             internalData.sensordata.ir.rightFTSensor,
                                             internalData.sensordata.ir.leftFBSensor,
                                             internalData.sensordata.ir.middleFBSensor,
-                                            internalData.sensordata.ir.rightFBSensor
-//                                            internalData.sensorInformation.leftFrontSensor.sensorLocation.x,
-//                                            internalData.sensorInformation.leftFrontSensor.sensorLocation.y,
-//                                            internalData.sensorInformation.leftFrontSensor.orientation
+                                            internalData.sensordata.ir.rightFBSensor,
+                                            internalData.sensorInformation.leftFrontSensor.sensorLocation.x,
+                                            internalData.sensorInformation.leftFrontSensor.sensorLocation.y,
+                                            internalData.sensorInformation.leftFrontSensor.orientation,
+                                            internalData.sensorInformation.middleFrontSensor.sensorLocation.x,
+                                            internalData.sensorInformation.middleFrontSensor.sensorLocation.y,
+                                            internalData.sensorInformation.middleFrontSensor.orientation,
+                                            internalData.sensorInformation.rightFrontSensor.sensorLocation.x,
+                                            internalData.sensorInformation.rightFrontSensor.sensorLocation.y,
+                                            internalData.sensorInformation.rightFrontSensor.orientation
                                             );
                                     tx_thread_obj.Destination = SERVER;
                                     break;
@@ -278,6 +286,15 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     TL_Queue_t send;
                                     send.type = REQUESTOCCUPANYGRID;
                                     SENSOR_THREAD_SendToQueue(send);
+                                    break;
+                                }
+                                case LocationInformation: {
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),",\"LocationInformation\":[\"%.1f\",\"%.1f\",\"%.1f\"]",
+                                            internalData.sensorInformation.roverLocation.x,
+                                            internalData.sensorInformation.roverLocation.y,
+                                            internalData.sensorInformation.orientation
+                                            );
+                                    tx_thread_obj.Destination = obj.message.External.Source;
                                     break;
                                 }
                                 default:
@@ -419,7 +436,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                     }
                     case SENSORDATA: {
                         internalData.sensordata = obj.message.Update.Data.sensordata;
-//                        internalData.sensorInformation = obj.Update.Data.sensorInformation;
+                        internalData.sensorInformation = obj.message.Update.Data.sensorInformation;
                         break;
                     }
                     case TIMERTICK: {

@@ -22,9 +22,7 @@ void raytrace3(int x1, int y1, int x2, int y2, bool maximum, GridType grid)
     int ddy, ddx;        // compulsory variables: the double values of dy and dx
     int dx = x2 - x1;
     int dy = y2 - y1;
-    if(checkBounds(x, y)) {
-        decrementIndex(x, y, grid);
-    }
+    decrementIndex(x, y, grid);
     // NB the last point can't be here, because of its previous point (which has to be verified)
     if (dy < 0){
         ystep = -1;
@@ -53,25 +51,23 @@ void raytrace3(int x1, int y1, int x2, int y2, bool maximum, GridType grid)
             y += ystep;
             error -= ddx;
             // three cases (octant == right->right-top for directions below):
-            if (error + errorprev < ddx && checkBounds(x, y)) {  // bottom square als
+            if (error + errorprev < ddx) {  // bottom square als
                 decrementIndex(x, y, grid);
             }
-            else if (error + errorprev > ddx && checkBounds(x-xstep, y)) { // left square also
+            else if (error + errorprev > ddx) { // left square also
                 decrementIndex(x-xstep, y, grid);
             }
-            else if(checkBounds(x, y-ystep) && checkBounds(x-xstep, y)){  // corner: bottom and left squares also
+            else {  // corner: bottom and left squares also
                 decrementIndex(x, y-ystep, grid);
                 decrementIndex(x-xstep, y, grid);
             }
           }
-          if(checkBounds(x, y)) {
-              if(!maximum && i+1 == dx) {
-                    incrementIndex(x, y, grid);
-              }
-              else {
-                    decrementIndex(x, y, grid);
-              }
-          }
+            if(!maximum && i+1 == dx) {
+                  incrementIndex(x, y, grid);
+            }
+            else {
+                  decrementIndex(x, y, grid);
+            }
           errorprev = error;
         }
     }
@@ -83,26 +79,24 @@ void raytrace3(int x1, int y1, int x2, int y2, bool maximum, GridType grid)
             if (error > ddy) {
                 x += xstep;
                 error -= ddy;
-                if (error + errorprev < ddy && checkBounds(x-xstep, y)) {
+                if (error + errorprev < ddy) {
                     decrementIndex(x-xstep,y,grid);
                 }
-                else if (error + errorprev > ddy && checkBounds(x, y-ystep)) {
+                else if (error + errorprev > ddy) {
                     decrementIndex(x, y-ystep, grid);
-                }
-                else if (checkBounds(x, y-ystep) && checkBounds(x-xstep, y)){
-                    decrementIndex(x-xstep,y,grid);
-                    decrementIndex(x, y-ystep, grid);
-                }
-            }
-            if(checkBounds(x, y)) {
-                if(!maximum && i+1 == dy) {
-                    incrementIndex(x, y, grid);
                 }
                 else {
-                    decrementIndex(x,y,grid);
+                    decrementIndex(x-xstep,y,grid);
+                    decrementIndex(x, y-ystep, grid);
                 }
-                errorprev = error;
             }
+            if(!maximum && i+1 == dy) {
+                incrementIndex(x, y, grid);
+            }
+            else {
+                decrementIndex(x,y,grid);
+            }
+            errorprev = error;
         }
     }
   // assert ((y == y2) && (x == x2));  // the last point (y2,x2) has to be the same with the last point of the algorithm
@@ -117,7 +111,7 @@ void rotatePoint(point_t* point, float originX, float originY, float pointX, flo
 }
 
 void updateOccupanyGrid2(SensorDataContainerType sensorData, GridType grid) {
-/*    SensorData_t minSensor, nonMinSensor;
+    SensorData_t minSensor, nonMinSensor;
     int angleOffset;
     if(sensorData.leftFrontSensor.distance <= sensorData.rightFrontSensor.distance) {
         minSensor = sensorData.leftFrontSensor;
@@ -150,7 +144,6 @@ void updateOccupanyGrid2(SensorDataContainerType sensorData, GridType grid) {
             raytrace3(rayTraceOrigin.x, rayTraceOrigin.y, rayTracePoint.x, rayTracePoint.y, true, grid);
         }
     }
-*/
 }
 
 

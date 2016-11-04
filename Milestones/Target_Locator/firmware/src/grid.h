@@ -7,8 +7,6 @@
 #define MAXIMUM 127
 #define MINIMUM -128
 
-bool checkBounds(int x, int y);
-
 typedef char GridType[HEIGHT][WIDTH];
 void initializeGrid(GridType grid);
 void incrementIndex(int x, int y, GridType grid);
