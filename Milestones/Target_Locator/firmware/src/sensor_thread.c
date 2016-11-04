@@ -118,7 +118,7 @@ void SENSOR_THREAD_Tasks ( void )
         SENSOR_THREAD_ReadFromQueue(&objRecv);
         switch(objRecv.type) {
             case SENSORADC: {
-                ConvertSensorADCToDistance(&objSend.message.Update.Data.sensordata, objRecv.sensors);
+                ConvertSensorADCToDistance(&objSend.message.Update.Data.sensordata, objRecv.contents.sensors);
                 /* Queue up the sensor data */
                 if(isFull(&sensorDataQ)) {
                     removeData(&sensorDataQ);
@@ -139,9 +139,9 @@ void SENSOR_THREAD_Tasks ( void )
             case RV1_POSUPDATE: {
                 SensorDataType data = removeData(&sensorDataQ);
                 point_t loc;
-                loc.x = objRecv.r1_movement.x;
-                loc.y = objRecv.r1_movement.y;
-                UpdateSensorLocations(&sensorInformation, data, loc, objRecv.r1_movement.orientation);
+                loc.x = objRecv.contents.r1_movement.x;
+                loc.y = objRecv.contents.r1_movement.y;
+                UpdateSensorLocations(&sensorInformation, data, loc, objRecv.contents.r1_movement.orientation);
                 updateOccupanyGrid2(sensorInformation, grid);
                 /*if(previousActionIsSet) {
                     SensorDataContainerType sI;

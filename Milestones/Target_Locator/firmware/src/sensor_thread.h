@@ -69,28 +69,16 @@ extern "C" {
 #endif
 // DOM-IGNORE-END 
 
-typedef enum {
-    LEFTFRONTULTRASONIC, MIDDLEFRONTULTRASONIC, RIGHTFRONTULTRASONIC, LEFTSIDEULTRASONIC, RIGHTSIDEULTRASONIC
-} UltrasonicLocation_t;
-
-typedef enum {
-    IRSENSORS, ULTRASONICSENSORS
-} SensorUpdate_t;
-
 typedef struct {
-    uint32_t middleFTSensor;
     uint32_t rightFTSensor;
     uint32_t leftFTSensor;
     uint32_t middleFBSensor;
     uint32_t rightFBSensor;
     uint32_t leftFBSensor;
-    uint32_t rightSDSensor;
-    uint32_t leftSDSensor;
 } IRSensorsADC_t;
 
 
 typedef struct {
-    SensorUpdate_t UpdateType;
     IRSensorsADC_t IRSensors;
 } SensorADC_t;
 
@@ -104,10 +92,14 @@ typedef struct {
     float amount;
 } Movement_t;
 
+typedef union {
+	SensorADC_t sensors;
+	Movement_t r1_movement;
+}TL_Message_t;
+
 typedef struct {
-    TLUpdate_t type;
-    SensorADC_t sensors;
-    Movement_t r1_movement;
+	TLUpdate_t type;
+	TL_Message_t contents;
 } TL_Queue_t;
 
 

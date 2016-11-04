@@ -88,17 +88,16 @@ void IntHandlerDrvAdc(void)
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     TL_Queue_t obj;
     obj.type = SENSORADC;
-    obj.sensors.UpdateType = IRSENSORS;
     memset(&obj, 0, sizeof(TL_Queue_t));
     
     int i = 0;
     dbgOutputLoc(ADDING_ADC_VAL_ISR);
     for(i; i < 8; i=i+8) {
-        obj.sensors.IRSensors.leftFBSensor += DRV_ADC_SamplesRead(i);
-        obj.sensors.IRSensors.middleFBSensor += DRV_ADC_SamplesRead(i + 1);
-        obj.sensors.IRSensors.rightFBSensor += DRV_ADC_SamplesRead(i + 2);
-        obj.sensors.IRSensors.leftFTSensor += DRV_ADC_SamplesRead(i + 3);
-        obj.sensors.IRSensors.rightFTSensor += DRV_ADC_SamplesRead(i + 4);
+        obj.contents.sensors.IRSensors.leftFBSensor += DRV_ADC_SamplesRead(i);
+        obj.contents.sensors.IRSensors.middleFBSensor += DRV_ADC_SamplesRead(i + 1);
+        obj.contents.sensors.IRSensors.rightFBSensor += DRV_ADC_SamplesRead(i + 2);
+        obj.contents.sensors.IRSensors.leftFTSensor += DRV_ADC_SamplesRead(i + 3);
+        obj.contents.sensors.IRSensors.rightFTSensor += DRV_ADC_SamplesRead(i + 4);
         DRV_ADC_SamplesRead(i + 5);
         DRV_ADC_SamplesRead(i + 6);
         DRV_ADC_SamplesRead(i + 7);

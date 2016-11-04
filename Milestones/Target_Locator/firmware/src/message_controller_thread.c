@@ -344,7 +344,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                             }
                             case SERVER: {
                                 sendTL.type = RV1_POSUPDATE;
-                                sendTL.r1_movement = r1_movement;
+                                sendTL.contents.r1_movement = r1_movement;
                                 SENSOR_THREAD_SendToQueue(sendTL);
                                 break;
                             }
