@@ -66,7 +66,7 @@ static QueueHandle_t _queue;
 static int systemClock;
 
 #define TYPEOFQUEUE MessageObj
-#define SIZEOFQUEUE 36
+#define SIZEOFQUEUE 24
 
 /*******************************************************************************
   Function:
@@ -113,50 +113,50 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
         dbgOutputLoc(BEFORE_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD);
         MESSAGE_CONTROLLER_THREAD_ReadFromQueue(&obj);
         dbgOutputLoc(AFTER_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD);
-        switch(obj.Type) {
+        switch(obj.type) {
             case EXTERNAL_REQUEST_RESPONSE: {
                 dbgOutputLoc(CASE_EXTERNAL_REQUEST_RESPONSE_MESSAGE_CONTROLLER_THREAD);
-                if(obj.External.Error) {
+                if(obj.message.External.Error) {
                     statObject.ErrorCount++;
                     continue;
                 }
 
                 statObject.GoodCount++;
 
-                parseJSON(obj.External.Data, &type, items,  &numItems);
+                parseJSON(obj.message.External.Data, &type, items,  &numItems);
 
                 switch(type) {
                     case request: {
-                        switch(obj.External.Source) {
+                        switch(obj.message.External.Source) {
                             case SEARCHERMOVER:
-                                if ((obj.External.MessageCount - statObject.Req_From_SearcherMover) < 0) {
-                                    statObject.PacketsDropped = (256 - statObject.Req_From_SearcherMover) + obj.External.MessageCount;
+                                if ((obj.message.External.MessageCount - statObject.Req_From_SearcherMover) < 0) {
+                                    statObject.PacketsDropped = (256 - statObject.Req_From_SearcherMover) + obj.message.External.MessageCount;
                                 } else {
-                                    statObject.PacketsDropped = (obj.External.MessageCount - statObject.Req_From_SearcherMover);
+                                    statObject.PacketsDropped = (obj.message.External.MessageCount - statObject.Req_From_SearcherMover);
                                 }
                                 statObject.Req_From_SearcherMover++;
                                 break;
                             case TARGETLOCATOR:
-                                if ((obj.External.MessageCount - statObject.Req_From_TargetLocator) < 0) {
-                                    statObject.PacketsDropped = (256 - statObject.Req_From_TargetLocator) + obj.External.MessageCount;
+                                if ((obj.message.External.MessageCount - statObject.Req_From_TargetLocator) < 0) {
+                                    statObject.PacketsDropped = (256 - statObject.Req_From_TargetLocator) + obj.message.External.MessageCount;
                                 } else {
-                                    statObject.PacketsDropped = (obj.External.MessageCount - statObject.Req_From_TargetLocator);
+                                    statObject.PacketsDropped = (obj.message.External.MessageCount - statObject.Req_From_TargetLocator);
                                 }
                                 statObject.Req_From_TargetLocator++;
                                 break;
                             case PATHFINDER:
-                                if ((obj.External.MessageCount - statObject.Req_From_PathFinder) < 0) {
-                                    statObject.PacketsDropped = (256 - statObject.Req_From_PathFinder) + obj.External.MessageCount;
+                                if ((obj.message.External.MessageCount - statObject.Req_From_PathFinder) < 0) {
+                                    statObject.PacketsDropped = (256 - statObject.Req_From_PathFinder) + obj.message.External.MessageCount;
                                 } else {
-                                    statObject.PacketsDropped = (obj.External.MessageCount - statObject.Req_From_PathFinder);
+                                    statObject.PacketsDropped = (obj.message.External.MessageCount - statObject.Req_From_PathFinder);
                                 }
                                 statObject.Req_From_PathFinder++;
                                 break;
                             case TARGETGRABBER:
-                                if ((obj.External.MessageCount - statObject.Req_From_TargetGrabber) < 0) {
-                                    statObject.PacketsDropped = (256 - statObject.Req_From_TargetGrabber) + obj.External.MessageCount;
+                                if ((obj.message.External.MessageCount - statObject.Req_From_TargetGrabber) < 0) {
+                                    statObject.PacketsDropped = (256 - statObject.Req_From_TargetGrabber) + obj.message.External.MessageCount;
                                 } else {
-                                    statObject.PacketsDropped = (obj.External.MessageCount - statObject.Req_From_TargetGrabber);
+                                    statObject.PacketsDropped = (obj.message.External.MessageCount - statObject.Req_From_TargetGrabber);
                                 }
                                 statObject.Req_From_TargetGrabber++;
                                 break;
@@ -167,7 +167,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         }
 
                         int i = 0;
-                        tx_thread_obj.Destination = obj.External.Source;
+                        tx_thread_obj.Destination = obj.message.External.Source;
                         sprintf(tx_thread_obj.Data, "{\"type\":\"Response\"");
                         for(i = 0; i < numItems; i++) {
                             switch(items[i]) {
@@ -247,22 +247,18 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                             "\"leftFT\":\"%.3f\","
                                             "\"rightFT\":\"%.3f\","
                                             "\"leftFB\":\"%.3f\","
+                                            "\"middleFB\":\"%.3f\","
                                             "\"rightFB\":\"%.3f\"},"
-                                            "\"US\":{"
-                                            "\"leftFT\":\"%.3f\","
-                                            "\"middleFT\":\"%.3f\","
-                                            "\"rightFT\":\"%.3f\","
-                                            "\"leftSD\":\"%.3f\","
-                                            "\"rightSD\":\"%.3f\"}}",
+                                            "\"leftFT\":[\"0\",\"0\",\"0\"]"
+                                            "}",
                                             internalData.sensordata.ir.leftFTSensor,
                                             internalData.sensordata.ir.rightFTSensor,
                                             internalData.sensordata.ir.leftFBSensor,
-                                            internalData.sensordata.ir.rightFBSensor,
-                                            internalData.sensordata.ultrasonic.leftfront,
-                                            internalData.sensordata.ultrasonic.middlefront,
-                                            internalData.sensordata.ultrasonic.rightfront,
-                                            internalData.sensordata.ultrasonic.leftside,
-                                            internalData.sensordata.ultrasonic.rightside
+                                            internalData.sensordata.ir.middleFBSensor,
+                                            internalData.sensordata.ir.rightFBSensor
+//                                            internalData.sensorInformation.leftFrontSensor.sensorLocation.x,
+//                                            internalData.sensorInformation.leftFrontSensor.sensorLocation.y,
+//                                            internalData.sensorInformation.leftFrontSensor.orientation
                                             );
                                     tx_thread_obj.Destination = SERVER;
                                     break;
@@ -275,7 +271,13 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 }
                                 case msLocalTime:{
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"msLocalTime\":\"%d\"", getSystemClock() * 200);
-                                    tx_thread_obj.Destination = obj.External.Source;
+                                    tx_thread_obj.Destination = obj.message.External.Source;
+                                    break;
+                                }
+                                case OccupancyGrid: {
+                                    TL_Queue_t send;
+                                    send.type = REQUESTOCCUPANYGRID;
+                                    SENSOR_THREAD_SendToQueue(send);
                                     break;
                                 }
                                 default:
@@ -283,7 +285,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                             }
                         }
                         sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),"}");
-                        switch(obj.External.Source) {
+                        switch(obj.message.External.Source) {
                             case SEARCHERMOVER: {
                                 tx_thread_obj.MessageCount = statObject.Res_To_SearcherMover;
                                 statObject.Res_To_SearcherMover++;
@@ -312,7 +314,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         break;
                     }
                     case response: {
-                        switch(obj.External.Source) {
+                        switch(obj.message.External.Source) {
                             case SEARCHERMOVER: {
                                 statObject.Res_From_SearcherMover++;
                                 break;
@@ -347,7 +349,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
             case SEND_REQUEST: {
                 dbgOutputLoc(CASE_SEND_REQUEST_MESSAGE_CONTROLLER_THREAD);
                 // We will only need to have a new case for something we are requesting from another PIC
-                switch(obj.Request) {
+                switch(obj.message.Request) {
                     case SMtoTL: {
                         sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"Obstacles\",\"RV1_Location\",\"RV1_Orientation\"]}");
                         tx_thread_obj.Destination = TARGETLOCATOR;
@@ -406,21 +408,22 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
             }
             case UPDATE: {
                 dbgOutputLoc(CASE_UPDATE_MESSAGE_CONTROLLER_THREAD);
-                switch(obj.Update.Type) {
+                switch(obj.message.Update.Type) {
                     case LOCATION:{
-                        internalData.location = obj.Update.Data.location;
+                        internalData.location = obj.message.Update.Data.location;
                         break;
                     }
                     case ORIENTATION: {
-                        internalData.orientation = obj.Update.Data.orientation;
+                        internalData.orientation = obj.message.Update.Data.orientation;
                         break;
                     }
                     case SENSORDATA: {
-                        internalData.sensordata = obj.Update.Data.sensordata;
+                        internalData.sensordata = obj.message.Update.Data.sensordata;
+//                        internalData.sensorInformation = obj.Update.Data.sensorInformation;
                         break;
                     }
                     case TIMERTICK: {
-                        internalData.difftickCount = obj.Update.Data.difftickCount;
+                        internalData.difftickCount = obj.message.Update.Data.difftickCount;
                         break;
                     }
                     default: {

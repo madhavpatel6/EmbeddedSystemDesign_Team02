@@ -58,7 +58,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "communication/messages.h"
 #include "FreeRTOS.h"
 #include "queue.h"
-
+#include "gridhelper.h"
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
@@ -103,6 +103,7 @@ typedef struct {
     Coordinates location;
     float orientation;
     SensorDataType sensordata;
+    SensorDataContainerType sensorInformation;
     uint32_t difftickCount;
 } InternalData;
 
@@ -121,7 +122,7 @@ typedef enum InternalRequestType_enum { SMtoTL,
  } InternalRequestType;
 
 //------------------------------------------------------------------------------
-//You should not need to change anything beyond this point
+// You should not need to change anything beyond this point
 //------------------------------------------------------------------------------
 typedef enum MessageItemType_enum {EXTERNAL_REQUEST_RESPONSE, SEND_REQUEST, UPDATE} MessageItemType;
 
@@ -138,16 +139,19 @@ typedef struct {
     char MessageCount;
 } ExternalObj;
 
+typedef union {
+	ExternalObj External;
+	//If this object is a SENDOUT_REQUEST
+	InternalRequestType Request;
+	//If if the MessageItemType is set to update then we will access the Update object and see what the update is from
+	UpdateObj Update;
+} Message_t;
+
 typedef struct {
     //This is set to update when we are updating internal information
     //It should be set to Request_response when we get an external message
-    MessageItemType Type;
-    //This source is set when we get a request or response from an external source
-    ExternalObj External;
-    //If this object is a SENDOUT_REQUEST
-    InternalRequestType Request;
-    //If if the MessageItemType is set to update then we will access the Update object and see what the update is from
-    UpdateObj Update;
+    MessageItemType type;
+    Message_t message;
 } MessageObj;
 
 typedef struct {
