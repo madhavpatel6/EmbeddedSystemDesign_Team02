@@ -73,7 +73,7 @@ static QueueHandle_t _queue;
   Remarks:
     See prototype in sensor_thread.h.
  */
-
+static int x;
 void SENSOR_THREAD_Initialize ( void )
 {
     SENSOR_THREAD_InitializeQueue();
@@ -81,7 +81,7 @@ void SENSOR_THREAD_Initialize ( void )
 
     DRV_ADC_Open();
 }
-
+static GridType grid;
 /******************************************************************************
   Function:
     void SENSOR_THREAD_Tasks ( void )
@@ -109,7 +109,7 @@ void SENSOR_THREAD_Tasks ( void )
     sensorInformation.middleFrontSensor.maximumMeasuringDistance = 30;
     sensorInformation.middleFrontSensor.minimumMeasuringDistance = 7;
     sensorInformation.middleFrontSensor.orientation = 0;
-    GridType grid;
+
     initializeGrid(grid);
     Movement_t previousAction;
     bool previousActionIsSet = false;
