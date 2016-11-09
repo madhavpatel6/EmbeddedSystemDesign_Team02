@@ -5,7 +5,7 @@
 #ifndef MYQUEUE_H
 #define MYQUEUE_H
 
-#define MAX 1
+#define MAX 10
 
 typedef SensorDataType Queue_t;
 

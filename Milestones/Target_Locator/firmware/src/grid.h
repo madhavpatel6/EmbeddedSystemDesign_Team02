@@ -2,8 +2,8 @@
 #define GRIDCELL_H
 #include <stddef.h>
 #include <stdbool.h>
-#define WIDTH 200
-#define HEIGHT 200
+#define WIDTH 160
+#define HEIGHT 160
 #define MAXIMUM 127
 #define MINIMUM -128
 

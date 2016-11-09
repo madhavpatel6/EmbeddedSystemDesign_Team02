@@ -82,6 +82,7 @@ void SENSOR_THREAD_Initialize ( void )
     DRV_ADC_Open();
 }
 static GridType grid;
+static Queue sensorDataQ;
 /******************************************************************************
   Function:
     void SENSOR_THREAD_Tasks ( void )
@@ -92,7 +93,6 @@ static GridType grid;
 
 void SENSOR_THREAD_Tasks ( void )
 {
-    Queue sensorDataQ;
     initializeQueue(&sensorDataQ);
     TL_Queue_t objRecv;
     MessageObj objSend;
@@ -120,64 +120,62 @@ void SENSOR_THREAD_Tasks ( void )
             case SENSORADC: {
                 ConvertSensorADCToDistance(&objSend.message.Update.Data.sensordata, objRecv.contents.sensors);
                 /* Queue up the sensor data */
-                if(isFull(&sensorDataQ)) {
-                    removeData(&sensorDataQ);
-                    insertData(&sensorDataQ, objSend.message.Update.Data.sensordata);
+                if(FilterIRSensors(objSend.message.Update.Data.sensordata)) {\
+                    if(isFull(&sensorDataQ)) {
+                        removeData(&sensorDataQ);
+                        insertData(&sensorDataQ, objSend.message.Update.Data.sensordata);
+                    }
+                    else {
+                        insertData(&sensorDataQ, objSend.message.Update.Data.sensordata);
+                    }
+                    MESSAGE_CONTROLLER_THREAD_SendToQueue(objSend);
                 }
-                else {
-                    insertData(&sensorDataQ, objSend.message.Update.Data.sensordata);
-                }
-//                point_t location;
-//                location.x = 10;
-//                location.y = 10;
-//                
-//                UpdateSensorLocations(&sensorInformation, objSend.message.Update.Data.sensordata, location, 90+45);
-//                updateOccupanyGrid2(sensorInformation, grid);
-                objSend.message.Update.Data.sensorInformation = sensorInformation;
                 break;
             }
             case RV1_POSUPDATE: {
-                SensorDataType data = removeData(&sensorDataQ);
-                point_t loc;
-                loc.x = objRecv.contents.r1_movement.x;
-                loc.y = objRecv.contents.r1_movement.y;
-                UpdateSensorLocations(&sensorInformation, data, loc, objRecv.contents.r1_movement.orientation);
-                updateOccupanyGrid2(sensorInformation, grid);
-                /*if(previousActionIsSet) {
-                    SensorDataContainerType sI;
-                    sI.middleFrontSensor.minimumMeasuringDistance = 20;
-                    sI.rightFrontSensor.maximumMeasuringDistance = 70;
-                    sI.rightFrontSensor.minimumMeasuringDistance = 20;
-                    sI.rightFrontSensor.orientation = 0;
-                    sI.leftFrontSensor.maximumMeasuringDistance = 70;
-                    sI.leftFrontSensor.minimumMeasuringDistance = 20;
-                    sI.leftFrontSensor.orientation = 0;
-                    sI.middleFrontSensor.maximumMeasuringDistance = 30;
-                    sI.middleFrontSensor.minimumMeasuringDistance = 7;
-                    sI.middleFrontSensor.orientation = 0;
+//                SensorDataType data = removeData(&sensorDataQ);
+//                point_t loc;
+//                loc.x = objRecv.contents.r1_movement.x;
+//                loc.y = objRecv.contents.r1_movement.y;
+//                UpdateSensorLocations(&sensorInformation, data, loc, objRecv.contents.r1_movement.orientation);
+//                updateOccupanyGrid2(sensorInformation, grid);
+                if(previousActionIsSet && size(&sensorDataQ) != 0) {
+                    // Stop the ADC timer
+                    DRV_TMR0_Stop();
                     point_t deltaPosition;
-                    deltaPosition.x = previousAction.x - objRecv.r1_movement.x;
-                    deltaPosition.y = previousAction.y - objRecv.r1_movement.y;
-                    float dtheta = previousAction.orientation - objRecv.r1_movement.orientation;
-                    float distance = sqrt(pow(deltaPosition.x,2) + pow(deltaPosition.y,2));
-                    float increment = distance ;///(size(&sensorDataQ) + 1);
-                    float cosX = cos(objRecv.r1_movement.orientation)*increment;
-                    float sinY = sin(objRecv.r1_movement.orientation)*increment;
                     int i = 0;
-//                    for(i = 1; i <= size(&sensorDataQ) + 1; i++) {
+                    deltaPosition.x = previousAction.x - objRecv.contents.r1_movement.x;
+                    deltaPosition.y = previousAction.y - objRecv.contents.r1_movement.y;
+                    float dtheta =  objRecv.contents.r1_movement.orientation - previousAction.orientation;
+                    float distance = sqrt(pow(deltaPosition.x,2) + pow(deltaPosition.y,2));
+                    float distance_increments = distance / size(&sensorDataQ);
+                    float theta_increments = dtheta / size(&sensorDataQ);
+                    float cosX = cos(objRecv.contents.r1_movement.orientation)*distance_increments;
+                    float sinY = sin(objRecv.contents.r1_movement.orientation)*distance_increments;
+                    int sizeofqueue = size(&sensorDataQ);
+                    for(i = 0; i < sizeofqueue; i++) {
                         SensorDataType data = removeData(&sensorDataQ);
                         point_t location;
+                        float theta = previousAction.orientation + theta_increments*i;
                         location.x = cosX*i+previousAction.x;
                         location.y = sinY*i+previousAction.y;
-                        UpdateSensorLocations(&sI, data, location, 0);
+                        UpdateSensorLocations(&sensorInformation, data, location, theta);
                         updateOccupanyGrid2(sensorInformation, grid);
-//                    }
+                    }
+                    point_t loc;
+                    loc.x = objRecv.contents.r1_movement.x;
+                    loc.y = objRecv.contents.r1_movement.y;
+                    SensorDataType data;
+                    UpdateSensorLocations(&sensorInformation, data, loc, objRecv.contents.r1_movement.orientation);                    
+                    objSend.message.Update.Data.sensorInformation = sensorInformation;
+                    // Start the ADC timer
+                    DRV_TMR0_Start();
                 }
                 else {
-//                    clearQueue(&sensorDataQ);
+                    clearQueue(&sensorDataQ);
                     previousActionIsSet = true;
                 }
-                previousAction = objRecv.r1_movement;*/
+                previousAction = objRecv.contents.r1_movement;
                 break;
             }
             case REQUESTOCCUPANYGRID: {
@@ -197,7 +195,6 @@ void SENSOR_THREAD_Tasks ( void )
                 break;
             }
         }
-        MESSAGE_CONTROLLER_THREAD_SendToQueue(objSend);
     }
 }
 
@@ -328,6 +325,13 @@ void ConvertTopLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
     else {
         *distanceCM = -1;
     }
+}
+
+bool FilterIRSensors(SensorDataType sensors) {
+    if(sensors.ir.middleFBSensor < 17 || sensors.ir.rightFBSensor == -1 || sensors.ir.leftFBSensor == -1) {
+        return false;
+    }
+    return true;
 }
 
 /*******************************************************************************
