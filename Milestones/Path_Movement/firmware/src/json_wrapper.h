@@ -78,6 +78,8 @@ void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numI
 int extractResponse_Vertices(float xArr[], float yArr[]);
 int extractResponse_Obstacles(float arrX[10][4], float arrY[10][4]);
 int extractResponse_Targets(float arrX[10][4], float arrY[10][4]);
+
+bool extractResponse_targetAlignment(bool *g_align, float *distance, float *angle, bool *acquired);
   
 
 #endif /* _EXAMPLE_FILE_NAME_H */

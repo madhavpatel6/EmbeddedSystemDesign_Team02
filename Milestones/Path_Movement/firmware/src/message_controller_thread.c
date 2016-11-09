@@ -340,43 +340,56 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 break;
                             }
                         }
-                        float xArr[10], yArr[10];
-                        int len = extractResponse_Vertices(xArr, yArr);
-                        message_in_t msg;
-                        int j;
-                        if(len > 0){
-                            msg.type = vertex;
-                            for(j = 0; j < len; j++){
-                                msg.x[j] = xArr[j];
-                                msg.y[j] = yArr[j];
-                            }
-                            msg.len = len;
+                        bool g_align, t_acq;
+                        float distance, angle;
+                        if(extractResponse_targetAlignment(&g_align,&distance,&angle, &t_acq)){
+                            message_in_t msg;
+                            msg.type = targetAlignment;
+                            msg.targetAligned = g_align;
+                            msg.targetAcquired = t_acq;
+                            msg.targetAngle = angle;
+                            msg.targetDistance = distance;
                             MOTOR_CONTROLLER_THREAD_SendToQueue(msg);
-                        }
+                        }else{
                         
-                        float obsXArr[10][4], obsYArr[10][4];
-                        len = extractResponse_Obstacles(obsXArr, obsYArr);
-                        int i;
-                        for(i = 0; i < len; i++){
-                            msg.type = obstacle;
-                            for(j = 0; j < 4; j++){
-                                msg.x[j] = obsXArr[i][j];
-                                msg.y[j] = obsYArr[i][j];
+                            float xArr[10], yArr[10];
+                            int len = extractResponse_Vertices(xArr, yArr);
+                            message_in_t msg;
+                            int j;
+                            if(len > 0){
+                                msg.type = vertex;
+                                for(j = 0; j < len; j++){
+                                    msg.x[j] = xArr[j];
+                                    msg.y[j] = yArr[j];
+                                }
+                                msg.len = len;
+                                MOTOR_CONTROLLER_THREAD_SendToQueue(msg);
                             }
-                            msg.len = 4;
-                            MOTOR_CONTROLLER_THREAD_SendToQueue(msg);
-                        }
-                        
-                        float tarXArr[10][4], tarYArr[10][4];
-                        len = extractResponse_Targets(tarXArr, tarYArr);
-                        for(i = 0; i < len; i++){
-                            msg.type = target;
-                            for(j = 0; j < 4; j++){
-                                msg.x[j] = tarXArr[i][j];
-                                msg.y[j] = tarYArr[i][j];
+
+                            float obsXArr[10][4], obsYArr[10][4];
+                            len = extractResponse_Obstacles(obsXArr, obsYArr);
+                            int i;
+                            for(i = 0; i < len; i++){
+                                msg.type = obstacle;
+                                for(j = 0; j < 4; j++){
+                                    msg.x[j] = obsXArr[i][j];
+                                    msg.y[j] = obsYArr[i][j];
+                                }
+                                msg.len = 4;
+                                MOTOR_CONTROLLER_THREAD_SendToQueue(msg);
                             }
-                            msg.len = 4;
-                            MOTOR_CONTROLLER_THREAD_SendToQueue(msg);
+
+                            float tarXArr[10][4], tarYArr[10][4];
+                            len = extractResponse_Targets(tarXArr, tarYArr);
+                            for(i = 0; i < len; i++){
+                                msg.type = target;
+                                for(j = 0; j < 4; j++){
+                                    msg.x[j] = tarXArr[i][j];
+                                    msg.y[j] = tarYArr[i][j];
+                                }
+                                msg.len = 4;
+                                MOTOR_CONTROLLER_THREAD_SendToQueue(msg);
+                            }
                         }
                         
                         break;
@@ -424,7 +437,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         break;
                     }
                     case PFtoTG: {
-                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"PFtoTG\"]}");
+                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"targetAlignment\",\"targetAcquired\"]}");
                         tx_thread_obj.Destination = TARGETGRABBER;
                         tx_thread_obj.MessageCount = statObject.Req_To_TargetGrabber;
                         statObject.Req_To_TargetGrabber++;

@@ -615,6 +615,7 @@ bool can_I_go_targ(Point start){
     
     for(i = 0; i < targetLen; i++){
         for( j = 0; j < pointsToObject; j++){
+            resetPath();
             if(findPath(start, targets[i][j])){
                 if(finalLen < minPath){
                     minPath = finalLen;
@@ -624,11 +625,20 @@ bool can_I_go_targ(Point start){
             }
         }
     }
-    
+    resetPath();
     if(res){
         findPath(start, destination);
     }
     return res;
+}
+
+bool can_I_go_home(Point start){
+    Point destination;
+    destination.x = 0;
+    destination.y = 0;
+    
+    resetPath();
+    return findPath(start, destination);
 }
 
 void getPath(Point path[], int* len){
