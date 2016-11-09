@@ -94,7 +94,7 @@ void ClientSocket::readyRead()
                 }
                 itr = s;
                 QVector<char> vec;
-                for(int i = 0; i < 200; i++) {
+                for(int i = 0; i < 160; i++) {
                     vec.push_back(*itr);
                     itr++;
                 }

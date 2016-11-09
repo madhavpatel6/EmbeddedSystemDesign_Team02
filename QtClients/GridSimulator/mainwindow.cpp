@@ -92,7 +92,7 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     loadSimulationButton = new QPushButton("Load Simulation");
     saveSimulationButton = new QPushButton("Save Simulation");
     sendResponse = new QPushButton("Update PIC Position");
-    ipaddress = new QLineEdit("192.168.1.4");
+    ipaddress = new QLineEdit("192.168.0.197");
     connectToServer = new QPushButton("Connect to Server");
     resetButton = new QPushButton("Reset Simulator");
     simulateMap = new QPushButton("Start Simulation");
