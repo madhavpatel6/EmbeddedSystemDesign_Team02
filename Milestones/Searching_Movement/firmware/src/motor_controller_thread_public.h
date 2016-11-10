@@ -36,8 +36,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+    
+typedef enum MotorType { NORMAL, UPDATE_POSITION } MotorObjType;
 
 typedef struct {
+    MotorObjType type;
     char stop;
     char mode;
     char direction;

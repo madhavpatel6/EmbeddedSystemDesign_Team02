@@ -116,6 +116,23 @@ void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numI
             
             sprintf(buf, "%.*s\0", t[i+1].end - t[i+1].start, JSON_STRING + t[i+1].start);
                     *data = atoi(buf);
+        } else if (jsoneq(JSON_STRING, &t[i], "R1_Location") == 0) {
+            int l = 0;
+            int k = 0;
+            for (l = 0; (l < (sizeof(Dictionary) / sizeof(*Dictionary))); l++) {
+                if (strcmp("R1_Location", Dictionary[l].stringValue) == 0) {
+                    items[k] = Dictionary[l].enumValue;
+                    sprintf(buf, "%.*s\0", t[i+3].end - t[i+3].start, JSON_STRING + t[i+3].start);
+                    motorObj->location.x = atof(buf);
+                    sprintf(buf, "%.*s\0", t[i+5].end - t[i+5].start, JSON_STRING + t[i+5].start);
+                    motorObj->location.y = atof(buf);
+                    sprintf(buf, "%.*s\0", t[i+7].end - t[i+7].start, JSON_STRING + t[i+7].start);
+                    motorObj->orientation = atof(buf);
+                    k++;
+                    break;
+                }
+            }
+            *numItems = k;
         }
     }
 }

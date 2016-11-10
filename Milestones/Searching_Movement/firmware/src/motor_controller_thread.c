@@ -156,7 +156,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
             MOTOR_CONTROLLER_THREAD_ReadFromQueue(&motorObj);
             dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
 
-            if (motorObj.mode != NULL) {
+            if (motorObj.type == UPDATE_POSITION) {
                 mode = motorObj.mode;
                 x = motorObj.location.x;
                 y = motorObj.location.y;
@@ -251,6 +251,12 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                     state = stop;
                 }
 
+                if (motorObj.type == UPDATE_POSITION) {
+                    x = motorObj.location.x;
+                    y = motorObj.location.y;
+                    orientation = motorObj.orientation;
+                }
+                
                 switch (state) {
                     case forward: {
                         if ((motorObj.lineLocation == 0) && (motorObj.sensorData == 0)) {
@@ -382,6 +388,12 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 
                 if (motorObj.stop == 'Y') {
                     state = stop;
+                }
+                
+                if (motorObj.type == UPDATE_POSITION) {
+                    x = motorObj.location.x;
+                    y = motorObj.location.y;
+                    orientation = motorObj.orientation;
                 }
 
                 switch (state) {

@@ -358,6 +358,25 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                             }
                             case TARGETLOCATOR: {
                                 statObject.Res_From_TargetLocator++;
+                                
+                                int i = 0;
+                                for(i = 0; i < numItems; i++) {
+                                    switch(items[i]) {
+                                        case SensorData: {
+                                            motorObj.sensorData = data;
+                                            MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
+                                            break;
+                                        }
+                                        case R1_Location: {
+                                            motorObj.type = UPDATE_POSITION;
+                                            MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
+                                            break;
+                                        }
+                                        default: {
+                                            break;
+                                        }
+                                    }
+                                }
                                 break;
                             }
                             case PATHFINDER: {
@@ -374,6 +393,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     switch(items[i]) {
                                         case InitialData: {
                                             initialized = true;
+                                            motorObj.type = UPDATE_POSITION;
                                             motorObj.mode = mode;
                                             MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                             break;
@@ -383,11 +403,17 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                             MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                             break;
                                         }
+                                        case R1_Location: {
+                                            motorObj.type = UPDATE_POSITION;
+                                            MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
+                                            break;
+                                        }
                                         default: {
                                             break;
                                         }
                                     }
                                 }
+                                break;
                             }
                             default: {
                                 break;
