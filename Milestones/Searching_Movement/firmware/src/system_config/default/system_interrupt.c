@@ -124,7 +124,7 @@ void IntHandlerDrvAdc(void)
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
 }
 
-/* This timer is for the ADC to fire every 100 ms */
+/* This timer is for PWM, fires every 100 ms */
 // Timer 2
 void IntHandlerDrvTmrInstance0(void)
 {

@@ -84,6 +84,8 @@ static bool motionComplete = true;
 
 static int integralLeft = 0;
 
+static unsigned int msTimer = 0;
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Application Initialization and State Machine Functions
@@ -408,7 +410,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                         if (totalDistance < -3) {
                             completeMotion();
                             state = turnRight;
-                            angle = rand() % 360;
+                            angle = rand() % 180;
                         }
                         break;
                     }
@@ -456,16 +458,13 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
             prevLeftCount = leftCount;
             
             // Orientation correction for mismatched ticks when going straight
-//            switch(movement.action) {
-//                case FORWARD: case BACKWARD: {
-//                    weightedDiff = (deltaRight - deltaLeft)/2;
-//                    deltaLeft = deltaRight - weightedDiff;
-//    //                weightedDiff = (deltaRight + deltaLeft)/2;
-//    //                deltaRight = weightedDiff;
-//    //                deltaLeft = weightedDiff;
-//                    break;
-//                }
-//            }
+            switch(movement.action) {
+                case FORWARD: case BACKWARD: {
+                    weightedDiff = (deltaRight - deltaLeft)/2;
+                    deltaLeft = deltaRight - weightedDiff;
+                    break;
+                }
+            }
             
             // Calculate distance traveled
             distance = ((deltaRight+deltaLeft)/2.0)/TICKS_PER_CM;
@@ -513,6 +512,8 @@ int prevLeftPID = 0;
 
 // PID algorithm to match left motor speed to right motor
 void MOTOR_CONTROLLER_THREAD_CorrectSpeed(int timer) {
+    msTimer++;
+    
     int errorLeft = 0;
     int outputLeft = 0;
     
@@ -581,24 +582,30 @@ void enableMotors(int mode) {
 
 // Set pulse width for both motors to 0
 void disableMotors(void) {
-    
+    unsigned int currentTime = msTimer;
     int right = rightSpeed;
     int left = leftSpeed;
     
     while ((right > 0) && (left > 0)) {
-        right -= 2;
-        left -= 2;
+        Tx_Thead_Queue_DataType tx_thread_obj;
+            memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
+            tx_thread_obj.Destination = TARGETLOCATOR;
+            BaseType_t *ptr;
+            sprintf(tx_thread_obj.Data, "right: %d, left: %d", right, left);
+            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+            
+            sprintf(tx_thread_obj.Data, "msTimer: %d, currentTime: %d", msTimer, currentTime);
+            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+            
+        if ((msTimer-currentTime) >= 1) {
+            right = right/2;
+            left = left/2;
         
-        if (right < 0) {
-            right = 0;
+            PLIB_OC_PulseWidth16BitSet(OC_ID_1, right);
+            PLIB_OC_PulseWidth16BitSet(OC_ID_2, left);
+            
+            currentTime = msTimer;
         }
-        
-        if (left < 0) {
-            left = 0;
-        }
-        
-        PLIB_OC_PulseWidth16BitSet(OC_ID_1, right);
-        PLIB_OC_PulseWidth16BitSet(OC_ID_2, left);
     }
 }
 
