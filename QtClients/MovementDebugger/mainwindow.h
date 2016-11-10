@@ -27,7 +27,7 @@ signals:
     void pb_rightClicked(int degrees);
     void pb_obstacleClicked(bool send);
     void pb_clearClicked(bool send);
-    void sendInitialData(char mode);
+    void sendInitialData(QString mode, QString position, QString numVertices, QString vertices);
 
 public slots:
     void on_pb_connectToServer_clicked();

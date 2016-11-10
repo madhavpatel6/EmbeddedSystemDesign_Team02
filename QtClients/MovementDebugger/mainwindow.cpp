@@ -28,28 +28,12 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(updateMovement(char,QString,QString,QString,QString,QString)));
     connect(tcpSocket, SIGNAL(sendLineLocation(int)), this, SLOT(updateLineLocation(int)));
     connect(tcpSocket, SIGNAL(initialRequest()), this, SLOT(sendInitialResponse()));
-    connect(this, SIGNAL(sendInitialData(char)), tcpSocket, SLOT(sendInitialData(char)));
+    connect(this, SIGNAL(sendInitialData(QString,QString,QString,QString)), tcpSocket, SLOT(sendInitialData(QString,QString,QString,QString)));
 
-//    ui->lbl_1->setVisible(false);   ui->le_x1->setVisible(false);   ui->le_y1->setVisible(false);
-//    ui->lbl_2->setVisible(false);   ui->le_x2->setVisible(false);   ui->le_y2->setVisible(false);
-//    ui->lbl_3->setVisible(false);   ui->le_x3->setVisible(false);   ui->le_y3->setVisible(false);
-//    ui->lbl_4->setVisible(false);   ui->le_x4->setVisible(false);   ui->le_y4->setVisible(false);
-//    ui->lbl_5->setVisible(false);   ui->le_x5->setVisible(false);   ui->le_y5->setVisible(false);
-//    ui->lbl_6->setVisible(false);   ui->le_x6->setVisible(false);   ui->le_y6->setVisible(false);
-//    ui->lbl_7->setVisible(false);   ui->le_x7->setVisible(false);   ui->le_y7->setVisible(false);
-//    ui->lbl_8->setVisible(false);   ui->le_x8->setVisible(false);   ui->le_y8->setVisible(false);
-//    ui->lbl_9->setVisible(false);   ui->le_x9->setVisible(false);   ui->le_y9->setVisible(false);
-//    ui->lbl_10->setVisible(false);   ui->le_x10->setVisible(false);   ui->le_y10->setVisible(false);
-//    ui->lbl_11->setVisible(false);   ui->le_x11->setVisible(false);   ui->le_y11->setVisible(false);
-//    ui->lbl_12->setVisible(false);   ui->le_x12->setVisible(false);   ui->le_y12->setVisible(false);
-//    ui->lbl_13->setVisible(false);   ui->le_x13->setVisible(false);   ui->le_y13->setVisible(false);
-//    ui->lbl_14->setVisible(false);   ui->le_x14->setVisible(false);   ui->le_y14->setVisible(false);
-//    ui->lbl_15->setVisible(false);   ui->le_x15->setVisible(false);   ui->le_y15->setVisible(false);
-//    ui->lbl_16->setVisible(false);   ui->le_x16->setVisible(false);   ui->le_y16->setVisible(false);
-//    ui->lbl_17->setVisible(false);   ui->le_x17->setVisible(false);   ui->le_y17->setVisible(false);
-//    ui->lbl_18->setVisible(false);   ui->le_x18->setVisible(false);   ui->le_y18->setVisible(false);
-//    ui->lbl_19->setVisible(false);   ui->le_x19->setVisible(false);   ui->le_y19->setVisible(false);
-//    ui->lbl_20->setVisible(false);   ui->le_x20->setVisible(false);   ui->le_y20->setVisible(false);
+    QStringList colHeaders;
+    colHeaders << "x" << "y";
+    ui->tbl_vertices->setHorizontalHeaderLabels(colHeaders);
+    ui->tbl_vertices->setRowCount(ui->sb_numVertices->value());
 }
 
 MainWindow::~MainWindow()
@@ -134,17 +118,47 @@ void MainWindow::updateLineLocation(int location)
 
 void MainWindow::sendInitialResponse()
 {
-    char mode;
+    QString mode;
+    QString position;
+    QString numVertices;
+    QString vertices;
+    int count = 0;
+
+    mode = "\"mode\":";
 
     if (ui->rb_debug->isChecked()) {
-        mode = 'D';
+        mode.append("\"D\"");
     } else if (ui->rb_lawnmower->isChecked()) {
-        mode = 'L';
+        mode.append("\"L\"");
     } else if (ui->rb_random->isChecked()) {
-        mode = 'R';
+        mode.append("\"R\"");
     }
 
-    emit sendInitialData(mode);
+    position = "\"x\":\"" + QString::number(ui->sb_x_initial->value()) + "\"," +
+            "\"y\":\"" + QString::number(ui->sb_y_initial->value()) + "\"," +
+            "\"orientation\":\"" + QString::number(ui->sb_orientation_initial->value()) + "\"";
+
+    numVertices = "\"numVertices\":\"" + QString::number(ui->sb_numVertices->value()) + "\"";
+
+    vertices = "\"vertices\":[";
+
+    for (int i = 0; i < ui->sb_numVertices->value(); i++) {
+        if (ui->tbl_vertices->item(i, 0) && ui->tbl_vertices->item(i, 1)) {
+            count++;
+            vertices.append("[\"" + ui->tbl_vertices->item(i, 0)->text() + "\",\"" +
+                            ui->tbl_vertices->item(i, 1)->text() + "\"]");
+
+            if (i != ui->sb_numVertices->value() - 1) {
+                vertices.append(",");
+            }
+        }
+    }
+
+    vertices.append("]");
+
+    if (count == ui->sb_numVertices->value()) {
+        emit sendInitialData(mode, position, numVertices, vertices);
+    }
 }
 
 void MainWindow::on_pb_forward_clicked()
@@ -223,5 +237,47 @@ void MainWindow::on_pb_obstacle_clicked()
 
 void MainWindow::on_sb_numVertices_valueChanged(int value)
 {
+    ui->tbl_vertices->setRowCount(ui->sb_numVertices->value());
 
+    QString mode;
+    QString position;
+    QString numVertices;
+    QString vertices;
+    int count = 0;
+
+    mode = "\"mode\":";
+
+    if (ui->rb_debug->isChecked()) {
+        mode.append("\"D\"");
+    } else if (ui->rb_lawnmower->isChecked()) {
+        mode.append("\"L\"");
+    } else if (ui->rb_random->isChecked()) {
+        mode.append("\"R\"");
+    }
+
+    position = "\"x\":\"" + QString::number(ui->sb_x_initial->value()) + "\"," +
+            "\"y\":\"" + QString::number(ui->sb_y_initial->value()) + "\"," +
+            "\"orientation\":\"" + QString::number(ui->sb_orientation_initial->value()) + "\"";
+
+    numVertices = "\"numVertices\":\"" + QString::number(ui->sb_numVertices->value()) + "\"";
+
+    vertices = "\"vertices\":[";
+
+    for (int i = 0; i < ui->sb_numVertices->value(); i++) {
+        if (ui->tbl_vertices->item(i, 0) && ui->tbl_vertices->item(i, 1)) {
+            count++;
+            vertices.append("[\"" + ui->tbl_vertices->item(i, 0)->text() + "\",\"" +
+                            ui->tbl_vertices->item(i, 1)->text() + "\"]");
+
+            if (i != ui->sb_numVertices->value() - 1) {
+                vertices.append(",");
+            }
+        }
+    }
+
+    vertices.append("]");
+
+    QString response_begin = "{\"type\":\"Response\",\"InitialData\":{";
+    QString response_end = "}}";
+    qDebug() << response_begin + mode + "," + position + "," + numVertices + "," + vertices + response_end;
 }

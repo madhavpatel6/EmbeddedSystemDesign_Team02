@@ -71,10 +71,10 @@ void ClientSocket::sendRightCommand(int degrees){
     qDebug() << request_begin + "\"Right\":" + "\"" + QString::number(degrees) + "\"" + request_end;
 }
 
-void ClientSocket::sendInitialData(char mode){
-    QString response_begin = "{\"type\":\"Response\",";
-    QString response_end = "}";
-    SendJSONResponseToSocket(response_begin + "\"InitialData\":{\"mode\":\"" + mode + "\"}" + response_end, SEARCHERMOVER);
+void ClientSocket::sendInitialData(QString mode, QString position, QString numVertices, QString vertices) {
+    QString response_begin = "{\"type\":\"Response\",\"InitialData\":{";
+    QString response_end = "}}";
+    SendJSONResponseToSocket(response_begin + mode + "," + position + "," + numVertices + "," + vertices + response_end, SEARCHERMOVER);
 }
 
 void ClientSocket::sendClear(bool send){
