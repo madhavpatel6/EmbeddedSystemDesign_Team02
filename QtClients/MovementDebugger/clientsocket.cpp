@@ -232,9 +232,9 @@ void ClientSocket::HandleRequest(QJsonArray array)
 
         if (sendData) {
             if (isClear) {
-                data = "[\"0\",\"0\",\"0\"]";
+                data = "\"0\"";
             } else {
-                data = "[\"1\",\"1\",\"1\"]";
+                data = "\"1\"";
             }
             SendJSONResponseToSocket(response_begin + "\"SensorData\":" + data + response_end, SEARCHERMOVER);
         }
