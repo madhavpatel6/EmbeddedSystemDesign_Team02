@@ -39,7 +39,7 @@ void initParser(){
 }
 
 
-void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, int *value, char *mode, uint8_t *data){
+void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, int *value, char *mode, uint8_t *data, MotorObj *motorObj){
     int r, i;
     r = jsmn_parse(&p, JSON_STRING, strlen(JSON_STRING), t, sizeof(t)/sizeof(t[0]));
     for(i = 1; i < r; i++){
@@ -90,6 +90,12 @@ void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numI
                     items[k] = Dictionary[l].enumValue;
                     sprintf(buf, "%.*s\0", t[i+3].end - t[i+3].start, JSON_STRING + t[i+3].start);
                     *mode = buf[0];
+                    sprintf(buf, "%.*s\0", t[i+5].end - t[i+5].start, JSON_STRING + t[i+5].start);
+                    motorObj->location.x = atof(buf);
+                    sprintf(buf, "%.*s\0", t[i+7].end - t[i+7].start, JSON_STRING + t[i+7].start);
+                    motorObj->location.y = atof(buf);
+                    sprintf(buf, "%.*s\0", t[i+9].end - t[i+9].start, JSON_STRING + t[i+9].start);
+                    motorObj->orientation = atof(buf);
                     k++;
                     break;
                 }
@@ -97,29 +103,19 @@ void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numI
             *numItems = k;
         } else if (jsoneq(JSON_STRING, &t[i], "SensorData") == 0) {
             int j = 0;
-            int l = 0;
             int k = 0;
-            if (t[i+1].type != JSMN_ARRAY) {
-                continue; /* We expect items to be an array of strings */
-            }
-            for (j = 0; j < t[i+1].size; j++) {
-                jsmntok_t *g = &t[i+j+2];
-                sprintf(buf, "%.*s\0", g->end - g->start, JSON_STRING + g->start);
-                if (strcmp(buf, "0") == 0) {
-                    *data = 0;
-                } else {
-                    *data = 1;
-                    break;
-                }
-            }
-            for (l = 0; (l < (sizeof(Dictionary) / sizeof(*Dictionary))); l++) {
-                if (strcmp("SensorData", Dictionary[l].stringValue) == 0) {
-                    items[k] = Dictionary[l].enumValue;
+            
+            for (j = 0; (j < (sizeof(Dictionary) / sizeof(*Dictionary))); j++) {
+                if (strcmp("SensorData", Dictionary[j].stringValue) == 0) {
+                    items[k] = Dictionary[j].enumValue;
                     k++;
                     break;
                 }
             }
             *numItems = k;
+            
+            sprintf(buf, "%.*s\0", t[i+1].end - t[i+1].start, JSON_STRING + t[i+1].start);
+                    *data = atoi(buf);
         }
     }
 }

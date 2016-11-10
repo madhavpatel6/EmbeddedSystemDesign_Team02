@@ -25,13 +25,14 @@
 #include <string.h>
 #include <stdio.h>
 #include "communication/jsmn.h"
+#include "motor_controller_thread_public.h"
 
 typedef enum {request, response, unknown} type_t;
 typedef enum {CommStatsSearcherMover, CommStatsTargetLocator, CommStatsPathFinder, 
             CommStatsTargetGrabber, DetailedCommStatsSearcherMover, 
             DetailedCommStatsTargetLocator, DetailedCommStatsPathFinder,
             DetailedCommStatsTargetGrabber, R1_Movement, Forward, Back, Left, Right, 
-            InitialData, SensorData, LineLocation, msLocalTime} items_t;
+            Start, Stop, InitialData, SensorData, LineLocation, msLocalTime} items_t;
 
 typedef struct {
   char stringValue[512];
@@ -53,6 +54,8 @@ static const DictionaryType Dictionary[] = {
     {"Back", Back},
     {"Left", Left},
     {"Right", Right},
+    {"Start", Start},
+    {"Stop", Stop},
     {"InitialData", InitialData},
     {"SensorData", SensorData},
     {"LineLocation", LineLocation},
@@ -68,7 +71,7 @@ int jsoneq(const char *json, jsmntok_t *tok, const char *s) ;
 
 void initParser();
 
-void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, int *value, char *mode, uint8_t *data);
+void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, int *value, char *mode, uint8_t *data, MotorObj *motorObj);
 
 #endif /* _EXAMPLE_FILE_NAME_H */
 

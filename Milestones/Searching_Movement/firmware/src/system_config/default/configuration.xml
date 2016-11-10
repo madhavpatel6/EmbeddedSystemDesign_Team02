@@ -265,12 +265,12 @@
       <Template>
         <Name>drv_adc_static.h</Name>
         <Path>Header Files/app/system_config/default/framework/driver/adc</Path>
-        <Checksum>66ECC7C9E0269D4CEDE4D3AF31A212A6</Checksum>
+        <Checksum>8A4EDE216AAB54F878E62BB78CB6D96E</Checksum>
       </Template>
       <Template>
         <Name>drv_adc_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/adc/src</Path>
-        <Checksum>0D46C15B329C42766811E54D515BB5FF</Checksum>
+        <Checksum>D420ABDBEA9026BF738C912FCA33CCF2</Checksum>
         <ProjectFileChecksum>6E96E409763E47F6A1694F64D86CEE2B</ProjectFileChecksum>
       </Template>
       <Template>
