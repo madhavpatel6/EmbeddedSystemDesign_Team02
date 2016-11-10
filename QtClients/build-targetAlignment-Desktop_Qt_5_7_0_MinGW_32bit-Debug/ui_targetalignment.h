@@ -15,6 +15,7 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLCDNumber>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
@@ -76,11 +77,7 @@ public:
     QSpacerItem *horizontalSpacer_4;
     QPlainTextEdit *IR_2PlainTextEdit;
     QTextEdit *IR_2_bool_textEdit;
-    QWidget *widget;
-    QHBoxLayout *horizontalLayout_5;
-    QLabel *AlignmentInfoLabel;
-    QLabel *Alignment_InfoLabel;
-    QWidget *widget1;
+    QWidget *layoutWidget1;
     QVBoxLayout *verticalLayout_2;
     QPushButton *startSensingButton;
     QLabel *numberOfSensorValuesReceivedLabel;
@@ -94,6 +91,49 @@ public:
     QHBoxLayout *horizontalLayout_2;
     QLabel *GrabberIsAlignedLabel;
     QLabel *Grabber_AlignedLabel;
+    QWidget *layoutWidget2;
+    QVBoxLayout *verticalLayout_9;
+    QHBoxLayout *horizontalLayout_5;
+    QLabel *AlignmentInfoLabel;
+    QLabel *Alignment_InfoLabel;
+    QHBoxLayout *horizontalLayout_11;
+    QVBoxLayout *verticalLayout_8;
+    QPushButton *calculateVarianceButton;
+    QHBoxLayout *horizontalLayout_10;
+    QLabel *varianceStartedLabel;
+    QLabel *variance_started_label;
+    QVBoxLayout *verticalLayout_7;
+    QLabel *varianceIR0Label;
+    QLCDNumber *varianceIR0LcdNumber;
+    QVBoxLayout *verticalLayout_5;
+    QLabel *varianceIR1Label;
+    QLCDNumber *varianceIR1LcdNumber;
+    QVBoxLayout *verticalLayout_3;
+    QLabel *varianceIR2Label;
+    QLCDNumber *varianceIR2LcdNumber;
+    QWidget *widget;
+    QVBoxLayout *verticalLayout_11;
+    QHBoxLayout *horizontalLayout_15;
+    QLabel *label_4;
+    QLCDNumber *meanIR0LcdNumber;
+    QLCDNumber *meanIR1LcdNumber;
+    QLCDNumber *meanIR2LcdNumber;
+    QVBoxLayout *verticalLayout_10;
+    QHBoxLayout *horizontalLayout_12;
+    QLabel *xiLabel;
+    QLCDNumber *ximeanIR0LcdNumber;
+    QLCDNumber *ximeanIR1LcdNumber;
+    QLCDNumber *ximeanIR2LcdNumber;
+    QHBoxLayout *horizontalLayout_13;
+    QLabel *ximeansqLabel;
+    QLCDNumber *ximeansqIR0LcdNumber;
+    QLCDNumber *ximeansqIR1LcdNumber;
+    QLCDNumber *ximeansqIR2LcdNumber;
+    QHBoxLayout *horizontalLayout_14;
+    QLabel *sumximeansqLabel;
+    QLCDNumber *sumximeansqIR0LcdNumber;
+    QLCDNumber *sumximeansqIR1LcdNumber;
+    QLCDNumber *sumximeansqIR2LcdNumber;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -102,7 +142,7 @@ public:
     {
         if (targetAlignment->objectName().isEmpty())
             targetAlignment->setObjectName(QStringLiteral("targetAlignment"));
-        targetAlignment->resize(701, 434);
+        targetAlignment->resize(802, 625);
         centralWidget = new QWidget(targetAlignment);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         layoutWidget_3 = new QWidget(centralWidget);
@@ -310,39 +350,20 @@ public:
 
         verticalLayout->addLayout(horizontalLayout);
 
-        widget = new QWidget(centralWidget);
-        widget->setObjectName(QStringLiteral("widget"));
-        widget->setGeometry(QRect(12, 330, 271, 31));
-        horizontalLayout_5 = new QHBoxLayout(widget);
-        horizontalLayout_5->setSpacing(6);
-        horizontalLayout_5->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
-        horizontalLayout_5->setContentsMargins(0, 0, 0, 0);
-        AlignmentInfoLabel = new QLabel(widget);
-        AlignmentInfoLabel->setObjectName(QStringLiteral("AlignmentInfoLabel"));
-
-        horizontalLayout_5->addWidget(AlignmentInfoLabel);
-
-        Alignment_InfoLabel = new QLabel(widget);
-        Alignment_InfoLabel->setObjectName(QStringLiteral("Alignment_InfoLabel"));
-        Alignment_InfoLabel->setAlignment(Qt::AlignCenter);
-
-        horizontalLayout_5->addWidget(Alignment_InfoLabel);
-
-        widget1 = new QWidget(centralWidget);
-        widget1->setObjectName(QStringLiteral("widget1"));
-        widget1->setGeometry(QRect(352, 10, 341, 131));
-        verticalLayout_2 = new QVBoxLayout(widget1);
+        layoutWidget1 = new QWidget(centralWidget);
+        layoutWidget1->setObjectName(QStringLiteral("layoutWidget1"));
+        layoutWidget1->setGeometry(QRect(352, 10, 341, 131));
+        verticalLayout_2 = new QVBoxLayout(layoutWidget1);
         verticalLayout_2->setSpacing(6);
         verticalLayout_2->setContentsMargins(11, 11, 11, 11);
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
-        startSensingButton = new QPushButton(widget1);
+        startSensingButton = new QPushButton(layoutWidget1);
         startSensingButton->setObjectName(QStringLiteral("startSensingButton"));
 
         verticalLayout_2->addWidget(startSensingButton);
 
-        numberOfSensorValuesReceivedLabel = new QLabel(widget1);
+        numberOfSensorValuesReceivedLabel = new QLabel(layoutWidget1);
         numberOfSensorValuesReceivedLabel->setObjectName(QStringLiteral("numberOfSensorValuesReceivedLabel"));
         numberOfSensorValuesReceivedLabel->setAlignment(Qt::AlignCenter);
         numberOfSensorValuesReceivedLabel->setWordWrap(false);
@@ -352,32 +373,32 @@ public:
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setSpacing(6);
         horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
-        IR_0Label = new QLabel(widget1);
+        IR_0Label = new QLabel(layoutWidget1);
         IR_0Label->setObjectName(QStringLiteral("IR_0Label"));
 
         horizontalLayout_3->addWidget(IR_0Label);
 
-        IR_0CountLabel = new QLabel(widget1);
+        IR_0CountLabel = new QLabel(layoutWidget1);
         IR_0CountLabel->setObjectName(QStringLiteral("IR_0CountLabel"));
 
         horizontalLayout_3->addWidget(IR_0CountLabel);
 
-        IR_1Label = new QLabel(widget1);
+        IR_1Label = new QLabel(layoutWidget1);
         IR_1Label->setObjectName(QStringLiteral("IR_1Label"));
 
         horizontalLayout_3->addWidget(IR_1Label);
 
-        IR_1CountLabel = new QLabel(widget1);
+        IR_1CountLabel = new QLabel(layoutWidget1);
         IR_1CountLabel->setObjectName(QStringLiteral("IR_1CountLabel"));
 
         horizontalLayout_3->addWidget(IR_1CountLabel);
 
-        IR_2Label = new QLabel(widget1);
+        IR_2Label = new QLabel(layoutWidget1);
         IR_2Label->setObjectName(QStringLiteral("IR_2Label"));
 
         horizontalLayout_3->addWidget(IR_2Label);
 
-        IR_2CountLabel = new QLabel(widget1);
+        IR_2CountLabel = new QLabel(layoutWidget1);
         IR_2CountLabel->setObjectName(QStringLiteral("IR_2CountLabel"));
 
         horizontalLayout_3->addWidget(IR_2CountLabel);
@@ -388,12 +409,12 @@ public:
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setSpacing(6);
         horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
-        GrabberIsAlignedLabel = new QLabel(widget1);
+        GrabberIsAlignedLabel = new QLabel(layoutWidget1);
         GrabberIsAlignedLabel->setObjectName(QStringLiteral("GrabberIsAlignedLabel"));
 
         horizontalLayout_2->addWidget(GrabberIsAlignedLabel);
 
-        Grabber_AlignedLabel = new QLabel(widget1);
+        Grabber_AlignedLabel = new QLabel(layoutWidget1);
         Grabber_AlignedLabel->setObjectName(QStringLiteral("Grabber_AlignedLabel"));
 
         horizontalLayout_2->addWidget(Grabber_AlignedLabel);
@@ -401,10 +422,244 @@ public:
 
         verticalLayout_2->addLayout(horizontalLayout_2);
 
+        layoutWidget2 = new QWidget(centralWidget);
+        layoutWidget2->setObjectName(QStringLiteral("layoutWidget2"));
+        layoutWidget2->setGeometry(QRect(10, 332, 681, 86));
+        verticalLayout_9 = new QVBoxLayout(layoutWidget2);
+        verticalLayout_9->setSpacing(6);
+        verticalLayout_9->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_9->setObjectName(QStringLiteral("verticalLayout_9"));
+        verticalLayout_9->setContentsMargins(0, 0, 0, 0);
+        horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setSpacing(6);
+        horizontalLayout_5->setObjectName(QStringLiteral("horizontalLayout_5"));
+        AlignmentInfoLabel = new QLabel(layoutWidget2);
+        AlignmentInfoLabel->setObjectName(QStringLiteral("AlignmentInfoLabel"));
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(AlignmentInfoLabel->sizePolicy().hasHeightForWidth());
+        AlignmentInfoLabel->setSizePolicy(sizePolicy);
+
+        horizontalLayout_5->addWidget(AlignmentInfoLabel);
+
+        Alignment_InfoLabel = new QLabel(layoutWidget2);
+        Alignment_InfoLabel->setObjectName(QStringLiteral("Alignment_InfoLabel"));
+        Alignment_InfoLabel->setAlignment(Qt::AlignCenter);
+
+        horizontalLayout_5->addWidget(Alignment_InfoLabel);
+
+
+        verticalLayout_9->addLayout(horizontalLayout_5);
+
+        horizontalLayout_11 = new QHBoxLayout();
+        horizontalLayout_11->setSpacing(6);
+        horizontalLayout_11->setObjectName(QStringLiteral("horizontalLayout_11"));
+        verticalLayout_8 = new QVBoxLayout();
+        verticalLayout_8->setSpacing(6);
+        verticalLayout_8->setObjectName(QStringLiteral("verticalLayout_8"));
+        calculateVarianceButton = new QPushButton(layoutWidget2);
+        calculateVarianceButton->setObjectName(QStringLiteral("calculateVarianceButton"));
+
+        verticalLayout_8->addWidget(calculateVarianceButton);
+
+        horizontalLayout_10 = new QHBoxLayout();
+        horizontalLayout_10->setSpacing(6);
+        horizontalLayout_10->setObjectName(QStringLiteral("horizontalLayout_10"));
+        varianceStartedLabel = new QLabel(layoutWidget2);
+        varianceStartedLabel->setObjectName(QStringLiteral("varianceStartedLabel"));
+        sizePolicy.setHeightForWidth(varianceStartedLabel->sizePolicy().hasHeightForWidth());
+        varianceStartedLabel->setSizePolicy(sizePolicy);
+
+        horizontalLayout_10->addWidget(varianceStartedLabel);
+
+        variance_started_label = new QLabel(layoutWidget2);
+        variance_started_label->setObjectName(QStringLiteral("variance_started_label"));
+
+        horizontalLayout_10->addWidget(variance_started_label);
+
+
+        verticalLayout_8->addLayout(horizontalLayout_10);
+
+
+        horizontalLayout_11->addLayout(verticalLayout_8);
+
+        verticalLayout_7 = new QVBoxLayout();
+        verticalLayout_7->setSpacing(6);
+        verticalLayout_7->setObjectName(QStringLiteral("verticalLayout_7"));
+        varianceIR0Label = new QLabel(layoutWidget2);
+        varianceIR0Label->setObjectName(QStringLiteral("varianceIR0Label"));
+        varianceIR0Label->setAlignment(Qt::AlignCenter);
+
+        verticalLayout_7->addWidget(varianceIR0Label);
+
+        varianceIR0LcdNumber = new QLCDNumber(layoutWidget2);
+        varianceIR0LcdNumber->setObjectName(QStringLiteral("varianceIR0LcdNumber"));
+
+        verticalLayout_7->addWidget(varianceIR0LcdNumber);
+
+
+        horizontalLayout_11->addLayout(verticalLayout_7);
+
+        verticalLayout_5 = new QVBoxLayout();
+        verticalLayout_5->setSpacing(6);
+        verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
+        varianceIR1Label = new QLabel(layoutWidget2);
+        varianceIR1Label->setObjectName(QStringLiteral("varianceIR1Label"));
+        varianceIR1Label->setAlignment(Qt::AlignCenter);
+
+        verticalLayout_5->addWidget(varianceIR1Label);
+
+        varianceIR1LcdNumber = new QLCDNumber(layoutWidget2);
+        varianceIR1LcdNumber->setObjectName(QStringLiteral("varianceIR1LcdNumber"));
+
+        verticalLayout_5->addWidget(varianceIR1LcdNumber);
+
+
+        horizontalLayout_11->addLayout(verticalLayout_5);
+
+        verticalLayout_3 = new QVBoxLayout();
+        verticalLayout_3->setSpacing(6);
+        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
+        varianceIR2Label = new QLabel(layoutWidget2);
+        varianceIR2Label->setObjectName(QStringLiteral("varianceIR2Label"));
+        varianceIR2Label->setAlignment(Qt::AlignCenter);
+
+        verticalLayout_3->addWidget(varianceIR2Label);
+
+        varianceIR2LcdNumber = new QLCDNumber(layoutWidget2);
+        varianceIR2LcdNumber->setObjectName(QStringLiteral("varianceIR2LcdNumber"));
+
+        verticalLayout_3->addWidget(varianceIR2LcdNumber);
+
+
+        horizontalLayout_11->addLayout(verticalLayout_3);
+
+
+        verticalLayout_9->addLayout(horizontalLayout_11);
+
+        widget = new QWidget(centralWidget);
+        widget->setObjectName(QStringLiteral("widget"));
+        widget->setGeometry(QRect(10, 420, 681, 125));
+        verticalLayout_11 = new QVBoxLayout(widget);
+        verticalLayout_11->setSpacing(6);
+        verticalLayout_11->setContentsMargins(11, 11, 11, 11);
+        verticalLayout_11->setObjectName(QStringLiteral("verticalLayout_11"));
+        verticalLayout_11->setContentsMargins(0, 0, 0, 0);
+        horizontalLayout_15 = new QHBoxLayout();
+        horizontalLayout_15->setSpacing(6);
+        horizontalLayout_15->setObjectName(QStringLiteral("horizontalLayout_15"));
+        label_4 = new QLabel(widget);
+        label_4->setObjectName(QStringLiteral("label_4"));
+
+        horizontalLayout_15->addWidget(label_4);
+
+        meanIR0LcdNumber = new QLCDNumber(widget);
+        meanIR0LcdNumber->setObjectName(QStringLiteral("meanIR0LcdNumber"));
+
+        horizontalLayout_15->addWidget(meanIR0LcdNumber);
+
+        meanIR1LcdNumber = new QLCDNumber(widget);
+        meanIR1LcdNumber->setObjectName(QStringLiteral("meanIR1LcdNumber"));
+
+        horizontalLayout_15->addWidget(meanIR1LcdNumber);
+
+        meanIR2LcdNumber = new QLCDNumber(widget);
+        meanIR2LcdNumber->setObjectName(QStringLiteral("meanIR2LcdNumber"));
+
+        horizontalLayout_15->addWidget(meanIR2LcdNumber);
+
+
+        verticalLayout_11->addLayout(horizontalLayout_15);
+
+        verticalLayout_10 = new QVBoxLayout();
+        verticalLayout_10->setSpacing(6);
+        verticalLayout_10->setObjectName(QStringLiteral("verticalLayout_10"));
+        horizontalLayout_12 = new QHBoxLayout();
+        horizontalLayout_12->setSpacing(6);
+        horizontalLayout_12->setObjectName(QStringLiteral("horizontalLayout_12"));
+        xiLabel = new QLabel(widget);
+        xiLabel->setObjectName(QStringLiteral("xiLabel"));
+
+        horizontalLayout_12->addWidget(xiLabel);
+
+        ximeanIR0LcdNumber = new QLCDNumber(widget);
+        ximeanIR0LcdNumber->setObjectName(QStringLiteral("ximeanIR0LcdNumber"));
+
+        horizontalLayout_12->addWidget(ximeanIR0LcdNumber);
+
+        ximeanIR1LcdNumber = new QLCDNumber(widget);
+        ximeanIR1LcdNumber->setObjectName(QStringLiteral("ximeanIR1LcdNumber"));
+
+        horizontalLayout_12->addWidget(ximeanIR1LcdNumber);
+
+        ximeanIR2LcdNumber = new QLCDNumber(widget);
+        ximeanIR2LcdNumber->setObjectName(QStringLiteral("ximeanIR2LcdNumber"));
+
+        horizontalLayout_12->addWidget(ximeanIR2LcdNumber);
+
+
+        verticalLayout_10->addLayout(horizontalLayout_12);
+
+        horizontalLayout_13 = new QHBoxLayout();
+        horizontalLayout_13->setSpacing(6);
+        horizontalLayout_13->setObjectName(QStringLiteral("horizontalLayout_13"));
+        ximeansqLabel = new QLabel(widget);
+        ximeansqLabel->setObjectName(QStringLiteral("ximeansqLabel"));
+
+        horizontalLayout_13->addWidget(ximeansqLabel);
+
+        ximeansqIR0LcdNumber = new QLCDNumber(widget);
+        ximeansqIR0LcdNumber->setObjectName(QStringLiteral("ximeansqIR0LcdNumber"));
+
+        horizontalLayout_13->addWidget(ximeansqIR0LcdNumber);
+
+        ximeansqIR1LcdNumber = new QLCDNumber(widget);
+        ximeansqIR1LcdNumber->setObjectName(QStringLiteral("ximeansqIR1LcdNumber"));
+
+        horizontalLayout_13->addWidget(ximeansqIR1LcdNumber);
+
+        ximeansqIR2LcdNumber = new QLCDNumber(widget);
+        ximeansqIR2LcdNumber->setObjectName(QStringLiteral("ximeansqIR2LcdNumber"));
+
+        horizontalLayout_13->addWidget(ximeansqIR2LcdNumber);
+
+
+        verticalLayout_10->addLayout(horizontalLayout_13);
+
+        horizontalLayout_14 = new QHBoxLayout();
+        horizontalLayout_14->setSpacing(6);
+        horizontalLayout_14->setObjectName(QStringLiteral("horizontalLayout_14"));
+        sumximeansqLabel = new QLabel(widget);
+        sumximeansqLabel->setObjectName(QStringLiteral("sumximeansqLabel"));
+
+        horizontalLayout_14->addWidget(sumximeansqLabel);
+
+        sumximeansqIR0LcdNumber = new QLCDNumber(widget);
+        sumximeansqIR0LcdNumber->setObjectName(QStringLiteral("sumximeansqIR0LcdNumber"));
+
+        horizontalLayout_14->addWidget(sumximeansqIR0LcdNumber);
+
+        sumximeansqIR1LcdNumber = new QLCDNumber(widget);
+        sumximeansqIR1LcdNumber->setObjectName(QStringLiteral("sumximeansqIR1LcdNumber"));
+
+        horizontalLayout_14->addWidget(sumximeansqIR1LcdNumber);
+
+        sumximeansqIR2LcdNumber = new QLCDNumber(widget);
+        sumximeansqIR2LcdNumber->setObjectName(QStringLiteral("sumximeansqIR2LcdNumber"));
+
+        horizontalLayout_14->addWidget(sumximeansqIR2LcdNumber);
+
+
+        verticalLayout_10->addLayout(horizontalLayout_14);
+
+
+        verticalLayout_11->addLayout(verticalLayout_10);
+
         targetAlignment->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(targetAlignment);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 701, 17));
+        menuBar->setGeometry(QRect(0, 0, 802, 26));
         targetAlignment->setMenuBar(menuBar);
         mainToolBar = new QToolBar(targetAlignment);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -422,7 +677,7 @@ public:
     {
         targetAlignment->setWindowTitle(QApplication::translate("targetAlignment", "targetAlignment", 0));
         ipAddressLabel->setText(QApplication::translate("targetAlignment", "IP Address:", 0));
-        serverIPLineEdit->setText(QApplication::translate("targetAlignment", "192.168.0.197", 0));
+        serverIPLineEdit->setText(QApplication::translate("targetAlignment", "192.168.0.5", 0));
         portLabel->setText(QApplication::translate("targetAlignment", "Port: ", 0));
         portLineEdit->setText(QApplication::translate("targetAlignment", "2000", 0));
         connectedLabel->setText(QApplication::translate("targetAlignment", "Connected:", 0));
@@ -435,8 +690,6 @@ public:
         IR_1_boolLabel->setText(QApplication::translate("targetAlignment", "IR_1_bool", 0));
         label_3->setText(QApplication::translate("targetAlignment", "IR_2", 0));
         IR_2_boolLabel->setText(QApplication::translate("targetAlignment", "IR_2_bool", 0));
-        AlignmentInfoLabel->setText(QApplication::translate("targetAlignment", "Alignment Information:", 0));
-        Alignment_InfoLabel->setText(QApplication::translate("targetAlignment", "N/A", 0));
         startSensingButton->setText(QApplication::translate("targetAlignment", "Start Reading Sensors", 0));
         numberOfSensorValuesReceivedLabel->setText(QApplication::translate("targetAlignment", "Number of Sensor Values Received", 0));
         IR_0Label->setText(QApplication::translate("targetAlignment", "IR_0:", 0));
@@ -447,6 +700,18 @@ public:
         IR_2CountLabel->setText(QApplication::translate("targetAlignment", "0", 0));
         GrabberIsAlignedLabel->setText(QApplication::translate("targetAlignment", "Grabber is Aligned:", 0));
         Grabber_AlignedLabel->setText(QApplication::translate("targetAlignment", "No", 0));
+        AlignmentInfoLabel->setText(QApplication::translate("targetAlignment", "Alignment Information:", 0));
+        Alignment_InfoLabel->setText(QApplication::translate("targetAlignment", "N/A", 0));
+        calculateVarianceButton->setText(QApplication::translate("targetAlignment", "Calclaute Variance", 0));
+        varianceStartedLabel->setText(QApplication::translate("targetAlignment", "Variance Started:", 0));
+        variance_started_label->setText(QApplication::translate("targetAlignment", "No", 0));
+        varianceIR0Label->setText(QApplication::translate("targetAlignment", "Variance IR_0:", 0));
+        varianceIR1Label->setText(QApplication::translate("targetAlignment", "Variance IR_1:", 0));
+        varianceIR2Label->setText(QApplication::translate("targetAlignment", "Variance IR_2:", 0));
+        label_4->setText(QApplication::translate("targetAlignment", "Mean:", 0));
+        xiLabel->setText(QApplication::translate("targetAlignment", "Xi-Mean:", 0));
+        ximeansqLabel->setText(QApplication::translate("targetAlignment", "(Xi-Mean)^2 :", 0));
+        sumximeansqLabel->setText(QApplication::translate("targetAlignment", "Sum (Xi-Mean)^2:", 0));
     } // retranslateUi
 
 };

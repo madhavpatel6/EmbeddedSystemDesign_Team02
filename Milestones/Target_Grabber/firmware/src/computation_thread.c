@@ -81,7 +81,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 static QueueHandle_t _queue;
 
-#define SIZEOFQUEUE 10
+#define SIZEOFQUEUE 200
 #define TYPEOFQUEUE TargetAlignment_Type
 
 COMPUTATION_THREAD_DATA computation_threadData;
