@@ -30,6 +30,7 @@ signals:
     void pb_obstacleClicked(bool send);
     void pb_clearClicked(bool send);
     void sendInitialData(QString mode, QString position, QString numVertices, QString vertices);
+    void pb_sendClicked(QString x, QString y, QString orientation);
 
 public slots:
     void on_pb_connectToServer_clicked();
@@ -55,6 +56,8 @@ private slots:
     void on_sb_distance_valueChanged(int value);
     void on_sb_degrees_valueChanged(int value);
     void on_sb_numVertices_valueChanged(int value);
+
+    void on_pb_send_clicked();
 
 private:
     Ui::MainWindow *ui;

@@ -91,6 +91,14 @@ void ClientSocket::sendInitialData(QString mode, QString position, QString numVe
     SendJSONResponseToSocket(response_begin + mode + "," + position + "," + numVertices + "," + vertices + response_end, SEARCHERMOVER);
 }
 
+void ClientSocket::sendCorrectedPosition(QString x, QString y, QString orientation)
+{
+    QString response_begin = "{\"type\":\"Response\",\"R1_Location\":{";
+    QString response_end = "}}";
+    SendJSONResponseToSocket(response_begin + "\"x\":\"" + x + "\",\"y\":\"" + y + "\",\"orientation\":\"" + orientation + "\"" + response_end, SEARCHERMOVER);
+    qDebug() << response_begin + "\"x\":\"" + x + "\",\"y\":\"" + y + "\",\"orientation\":\"" + orientation + "\"" + response_end;
+}
+
 void ClientSocket::sendClear(bool send){
     sendData = send;
     isClear = true;

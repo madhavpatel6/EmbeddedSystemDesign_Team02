@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(tcpSocket, SIGNAL(sendLineLocation(int)), this, SLOT(updateLineLocation(int)));
     connect(tcpSocket, SIGNAL(initialRequest()), this, SLOT(sendInitialResponse()));
     connect(this, SIGNAL(sendInitialData(QString,QString,QString,QString)), tcpSocket, SLOT(sendInitialData(QString,QString,QString,QString)));
+    connect(this, SIGNAL(pb_sendClicked(QString,QString,QString)), tcpSocket, SLOT(sendCorrectedPosition(QString,QString,QString)));
 
     QStringList colHeaders;
     colHeaders << "x" << "y";
@@ -250,4 +251,10 @@ void MainWindow::on_pb_start_clicked()
 void MainWindow::on_pb_stop_clicked()
 {
     emit pb_stopClicked();
+}
+
+void MainWindow::on_pb_send_clicked()
+{
+    emit pb_sendClicked(QString::number(ui->sb_x_corrected->value()),QString::number(ui->sb_y_corrected->value()),
+                        QString::number(ui->sb_orientation_corrected->value()));
 }
