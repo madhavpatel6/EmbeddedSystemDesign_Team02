@@ -21,6 +21,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(pb_backClicked(int)), tcpSocket, SLOT(sendBackCommand(int)));
     connect(this, SIGNAL(pb_leftClicked(int)), tcpSocket, SLOT(sendLeftCommand(int)));
     connect(this, SIGNAL(pb_rightClicked(int)), tcpSocket, SLOT(sendRightCommand(int)));
+    connect(this, SIGNAL(pb_startClicked()), tcpSocket, SLOT(sendStartCommand()));
+    connect(this, SIGNAL(pb_stopClicked()), tcpSocket, SLOT(sendStopCommand()));
     connect(this, SIGNAL(pb_clearClicked(bool)), tcpSocket, SLOT(sendClear(bool)));
     connect(this, SIGNAL(pb_obstacleClicked(bool)), tcpSocket, SLOT(sendObstacle(bool)));
     connect(tcpSocket, SIGNAL(serverIsConnectedSignal(bool)), this, SLOT(HostConnectionEvent(bool)));
@@ -238,46 +240,14 @@ void MainWindow::on_pb_obstacle_clicked()
 void MainWindow::on_sb_numVertices_valueChanged(int value)
 {
     ui->tbl_vertices->setRowCount(ui->sb_numVertices->value());
+}
 
-    QString mode;
-    QString position;
-    QString numVertices;
-    QString vertices;
-    int count = 0;
+void MainWindow::on_pb_start_clicked()
+{
+    emit pb_startClicked();
+}
 
-    mode = "\"mode\":";
-
-    if (ui->rb_debug->isChecked()) {
-        mode.append("\"D\"");
-    } else if (ui->rb_lawnmower->isChecked()) {
-        mode.append("\"L\"");
-    } else if (ui->rb_random->isChecked()) {
-        mode.append("\"R\"");
-    }
-
-    position = "\"x\":\"" + QString::number(ui->sb_x_initial->value()) + "\"," +
-            "\"y\":\"" + QString::number(ui->sb_y_initial->value()) + "\"," +
-            "\"orientation\":\"" + QString::number(ui->sb_orientation_initial->value()) + "\"";
-
-    numVertices = "\"numVertices\":\"" + QString::number(ui->sb_numVertices->value()) + "\"";
-
-    vertices = "\"vertices\":[";
-
-    for (int i = 0; i < ui->sb_numVertices->value(); i++) {
-        if (ui->tbl_vertices->item(i, 0) && ui->tbl_vertices->item(i, 1)) {
-            count++;
-            vertices.append("[\"" + ui->tbl_vertices->item(i, 0)->text() + "\",\"" +
-                            ui->tbl_vertices->item(i, 1)->text() + "\"]");
-
-            if (i != ui->sb_numVertices->value() - 1) {
-                vertices.append(",");
-            }
-        }
-    }
-
-    vertices.append("]");
-
-    QString response_begin = "{\"type\":\"Response\",\"InitialData\":{";
-    QString response_end = "}}";
-    qDebug() << response_begin + mode + "," + position + "," + numVertices + "," + vertices + response_end;
+void MainWindow::on_pb_stop_clicked()
+{
+    emit pb_stopClicked();
 }

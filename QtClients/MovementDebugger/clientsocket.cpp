@@ -71,6 +71,20 @@ void ClientSocket::sendRightCommand(int degrees){
     qDebug() << request_begin + "\"Right\":" + "\"" + QString::number(degrees) + "\"" + request_end;
 }
 
+void ClientSocket::sendStartCommand(){
+    QString request_begin = "{\"type\":\"Request\",\"items\":[";
+    QString request_end = "]}";
+    SendJSONRequestToSocket(request_begin + "\"Start\"" + request_end, SEARCHERMOVER);
+    qDebug() << request_begin + "\"Start\"" + request_end;
+}
+
+void ClientSocket::sendStopCommand(){
+    QString request_begin = "{\"type\":\"Request\",\"items\":[";
+    QString request_end = "]}";
+    SendJSONRequestToSocket(request_begin + "\"Stop\"" + request_end, SEARCHERMOVER);
+    qDebug() << request_begin + "\"Stop\"" + request_end;
+}
+
 void ClientSocket::sendInitialData(QString mode, QString position, QString numVertices, QString vertices) {
     QString response_begin = "{\"type\":\"Response\",\"InitialData\":{";
     QString response_end = "}}";
