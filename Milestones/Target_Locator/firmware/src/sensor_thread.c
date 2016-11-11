@@ -66,6 +66,8 @@ static QueueHandle_t _queue;
 #define TYPEOFQUEUE TL_Queue_t
 #define SIZEOFQUEUE 10
 
+#define M_PI 3.14159265358979323846
+
 /*******************************************************************************
   Function:
     void SENSOR_THREAD_Initialize ( void )
@@ -120,7 +122,7 @@ void SENSOR_THREAD_Tasks ( void )
             case SENSORADC: {
                 ConvertSensorADCToDistance(&objSend.message.Update.Data.sensordata, objRecv.contents.sensors);
                 /* Queue up the sensor data */
-                if(FilterIRSensors(objSend.message.Update.Data.sensordata)) {\
+                if(FilterIRSensors(objSend.message.Update.Data.sensordata)) {
                     if(isFull(&sensorDataQ)) {
                         removeData(&sensorDataQ);
                         insertData(&sensorDataQ, objSend.message.Update.Data.sensordata);
@@ -128,15 +130,15 @@ void SENSOR_THREAD_Tasks ( void )
                     else {
                         insertData(&sensorDataQ, objSend.message.Update.Data.sensordata);
                     }
-                    MESSAGE_CONTROLLER_THREAD_SendToQueue(objSend);
                 }
+                MESSAGE_CONTROLLER_THREAD_SendToQueue(objSend);
                 break;
             }
             case RV1_POSUPDATE: {
 //                SensorDataType data = removeData(&sensorDataQ);
 //                point_t loc;
 //                loc.x = objRecv.contents.r1_movement.x;
-//                loc.y = objRecv.contents.r1_movement.y;
+//                loc.y = objRecv.contents.r1_movyomeent.y;
 //                UpdateSensorLocations(&sensorInformation, data, loc, objRecv.contents.r1_movement.orientation);
 //                updateOccupanyGrid2(sensorInformation, grid);
                 if(previousActionIsSet && size(&sensorDataQ) != 0) {
@@ -150,8 +152,8 @@ void SENSOR_THREAD_Tasks ( void )
                     float distance = sqrt(pow(deltaPosition.x,2) + pow(deltaPosition.y,2));
                     float distance_increments = distance / size(&sensorDataQ);
                     float theta_increments = dtheta / size(&sensorDataQ);
-                    float cosX = cos(objRecv.contents.r1_movement.orientation)*distance_increments;
-                    float sinY = sin(objRecv.contents.r1_movement.orientation)*distance_increments;
+                    float cosX = cos(objRecv.contents.r1_movement.orientation*M_PI/180)*distance_increments;
+                    float sinY = sin(objRecv.contents.r1_movement.orientation*M_PI/180)*distance_increments;
                     int sizeofqueue = size(&sensorDataQ);
                     for(i = 0; i < sizeofqueue; i++) {
                         SensorDataType data = removeData(&sensorDataQ);
@@ -203,6 +205,7 @@ void ConvertSensorADCToDistance(SensorDataType* distances, SensorADC_t adcValues
     ConvertMidRangeToCM(&(distances->ir.middleFBSensor), adcValues.IRSensors.middleFBSensor);
     ConvertBottomRightLongRangeIRToCM(&(distances->ir.rightFBSensor),  adcValues.IRSensors.rightFBSensor);
     ConvertTopLeftLongRangeIRToCM(&(distances->ir.leftFTSensor),  adcValues.IRSensors.leftFTSensor);
+    ConvertTopRightLongRangeIRToCM(&(distances->ir.rightFTSensor),  adcValues.IRSensors.rightFTSensor);
 }
 
 void UpdateSensorLocations(SensorDataContainerType* sensors, SensorDataType distances, point_t roverLocation, int orientation) {
@@ -253,6 +256,7 @@ void ConvertShortRangeToCM(float* distanceCM, uint32_t adcValue) {
     else {
         *distanceCM = -1;
     }
+   // *distanceCM = voltage;
 }
 
 void ConvertMidRangeToCM(float* distanceCM, uint32_t adcValue) {
@@ -270,6 +274,7 @@ void ConvertMidRangeToCM(float* distanceCM, uint32_t adcValue) {
     else {
         *distanceCM = -1;
     }
+//    *distanceCM = voltage;
 }
 
 void ConvertBottomLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
@@ -288,6 +293,7 @@ void ConvertBottomLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
     else {
         *distanceCM = -1;
     }
+//    *distanceCM = voltage;
 }
 
 void ConvertBottomRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
@@ -306,6 +312,7 @@ void ConvertBottomRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
     else {
         *distanceCM = -1;
     }
+//    *distanceCM = voltage;
 
 }
 
@@ -325,8 +332,27 @@ void ConvertTopLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
     else {
         *distanceCM = -1;
     }
+//    *distanceCM = voltage;
 }
 
+void ConvertTopRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
+    float avgAdcValue = adcValue;
+    float voltage = avgAdcValue/(310.303);
+    
+    if(voltage < 0.87) {
+        *distanceCM = 70;
+    }
+    else if(voltage < 1.170) {
+        *distanceCM = 51.833/(voltage-0.1318);
+    }
+    else if(voltage < 2.46) {
+        *distanceCM = 110.775*(pow(0.501, voltage));
+    }
+    else {
+        *distanceCM = -1;
+    }
+//    *distanceCM = voltage;
+}
 bool FilterIRSensors(SensorDataType sensors) {
     if(sensors.ir.middleFBSensor < 17 || sensors.ir.rightFBSensor == -1 || sensors.ir.leftFBSensor == -1) {
         return false;

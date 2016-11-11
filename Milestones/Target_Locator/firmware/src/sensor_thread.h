@@ -201,6 +201,8 @@ void ConvertBottomRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
 
 void ConvertTopLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
 
+void ConvertTopRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
+
 bool FilterIRSensors(SensorDataType sensors);
 
 #endif /* _SENSOR_THREAD_H */
