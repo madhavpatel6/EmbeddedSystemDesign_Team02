@@ -36,7 +36,7 @@
 extern "C" {
 #endif
     
-typedef enum {vertex, target, obstacle, update, targetAlignment} coord_t;
+typedef enum {vertex, target, obstacle, update, targetAlignment, debug} coord_t;
 
 typedef struct {
     float x[10];

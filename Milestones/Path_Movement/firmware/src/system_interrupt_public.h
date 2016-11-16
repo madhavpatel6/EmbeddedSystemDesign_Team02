@@ -37,7 +37,14 @@ void Usart0_SendToQueue(char buffer);
 
 void Usart0_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken);
 
+void motor_SendToQueue(char buffer);
+
+void motor_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken);
+
 void addMotorTask(int type, int distance);
+
+void enableTrue();
+void enableFalse();
 
     /* Provide C++ Compatibility */
 #ifdef __cplusplus

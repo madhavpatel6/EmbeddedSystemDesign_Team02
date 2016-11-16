@@ -79,8 +79,11 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 
 static QueueHandle_t _usartqueue;
+static QueueHandle_t motorQueue;
 #define USARTTYPEOFQUEUE char
 #define USARTSIZEOFQUEUE 600
+#define MOTORTYPEOFQUEUE char
+#define MOTORSIZEOFQUEUE 300
 
 void IntHandlerDrvAdc(void)
 {
@@ -123,29 +126,58 @@ void IntHandlerDrvTmrInstance0(void)
 //uint16_t timerCount = 0;
 
 
-static float desiredTicksR = 5;
+static float desiredTicksR = 0;
 static float outputR;
 static unsigned short pwmCmdR = 0;
 static float integralR = 0;
-static float KpR = 7790;// 500;//2900;
-static float KiR = 800; // 14;
+static float KpR = 6000;
+static float KiR = 10000;
 static int rightSign = 1;
 
-static float desiredTicksL = 5;
+static float desiredTicksL = 0;
 static float outputL;
 static unsigned short pwmCmdL = 0;
 static float integralL = 0;
-static float KpL = 8000;// ;// 2700;
-static float KiL = 500;// 8;
+static float KpL = 6000;
+static float KiL = 10000;
 static int leftSign = 1;
 static int time = 0;
 static int timeOut = 0;
+
+// for MS3 8000 5000
+//         ?    ?
+// Working state 
+//    8000 500
+//    8000 500
+
+
+//working okay 8000 10000 for both
+
+//now that we have ramps and profiles in place lets tune i
+// 10,000 works well, 20,000 too jittery, 15000 still jittery, 12500 little jitter lets see how 10000 was, that feels pretty good
+// lets try reducing my kp, its at 8k, lets try 7 felt like more overshoot but left == right seemed more true
+// lets try 6k, overshot still got worse but right == left was still suprisingly good
+// lets try 3k, right == left was not as good and it felt chunky
+// lets see if 4.5k is a good medium -- naah left vs right was not as good lets stick with 6k for now
+
+// i tuned some movement in turning now im coming back to smooth it out if necissary, lets turn back up to 8k
+// no difference from 66k guess ill leave it at 6k
+// yeah 6 is fine im happy
 
 static int desiredTicks = 0;
 static int ticksSoFar = 0;
 
 static int cacheType = 0;
 static int cacheDistance = 0;
+
+static bool enable;
+
+void enableTrue(){
+    enable = true;
+}
+void enableFalse(){
+    enable = false;
+}
 
 
 /* This timer is for the TX to fire every 200 ms */
@@ -203,13 +235,26 @@ void IntHandlerDrvTmrInstance1(void)
         }
     }
     
-    
-    
+    char newSP;
+    if(time % 10 == 0){
+        if( motor_ReadFromQueue(&newSP) == pdTRUE){
+            desiredTicksL = (float) newSP;
+            desiredTicksR = (float) newSP;
+        }else{
+            message_in_t buffer;
+            buffer.type = update;
+            buffer.cacheType = cacheType;
+            buffer.cacheDistance = cacheDistance;
+            BaseType_t *temp1;
+            MOTOR_CONTROLLER_THREAD_SendToQueueISR(buffer, temp1);
+            cacheDistance = 0;
+        }
+    }
     
     // && 0 to temporarily disable motors
-    if(time >= 50 && 0){
+    if(time >= 50  && enable == true){// && (desiredTicksL != 0 || desiredTicksR != 0)){
     
-        setDirectionForward();
+        // setDirectionForward();
 
         int rightCount = PLIB_TMR_Counter16BitGet(TMR_ID_3) * rightSign;
         int leftCount = PLIB_TMR_Counter16BitGet(TMR_ID_4) * leftSign;
@@ -219,42 +264,44 @@ void IntHandlerDrvTmrInstance1(void)
         // derivative = (error - previous_error)/dt
         outputR = KpR* errorR + KiR* integralR;
         if(outputR > 0){
-            setDirectionForward();
+//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, 14, 0); // right forward
             rightSign = 1;
         }else{
-            setDirectionBack();
-            outputR *= -1;
-            rightSign = -1;
+//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_C, 14, 1); // right back
+              outputR = 0;
+//            outputR *= -1;
+//            rightSign = -1;
         }
         if(outputR > 65535){
             outputR = 65535;
         }
         pwmCmdR = (unsigned short) outputR;
-//        if(pwmCmdL)
+
 
         float errorL = desiredTicksL - (float) leftCount;
         integralL = integralL + errorL; // for now assume dt = 1 when really its 200ms
         // derivative = (error - previous_error)/dt
         outputL = KpL*errorL + KiL*integralL;
         if(outputL > 0){
-            setDirectionForward();
+//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 0); // left forward
             leftSign = 1;
         }else{
-            setDirectionBack();
-            outputL *= -1;
-            leftSign = -1;
+              outputL = 0;
+//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 1); // left back
+//            outputL *= -1;
+//            leftSign = -1;
         }
         if(outputL > 65535){
             outputL = 65535;
         }
         pwmCmdL = (unsigned short) outputL;
         
-        if(time % 3 == 0){
+        if(time % 1 == 0 && 0){
             Tx_Thead_Queue_DataType tx_thread_obj;
             memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
-            tx_thread_obj.Destination = PATHFINDER;
+            tx_thread_obj.Destination = TARGETGRABBER;
             //sprintf(tx_thread_obj.Data, " %4d, %4d, %6d, %6d \n", rightCount, leftCount, pwmCmdR, pwmCmdL);
-            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"1\", \"vel\": \"%4d\", \"time\": \"%4d\", \"output\": \"%4f\", \"pwm\": \"%4d\"}", rightCount, timeOut, outputR, pwmCmdR);
+            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"1\", \"vel\": \"%4d\", \"time\": \"%4d\"}", rightCount, time);
             BaseType_t *ptr;
             TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
             sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"2\", \"vel\": \"%4d\", \"time\": \"%4d\"}", leftCount, time);
@@ -269,7 +316,8 @@ void IntHandlerDrvTmrInstance1(void)
         PLIB_TMR_Counter16BitClear(TMR_ID_4);
 
     }else{
-        // disableMotors();
+//        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+//        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
     }
     timeOut++;
     time++;
@@ -347,6 +395,7 @@ void IntHandlerDrvUsartInstance0(void)
 
 void InitializeISRQueues() {
     Usart0_InitializeQueue();
+    motor_InitializeQueue();
 }
 
 void addMotorTask(int type, int distance){
@@ -354,8 +403,10 @@ void addMotorTask(int type, int distance){
     cacheDistance = distance;
     
     ticksSoFar = 0;
+    char peak = 5;
+    int length;
     
-    if(type == 0){
+    if(type == 0 && (distance == 3 || distance == -3)){
         // straight
         if(distance > 0){
             setDirectionForward();
@@ -363,22 +414,113 @@ void addMotorTask(int type, int distance){
             setDirectionBack();
             distance *= -1;
         }
-        desiredTicks = 250 * distance;
-    }else{
+        length = 6;
+//        desiredTicks = 250 * distance;
+        int i;
+        for(i = 0; i <= peak; i++){
+            motor_SendToQueue(i);
+        }
+        for(i = 0; i < length; i++){
+            motor_SendToQueue(peak);
+        }
+        for(i = peak; i >= 0; i--){
+            motor_SendToQueue(i);
+        }
+    }else if (type == 1 && (distance == 90 || distance == -90)){
         // turn
         if(distance > 0){
             setDirectionLeft();
-            desiredTicks = distance * 7.7;
+//            desiredTicks = distance * 7.7;
         }else{
             setDirectionRight();
             distance *= -1;
-            desiredTicks = distance * 7.7;
+//            desiredTicks = distance * 7.7;
         }
+        peak = 4;
+        length = 7;
+        int i, j;
+        int rampLethargy = 2;
+        for(i = 0; i <= peak; i++){
+            for(j = 0; j < rampLethargy; j++){
+                motor_SendToQueue(i);
+            }
+        }
+        for(i = 0; i < length; i++){
+            motor_SendToQueue(peak);
+        }
+        for(i = peak; i >= 0; i--){
+            for(j = 0; j < rampLethargy; j++){
+                motor_SendToQueue(i);
+            }
+        }
+        // added lethargy, things seemed less stable but more controllable at two then 1 still has really good right == left
+        // when time at peak was 9 and 10 we were rotating past 90 degrees
+        // 8 is still too long
+        // 7 feels spot on but its error still adds up, ill try 6 just to go under, 6 was under
+        // lets fo crazy and pump up the peak from 4 to 5
+        // im def overshooting which is fine, right == left still good, feels jerky
+        // turning our length to zero made us not turn far enough
+        // lets try lenth =2, thats a tad beyone 90
+        // lets try lenght 1, nvm we are sacrificing our right == left ness when we get rid of length
+        // my best guess for th enight is peak 4 len 7 leth 2
+        
+        
+        
+        
         // desiredTicks = 9 * distance;
+    }else if (type == 2){
+        motor_SendToQueue(0);
+        motor_SendToQueue(2);
+        motor_SendToQueue(2);
+        motor_SendToQueue(4);// we need more than two fours but 6 is probably more than enough
+        motor_SendToQueue(4);
+        motor_SendToQueue(4);
+        motor_SendToQueue(4);
+        motor_SendToQueue(4);
+        motor_SendToQueue(4);
+        motor_SendToQueue(2);
+        motor_SendToQueue(2);
+        motor_SendToQueue(0);
+        
     }
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/2);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/2);
     
+//    
+//    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/2);
+//    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/2);
+    
+}
+
+void increaseSP(){
+     motor_SendToQueue((char)desiredTicksL + 1);
+//    desiredTicksR++;
+//    desiredTicksL++;
+}
+void decreaseSP(){
+    motor_SendToQueue((char)desiredTicksL - 1);
+//    desiredTicksR--;
+//    desiredTicksL--;
+}
+
+void motor_InitializeQueue() {
+    motorQueue = xQueueCreate(MOTORSIZEOFQUEUE, sizeof(MOTORTYPEOFQUEUE));
+    if(motorQueue == 0) {
+        /*Handle this Error*/
+        dbgOutputBlock(pdFALSE);
+    }
+}
+
+int motor_ReadFromQueue(void* pvBuffer) {
+    BaseType_t *pxHigherPriorityTaskWoken;
+    int ret = xQueueReceiveFromISR(motorQueue, pvBuffer, pxHigherPriorityTaskWoken);
+    return ret;
+}
+
+void motor_SendToQueue(char buffer) {
+    xQueueSendToBack(motorQueue, &buffer, portMAX_DELAY);
+}
+
+void motor_SendToQueueISR(char buffer, BaseType_t *pxHigherPriorityTaskWoken) {
+    xQueueSendToBackFromISR(motorQueue, &buffer, pxHigherPriorityTaskWoken);
 }
   
 /*******************************************************************************
