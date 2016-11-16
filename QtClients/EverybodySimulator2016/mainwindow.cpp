@@ -181,6 +181,7 @@ void MainWindow::dataReadSlot(QByteArray data){
                         }
                     }
                 }
+                jsonMessage.remove('\n').remove('\t').remove(' ');
                 jsonMessage.chop(1); // this removes the extra comma at the end
                 jsonMessage += "}";
                 qDebug() << jsonMessage;
@@ -234,4 +235,35 @@ void MainWindow::on_pushButton_2_clicked()
     tuner->show();
 
     connect(this, SIGNAL(pidTunerMessage(QJsonObject)), tuner, SLOT(motorUpdate(QJsonObject)));
+
+    connect(tuner, SIGNAL(upClicked()), this, SLOT(sendUp()));
+    connect(tuner, SIGNAL(downClicked()), this, SLOT(sendDown()));
+}
+
+void MainWindow::sendUp(){
+    QString outGoing = "{\"type\":\"Response\",\"val\":\"0\"}";
+
+    char message[2048];
+    char destination = PATHFINDER;
+
+    int len = CreateMessage(message, outGoing.toLatin1().data(), destination, 0);
+
+    QByteArray txMessage;
+    txMessage.setRawData(message, len);
+
+    socket->send(txMessage);
+}
+
+void MainWindow::sendDown(){
+    QString outGoing = "{\"type\":\"Response\",\"val\":\"1\"}";
+
+    char message[2048];
+    char destination = PATHFINDER;
+
+    int len = CreateMessage(message, outGoing.toLatin1().data(), destination, 0);
+
+    QByteArray txMessage;
+    txMessage.setRawData(message, len);
+
+    socket->send(txMessage);
 }

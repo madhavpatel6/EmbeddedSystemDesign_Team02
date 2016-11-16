@@ -19,12 +19,21 @@ class pidTuner : public QWidget
 
 public:
     explicit pidTuner(QWidget *parent = 0);
+
     ~pidTuner();
 public slots:
     void motorUpdate(QJsonObject in);
 
+signals:
+    void upClicked();
+    void downClicked();
+
 private slots:
     void on_pushButton_clicked();
+
+    void on_upButton_clicked();
+
+    void on_downButton_clicked();
 
 private:
     Ui::pidTuner *ui;
