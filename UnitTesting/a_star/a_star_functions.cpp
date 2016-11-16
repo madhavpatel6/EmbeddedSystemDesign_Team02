@@ -4,8 +4,8 @@
 #include "iostream"
 using namespace std;
 
-#define listLength 5000
-#define MAXLOOPCOUNT 1100
+#define listLength 400
+#define MAXLOOPCOUNT 250
 #define maxVerticies 25
 #define pointsToObject 4
 
