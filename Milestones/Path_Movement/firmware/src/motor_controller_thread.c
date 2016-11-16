@@ -64,6 +64,12 @@ static QueueHandle_t _queue;
 #define TYPEOFQUEUE message_in_t
 #define SIZEOFQUEUE 36
 
+#define MIN_ANGLE -5
+#define MAX_ANGLE 5
+#define FAR_DIST 5
+#define CLOSE_DIST 1
+
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Global Data Definitions
@@ -135,8 +141,9 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
     message_in_t msg;
     
     initWorld();
-    myLoc.x = 0;
-    myLoc.y = 0;
+    // lets start at 9 9 cuz were starting at a target
+    myLoc.x = 6;
+    myLoc.y = 6;
 //    int myDir = 0;
 //    int desiredDir = 0;
     
@@ -160,14 +167,14 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 disableMotors();
                 setDirectionForward();
                 addMotorTask(2, 3); // get on edge
-                motor_controller_threadData.state = wait_calc_path;
+                motor_controller_threadData.state = tuneDir;
                 enableTrue();
                 // motor_controller_threadData.state = spin;
                 Nop();
                 MessageObj upObj;
                 upObj.Type = UPDATE;
                 upObj.Update.Type = TARG_PROX;
-                upObj.Update.Data.targetProx = 6.666f;
+                upObj.Update.Data.targetProx = 10.0f;
                 MESSAGE_CONTROLLER_THREAD_SendToQueue(upObj);
                 upObj.Update.Type = OUTS_ARENA;
                 upObj.Update.Data.outsArena = false;
@@ -204,6 +211,15 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
             }
             case exec_path:
             {   
+                MessageObj upObj;
+                upObj.Type = UPDATE;
+                upObj.Update.Type = TARG_PROX;
+                upObj.Update.Data.targetProx = 10.0f;
+                MESSAGE_CONTROLLER_THREAD_SendToQueue(upObj);
+                upObj.Type = UPDATE;
+                upObj.Update.Type = MOV_STOP;
+                upObj.Update.Data.movStop = false;
+                MESSAGE_CONTROLLER_THREAD_SendToQueue(upObj);
                 Nop();
                 MOTOR_CONTROLLER_THREAD_ReadFromQueue(&msg);
                 addToMap(msg);
@@ -218,6 +234,9 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 
                 if (msg.type == update && msg.cacheType == 1){
                     myDir += msg.cacheDistance;
+                    if(myDir < 0){
+                        myDir = 360 + myDir;
+                    }
                     myDir %= 360;
                     inProg = false;
                 }else if( msg.type  == update && msg.cacheType == 0){
@@ -305,16 +324,31 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
             }
             case tuneDir:
             {
+                MessageObj upObj;
+                upObj.Type = UPDATE;
+                upObj.Update.Type = TARG_PROX;
+                upObj.Update.Data.targetProx = 5.9f;
+                MESSAGE_CONTROLLER_THREAD_SendToQueue(upObj);
+                upObj.Type = UPDATE;
+                upObj.Update.Type = MOV_STOP;
+                upObj.Update.Data.movStop = false;
+                MESSAGE_CONTROLLER_THREAD_SendToQueue(upObj);
+                MOTOR_CONTROLLER_THREAD_ReadFromQueue(&msg);
                 enableFalse();
                 // talk to warthog 1, find stuff, be fast and adaptive
                 MOTOR_CONTROLLER_THREAD_ReadFromQueue(&msg);
                 addToMap(msg);
                 if(msg.type == targetAlignment){
-                    if(msg.targetAngle > 20){
+                    if(msg.targetAligned == true){
+                        setDirectionForward();
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);  
+                        motor_controller_threadData.state = waitAcquired;
+                    } else if(msg.targetAngle > MAX_ANGLE){
                         setDirectionLeft();
                         PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/3);
                         PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/3);
-                    }else if (msg.targetAngle < -20){
+                    }else if (msg.targetAngle < MIN_ANGLE){
                         setDirectionRight();
                         PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/3);
                         PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/3);
@@ -334,20 +368,29 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 MOTOR_CONTROLLER_THREAD_ReadFromQueue(&msg);
                 addToMap(msg);
                 if(msg.type == targetAlignment){
-                    if(msg.targetAngle > 20 || msg.targetAngle < -20){
+                    if(msg.targetAngle > MAX_ANGLE || msg.targetAngle < MIN_ANGLE){
                         motor_controller_threadData.state = tuneDir;                    
                     }
                     
-                    if(msg.targetDistance > 5){
+                    if(msg.targetAligned == true){
+                        setDirectionForward();
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);  
+                        motor_controller_threadData.state = waitAcquired;
+                    } else if(msg.targetDistance > FAR_DIST){
                         setDirectionForward();
                         PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/3);
                         PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/3);     
                         
-                    } else if(msg.targetDistance > 1){
+                    } else if(msg.targetDistance > CLOSE_DIST){
                         setDirectionForward();
                         PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/4);
                         PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/4);                  
-                    } else{
+                    } else if(msg.targetAligned == false){
+                        setDirectionForward();
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/4);
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/4); 
+                    }else{
                         setDirectionForward();
                         PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
                         PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);  
@@ -367,13 +410,27 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
             }
             case waitAcquired:
             {
+                MessageObj upObj;
+                upObj.Type = UPDATE;
+                upObj.Update.Type = MOV_STOP;
+                upObj.Update.Data.movStop = true;
+                MESSAGE_CONTROLLER_THREAD_SendToQueue(upObj);
+                
+                if(holdingTarg == true){
+                    upObj.Type = UPDATE;
+                    upObj.Update.Type = OUTS_ARENA;
+                    upObj.Update.Data.outsArena = true;
+                    MESSAGE_CONTROLLER_THREAD_SendToQueue(upObj);
+                }
+                
                 MOTOR_CONTROLLER_THREAD_ReadFromQueue(&msg);
                 addToMap(msg);
                 if(holdingTarg == false && msg.type == targetAlignment){
-                    if(msg.targetAngle > 20 || msg.targetAngle < -20){
-                        motor_controller_threadData.state = tuneDir;                    
-                    }else if(msg.targetDistance > 1){
-                        motor_controller_threadData.state = tuneDist;                    
+                    if(msg.targetAligned == false){
+                        setDirectionForward();
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0); 
+                        motor_controller_threadData.state = wait_calc_path;
                     }else if(msg.targetAcquired == true){
                         motor_controller_threadData.state = wait_calc_path;
                         holdingTarg = true;
@@ -383,6 +440,10 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                     if(msg.targetAcquired == false){
                         holdingTarg = false;
                         motor_controller_threadData.state = wait_calc_path;
+                                            upObj.Type = UPDATE;
+                        upObj.Update.Type = OUTS_ARENA;
+                        upObj.Update.Data.outsArena = false;
+                        MESSAGE_CONTROLLER_THREAD_SendToQueue(upObj);
                     }
                 }
                 break;
