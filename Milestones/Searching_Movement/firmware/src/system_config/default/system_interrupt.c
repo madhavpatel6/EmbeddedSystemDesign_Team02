@@ -93,15 +93,15 @@ void IntHandlerDrvAdc(void)
     
     dbgOutputLoc(ADDING_ADC_VAL_ISR);
     if (ANALOG) {
-        for (i = 0; i < 16; i += 8) {
+        for (i = 0; i < 15; i += 3) {
             lineObj.IR_0 += DRV_ADC_SamplesRead(i);
             lineObj.IR_1 += DRV_ADC_SamplesRead(i+1);
             lineObj.IR_2 += DRV_ADC_SamplesRead(i+2);
-            lineObj.IR_3 += DRV_ADC_SamplesRead(i+3);
-            lineObj.IR_4 += DRV_ADC_SamplesRead(i+4);
-            lineObj.IR_5 += DRV_ADC_SamplesRead(i+5);
-            lineObj.IR_6 += DRV_ADC_SamplesRead(i+6);
-            lineObj.IR_7 += DRV_ADC_SamplesRead(i+7);
+//            lineObj.IR_3 += DRV_ADC_SamplesRead(i+3);
+//            lineObj.IR_4 += DRV_ADC_SamplesRead(i+4);
+//            lineObj.IR_5 += DRV_ADC_SamplesRead(i+5);
+//            lineObj.IR_6 += DRV_ADC_SamplesRead(i+6);
+//            lineObj.IR_7 += DRV_ADC_SamplesRead(i+7);
         }
     } else {
         lineObj.IR_0 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_F, 13);
@@ -124,7 +124,7 @@ void IntHandlerDrvAdc(void)
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
 }
 
-/* This timer is for the ADC to fire every 100 ms */
+/* This timer is for PWM, fires every 100 ms */
 // Timer 2
 void IntHandlerDrvTmrInstance0(void)
 {
@@ -154,7 +154,7 @@ void IntHandlerDrvTmrInstance1(void)
         }
     }
     
-    // Issue requests every 260 ms
+    // Issue requests every 300 ms
     if (timerCount % 15 == 0) {
         dbgOutputLoc(BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR);
         switch(MYMODULE){

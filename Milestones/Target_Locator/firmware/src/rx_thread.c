@@ -91,19 +91,19 @@ void RX_THREAD_Tasks ( void )
     dbgOutputLoc(ENTER_RXTHREAD);
     dbgOutputLoc(BEFORE_WHILELOOP_RXTHREAD);
     MessageObj obj;
-    obj.Type = EXTERNAL_REQUEST_RESPONSE;
+    obj.type = EXTERNAL_REQUEST_RESPONSE;
     char c;
     while(1){
         dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_RXTHREAD);
         RX_THREAD_ReadFromQueue(&c);
         dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_RXTHREAD);
-        bool isComplete = ParseMessage(c, obj.External.Data, &obj.External.Source, &obj.External.MessageCount, &obj.External.Error);
+        bool isComplete = ParseMessage(c, obj.message.External.Data, &obj.message.External.Source, &obj.message.External.MessageCount, &obj.message.External.Error);
         dbgOutputVal(isComplete);
         if(isComplete) {
             /*Since we returned true we assume the message is valid*/
             MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
         }
-        else if(obj.External.Error) {
+        else if(obj.message.External.Error) {
             MESSAGE_CONTROLLER_THREAD_SendToQueue(obj);
         }
     }

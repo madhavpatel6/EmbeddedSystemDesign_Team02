@@ -71,10 +71,32 @@ void ClientSocket::sendRightCommand(int degrees){
     qDebug() << request_begin + "\"Right\":" + "\"" + QString::number(degrees) + "\"" + request_end;
 }
 
-void ClientSocket::sendInitialData(char mode){
-    QString response_begin = "{\"type\":\"Response\",";
-    QString response_end = "}";
-    SendJSONResponseToSocket(response_begin + "\"InitialData\":{\"mode\":\"" + mode + "\"}" + response_end, SEARCHERMOVER);
+void ClientSocket::sendStartCommand(){
+    QString request_begin = "{\"type\":\"Request\",\"items\":[";
+    QString request_end = "]}";
+    SendJSONRequestToSocket(request_begin + "\"Start\"" + request_end, SEARCHERMOVER);
+    qDebug() << request_begin + "\"Start\"" + request_end;
+}
+
+void ClientSocket::sendStopCommand(){
+    QString request_begin = "{\"type\":\"Request\",\"items\":[";
+    QString request_end = "]}";
+    SendJSONRequestToSocket(request_begin + "\"Stop\"" + request_end, SEARCHERMOVER);
+    qDebug() << request_begin + "\"Stop\"" + request_end;
+}
+
+void ClientSocket::sendInitialData(QString mode, QString position, QString numVertices, QString vertices) {
+    QString response_begin = "{\"type\":\"Response\",\"InitialData\":{";
+    QString response_end = "}}";
+    SendJSONResponseToSocket(response_begin + mode + "," + position + "," + numVertices + "," + vertices + response_end, SEARCHERMOVER);
+}
+
+void ClientSocket::sendCorrectedPosition(QString x, QString y, QString orientation)
+{
+    QString response_begin = "{\"type\":\"Response\",\"R1_Location\":{";
+    QString response_end = "}}";
+    SendJSONResponseToSocket(response_begin + "\"x\":\"" + x + "\",\"y\":\"" + y + "\",\"orientation\":\"" + orientation + "\"" + response_end, SEARCHERMOVER);
+    qDebug() << response_begin + "\"x\":\"" + x + "\",\"y\":\"" + y + "\",\"orientation\":\"" + orientation + "\"" + response_end;
 }
 
 void ClientSocket::sendClear(bool send){
@@ -218,9 +240,9 @@ void ClientSocket::HandleRequest(QJsonArray array)
 
         if (sendData) {
             if (isClear) {
-                data = "[\"0\",\"0\",\"0\"]";
+                data = "\"0\"";
             } else {
-                data = "[\"1\",\"1\",\"1\"]";
+                data = "\"1\"";
             }
             SendJSONResponseToSocket(response_begin + "\"SensorData\":" + data + response_end, SEARCHERMOVER);
         }

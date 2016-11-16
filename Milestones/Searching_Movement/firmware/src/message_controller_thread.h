@@ -87,7 +87,7 @@ typedef struct {
     float orientation;
     Movement movement;
     LineObj lineLocation;
-}InternalData;
+} InternalData;
 
 //This should include a new enum for anything in the InternalData
 typedef enum UpdateType_enum { MOVEMENT, LINELOCATION } UpdateType;

@@ -6,11 +6,14 @@
 #include <QApplication>
 #include <QFileDialog>
 #include <QMessageBox>
+
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
 {
     srand(time(NULL));
     setupUi(this);
+    socket = new ClientSocket();
+
     connect(clearOccupanyGridButton, SIGNAL(released()), this, SLOT(handleGridClear()));
     connect(simulateButton, SIGNAL(released()), this, SLOT(handleSimulate()));
     connect(gridwidget, SIGNAL(updateCursorPosition(int,int)), this, SLOT(updateCursorPosition(int,int)));
@@ -18,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     movementTimer = new QTimer();
     movementTimer->setInterval(333); //original 333
     sensorReadingTimer->setInterval(50); //original 50
-    sensorReadingTimer->start();
+
     connect(sensorReadingTimer, SIGNAL(timeout()), this, SLOT(handleSimulate()));
     connect(showObjects, SIGNAL(released()), this, SLOT(handleShowObjects()));
     connect(gridwidget, SIGNAL(updateRoverPosition(float,float,float)), this, SLOT(handleRoverCoordinateUpdate(float,float,float)));
@@ -28,7 +31,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(loadSimulationButton, SIGNAL(released()), this, SLOT(handleLoadSimulation()));
     connect(saveSimulationButton, SIGNAL(released()), this, SLOT(handleSaveSimulation()));
     connect(resetButton, SIGNAL(released()), this, SLOT(handleSimulationReset()));
-
+    connect(requestOccupanyGridButton, SIGNAL(released()), this, SLOT(handleRequestOccupanyGrid()));
+    connect(simulationMode, SIGNAL(toggled(bool)), this, SLOT(handleSimulateRadioButtion(bool)));
+    connect(requestMode, SIGNAL(toggled(bool)), this, SLOT(handleSimulateRadioButtion(bool)));
+    connect(connectToServer, SIGNAL(released()), this, SLOT(handleConnect()));
+    connect(socket, SIGNAL(serverIsConnectedSignal(bool)), this, SLOT(HostConnectionEvent(bool)));
+    connect(socket, SIGNAL(updateGrid(int,QVector<char>)), gridwidget, SLOT(handleUpdate(int,QVector<char>)));
+    connect(socket, SIGNAL(updateRoverPosition(float,float,float)), gridwidget, SLOT(updateRoverPosition(float,float,float)));
+    connect(sendResponse, SIGNAL(released()), this, SLOT(handlePICPositionUpdate()));
     middleFIRDistance->setText(QString::number(20));
     rightFIRDistance->setText(QString::number(20));
     leftFIRDistance->setText(QString::number(20));
@@ -64,9 +74,9 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     simulateButton->setText("Update Map");
     clearOccupanyGridButton->setText("Clear Occupany Grid");
 
-    xRoverLoc = new QLineEdit();
-    yRoverLoc = new QLineEdit();
-    roverAngle = new QLineEdit();
+    xRoverLoc = new QLineEdit("0");
+    yRoverLoc = new QLineEdit("0");
+    roverAngle = new QLineEdit("0");
     roverLocXLabel = new QLabel("X Location");
     roverLocYLabel = new QLabel("Y Location");
     roverAngleLabel = new QLabel("Angle");
@@ -78,28 +88,36 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     verticalSpacer2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     showObjects = new QPushButton("Hide Objects");
     errorButton = new QPushButton("Enable Errors");
+    requestOccupanyGridButton = new QPushButton("Request Occupany Grid");
     loadSimulationButton = new QPushButton("Load Simulation");
     saveSimulationButton = new QPushButton("Save Simulation");
+    sendResponse = new QPushButton("Update PIC Position");
+    ipaddress = new QLineEdit("192.168.0.197");
+    connectToServer = new QPushButton("Connect to Server");
     resetButton = new QPushButton("Reset Simulator");
-    comboBox = new QComboBox();
-    comboBox->addItem(QString("Map 1"));
-    SimulationSetupType map1;
     simulateMap = new QPushButton("Start Simulation");
+    simulationMode = new QRadioButton("Simulation Mode");
+    requestMode = new QRadioButton("Request Mode");
     verticalLayout1->addWidget(roverLocXLabel);
     verticalLayout1->addWidget(xRoverLoc);
     verticalLayout1->addWidget(roverLocYLabel);
     verticalLayout1->addWidget(yRoverLoc);
     verticalLayout1->addWidget(roverAngleLabel);
     verticalLayout1->addWidget(roverAngle);
+    verticalLayout1->addWidget(sendResponse);
     verticalLayout1->addWidget(clearOccupanyGridButton);
     verticalLayout1->addWidget(simulateButton);
     verticalLayout1->addWidget(showObjects);
     verticalLayout1->addWidget(errorButton);
-    verticalLayout1->addWidget(comboBox);
     verticalLayout1->addWidget(loadSimulationButton);
     verticalLayout1->addWidget(saveSimulationButton);
     verticalLayout1->addWidget(simulateMap);
     verticalLayout1->addWidget(resetButton);
+    verticalLayout1->addWidget(simulationMode);
+    verticalLayout1->addWidget(requestMode);
+    verticalLayout1->addWidget(ipaddress);
+    verticalLayout1->addWidget(connectToServer);
+    verticalLayout1->addWidget(requestOccupanyGridButton);
     verticalLayout1->addWidget(cursorPosition);
     verticalLayout1->addItem(verticalSpacer1);
     middleFIRDistance = new QLineEdit();
@@ -107,6 +125,7 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     leftFIRDistance = new QLineEdit();
     verticalLayout2->addItem(verticalSpacer2);
     setFocusProxy(gridwidget);
+    requestMode->setChecked(true);
 }
 
 void MainWindow::handleGridClear() {
@@ -121,7 +140,6 @@ void MainWindow::handleSimulationReset() {
     gridwidget->resetRoverPosition();
     gridwidget->resetGrid();
     gridwidget->objects.clear();
-    sensorReadingTimer->start();
 }
 
 void MainWindow::handleRoverCoordinateUpdate(float x, float y, float angle) {
@@ -131,7 +149,6 @@ void MainWindow::handleRoverCoordinateUpdate(float x, float y, float angle) {
 }
 
 void MainWindow::handleSimulate() {
-    gridwidget->setFocus();
     gridwidget->updateSensorReading();
 }
 
@@ -191,6 +208,7 @@ void MainWindow::handleLoadSimulation() {
     gridwidget->update();
     sensorReadingTimer->start();
 }
+
 
 void MainWindow::handleSaveSimulation() {
     QString filename = QFileDialog::getSaveFileName(this, tr("Save Simulation"),

@@ -6,7 +6,7 @@
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../../targetAlignment/clientsocket.h"
+#include "../../../../Users/ccox/Desktop/VT_16-17/ECE4534_Fall_2016/MPLAB PROJECTS/TG_10_10_16/targetAlignment/clientsocket.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)

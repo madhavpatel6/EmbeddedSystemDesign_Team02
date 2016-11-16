@@ -13,7 +13,7 @@ namespace Grid {
     static const int MINIMUM = -128;
     bool checkBounds(int x, int y);
 
-    typedef int8_t GridType[HEIGHT][WIDTH];
+    typedef char GridType[HEIGHT][WIDTH];
     void initializeGrid(GridType grid);
     void incrementIndex(int x, int y, GridType grid);
     void decrementIndex(int x, int y, GridType grid);

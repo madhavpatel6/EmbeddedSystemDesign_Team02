@@ -135,6 +135,9 @@
       <itemPath>../src/rx_thread_public.h</itemPath>
       <itemPath>../src/tx_thread_public.h</itemPath>
       <itemPath>../src/sensor_thread_public.h</itemPath>
+      <itemPath>../src/gridhelper.h</itemPath>
+      <itemPath>../src/grid.h</itemPath>
+      <itemPath>../src/myqueue.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -241,6 +244,9 @@
         <itemPath>../../../../../microchip/harmony/v1_08_01/third_party/rtos/FreeRTOS/Source/event_groups.c</itemPath>
       </logicalFolder>
       <itemPath>../src/debug.c</itemPath>
+      <itemPath>../src/grid.c</itemPath>
+      <itemPath>../src/gridhelper.c</itemPath>
+      <itemPath>../src/myqueue.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

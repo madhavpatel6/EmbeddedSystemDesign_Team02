@@ -39,7 +39,7 @@ void initParser(){
 }
 
 
-void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems){
+void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, Movement_t* r1_movement){
     int r, i;
     r = jsmn_parse(&p, JSON_STRING, strlen(JSON_STRING), t, sizeof(t)/sizeof(t[0]));
     for(i = 1; i < r; i++){
@@ -73,6 +73,38 @@ void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numI
                     }
                 }
                 *numItems = k;
+            }
+            i += t[i+1].size + 1;
+        }
+        else if (jsoneq(JSON_STRING, &t[i], "R1_Movement") == 0) {
+            int j;
+            int k = 0;
+            if (t[i+1].type != JSMN_ARRAY) {
+                continue; /* We expect items to be an array of strings */
+            }
+            for (j = 0; j < t[i+1].size; j++) {
+                jsmntok_t *g = &t[i+j+2];
+                sprintf(buf, "%.*s\0", g->end - g->start, JSON_STRING + g->start);
+                // This is the x position
+                if(j == 0) {
+                    r1_movement->x = (float)atof(buf);
+                }
+                // THis is the y position
+                else if(j == 1) {
+                    r1_movement->y = (float)atof(buf);
+                }
+                // This is the orientation
+                else if(j == 2) {
+                    r1_movement->orientation = (float)atof(buf);
+                }
+                // This is the action
+                else if(j == 3) {
+                    r1_movement->action = buf[0];
+                }
+                // This is the amount
+                else if(j == 4) {
+                    r1_movement->amount = (float)atof(buf);
+                }
             }
             i += t[i+1].size + 1;
         }

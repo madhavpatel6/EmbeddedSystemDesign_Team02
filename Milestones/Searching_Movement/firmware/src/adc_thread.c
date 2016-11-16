@@ -144,14 +144,16 @@ void ADC_THREAD_Initialize ( void )
 
  /* This averages the data coming from the line sensor*/
  void averageData(LineObj* lineObj) {
-     (*lineObj).IR_0 = ((*lineObj).IR_0/2.0);
-     (*lineObj).IR_1 = ((*lineObj).IR_1/2.0);
-     (*lineObj).IR_2 = ((*lineObj).IR_2/2.0);
-     (*lineObj).IR_3 = ((*lineObj).IR_3/2.0);
-     (*lineObj).IR_4 = ((*lineObj).IR_4/2.0);
-     (*lineObj).IR_5 = ((*lineObj).IR_5/2.0);
-     (*lineObj).IR_6 = ((*lineObj).IR_6/2.0);
-     (*lineObj).IR_7 = ((*lineObj).IR_7/2.0);
+     float samples = 5.0;
+     
+     (*lineObj).IR_0 = ((*lineObj).IR_0/samples);
+     (*lineObj).IR_1 = ((*lineObj).IR_1/samples);
+     (*lineObj).IR_2 = ((*lineObj).IR_2/samples);
+     (*lineObj).IR_3 = ((*lineObj).IR_3/samples);
+     (*lineObj).IR_4 = ((*lineObj).IR_4/samples);
+     (*lineObj).IR_5 = ((*lineObj).IR_5/samples);
+     (*lineObj).IR_6 = ((*lineObj).IR_6/samples);
+     (*lineObj).IR_7 = ((*lineObj).IR_7/samples);
  }
  
 void ADC_THREAD_InitializeQueue() {

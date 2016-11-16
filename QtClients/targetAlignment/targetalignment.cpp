@@ -1,7 +1,7 @@
 #include "targetalignment.h"
 #include "ui_targetalignment.h"
 
-#define REQUESTRATE_MS 200
+#define REQUESTRATE_MS 400
 
 targetAlignment::targetAlignment(QWidget *parent) :
     QMainWindow(parent),

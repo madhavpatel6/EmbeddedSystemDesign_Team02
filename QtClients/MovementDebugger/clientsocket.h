@@ -38,7 +38,10 @@ public slots:
     void sendBackCommand(int distance);
     void sendLeftCommand(int degrees);
     void sendRightCommand(int degrees);
-    void sendInitialData(char mode);
+    void sendStartCommand();
+    void sendStopCommand();
+    void sendInitialData(QString mode, QString position, QString numVertices, QString vertices);
+    void sendCorrectedPosition(QString x, QString y, QString orientation);
     void sendClear(bool send);
     void sendObstacle(bool send);
 

@@ -79,36 +79,25 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 
 static QueueHandle_t _usartqueue;
 #define USARTTYPEOFQUEUE char
-#define USARTSIZEOFQUEUE 600
-
-
-static TimerHandle_t timer;
-static bool mode0 = true;
-static bool mode1 = true;
-static bool mode2 = true;
-static bool mode3 = true;
-static bool mode4 = true;
+#define USARTSIZEOFQUEUE 400
 
 
 void IntHandlerDrvAdc(void)
 {
     dbgOutputLoc(ENTER_ADC_ISR);
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-    SensorADC_t obj;
-    obj.UpdateType = IRSENSORS;
-    memset(&obj, 0, sizeof(SensorADC_t));
+    TL_Queue_t obj;
+    obj.type = SENSORADC;
+    memset(&obj, 0, sizeof(TL_Queue_t));
     
     int i = 0;
     dbgOutputLoc(ADDING_ADC_VAL_ISR);
-    for(i; i < 8; i=i+8) {
-        obj.IRSensors.leftFTSensor += DRV_ADC_SamplesRead(i);
-        obj.IRSensors.middleFTSensor += DRV_ADC_SamplesRead(i + 1);
-        obj.IRSensors.rightFTSensor += DRV_ADC_SamplesRead(i + 2);
-        obj.IRSensors.leftFBSensor += DRV_ADC_SamplesRead(i + 3);
-        obj.IRSensors.middleFBSensor += DRV_ADC_SamplesRead(i + 4);
-        obj.IRSensors.rightFBSensor += DRV_ADC_SamplesRead(i + 5);
-        obj.IRSensors.leftSDSensor += DRV_ADC_SamplesRead(i + 6);
-        obj.IRSensors.rightSDSensor += DRV_ADC_SamplesRead(i + 7);
+    for(i; i < 5; i=i+5) {
+        obj.contents.sensors.IRSensors.leftFBSensor += DRV_ADC_SamplesRead(i);
+        obj.contents.sensors.IRSensors.middleFBSensor += DRV_ADC_SamplesRead(i + 1);
+        obj.contents.sensors.IRSensors.rightFBSensor += DRV_ADC_SamplesRead(i + 2);
+        obj.contents.sensors.IRSensors.leftFTSensor += DRV_ADC_SamplesRead(i + 3);
+        obj.contents.sensors.IRSensors.rightFTSensor += DRV_ADC_SamplesRead(i + 4);
     }
     dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
     SENSOR_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
@@ -119,170 +108,6 @@ void IntHandlerDrvAdc(void)
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
 }
 
-
-void IntHandlerExternalInterruptInstance0(void)
-{
-    uint32_t val = DRV_TMR2_CounterValueGet();
-    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-    //rising edge trigger
-    if(mode0) {
-        DRV_TMR2_Start();
-        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE0, INT_EDGE_TRIGGER_FALLING);
-        mode0 = false;
-    }
-    //falling edge trigger
-    else {
-        DRV_TMR2_Stop();
-        SensorADC_t obj;
-        memset(&obj, 0, sizeof(SensorADC_t));
-        obj.UpdateType = ULTRASONICSENSORS;
-        obj.USSensors.location = LEFTFRONTULTRASONIC;
-        obj.USSensors.tickCount = val;
-        DRV_TMR2_CounterClear();
-                MessageObj obj1;
-            obj1.Update.Data.difftickCount = (val) * 8 / 80;
-            obj1.Type = UPDATE;
-            obj1.Update.Type = TIMERTICK;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj1, &pxHigherPriorityTaskWoken);
-        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE0, INT_EDGE_TRIGGER_RISING);
-        SENSOR_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-        mode0 = true;
-        
-    }
-    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
-    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_0);
-}
-
-void IntHandlerExternalInterruptInstance1(void) {
-    uint32_t val = DRV_TMR2_CounterValueGet();
-    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-    //rising edge trigger
-    if(mode0) {
-        DRV_TMR2_Start();
-        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE1, INT_EDGE_TRIGGER_FALLING);
-        mode0 = false;
-    }
-    //falling edge trigger
-    else {
-        DRV_TMR2_Stop();
-        SensorADC_t obj;
-        memset(&obj, 0, sizeof(SensorADC_t));
-        obj.UpdateType = ULTRASONICSENSORS;
-        obj.USSensors.location = MIDDLEFRONTULTRASONIC;
-        obj.USSensors.tickCount = val;
-        DRV_TMR2_CounterClear();
-                MessageObj obj1;
-            obj1.Update.Data.difftickCount = (val) * 8 / 80;
-            obj1.Type = UPDATE;
-            obj1.Update.Type = TIMERTICK;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj1, &pxHigherPriorityTaskWoken);
-        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE1, INT_EDGE_TRIGGER_RISING);
-        SENSOR_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-        mode0 = true;
-        
-    }
-    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
-    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_1);
-}
-
-void IntHandlerExternalInterruptInstance2(void)
-{    
-    uint32_t val = DRV_TMR2_CounterValueGet();
-    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-    //rising edge trigger
-    if(mode0) {
-        DRV_TMR2_Start();
-        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE2, INT_EDGE_TRIGGER_FALLING);
-        mode0 = false;
-    }
-    //falling edge trigger
-    else {
-        DRV_TMR2_Stop();
-        SensorADC_t obj;
-        memset(&obj, 0, sizeof(SensorADC_t));
-        obj.UpdateType = ULTRASONICSENSORS;
-        obj.USSensors.location = RIGHTFRONTULTRASONIC;
-        obj.USSensors.tickCount = val;
-        DRV_TMR2_CounterClear();
-                MessageObj obj1;
-            obj1.Update.Data.difftickCount = (val) * 8 / 80;
-            obj1.Type = UPDATE;
-            obj1.Update.Type = TIMERTICK;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj1, &pxHigherPriorityTaskWoken);
-        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE2, INT_EDGE_TRIGGER_RISING);
-        SENSOR_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-        mode0 = true;
-        
-    }
-    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
-    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_2);
-}
-
-void IntHandlerExternalInterruptInstance3(void)
-{
-    uint32_t val = DRV_TMR2_CounterValueGet();
-    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-    //rising edge trigger
-    if(mode0) {
-        DRV_TMR2_Start();
-        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE3, INT_EDGE_TRIGGER_FALLING);
-        mode0 = false;
-    }
-    //falling edge trigger
-    else {
-        DRV_TMR2_Stop();
-        SensorADC_t obj;
-        memset(&obj, 0, sizeof(SensorADC_t));
-        obj.UpdateType = ULTRASONICSENSORS;
-        obj.USSensors.location = LEFTFRONTULTRASONIC;
-        obj.USSensors.tickCount = val;
-        DRV_TMR2_CounterClear();
-                MessageObj obj1;
-            obj1.Update.Data.difftickCount = (val) * 8 / 80;
-            obj1.Type = UPDATE;
-            obj1.Update.Type = TIMERTICK;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj1, &pxHigherPriorityTaskWoken);
-        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE3, INT_EDGE_TRIGGER_RISING);
-        SENSOR_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-        mode0 = true;
-        
-    }
-    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
-    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_3);
-}
-
-void IntHandlerExternalInterruptInstance4(void)
-{
-    uint32_t val = DRV_TMR2_CounterValueGet();
-    BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
-    //rising edge trigger
-    if(mode0) {
-        DRV_TMR2_Start();
-        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE4, INT_EDGE_TRIGGER_FALLING);
-        mode0 = false;
-    }
-    //falling edge trigger
-    else {
-        DRV_TMR2_Stop();
-        SensorADC_t obj;
-        memset(&obj, 0, sizeof(SensorADC_t));
-        obj.UpdateType = ULTRASONICSENSORS;
-        obj.USSensors.location = LEFTFRONTULTRASONIC;
-        obj.USSensors.tickCount = val;
-        DRV_TMR2_CounterClear();
-                MessageObj obj1;
-            obj1.Update.Data.difftickCount = (val) * 8 / 80;
-            obj1.Type = UPDATE;
-            obj1.Update.Type = TIMERTICK;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj1, &pxHigherPriorityTaskWoken);
-        SYS_INT_ExternalInterruptTriggerSet(INT_EXTERNAL_INT_SOURCE4, INT_EDGE_TRIGGER_RISING);
-        SENSOR_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-        mode0 = true;
-        
-    }
-    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
-    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_4);
-}
 
 /* This timer is to fire the ADC */
 void IntHandlerDrvTmrInstance0(void)
@@ -307,27 +132,27 @@ void IntHandlerDrvTmrInstance1(void)
     dbgOutputLoc(ENTER_TMR_INSTANCE_1_ISR);
     BaseType_t pxHigherPriorityTaskWoken = pdFALSE;
     MessageObj obj;
-    obj.Type = SEND_REQUEST;
+    obj.type = SEND_REQUEST;
     dbgOutputLoc(BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR);
     switch(MYMODULE){
         case SEARCHERMOVER:
-            obj.Request = SMtoTL;
+            obj.message.Request = SMtoTL;
             MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             break;
         case TARGETLOCATOR:
-            obj.Request = TLtoSM;
-//            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            obj.Request = TLtoPF;
+            obj.message.Request = TLtoSM;
+            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+            obj.message.Request = TLtoPF;
 //            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             break;
         case PATHFINDER:
-            obj.Request = PFtoTL;
+            obj.message.Request = PFtoTL;
             MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-            obj.Request = PFtoTG;
+            obj.message.Request = PFtoTG;
             MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             break;
         case TARGETGRABBER:
-            obj.Request = TGtoPF;
+            obj.message.Request = TGtoPF;
             MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             break;
     }
@@ -338,104 +163,6 @@ void IntHandlerDrvTmrInstance1(void)
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
 }
 
-/* This timer is only used to measure the pulse width of the ultrasonic sensors*/
-void IntHandlerDrvTmrInstance2(void)
-{
-    PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
-}
-
-
-UltrasonicLocation_t triggerState = LEFTFRONTULTRASONIC;
-
-void IntHandlerDrvTmrInstance3(void)
-{
-    switch(triggerState) {
-        case LEFTFRONTULTRASONIC: { 
-            PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_EXTERNAL_1);
-            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_1);
-            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_0);
-            PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_EXTERNAL_0);
-      
-            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 13, 1);
-            uint32_t start = DRV_TMR0_CounterValueGet();
-            uint32_t end = start + 4;
-            if(end > 15625) {
-                end = 4;
-            }
-            while(DRV_TMR0_CounterValueGet() < end) {}
-            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 13, 0);
-            triggerState = LEFTFRONTULTRASONIC;
-            break;
-        }
-        case MIDDLEFRONTULTRASONIC: { 
-//            PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_EXTERNAL_0);
-//            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_0);
-//            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_1);
-//            PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_EXTERNAL_1);
-//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 7, 1);
-//            uint32_t start = DRV_TMR0_CounterValueGet();
-//            uint32_t end = start + 4;
-//            if(end > 15625) {
-//                end = 4;
-//            }
-//            while(DRV_TMR0_CounterValueGet() < end) {}
-//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 7, 0);
-//            triggerState = LEFTFRONTULTRASONIC;
-            break;
-        }
-//        case RIGHTFRONTULTRASONIC: { 
-//            PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_EXTERNAL_1);
-//            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_1);
-//            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_2);
-//            PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_EXTERNAL_2);
-//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 1);
-//            uint32_t start = DRV_TMR0_CounterValueGet();
-//            uint32_t end = start + 4;
-//            if(end > 15625) {
-//                end = 4;
-//            }
-//            while(DRV_TMR0_CounterValueGet() < end) {}
-//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 1, 0);
-//            triggerState = LEFTFRONTULTRASONIC;
-//            break;
-//        }
-//        case LEFTSIDEULTRASONIC: { 
-////            PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_EXTERNAL_2);
-////            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_2);
-////            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_3);
-////            PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_EXTERNAL_3);
-//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 0, 1);
-//            uint32_t start = DRV_TMR0_CounterValueGet();
-//            uint32_t end = start + 4;
-//            if(end > 15625) {
-//                end = 4;
-//            }
-//            while(DRV_TMR0_CounterValueGet() < end) {}
-//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_G, 0, 0);
-//            triggerState = RIGHTSIDEULTRASONIC;
-//            break;
-//        }
-//        case RIGHTSIDEULTRASONIC: { 
-////            PLIB_INT_SourceDisable(INT_ID_0, INT_SOURCE_EXTERNAL_3);
-////            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_3);
-////            PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_EXTERNAL_4);
-////            PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_EXTERNAL_4);
-//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 12, 1);
-//            uint32_t start = DRV_TMR0_CounterValueGet();
-//            uint32_t end = start + 4;
-//            if(end > 15625) {
-//                end = 4;
-//            }
-//            while(DRV_TMR0_CounterValueGet() < end) {}
-//            SYS_PORTS_PinWrite(PORTS_ID_0, PORT_CHANNEL_D, 12, 0);
-//            triggerState = LEFTFRONTULTRASONIC;
-//            break;
-//        }
-        default:
-            break;
-    }
-    PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_TIMER_5);
-}
 
 void Usart0_InitializeQueue() {
     _usartqueue = xQueueCreate(USARTSIZEOFQUEUE, sizeof(USARTTYPEOFQUEUE));

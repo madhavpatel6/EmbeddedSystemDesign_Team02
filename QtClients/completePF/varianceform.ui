@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>varianceForm</class>
+ <widget class="QWidget" name="varianceForm">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1083</width>
+    <height>241</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>2</x>
+     <y>10</y>
+     <width>1071</width>
+     <height>221</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_8">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_6">
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_7">
+        <item>
+         <widget class="QPushButton" name="calculateVarianceButton">
+          <property name="text">
+           <string>Calclaute Variance</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QLabel" name="varianceStartedLabel">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Variance Started:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="variance_started_label">
+            <property name="text">
+             <string>No</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <widget class="QLabel" name="varianceIR0Label">
+          <property name="text">
+           <string>Variance IR_0:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="varianceIR0LcdNumber"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="QLabel" name="varianceIR1Label">
+          <property name="text">
+           <string>Variance IR_1:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="varianceIR1LcdNumber"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QLabel" name="varianceIR2Label">
+          <property name="text">
+           <string>Variance IR_2:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="varianceIR2LcdNumber"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QLabel" name="varianceIR3Label">
+          <property name="text">
+           <string>Variance IR_3:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="varianceIR3LcdNumber"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QLabel" name="varianceIR4Label">
+          <property name="text">
+           <string>Variance IR_4:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="varianceIR4LcdNumber"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Mean:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="meanIR0LcdNumber"/>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="meanIR1LcdNumber"/>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="meanIR2LcdNumber"/>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="meanIR3LcdNumber"/>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="meanIR4LcdNumber"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="xiLabel">
+          <property name="text">
+           <string>Xi-Mean:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="ximeanIR0LcdNumber"/>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="ximeanIR1LcdNumber"/>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="ximeanIR2LcdNumber"/>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="ximeanIR3LcdNumber"/>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="ximeanIR4LcdNumber"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="ximeansqLabel">
+          <property name="text">
+           <string>(Xi-Mean)^2 :</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="ximeansqIR0LcdNumber"/>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="ximeansqIR1LcdNumber"/>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="ximeansqIR2LcdNumber"/>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="ximeansqIR3LcdNumber"/>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="ximeansqIR4LcdNumber"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="sumximeansqLabel">
+          <property name="text">
+           <string>Sum (Xi-Mean)^2:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="sumximeansqIR0LcdNumber"/>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="sumximeansqIR1LcdNumber"/>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="sumximeansqIR2LcdNumber"/>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="sumximeansqIR3LcdNumber"/>
+        </item>
+        <item>
+         <widget class="QLCDNumber" name="sumximeansqIR4LcdNumber"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

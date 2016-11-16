@@ -1,0 +1,15 @@
+INPUT(
+./debug\main.o
+./debug\pfwindow.o
+./debug\messages.o
+./debug\debug.o
+./debug\clientsocket.o
+./debug\varianceform.o
+./debug\req_respform.o
+./debug\tg_req_respform.o
+./debug\moc_pfwindow.o
+./debug\moc_clientsocket.o
+./debug\moc_varianceform.o
+./debug\moc_req_respform.o
+./debug\moc_tg_req_respform.o
+);

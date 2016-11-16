@@ -105,7 +105,7 @@ void ClientSocket::HandleResponse(QJsonObject obj) {
     if(obj.contains(QStringLiteral("TargetLocatorSensorData"))) {
         QJsonObject ir = obj["TargetLocatorSensorData"].toObject()["IR"].toObject();
         QJsonObject us = obj["TargetLocatorSensorData"].toObject()["US"].toObject();
-        emit sendUpdate(ir["leftFT"].toString(), ir["rightFT"].toString(), ir["leftFB"].toString(), ir["rightFB"].toString(), us["leftFT"].toString(), us["middleFT"].toString(), us["rightFT"].toString(), us["leftSD"].toString(), us["rightSD"].toString());
+        emit sendUpdate(ir["leftFT"].toString(), ir["rightFT"].toString(), ir["leftFB"].toString(), ir["middleFB"].toString(), ir["rightFB"].toString(), us["leftFT"].toString(), us["middleFT"].toString(), us["rightFT"].toString(), us["leftSD"].toString(), us["rightSD"].toString());
     }
 
 }

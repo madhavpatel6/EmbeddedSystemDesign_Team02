@@ -98,15 +98,10 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
 {
     dbgOutputLoc(ENTER_MESSAGE_CONTROLLER_THREAD);
     InternalData internalData;
-    InternalData initialData;
     memset(&internalData, 0, sizeof(InternalData));
-    memset(&initialData, 0, sizeof(InternalData));
     internalData.location.x = 0;
     internalData.location.y = 0;
     internalData.orientation = 0;
-    initialData.location.x = 0;
-    initialData.location.y = 0;
-    initialData.orientation = 0;
     StatObjectType statObject;
     memset(&statObject, 0, sizeof(StatObjectType));
     type_t type = unknown;
@@ -121,10 +116,10 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
         initParser();
         MessageObj messageObj;
         MotorObj motorObj;
+        Tx_Thead_Queue_DataType tx_thread_obj;
+
         memset(&messageObj, 0, sizeof(MessageObj));
         memset(&motorObj, 0, sizeof(MotorObj));
-
-        Tx_Thead_Queue_DataType tx_thread_obj;
         memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
 
         dbgOutputLoc(BEFORE_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD);
@@ -140,7 +135,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                 
                 statObject.GoodCount++;
                 
-                parseJSON(messageObj.External.Data, &type, items,  &numItems, &value, &mode, &data);
+                parseJSON(messageObj.External.Data, &type, items,  &numItems, &value, &mode, &data, &motorObj);
                 
                 switch(type) {
                     case request: {
@@ -294,6 +289,16 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                     break;
                                 }
+                                case Start: {
+                                    motorObj.stop = 'N';
+                                    MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
+                                    break;
+                                }
+                                case Stop: {
+                                    motorObj.stop = 'Y';
+                                    MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
+                                    break;
+                                }
                                 case LineLocation: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"LineLocation\":{\"0\":\"%0.02f\",\"1\":\"%0.02f\",\"2\":\"%0.02f\","
                                             "\"3\":\"%0.02f\",\"4\":\"%0.02f\",\"5\":\"%0.02f\",\"6\":\"%0.02f\",\"7\":\"%0.02f\"}", 
@@ -353,6 +358,25 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                             }
                             case TARGETLOCATOR: {
                                 statObject.Res_From_TargetLocator++;
+                                
+                                int i = 0;
+                                for(i = 0; i < numItems; i++) {
+                                    switch(items[i]) {
+                                        case SensorData: {
+                                            motorObj.sensorData = data;
+                                            MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
+                                            break;
+                                        }
+                                        case R1_Location: {
+                                            motorObj.type = UPDATE_POSITION;
+                                            MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
+                                            break;
+                                        }
+                                        default: {
+                                            break;
+                                        }
+                                    }
+                                }
                                 break;
                             }
                             case PATHFINDER: {
@@ -369,6 +393,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     switch(items[i]) {
                                         case InitialData: {
                                             initialized = true;
+                                            motorObj.type = UPDATE_POSITION;
                                             motorObj.mode = mode;
                                             MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                             break;
@@ -378,11 +403,17 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                             MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                             break;
                                         }
+                                        case R1_Location: {
+                                            motorObj.type = UPDATE_POSITION;
+                                            MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
+                                            break;
+                                        }
                                         default: {
                                             break;
                                         }
                                     }
                                 }
+                                break;
                             }
                             default: {
                                 break;
@@ -468,9 +499,9 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                 dbgOutputLoc(CASE_UPDATE_MESSAGE_CONTROLLER_THREAD);
                 switch(messageObj.Update.Type) {
                     case MOVEMENT: {
-                        internalData.location.x = initialData.location.x + messageObj.Update.Data.location.x;
-                        internalData.location.y = initialData.location.y + messageObj.Update.Data.location.y;
-                        internalData.orientation = (initialData.orientation + messageObj.Update.Data.orientation);
+                        internalData.location.x = messageObj.Update.Data.location.x;
+                        internalData.location.y = messageObj.Update.Data.location.y;
+                        internalData.orientation = messageObj.Update.Data.orientation;
                         internalData.movement.action = messageObj.Update.Data.movement.action;
                         internalData.movement.amount = messageObj.Update.Data.movement.amount;
                         break;

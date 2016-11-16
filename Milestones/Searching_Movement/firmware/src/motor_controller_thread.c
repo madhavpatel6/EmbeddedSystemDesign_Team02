@@ -74,8 +74,8 @@ static QueueHandle_t _queue;
 static int rightCount = 0;
 static int leftCount = 0;
 
-static int rightSpeed = (int)MAX_PWM*0.8;
-static int leftSpeed = (int)MAX_PWM*0.8;
+static int rightSpeed = (int)MAX_PWM*0.75;
+static int leftSpeed = (int)MAX_PWM*0.75;
 
 static float totalDistance = 0;
 static float initialOrientation = 0;
@@ -83,6 +83,8 @@ static float orientation = 0;
 static bool motionComplete = true;
 
 static int integralLeft = 0;
+
+static unsigned int msTimer = 0;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -136,7 +138,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
     bool initialized = false;
     
     enum states {
-        forward, inchForward, inchBackward, turnRight, turnLeft, followLine
+        forward, inchForward, inchBackward, turnRight, turnLeft, stop
     } state, prevState;
     
     messageObj.Type = UPDATE;
@@ -154,8 +156,11 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
             MOTOR_CONTROLLER_THREAD_ReadFromQueue(&motorObj);
             dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
 
-            if (motorObj.mode != NULL) {
+            if (motorObj.type == UPDATE_POSITION) {
                 mode = motorObj.mode;
+                x = motorObj.location.x;
+                y = motorObj.location.y;
+                orientation = motorObj.orientation;
                 initialized = true;
             }
         } else {
@@ -167,7 +172,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                     dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
                     motionComplete = false;
                 }
-                
+
                 // Determine direction to travel
                 switch(motorObj.direction) {
                     case 'F': {
@@ -227,7 +232,11 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                         break;
                     }
                     default: {
-                        completeMotion();
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+                        motionComplete = true;
+                        totalDistance = 0;
+                        initialOrientation = orientation;
                         movement.action = FORWARD;
                         movement.amount = totalDistance;
                         break;
@@ -237,6 +246,16 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
                 MOTOR_CONTROLLER_THREAD_ReadFromQueue(&motorObj);
                 dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
+                
+                if (motorObj.stop == 'Y') {
+                    state = stop;
+                }
+
+                if (motorObj.type == UPDATE_POSITION) {
+                    x = motorObj.location.x;
+                    y = motorObj.location.y;
+                    orientation = motorObj.orientation;
+                }
                 
                 switch (state) {
                     case forward: {
@@ -343,8 +362,22 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                         }
                         break;
                     }
+                    case stop: {
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+
+                        if (motorObj.stop == 'N') {
+                            state = prevState;
+                        }
+                        break;
+                    }
                     default: {
-                        completeMotion();
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+                        totalDistance = 0;
+                        initialOrientation = orientation;
+                        movement.action = FORWARD;
+                        movement.amount = totalDistance;
                         break;
                     }
                 }
@@ -353,6 +386,16 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 MOTOR_CONTROLLER_THREAD_ReadFromQueue(&motorObj);
                 dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
                 
+                if (motorObj.stop == 'Y') {
+                    state = stop;
+                }
+                
+                if (motorObj.type == UPDATE_POSITION) {
+                    x = motorObj.location.x;
+                    y = motorObj.location.y;
+                    orientation = motorObj.orientation;
+                }
+
                 switch (state) {
                     case forward: {
                         if ((motorObj.lineLocation == 0) && (motorObj.sensorData == 0)) {
@@ -379,7 +422,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                         if (totalDistance < -3) {
                             completeMotion();
                             state = turnRight;
-                            angle = rand() % 360;
+                            angle = rand() % 180;
                         }
                         break;
                     }
@@ -398,8 +441,23 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                         }
                         break;
                     }
+                    case stop: {
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+
+                        if (motorObj.stop == 'N') {
+                            state = forward;
+                        }
+                        break;
+                    }
                     default: {
-                        completeMotion();
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+                        motionComplete = true;
+                        totalDistance = 0;
+                        initialOrientation = orientation;
+                        movement.action = FORWARD;
+                        movement.amount = totalDistance;
                         break;
                     }
                 }
@@ -416,18 +474,15 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 case FORWARD: case BACKWARD: {
                     weightedDiff = (deltaRight - deltaLeft)/2;
                     deltaLeft = deltaRight - weightedDiff;
-    //                weightedDiff = (deltaRight + deltaLeft)/2;
-    //                deltaRight = weightedDiff;
-    //                deltaLeft = weightedDiff;
                     break;
                 }
             }
             
             // Calculate distance traveled
-            distance = (((deltaRight+deltaLeft)/2.0)/TICKS_PER_CM);
+            distance = ((deltaRight+deltaLeft)/2.0)/TICKS_PER_CM;
             totalDistance += distance;
 
-            orientation += (((((deltaRight-deltaLeft)/2.0)/TICKS_PER_CM)/CIRCUMFERENCE)*360.0);
+            orientation += ((deltaRight-deltaLeft)/2.0)/TICKS_PER_DEG;
 
             // Update position of rover - location & orientation
             x += distance*cos(orientation*2*M_PI/360.0);
@@ -469,14 +524,13 @@ int prevLeftPID = 0;
 
 // PID algorithm to match left motor speed to right motor
 void MOTOR_CONTROLLER_THREAD_CorrectSpeed(int timer) {
+    msTimer++;
+    
     int errorLeft = 0;
     int outputLeft = 0;
     
-//    int Kp_Left = 5500;
-//    int Ki_Left = 2250;
-    
-    int Kp_Left = 55;
-    int Ki_Left = 25;
+    int Kp_Left = 70;
+    int Ki_Left = 95;
     
     errorLeft = (rightCount-prevRightPID)-(leftCount-prevLeftPID);
     integralLeft += errorLeft;
@@ -491,15 +545,15 @@ void MOTOR_CONTROLLER_THREAD_CorrectSpeed(int timer) {
     
     leftSpeed = outputLeft;
     
-    if(timer % 2 == 0) {
+    if(timer % 50 == 0) {
             Tx_Thead_Queue_DataType tx_thread_obj;
             memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
             tx_thread_obj.Destination = TARGETLOCATOR;
             BaseType_t *ptr;
-            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"1\", \"vel\": \"%4d\", \"time\": \"%4d\", \"output\": \"%4f\", \"pwm\": \"%4d\"}", leftCount-prevLeftPID, timer, outputLeft, leftSpeed);
-//            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
-            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"2\", \"vel\": \"%4d\", \"time\": \"%4d\"}", rightCount-prevRightPID, timer);
-//            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"1\", \"vel\": \"%4d\", \"time\": \"%4d\", \"output\": \"%4f\", \"pwm\": \"%4d\"}", leftCount, timer, outputLeft, leftSpeed);
+            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"2\", \"vel\": \"%4d\", \"time\": \"%4d\"}", rightCount, timer);
+            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
     }
     
     prevRightPID = rightCount;
@@ -540,8 +594,31 @@ void enableMotors(int mode) {
 
 // Set pulse width for both motors to 0
 void disableMotors(void) {
-    PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
-    PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+    unsigned int currentTime = msTimer;
+    int right = rightSpeed;
+    int left = leftSpeed;
+    
+    while ((right > 0) && (left > 0)) {
+        Tx_Thead_Queue_DataType tx_thread_obj;
+            memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
+            tx_thread_obj.Destination = TARGETLOCATOR;
+            BaseType_t *ptr;
+            sprintf(tx_thread_obj.Data, "right: %d, left: %d", right, left);
+            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+            
+            sprintf(tx_thread_obj.Data, "msTimer: %d, currentTime: %d", msTimer, currentTime);
+            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+            
+        if ((msTimer-currentTime) >= 1) {
+            right = right/2;
+            left = left/2;
+        
+            PLIB_OC_PulseWidth16BitSet(OC_ID_1, right);
+            PLIB_OC_PulseWidth16BitSet(OC_ID_2, left);
+            
+            currentTime = msTimer;
+        }
+    }
 }
 
 void setDirectionForward(void) {

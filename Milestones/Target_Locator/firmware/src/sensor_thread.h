@@ -59,6 +59,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "FreeRTOS.h"
 #include "queue.h"
 #include "message_controller_thread.h"
+#include "gridhelper.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -68,35 +69,40 @@ extern "C" {
 #endif
 // DOM-IGNORE-END 
 
-typedef enum {
-    LEFTFRONTULTRASONIC, MIDDLEFRONTULTRASONIC, RIGHTFRONTULTRASONIC, LEFTSIDEULTRASONIC, RIGHTSIDEULTRASONIC
-} UltrasonicLocation_t;
-
-typedef enum {
-    IRSENSORS, ULTRASONICSENSORS
-} SensorUpdate_t;
-
 typedef struct {
-    uint32_t middleFTSensor;
     uint32_t rightFTSensor;
     uint32_t leftFTSensor;
     uint32_t middleFBSensor;
     uint32_t rightFBSensor;
     uint32_t leftFBSensor;
-    uint32_t rightSDSensor;
-    uint32_t leftSDSensor;
 } IRSensorsADC_t;
 
-typedef struct {
-    UltrasonicLocation_t location;
-    uint32_t tickCount;
-} USSensorADC_t;
 
 typedef struct {
-    SensorUpdate_t UpdateType;
     IRSensorsADC_t IRSensors;
-    USSensorADC_t USSensors;
 } SensorADC_t;
+
+typedef enum { SENSORADC, RV1_POSUPDATE, REQUESTOCCUPANYGRID} TLUpdate_t;
+
+typedef struct {
+    float x;
+    float y;
+    float orientation;
+    char action;
+    float amount;
+} Movement_t;
+
+typedef union {
+	SensorADC_t sensors;
+	Movement_t r1_movement;
+}TL_Message_t;
+
+typedef struct {
+	TLUpdate_t type;
+	TL_Message_t contents;
+} TL_Queue_t;
+
+
 
 typedef struct {
     bool leftfront;
@@ -106,10 +112,10 @@ typedef struct {
     bool rightside;
 } UltrasonicIsSet_t;
 
-typedef struct {
-    UltrasonicIsSet_t isSet;
-    UltrasonicSensorDistance_t distance;
-} UltrasonicContainer;
+//typedef struct {
+//    UltrasonicIsSet_t isSet;
+////    UltrasonicSensorDistance_t distance;
+//} UltrasonicContainer;
 
 /*******************************************************************************
   Function:
@@ -179,17 +185,24 @@ void SENSOR_THREAD_Tasks( void );
 
 void SENSOR_THREAD_InitializeQueue();
 
-void SENSOR_THREAD_ReadFromQueue(SensorADC_t* pvBuffer);
+void SENSOR_THREAD_ReadFromQueue(TL_Queue_t* pvBuffer);
 
-void ConvertDigitalToCM(IRSensorsADC_t sensorData, IRSensorDistance_t* values);
+void ConvertSensorADCToDistance(SensorDataType* distances, SensorADC_t adcValues);
+
+void UpdateSensorLocations(SensorDataContainerType* sensors, SensorDataType distances, point_t roverLocation, int orientation);
+
+void ConvertShortRangeToCM(float* distanceCM, uint32_t adcValue);
+
+void ConvertMidRangeToCM(float* distanceCM, uint32_t adcValue);
+
+void ConvertBottomLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
+
+void ConvertBottomRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
 
 void ConvertTopLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
 
-void ConvertTopRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
+bool FilterIRSensors(SensorDataType sensors);
 
-void HandleUltrasonicUpdate(USSensorADC_t sensorData, UltrasonicContainer* values);
-
-void ConvertUltrasonicToCM(float* distanceCM, uint32_t tickCount);
 #endif /* _SENSOR_THREAD_H */
 
 //DOM-IGNORE-BEGIN

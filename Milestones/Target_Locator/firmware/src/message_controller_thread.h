@@ -58,7 +58,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "communication/messages.h"
 #include "FreeRTOS.h"
 #include "queue.h"
-
+#include "gridhelper.h"
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
@@ -69,41 +69,32 @@ extern "C" {
 //Depending on what data you would need to send out you should create a member of this struct that can hold that data
 
 typedef struct {
-    float x;
-    float y;
-} Coordinates;
-
-typedef struct {
     float middleFTSensor;
     float rightFTSensor;
     float leftFTSensor;
     float middleFBSensor;
     float rightFBSensor;
     float leftFBSensor;
-    float rightSDSensor;
-    float leftSDSensor;
 } IRSensorDistance_t;
 
-typedef struct {
-    float leftfront;
-    float middlefront;
-    float rightfront;
-    float leftside;
-    float rightside;
-} UltrasonicSensorDistance_t;
+//typedef struct {
+//    float leftfront;
+//    float middlefront;
+//    float rightfront;
+//    float leftside;
+//    float rightside;
+//} UltrasonicSensorDistance_t;
 
 typedef struct {
     IRSensorDistance_t ir;
-    UltrasonicSensorDistance_t ultrasonic;
+//    UltrasonicSensorDistance_t ultrasonic;
 } SensorDataType;
 
 
 //This is any data that someone else might request for
 typedef struct {
-    Coordinates location;
-    float orientation;
     SensorDataType sensordata;
-    uint32_t difftickCount;
+    SensorDataContainerType sensorInformation;
 } InternalData;
 
 //This should include a new enum for anything in the InternalData
@@ -121,7 +112,7 @@ typedef enum InternalRequestType_enum { SMtoTL,
  } InternalRequestType;
 
 //------------------------------------------------------------------------------
-//You should not need to change anything beyond this point
+// You should not need to change anything beyond this point
 //------------------------------------------------------------------------------
 typedef enum MessageItemType_enum {EXTERNAL_REQUEST_RESPONSE, SEND_REQUEST, UPDATE} MessageItemType;
 
@@ -138,16 +129,19 @@ typedef struct {
     char MessageCount;
 } ExternalObj;
 
+typedef union {
+	ExternalObj External;
+	//If this object is a SENDOUT_REQUEST
+	InternalRequestType Request;
+	//If if the MessageItemType is set to update then we will access the Update object and see what the update is from
+	UpdateObj Update;
+} Message_t;
+
 typedef struct {
     //This is set to update when we are updating internal information
     //It should be set to Request_response when we get an external message
-    MessageItemType Type;
-    //This source is set when we get a request or response from an external source
-    ExternalObj External;
-    //If this object is a SENDOUT_REQUEST
-    InternalRequestType Request;
-    //If if the MessageItemType is set to update then we will access the Update object and see what the update is from
-    UpdateObj Update;
+    MessageItemType type;
+    Message_t message;
 } MessageObj;
 
 typedef struct {
