@@ -5,10 +5,12 @@
         <group>
             <file>file:/C:/ECE4534/Milestones/Searching_Movement/firmware/src/motor_controller_thread.h</file>
             <file>file:/C:/ECE4534/Milestones/Searching_Movement/firmware/src/json_wrapper.c</file>
-            <file>file:/C:/ECE4534/Milestones/Searching_Movement/firmware/src/motor_controller_thread_public.h</file>
+            <file>file:/C:/ECE4534/Milestones/Searching_Movement/firmware/src/message_controller_thread.h</file>
             <file>file:/C:/ECE4534/Milestones/Searching_Movement/firmware/src/message_controller_thread.c</file>
+            <file>file:/C:/ECE4534/Milestones/Searching_Movement/firmware/src/motor_controller_thread_public.h</file>
             <file>file:/C:/ECE4534/Milestones/Searching_Movement/firmware/src/motor_controller_thread.c</file>
             <file>file:/C:/ECE4534/Milestones/Searching_Movement/firmware/src/system_config/default/system_interrupt.c</file>
+            <file>file:/C:/ECE4534/Milestones/Searching_Movement/firmware/src/json_wrapper.h</file>
         </group>
     </open-files>
 </project-private>

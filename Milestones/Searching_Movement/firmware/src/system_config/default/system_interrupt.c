@@ -81,6 +81,8 @@ static QueueHandle_t _usartqueue;
 #define USARTTYPEOFQUEUE char
 #define USARTSIZEOFQUEUE 600
 
+// ADC interrupt
+// Either scans through ADC channels or performs digital pin reads
 void IntHandlerDrvAdc(void)
 {
     dbgOutputLoc(ENTER_ADC_ISR);
@@ -92,6 +94,8 @@ void IntHandlerDrvAdc(void)
     int i;
     
     dbgOutputLoc(ADDING_ADC_VAL_ISR);
+    
+    // Sum ADC sample readings
     if (ANALOG) {
         for (i = 0; i < 15; i += 3) {
             lineObj.IR_0 += DRV_ADC_SamplesRead(i);
@@ -103,7 +107,9 @@ void IntHandlerDrvAdc(void)
 //            lineObj.IR_6 += DRV_ADC_SamplesRead(i+6);
 //            lineObj.IR_7 += DRV_ADC_SamplesRead(i+7);
         }
-    } else {
+    }
+    // Read digital pin values if ANALOG is not asserted
+    else {
         lineObj.IR_0 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_F, 13);
         lineObj.IR_1 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_F, 12);
         lineObj.IR_2 = SYS_PORTS_PinRead(PORTS_ID_0, PORT_CHANNEL_F, 5);
@@ -116,6 +122,7 @@ void IntHandlerDrvAdc(void)
     
     dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
 
+    // Send the line location to the motor_controller thread
     ADC_THREAD_SendToQueueISR(lineObj, &pxHigherPriorityTaskWoken);
     dbgOutputLoc(AFTER_SEND_TO_Q_ISR);
     dbgOutputLoc(LEAVE_ADC_ISR);
@@ -124,7 +131,7 @@ void IntHandlerDrvAdc(void)
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
 }
 
-/* This timer is for PWM, fires every 100 ms */
+/* This timer is for PWM, fires every 2 ms */
 // Timer 2
 void IntHandlerDrvTmrInstance0(void)
 {
@@ -134,7 +141,7 @@ void IntHandlerDrvTmrInstance0(void)
 
 uint16_t timerCount = 0;
 
-/* This timer is for the TX to fire every 20 ms */
+/* This timer is for the ADC, PID, and requests - fires every 20 ms */
 // Timer 5
 void IntHandlerDrvTmrInstance1(void)
 {
@@ -189,16 +196,18 @@ void IntHandlerDrvTmrInstance1(void)
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_5);
 }
 
-// Timer 3 - Motor 1
+// Timer 3 - Motor 1 - right encoder
 void IntHandlerDrvTmrInstance2(void)
 {
+    // Increment right encoder count
     MOTOR_CONTROLLER_THREAD_IncrementRight();
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_3);
 }
 
-// Timer 4 - Motor 2
+// Timer 4 - Motor 2 - left encoder
 void IntHandlerDrvTmrInstance3(void)
 {
+    // Increment right encoder count
     MOTOR_CONTROLLER_THREAD_IncrementLeft();
     PLIB_INT_SourceFlagClear(INT_ID_0,INT_SOURCE_TIMER_4);
 }
