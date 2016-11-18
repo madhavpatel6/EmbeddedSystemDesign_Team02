@@ -97,15 +97,15 @@ void IntHandlerDrvAdc(void)
     
     // Sum ADC sample readings
     if (ANALOG) {
-        for (i = 0; i < 15; i += 3) {
+        for (i = 0; i < 16; i += 8) {
             lineObj.IR_0 += DRV_ADC_SamplesRead(i);
             lineObj.IR_1 += DRV_ADC_SamplesRead(i+1);
             lineObj.IR_2 += DRV_ADC_SamplesRead(i+2);
-//            lineObj.IR_3 += DRV_ADC_SamplesRead(i+3);
-//            lineObj.IR_4 += DRV_ADC_SamplesRead(i+4);
-//            lineObj.IR_5 += DRV_ADC_SamplesRead(i+5);
-//            lineObj.IR_6 += DRV_ADC_SamplesRead(i+6);
-//            lineObj.IR_7 += DRV_ADC_SamplesRead(i+7);
+            lineObj.IR_3 += DRV_ADC_SamplesRead(i+3);
+            lineObj.IR_4 += DRV_ADC_SamplesRead(i+4);
+            lineObj.IR_5 += DRV_ADC_SamplesRead(i+5);
+            lineObj.IR_6 += DRV_ADC_SamplesRead(i+6);
+            lineObj.IR_7 += DRV_ADC_SamplesRead(i+7);
         }
     }
     // Read digital pin values if ANALOG is not asserted

@@ -71,8 +71,8 @@ static QueueHandle_t _queue;
 #define TYPEOFQUEUE MotorObj
 #define SIZEOFQUEUE 32
 
-static int rightCount = 0;
-static int leftCount = 0;
+static unsigned int rightCount = 0;
+static unsigned int leftCount = 0;
 
 // Initialize speed to 75%
 static int rightSpeed = (int)MAX_PWM*0.75;
@@ -223,7 +223,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                     case 'R': {
                         setDirectionRight();
                         enableMotors(1);
-                        movement.action = LEFT;
+                        movement.action = RIGHT;
                         movement.amount = (orientation - initialOrientation);
                         rightSign = -1;
                         leftSign = 1;
@@ -313,7 +313,9 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                         break;
                     }
                     case stop: {
-                        disableMotors();
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+
 
                         // Check for start command from server
                         if (motorObj.stop == 'N') {
@@ -322,7 +324,11 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                         break;
                     }
                     default: {
-                        completeMotion();
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
+                        motionComplete = true;
+                        totalDistance = 0;
+                        initialOrientation = orientation;
                         movement.action = FORWARD;
                         movement.amount = totalDistance;
                         break;
@@ -419,7 +425,7 @@ void MOTOR_CONTROLLER_THREAD_CorrectSpeed(int timer) {
     leftSpeed = outputLeft;
     
     // Send PI controller data to debugger
-    if(timer % 50 == 0) {
+    if(timer % 2 == 0) {
             Tx_Thead_Queue_DataType tx_thread_obj;
             memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
             tx_thread_obj.Destination = TARGETLOCATOR;
@@ -454,7 +460,7 @@ void completeMotion(void) {
     initialOrientation = orientation;
 }
 
-// Enable the motors with current pulse width values
+// Set the motors to desired pulse width values
 // Takes mode as an input: 0 - full speed, 1 - half speed
 void enableMotors(int mode) {
     if (!mode) {
@@ -472,17 +478,17 @@ void disableMotors(void) {
     int right = rightSpeed;
     int left = leftSpeed;
     
-    while ((right > 0) || (left > 0)) {
+    while ((right > 0) && (left > 0)) {
         Tx_Thead_Queue_DataType tx_thread_obj;
-        memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
-        tx_thread_obj.Destination = TARGETLOCATOR;
-        BaseType_t *ptr;
-        sprintf(tx_thread_obj.Data, "right: %d, left: %d", right, left);
-        TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
-        
-        sprintf(tx_thread_obj.Data, "msTimer: %d, currentTime: %d", msTimer, currentTime);
-        TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
-        
+            memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
+            tx_thread_obj.Destination = TARGETLOCATOR;
+            BaseType_t *ptr;
+            sprintf(tx_thread_obj.Data, "right: %d, left: %d", right, left);
+            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+            
+            sprintf(tx_thread_obj.Data, "msTimer: %d, currentTime: %d", msTimer, currentTime);
+            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+            
         if ((msTimer-currentTime) >= 1) {
             right = right/2;
             left = left/2;
