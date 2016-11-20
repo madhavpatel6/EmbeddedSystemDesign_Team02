@@ -25,12 +25,13 @@ signals:
     void serverIsConnectedSignal(bool connectedToServerBoolSignal);
     void sentCommStatSignal();
     void sendCommStat(char source, QString goodMsg, QString commError, QString reqRecv, QString resRecv, QString reqSent, QString resSent);
+    void updateProximity(QString farLeft, QString middle, QString farRight);
 public slots:
     void connected();
     void disconnected();
     void readyRead();
     void sendPositionUpdate(QString x, QString y, QString angle);
-
+    void sendProximityRequest();
 private:
     void SendJSONRequestToSocket(QString request, char destionation);
     void HandleCommStatsResponse(QJsonObject obj);

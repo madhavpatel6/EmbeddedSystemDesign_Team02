@@ -2,7 +2,7 @@
 
 #include "clientsocket.h"
 #include "mainwindow.h"
-
+#include <QJsonArray>
 ClientSocket::ClientSocket(QObject *parent) :
     QObject(parent)
 {
@@ -28,6 +28,11 @@ QTcpSocket* ClientSocket::getClient(){
 void ClientSocket::sendPositionUpdate(QString x, QString y, QString angle){
     QString response = "{\"type\":\"Response\",\"R1_Movement\":[\"" + x + "\",\"" + y + "\",\"" + angle + "\",\"F\",\"0\"]}";
     SendJSONRequestToSocket(response, TARGETLOCATOR);
+}
+
+void ClientSocket::sendProximityRequest() {
+    QString request = "{\"type\":\"Request\",\"items\":[\"ProximityInformation\"]}";
+    SendJSONRequestToSocket(request, TARGETLOCATOR);
 }
 
 void ClientSocket::connected()
@@ -63,10 +68,7 @@ void ClientSocket::readyRead()
             QJsonObject json = doc.object();
             QString type = json["type"].toString();
             if(type == QStringLiteral("Response")) {
-                if(json.contains(QStringLiteral("CommStatsSearcherMover")) ||
-                        json.contains(QStringLiteral("CommStatsTargetLocator")) ||
-                        json.contains(QStringLiteral("CommStatsPathFinder")) ||
-                        json.contains(QStringLiteral("CommStatsTargetGrabber"))) {
+                if(json.contains(QStringLiteral("ProximityInformation"))) {
                     HandleCommStatsResponse(json);
                 }
             }
@@ -105,26 +107,6 @@ void ClientSocket::SendJSONRequestToSocket(QString request, char destionation) {
 }
 
 void ClientSocket::HandleCommStatsResponse(QJsonObject obj) {
-    QJsonObject comStats;
-    if(obj.contains(QStringLiteral("CommStatsSearcherMover"))) {
-        comStats = obj["CommStatsSearcherMover"].toObject();
-        emit sendCommStat(SEARCHERMOVER, comStats["numGoodMessagesRecved"].toString(), comStats["numCommErrors"].toString(), comStats["numJSONRequestsRecved"].toString(), comStats["numJSONResponsesRecved"].toString(), comStats["numJSONRequestsSent"].toString(), comStats["numJSONResponsesSent"].toString());
-        //qDebug() << "Response From SM";
-    }
-    else if(obj.contains(QStringLiteral("CommStatsTargetLocator"))) {
-        comStats = obj["CommStatsTargetLocator"].toObject();
-        emit sendCommStat(TARGETLOCATOR, comStats["numGoodMessagesRecved"].toString(), comStats["numCommErrors"].toString(), comStats["numJSONRequestsRecved"].toString(), comStats["numJSONResponsesRecved"].toString(), comStats["numJSONRequestsSent"].toString(), comStats["numJSONResponsesSent"].toString());
-        //qDebug() << "Response From TL";
-    }
-    else if(obj.contains(QStringLiteral("CommStatsPathFinder"))) {
-        comStats = obj["CommStatsPathFinder"].toObject();
-        emit sendCommStat(PATHFINDER, comStats["numGoodMessagesRecved"].toString(), comStats["numCommErrors"].toString(), comStats["numJSONRequestsRecved"].toString(), comStats["numJSONResponsesRecved"].toString(), comStats["numJSONRequestsSent"].toString(), comStats["numJSONResponsesSent"].toString());
-        //qDebug() << "Response From PF";
-    }
-    else if(obj.contains(QStringLiteral("CommStatsTargetGrabber"))) {
-        comStats = obj["CommStatsTargetGrabber"].toObject();
-        emit sendCommStat(TARGETGRABBER, comStats["numGoodMessagesRecved"].toString(), comStats["numCommErrors"].toString(), comStats["numJSONRequestsRecved"].toString(), comStats["numJSONResponsesRecved"].toString(), comStats["numJSONRequestsSent"].toString(), comStats["numJSONResponsesSent"].toString());
-        //qDebug() << "Response From TG";
-    }
-
+    QJsonArray array = obj["ProximityInformation"].toArray();
+    updateProximity(array[0].toString(),array[1].toString(),array[2].toString());
 }

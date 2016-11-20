@@ -69,12 +69,14 @@ extern "C" {
 //Depending on what data you would need to send out you should create a member of this struct that can hold that data
 
 typedef struct {
+    float farLeftFTSensor;
+    float leftFTSensor;
     float middleFTSensor;
     float rightFTSensor;
-    float leftFTSensor;
+    float farRightFTSensor;
+    float leftFBSensor;
     float middleFBSensor;
     float rightFBSensor;
-    float leftFBSensor;
 } IRSensorDistance_t;
 
 //typedef struct {

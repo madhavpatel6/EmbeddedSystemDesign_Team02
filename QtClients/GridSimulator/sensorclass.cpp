@@ -85,6 +85,24 @@ void SensorClass::updatePosition(QPointF roverLocation, int roverOrientation) {
                                                   roverOrientation);
             break;
         }
+        case FARLEFTSENSOR: {
+            sensorLocation = rotatePoint(roverLocation.x(), roverLocation.y(),
+                    roverLocation.x() + 3, roverLocation.y() + 4,
+                        roverOrientation);
+            sensorPixelLocation = rotatePoint(roverLocation.x()*cell_pixel_size, roverLocation.y()*cell_pixel_size,
+                                              roverLocation.x()*cell_pixel_size + 3*cell_pixel_size, roverLocation.y()*cell_pixel_size + 4*cell_pixel_size,
+                                                  roverOrientation);
+            break;
+        }
+        case FARRIGHTSENSOR: {
+            sensorLocation = rotatePoint(roverLocation.x(), roverLocation.y(),
+                    roverLocation.x() + 3, roverLocation.y() - 4,
+                        roverOrientation);
+            sensorPixelLocation = rotatePoint(roverLocation.x()*cell_pixel_size, roverLocation.y()*cell_pixel_size,
+                                              roverLocation.x()*cell_pixel_size + 3*cell_pixel_size, roverLocation.y()*cell_pixel_size - 4*cell_pixel_size,
+                                                  roverOrientation);
+            break;
+        }
 
     }
     sensorMaximumLocation = QPointF(sensorLocation.x() + maximumDistanceCM*cos(sensorOrientation*M_PI/180.0),

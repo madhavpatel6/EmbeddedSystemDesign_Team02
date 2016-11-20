@@ -28,12 +28,18 @@ public slots:
     void on_connectToServer_clicked();
 //    void CommStatsRequestSent();
 //    void UpdateCommStats(char source, QString goodMsg, QString commError, QString reqRecv, QString resRecv, QString reqSent, QString resSent);
+    void updateProximity(QString farLeft, QString middle, QString farRight);
+
 private slots:
     void sendPosition();
 
     void on_StopPositionResponse_released();
 
+    void on_pushButton_released();
+
 private:
+    bool requestProximity;
+    bool respondPosition;
     int itr;
     int numberofiterations;
     float startX;

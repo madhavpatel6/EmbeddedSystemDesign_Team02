@@ -291,6 +291,15 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     tx_thread_obj.Destination = obj.message.External.Source;
                                     break;
                                 }
+                                case ProximityInformation: {
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),",\"ProximityInformation\":[\"%.1f\",\"%.1f\",\"%.1f\"]",
+                                            internalData.sensordata.ir.middleFBSensor - 0.2,
+                                            internalData.sensordata.ir.middleFBSensor,
+                                            internalData.sensordata.ir.middleFBSensor + 0.3
+                                            );
+                                    tx_thread_obj.Destination = obj.message.External.Source;
+                                    break;
+                                }
                                 default:
                                     break;
                             }

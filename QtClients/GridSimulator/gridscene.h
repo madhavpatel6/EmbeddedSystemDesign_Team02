@@ -71,6 +71,8 @@ private:
     SensorClass *leftFrontSensor;
     SensorClass *rightSideSensor;
     SensorClass *leftSideSensor;
+    SensorClass *farLeftSensor;
+    SensorClass *farRightSensor;
     void paintEvent(QPaintEvent *);
     QPolygonF newRect;
     QPolygonF newRotatedRect;
