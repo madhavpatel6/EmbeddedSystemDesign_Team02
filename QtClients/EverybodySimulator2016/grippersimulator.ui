@@ -105,7 +105,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>targetAlignment</string>
+    <string>targetAcquired</string>
    </property>
   </widget>
   <widget class="QCheckBox" name="Grabber_Aligned">

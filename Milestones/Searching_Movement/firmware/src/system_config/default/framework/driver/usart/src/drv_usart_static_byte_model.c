@@ -70,8 +70,6 @@ uint8_t DRV_USART0_ReadByte(void)
 {
     uint8_t readValue;
 	
-    /* This function needs to be thread safe */
-
     /* Receive one byte */
     readValue = PLIB_USART_ReceiverByteReceive(USART_ID_1);
 

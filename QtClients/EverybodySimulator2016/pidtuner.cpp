@@ -75,3 +75,13 @@ void pidTuner::on_pushButton_clicked()
     label = m2Scene.addText("10");
     label->setPos(QPointF(-10, -100));
 }
+
+void pidTuner::on_upButton_clicked()
+{
+    emit upClicked();
+}
+
+void pidTuner::on_downButton_clicked()
+{
+    emit downClicked();
+}

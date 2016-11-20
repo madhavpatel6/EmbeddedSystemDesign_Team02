@@ -97,6 +97,15 @@ void MainWindow::updateMovement(char source, QString x, QString y, QString orien
             ui->lbl_x_positionVal->setText(x);
             ui->lbl_y_positionVal->setText(y);
             ui->lbl_orientationVal->setText(QString::number(temp));
+            if (action == "0") {
+                action = "F";
+            } else if (action == "1") {
+                action = "B";
+            } else if (action == "2") {
+                action = "R";
+            } else if (action == "3") {
+                action = "L";
+            }
             ui->lbl_actionVal->setText(action);
             ui->lbl_amountVal->setText(amount);
             break;
@@ -131,8 +140,6 @@ void MainWindow::sendInitialResponse()
 
     if (ui->rb_debug->isChecked()) {
         mode.append("\"D\"");
-    } else if (ui->rb_lawnmower->isChecked()) {
-        mode.append("\"L\"");
     } else if (ui->rb_random->isChecked()) {
         mode.append("\"R\"");
     }

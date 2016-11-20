@@ -125,7 +125,10 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
         dbgOutputLoc(BEFORE_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD);
         MESSAGE_CONTROLLER_THREAD_ReadFromQueue(&messageObj);
         dbgOutputLoc(AFTER_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD);
+        
+        // Check the message type
         switch(messageObj.Type) {
+            // External message
             case EXTERNAL_REQUEST_RESPONSE: {
                 dbgOutputLoc(CASE_EXTERNAL_REQUEST_RESPONSE_MESSAGE_CONTROLLER_THREAD);
                 if(messageObj.External.Error) {
@@ -135,13 +138,16 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                 
                 statObject.GoodCount++;
                 
+                // Parse message and extract data
                 parseJSON(messageObj.External.Data, &type, items,  &numItems, &value, &mode, &data, &motorObj);
                 
                 switch(type) {
                     case request: {
+                        // Only handle message if rover has been initialized
                         if (!initialized) {
                             continue;
                         }
+                        // Increment message counter from source
                         switch(messageObj.External.Source) {
                             case SEARCHERMOVER:
                                 if ((messageObj.External.MessageCount - statObject.Req_From_SearcherMover) < 0) {
@@ -184,8 +190,10 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         int i = 0;
                         tx_thread_obj.Destination = messageObj.External.Source;
                         sprintf(tx_thread_obj.Data, "{\"type\":\"Response\"");
+                        // Iterate through all requested items
                         for(i = 0; i < numItems; i++) {
                             switch(items[i]) {
+                                // CommStats
                                 case CommStatsSearcherMover: case CommStatsTargetLocator: case CommStatsPathFinder: case CommStatsTargetGrabber: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), 
                                         ",\"CommStats%s\":{"
@@ -210,6 +218,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     tx_thread_obj.Destination = SERVER;
                                     break;
                                 }
+                                //Detailed CommStats
                                 case DetailedCommStatsSearcherMover: case DetailedCommStatsTargetLocator: case DetailedCommStatsPathFinder: case DetailedCommStatsTargetGrabber: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),
                                         ",\"DetailedStats%s\":{"
@@ -256,6 +265,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     tx_thread_obj.Destination = SERVER;
                                     break;
                                 }
+                                // Handle request for rover movement
                                 case R1_Movement: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), 
                                             ",\"R1_Movement\":{\"x\":\"%0.02f\",\"y\":\"%0.02f\",\"orientation\":\"%0.02f\","
@@ -265,40 +275,47 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                             );
                                     break;
                                 }
+                                // Send forward command to motor_controller thread
                                 case Forward: {
                                     motorObj.direction = 'F';
                                     motorObj.distance = value;
                                     MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                     break;
                                 }
+                                // Send reverse command to motor_controller thread
                                 case Back: {
                                     motorObj.direction = 'B';
                                     motorObj.distance = value;
                                     MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                     break;
                                 }
+                                // Send left command to motor_controller thread
                                 case Left: {
                                     motorObj.direction = 'L';
                                     motorObj.degrees = value;
                                     MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                     break;
                                 }
+                                // Send right command to motor_controller thread
                                 case Right: {
                                     motorObj.direction = 'R';
                                     motorObj.degrees = value;
                                     MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                     break;
                                 }
+                                // Send start/continue command to motor_controller thread
                                 case Start: {
                                     motorObj.stop = 'N';
                                     MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                     break;
                                 }
+                                // Send stop command to motor_controller thread
                                 case Stop: {
                                     motorObj.stop = 'Y';
                                     MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                     break;
                                 }
+                                // Handle request for line sensor data
                                 case LineLocation: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"LineLocation\":{\"0\":\"%0.02f\",\"1\":\"%0.02f\",\"2\":\"%0.02f\","
                                             "\"3\":\"%0.02f\",\"4\":\"%0.02f\",\"5\":\"%0.02f\",\"6\":\"%0.02f\",\"7\":\"%0.02f\"}", 
@@ -312,6 +329,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                             internalData.lineLocation.IR_7);
                                     break;
                                 }
+                                // Handle request for local system time
                                 case msLocalTime:{
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"msLocalTime\":\"%d\"", getSystemClock() * 200);
                                     tx_thread_obj.Destination = messageObj.External.Source;
@@ -322,6 +340,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                             }
                         }
                         sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),"}"); // Print ending brace }
+                        // Increment response counter to source
                         switch(messageObj.External.Source) {
                             case SEARCHERMOVER: {
                                 tx_thread_obj.MessageCount = statObject.Res_To_SearcherMover;
@@ -351,6 +370,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         break;
                     }
                     case response: {
+                        // Check source of response
                         switch(messageObj.External.Source) {
                             case SEARCHERMOVER: {
                                 statObject.Res_From_SearcherMover++;
@@ -362,11 +382,13 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 int i = 0;
                                 for(i = 0; i < numItems; i++) {
                                     switch(items[i]) {
+                                        // Send sensor data to motor_controller thread
                                         case SensorData: {
                                             motorObj.sensorData = data;
                                             MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                             break;
                                         }
+                                        // Send updated position to motor_controller thread
                                         case R1_Location: {
                                             motorObj.type = UPDATE_POSITION;
                                             MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
@@ -391,18 +413,22 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 int i = 0;
                                 for(i = 0; i < numItems; i++) {
                                     switch(items[i]) {
+                                        // Handle initial data from server
                                         case InitialData: {
+                                            // Assert initialized bool to begin operation of rover
                                             initialized = true;
                                             motorObj.type = UPDATE_POSITION;
                                             motorObj.mode = mode;
                                             MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                             break;
                                         }
+                                        // Send sensor data to motor_controller thread
                                         case SensorData: {
                                             motorObj.sensorData = data;
                                             MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                             break;
                                         }
+                                        // Send updated position to motor_controller thread
                                         case R1_Location: {
                                             motorObj.type = UPDATE_POSITION;
                                             MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
@@ -432,11 +458,12 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
             }
             case SEND_REQUEST: {
                 dbgOutputLoc(CASE_SEND_REQUEST_MESSAGE_CONTROLLER_THREAD);
+                // Request initial data until it is received
                 if (!initialized) {
                     sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"InitialData\"]}");
                     tx_thread_obj.Destination = SERVER;
                 } else {
-                    // We will only need to have a new case for something we are requesting from another PIC
+                    // Send requests to appropriate modules based on MYNAME
                     switch(messageObj.Request) {
                         case SMtoTL: {
                             sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"SensorData\",\"R1_Location\"]}");
@@ -498,6 +525,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
             case UPDATE: {
                 dbgOutputLoc(CASE_UPDATE_MESSAGE_CONTROLLER_THREAD);
                 switch(messageObj.Update.Type) {
+                    // Update internal location, orientation, and movement
                     case MOVEMENT: {
                         internalData.location.x = messageObj.Update.Data.location.x;
                         internalData.location.y = messageObj.Update.Data.location.y;
@@ -506,6 +534,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         internalData.movement.amount = messageObj.Update.Data.movement.amount;
                         break;
                     }
+                    // Update internal line sensor readings
                     case LINELOCATION: {
                         internalData.lineLocation = messageObj.Update.Data.lineLocation;
                         break;

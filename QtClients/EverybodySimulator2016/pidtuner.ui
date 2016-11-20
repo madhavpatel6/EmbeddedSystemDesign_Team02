@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>983</width>
-    <height>523</height>
+    <width>951</width>
+    <height>426</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,6 +20,13 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="3" column="0">
+    <widget class="QPushButton" name="downButton">
+     <property name="text">
+      <string>Down</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
      <item>
@@ -78,6 +85,13 @@
     <widget class="QPushButton" name="pushButton">
      <property name="text">
       <string>ClearGraphs</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QPushButton" name="upButton">
+     <property name="text">
+      <string>Up</string>
      </property>
     </widget>
    </item>

@@ -40,6 +40,7 @@ typedef struct {
   items_t enumValue;
 } DictionaryType;
 
+// Dictionary that json parser iterates through to find keys
 static const DictionaryType Dictionary[] = {
     {"CommStatsSearcherMover", CommStatsSearcherMover},
     {"CommStatsTargetLocator", CommStatsTargetLocator},

@@ -38,7 +38,7 @@
        <bool>false</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_initial">
        <attribute name="title">
@@ -502,18 +502,6 @@
                 </property>
                 <property name="checked">
                  <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="rb_lawnmower">
-                <property name="font">
-                 <font>
-                  <pointsize>10</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Lawnmower</string>
                 </property>
                </widget>
               </item>
@@ -998,7 +986,7 @@
                    </font>
                   </property>
                   <property name="text">
-                   <string>0</string>
+                   <string>F</string>
                   </property>
                  </widget>
                 </item>
