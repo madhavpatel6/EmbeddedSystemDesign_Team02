@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     tcpSocket  = new ClientSocket();
     connect(requestTimer, SIGNAL(timeout()), tcpSocket, SLOT(sendRequest()));
     connect(tcpSocket, SIGNAL(serverIsConnectedSignal(bool)), this, SLOT(HostConnectionEvent(bool)));
-    connect(tcpSocket, SIGNAL(sendUpdate(QString,QString,QString,QString,QString,QString,QString,QString,QString,QString)), this, SLOT(receiveUpdate(QString,QString,QString,QString,QString,QString,QString,QString,QString,QString)));
+    connect(tcpSocket, SIGNAL(sendUpdate(QString,QString,QString,QString,QString,QString,QString)), this, SLOT(receiveUpdate(QString,QString,QString,QString,QString,QString,QString)));
     connect(tcpSocket, SIGNAL(updateTime(QString)), this, SLOT(receiveTime(QString)));
 }
 
@@ -64,7 +64,7 @@ void MainWindow::HostConnectionEvent(bool connected) {
     }
 }
 
-void MainWindow::receiveUpdate(QString leftFTSensor, QString rightFTSensor, QString leftFBSensor, QString middleFBSensor, QString rightFBSensor, QString leftUltra, QString middleUltra, QString rightUltra, QString leftSideUltra, QString rightSideUltra) {
+void MainWindow::receiveUpdate(QString farLeftFBSensor, QString leftFBSensor, QString middleFBSensor, QString rightFBSensor, QString farRightFBSensor, QString leftFTSensor, QString rightFTSensor) {
     if(valuesTL.size() == 1000) {
         valuesTL.pop_front();
         valuesBM.pop_front();
@@ -79,16 +79,16 @@ void MainWindow::receiveUpdate(QString leftFTSensor, QString rightFTSensor, QStr
     valuesBL.push_back(leftFBSensor.toFloat());
     valuesBM.push_back(middleFBSensor.toFloat());
     valuesBR.push_back(rightFBSensor.toFloat());
-    valuesLS.push_back(leftSideUltra.toFloat());
-    valuesRS.push_back(rightSideUltra.toFloat());
+    valuesLS.push_back(farLeftFBSensor.toFloat());
+    valuesRS.push_back(farRightFBSensor.toFloat());
 
     ui->topleftBrowser->append(leftFTSensor);
     ui->toprightBrowser->append(rightFTSensor);
     ui->bottomleftBrowser->append(leftFBSensor);
     ui->bottomrightBrowser->append(rightFBSensor);
     ui->bottomMiddleBrowser->append(middleFBSensor);
-    ui->ultraLeftSideBrowser->append(leftSideUltra);
-    ui->ultraRightSideBrowser->append(rightSideUltra);
+    ui->farLeftBottomBrowser->append(farLeftFBSensor);
+    ui->farRightBottomBrowser->append(farRightFBSensor);
 
     updateStatistics(valuesTL, ui->valuesTL);
     updateStatistics(valuesTR, ui->valuesTR);
@@ -155,7 +155,7 @@ void MainWindow::on_pushButton_clicked()
     ui->bottomleftBrowser->clear();
     ui->bottomrightBrowser->clear();
     ui->bottomMiddleBrowser->clear();
-    ui->ultraLeftSideBrowser->clear();
-    ui->ultraRightSideBrowser->clear();
+    ui->farLeftBottomBrowser->clear();
+    ui->farRightBottomBrowser->clear();
 
 }

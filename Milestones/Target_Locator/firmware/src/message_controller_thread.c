@@ -249,7 +249,9 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                             "\"rightFT\":\"%.2f\","
                                             "\"leftFB\":\"%.2f\","
                                             "\"middleFB\":\"%.2f\","
-                                            "\"rightFB\":\"%.2f\"},"
+                                            "\"rightFB\":\"%.2f\","
+                                            "\"farLeftFB\":\"%.2f\","
+                                            "\"farRightFB\":\"%.2f\"},"
                                             "\"leftFT\":[\"%.1f\",\"%.1f\",\"%.1f\"],"
                                             "\"middleFT\":[\"%.1f\",\"%.1f\",\"%.1f\"],"
                                             "\"rightFT\":[\"%.1f\",\"%.1f\",\"%.1f\"]"
@@ -259,6 +261,8 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                             internalData.sensordata.ir.leftFBSensor,
                                             internalData.sensordata.ir.middleFBSensor,
                                             internalData.sensordata.ir.rightFBSensor,
+                                            internalData.sensordata.ir.farLeftFBSensor,
+                                            internalData.sensordata.ir.farRightFBSensor,
                                             internalData.sensorInformation.leftFrontSensor.sensorLocation.x,
                                             internalData.sensorInformation.leftFrontSensor.sensorLocation.y,
                                             internalData.sensorInformation.leftFrontSensor.orientation,

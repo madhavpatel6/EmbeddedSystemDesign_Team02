@@ -25,7 +25,7 @@ signals:
     void serverIsConnectedSignal(bool connectedToServerBoolSignal);
     void sentCommStatSignal();
     void updateTime(QString time);
-    void sendUpdate(QString leftFTSensor, QString rightFTSensor, QString leftFBSensor, QString middleFBSensor, QString rightFBSensor, QString leftUltra, QString middleUltra, QString rightUltra, QString leftUltraSide, QString rightUltraSide);
+    void sendUpdate(QString farLeftFBSensor, QString leftFBSensor, QString middleFBSensor, QString rightFBSensor, QString farRightFBSensor, QString leftFTSensor, QString rightFTSensor);
 public slots:
     void connected();
     void disconnected();

@@ -161,16 +161,6 @@ p, li { white-space: pre-wrap; }
           </item>
          </layout>
         </item>
-        <item row="4" column="1">
-         <widget class="QLabel" name="label_10">
-          <property name="text">
-           <string>Bottom Left IR Sensor</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
         <item row="4" column="3">
          <widget class="QLabel" name="label_6">
           <property name="text">
@@ -181,20 +171,10 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_3">
+        <item row="4" column="1">
+         <widget class="QLabel" name="label_10">
           <property name="text">
-           <string>Left Side Ultrasonic</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="4">
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>Right Side Ultrasonic</string>
+           <string>Bottom Left IR Sensor</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -202,7 +182,26 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item row="3" column="0">
-         <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <layout class="QHBoxLayout" name="horizontalLayout_9"/>
+        </item>
+        <item row="3" column="4">
+         <layout class="QHBoxLayout" name="horizontalLayout_12"/>
+        </item>
+        <item row="3" column="2">
+         <layout class="QHBoxLayout" name="horizontalLayout_7"/>
+        </item>
+        <item row="4" column="2">
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>Bottom Middle IR Sensor (10-30cm)</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_13">
           <item>
            <widget class="QLabel" name="labelLS">
             <property name="text">
@@ -218,7 +217,7 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <widget class="QTextBrowser" name="ultraLeftSideBrowser">
+           <widget class="QTextBrowser" name="farLeftBottomBrowser">
             <property name="html">
              <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -230,8 +229,8 @@ p, li { white-space: pre-wrap; }
           </item>
          </layout>
         </item>
-        <item row="3" column="4">
-         <layout class="QHBoxLayout" name="horizontalLayout_12">
+        <item row="5" column="4">
+         <layout class="QHBoxLayout" name="horizontalLayout_14">
           <item>
            <widget class="QLabel" name="labelRS">
             <property name="text">
@@ -247,7 +246,7 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <widget class="QTextBrowser" name="ultraRightSideBrowser">
+           <widget class="QTextBrowser" name="farRightBottomBrowser">
             <property name="html">
              <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -259,13 +258,20 @@ p, li { white-space: pre-wrap; }
           </item>
          </layout>
         </item>
-        <item row="3" column="2">
-         <layout class="QHBoxLayout" name="horizontalLayout_7"/>
-        </item>
-        <item row="4" column="2">
-         <widget class="QLabel" name="label_11">
+        <item row="4" column="4">
+         <widget class="QLabel" name="label_9">
           <property name="text">
-           <string>Bottom Middle IR Sensor (10-30cm)</string>
+           <string>Far Right IR Sensor</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Far Left IR Sensor</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>

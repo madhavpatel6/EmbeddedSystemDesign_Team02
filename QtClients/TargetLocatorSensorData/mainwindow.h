@@ -20,7 +20,7 @@ private slots:
     void on_requestButton_clicked();
     void on_connectToServer_clicked();
     void HostConnectionEvent(bool connected);
-    void receiveUpdate(QString leftFTSensor, QString rightFTSensor, QString leftFBSensor, QString middleFBSensor, QString rightFBSensor, QString leftUltra, QString middleUltra, QString rightUltra, QString leftSideUltra, QString rightSideUltra);
+    void receiveUpdate(QString farLeftFBSensor, QString leftFBSensor, QString middleFBSensor, QString rightFBSensor, QString farRightFBSensor, QString leftFTSensor, QString rightFTSensor);
     void receiveTime(QString time);
 
     void on_pushButton_clicked();

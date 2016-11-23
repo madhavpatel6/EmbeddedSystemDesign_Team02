@@ -3,25 +3,16 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/communication/jsmn.h</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/debug.h</file>
+            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/sensor_thread.c</file>
+            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/main.c</file>
+            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/message_controller_thread.c</file>
             <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/system_config/default/system_interrupt.c</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/gridhelper.c</file>
             <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/system_config/default/system_init.c</file>
             <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/sensor_thread.h</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/system_config/default/rtos_hooks.c</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/gridhelper.h</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/Target_Locator.X/nbproject/Makefile-default.mk</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/grid.c</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/sensor_thread.c</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/grid.h</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/message_controller_thread.c</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/myqueue.c</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/json_wrapper.c</file>
             <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/message_controller_thread.h</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/myqueue.h</file>
-            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/json_wrapper.h</file>
+            <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/debug.c</file>
             <file>file:/C:/ECE4534/Milestones/Target_Locator/firmware/src/system_config/default/framework/driver/adc/src/drv_adc_static.c</file>
+            <file>file:/C:/microchip/harmony/v1_08_01/framework/system/devcon/src/sys_devcon.c</file>
         </group>
     </open-files>
 </project-private>

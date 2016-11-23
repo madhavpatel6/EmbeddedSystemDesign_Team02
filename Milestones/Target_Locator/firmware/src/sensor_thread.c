@@ -135,12 +135,6 @@ void SENSOR_THREAD_Tasks ( void )
                 break;
             }
             case RV1_POSUPDATE: {
-//                SensorDataType data = removeData(&sensorDataQ);
-//                point_t loc;
-//                loc.x = objRecv.contents.r1_movement.x;
-//                loc.y = objRecv.contents.r1_movyomeent.y;
-//                UpdateSensorLocations(&sensorInformation, data, loc, objRecv.contents.r1_movement.orientation);
-//                updateOccupanyGrid2(sensorInformation, grid);
                 if(previousActionIsSet && size(&sensorDataQ) != 0) {
                     // Stop the ADC timer
                     DRV_TMR0_Stop();
@@ -200,14 +194,6 @@ void SENSOR_THREAD_Tasks ( void )
     }
 }
 
-void ConvertSensorADCToDistance(SensorDataType* distances, SensorADC_t adcValues) {
-    ConvertBottomLeftLongRangeIRToCM(&distances->ir.leftFBSensor, adcValues.IRSensors.leftFBSensor);
-    ConvertMidRangeToCM(&(distances->ir.middleFBSensor), adcValues.IRSensors.middleFBSensor);
-    ConvertBottomRightLongRangeIRToCM(&(distances->ir.rightFBSensor),  adcValues.IRSensors.rightFBSensor);
-    ConvertTopLeftLongRangeIRToCM(&(distances->ir.leftFTSensor),  adcValues.IRSensors.leftFTSensor);
-    ConvertTopRightLongRangeIRToCM(&(distances->ir.rightFTSensor),  adcValues.IRSensors.rightFTSensor);
-}
-
 void UpdateSensorLocations(SensorDataContainerType* sensors, SensorDataType distances, point_t roverLocation, int orientation) {
     /* Update the distances */
     sensors->leftFrontSensor.distance = distances.ir.leftFBSensor;
@@ -224,22 +210,38 @@ void UpdateSensorLocations(SensorDataContainerType* sensors, SensorDataType dist
     rotatePoint(&sensors->rightFrontSensor.sensorLocation, roverLocation.x, roverLocation.y, roverLocation.x + 5, roverLocation.y - 3, orientation);
 }
 
-void SENSOR_THREAD_InitializeQueue() {
-    _queue = xQueueCreate(SIZEOFQUEUE, sizeof(TYPEOFQUEUE));
+void ConvertSensorADCToDistance(SensorDataType* distances, SensorADC_t adcValues) {
+    ConvertBottomFarLeftLongRangeIRToCM(&distances->ir.farLeftFBSensor, adcValues.IRSensors.farLeftFBSensor);
+    ConvertBottomLeftLongRangeIRToCM(&distances->ir.leftFBSensor, adcValues.IRSensors.leftFBSensor);
+    ConvertMidRangeToCM(&(distances->ir.middleFBSensor), adcValues.IRSensors.middleFBSensor);
+    ConvertBottomRightLongRangeIRToCM(&(distances->ir.rightFBSensor),  adcValues.IRSensors.rightFBSensor);
+    ConvertBottomFarRightLongRangeIRToCM(&(distances->ir.farRightFBSensor), adcValues.IRSensors.farRightFBSensor);
+    ConvertTopLeftLongRangeIRToCM(&(distances->ir.leftFTSensor),  adcValues.IRSensors.leftFTSensor);
+    ConvertTopRightLongRangeIRToCM(&(distances->ir.rightFTSensor),  adcValues.IRSensors.rightFTSensor);
 }
 
-void SENSOR_THREAD_ReadFromQueue(TYPEOFQUEUE* pvBuffer) {
-    xQueueReceive(_queue, pvBuffer, portMAX_DELAY);
-}
 
-void SENSOR_THREAD_SendToQueue(TYPEOFQUEUE buffer) {
-    xQueueSend(_queue, &buffer, portMAX_DELAY);
+void GetDistanceFromLookupTableIR(float* distanceCM, LookupTable_t lookupTable[], size_t size, uint32_t adcValue) {
+	float voltage = adcValue / (310.303);
+	if (voltage < lookupTable[size - 1].voltage) {
+		*distanceCM = lookupTable[size - 1].distance;
+	}
+	else if (voltage < lookupTable[0].voltage){
+		size_t i = 0;
+		for (i = 0; i < size - 1; i++) {
+			if (lookupTable[i].voltage >= voltage && voltage >= lookupTable[i + 1].voltage) {
+				float slope = (lookupTable[i + 1].distance - lookupTable[i].distance) / (lookupTable[i + 1].voltage - lookupTable[i].voltage);
+				
+				float yintercept = lookupTable[i].distance - slope*lookupTable[i].voltage;
+				*distanceCM = slope*voltage + yintercept;
+				break;
+			}
+		}
+	}
+	else {
+		*distanceCM = -1;
+	}
 }
-
-void SENSOR_THREAD_SendToQueueISR(TYPEOFQUEUE buffer, BaseType_t *pxHigherPriorityTaskWoken) {
-    xQueueSendFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
-}
-
 
 void ConvertShortRangeToCM(float* distanceCM, uint32_t adcValue) {
     float voltage = adcValue/(310.303);
@@ -256,7 +258,7 @@ void ConvertShortRangeToCM(float* distanceCM, uint32_t adcValue) {
     else {
         *distanceCM = -1;
     }
-   // *distanceCM = voltage;
+    *distanceCM = voltage;
 }
 
 void ConvertMidRangeToCM(float* distanceCM, uint32_t adcValue) {
@@ -274,7 +276,7 @@ void ConvertMidRangeToCM(float* distanceCM, uint32_t adcValue) {
     else {
         *distanceCM = -1;
     }
-//    *distanceCM = voltage;
+    *distanceCM = voltage;
 }
 
 void ConvertBottomLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
@@ -293,7 +295,7 @@ void ConvertBottomLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
     else {
         *distanceCM = -1;
     }
-//    *distanceCM = voltage;
+    *distanceCM = voltage;
 }
 
 void ConvertBottomRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
@@ -312,8 +314,20 @@ void ConvertBottomRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
     else {
         *distanceCM = -1;
     }
-//    *distanceCM = voltage;
+    *distanceCM = voltage;
+}
 
+
+void ConvertBottomFarLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
+    float avgAdcValue = adcValue;
+    float voltage = avgAdcValue/(310.303);
+    *distanceCM = voltage;
+}
+
+void ConvertBottomFarRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
+    float avgAdcValue = adcValue;
+    float voltage = avgAdcValue/(310.303);
+    *distanceCM = voltage;
 }
 
 void ConvertTopLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
@@ -332,7 +346,7 @@ void ConvertTopLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
     else {
         *distanceCM = -1;
     }
-//    *distanceCM = voltage;
+    *distanceCM = voltage;
 }
 
 void ConvertTopRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
@@ -351,14 +365,33 @@ void ConvertTopRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
     else {
         *distanceCM = -1;
     }
-//    *distanceCM = voltage;
+    *distanceCM = voltage;
 }
+
+
 bool FilterIRSensors(SensorDataType sensors) {
     if(sensors.ir.middleFBSensor < 17 || sensors.ir.rightFBSensor == -1 || sensors.ir.leftFBSensor == -1) {
         return false;
     }
     return true;
 }
+
+void SENSOR_THREAD_InitializeQueue() {
+    _queue = xQueueCreate(SIZEOFQUEUE, sizeof(TYPEOFQUEUE));
+}
+
+void SENSOR_THREAD_ReadFromQueue(TYPEOFQUEUE* pvBuffer) {
+    xQueueReceive(_queue, pvBuffer, portMAX_DELAY);
+}
+
+void SENSOR_THREAD_SendToQueue(TYPEOFQUEUE buffer) {
+    xQueueSend(_queue, &buffer, portMAX_DELAY);
+}
+
+void SENSOR_THREAD_SendToQueueISR(TYPEOFQUEUE buffer, BaseType_t *pxHigherPriorityTaskWoken) {
+    xQueueSendFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
+}
+
 
 /*******************************************************************************
  End of File
