@@ -16,17 +16,13 @@ typedef struct {
     float maximumMeasuringDistance;
     float distance;
     float orientation;
-//    float coneAngle;
     point_t sensorLocation;
-//    point_t maxSensorLocation;
 } SensorData_t;
 
 typedef struct {
     SensorData_t middleFrontSensor;
     SensorData_t rightFrontSensor;
     SensorData_t leftFrontSensor;
-//    SensorData_t rightSideSensor;
-//    SensorData_t leftSideSensor;
     point_t roverLocation;
     float orientation;
 } SensorDataContainerType;

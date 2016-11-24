@@ -85,6 +85,93 @@ void SENSOR_THREAD_Initialize ( void )
 }
 static GridType grid;
 static Queue sensorDataQ;
+LookupTable_t bottomLeftLongRangeTable[] = {
+    {20,	2.508},
+    {25,	2.213},
+    {30,	1.881},
+    {35,	1.621},
+    {40,	1.415},
+    {45,	1.245},
+    {50,	1.113},
+    {55,	1.007},
+    {60,	0.922},
+    {65,	0.841},
+    {70,	0.781},
+};
+
+LookupTable_t bottomRightLongRangeTable[] = {
+    {20,	2.430},
+    {25,	2.127},
+    {30,	1.854},
+    {35,	1.588},
+    {40,	1.387},
+    {45,	1.219},
+    {50,	1.098},
+    {55,	0.980},
+    {60,	0.881},
+    {65,	0.804},
+    {70,	0.732},
+};
+
+LookupTable_t topLeftLongRangeTable[] = {
+    {20,	2.535},
+    {25,	2.233},
+    {30,	1.941},
+    {35,	1.683},
+    {40,	1.479},
+    {45,	1.318},
+    {50,	1.173},
+    {55,	1.067},
+    {60,	0.963},
+    {65,	0.889},
+    {70,	0.838},
+};
+LookupTable_t topRightLongRangeTable[] = {
+    {20,	2.510},
+    {25,	2.221},
+    {30,	1.948},
+    {35,	1.688},
+    {40,	1.489},
+    {45,	1.330},
+    {50,	1.211},
+    {55,	1.099},
+    {60,	1.001},
+    {65,	0.930},
+    {70,	0.865},
+};
+
+LookupTable_t middleMidRangeTable[] = {
+    {7,     3.051},
+    {10,	2.312},
+    {15,	1.600},
+    {20,	1.232},
+    {25,	0.981},
+    {30,	0.825},
+    {35,	0.731},
+    {40,	0.647},
+};
+
+LookupTable_t leftMidRangeTable[] = {
+    {7, 	3.048},
+    {10,	2.301},
+    {15,	1.562},
+    {20,	1.213},
+    {25,	0.983},
+    {30,	0.842},
+    {35,	0.733},
+    {40,	0.666},
+};
+
+LookupTable_t rightMidRangeTable[] = {
+    {7,     2.959},
+    {10,	2.218},
+    {15,	1.569},
+    {20,	1.221},
+    {25,	0.991},
+    {30,	0.833},
+    {35,	0.730},
+    {40,	0.644},  
+};
 /******************************************************************************
   Function:
     void SENSOR_THREAD_Tasks ( void )
@@ -211,13 +298,13 @@ void UpdateSensorLocations(SensorDataContainerType* sensors, SensorDataType dist
 }
 
 void ConvertSensorADCToDistance(SensorDataType* distances, SensorADC_t adcValues) {
-    ConvertBottomFarLeftLongRangeIRToCM(&distances->ir.farLeftFBSensor, adcValues.IRSensors.farLeftFBSensor);
-    ConvertBottomLeftLongRangeIRToCM(&distances->ir.leftFBSensor, adcValues.IRSensors.leftFBSensor);
-    ConvertMidRangeToCM(&(distances->ir.middleFBSensor), adcValues.IRSensors.middleFBSensor);
-    ConvertBottomRightLongRangeIRToCM(&(distances->ir.rightFBSensor),  adcValues.IRSensors.rightFBSensor);
-    ConvertBottomFarRightLongRangeIRToCM(&(distances->ir.farRightFBSensor), adcValues.IRSensors.farRightFBSensor);
-    ConvertTopLeftLongRangeIRToCM(&(distances->ir.leftFTSensor),  adcValues.IRSensors.leftFTSensor);
-    ConvertTopRightLongRangeIRToCM(&(distances->ir.rightFTSensor),  adcValues.IRSensors.rightFTSensor);
+    GetDistanceFromLookupTableIR(&distances->ir.leftFBSensor,       bottomLeftLongRangeTable,   sizeof(bottomLeftLongRangeTable) / sizeof(*bottomLeftLongRangeTable),       adcValues.IRSensors.leftFBSensor);
+    GetDistanceFromLookupTableIR(&distances->ir.rightFBSensor,      bottomRightLongRangeTable,  sizeof(bottomRightLongRangeTable) / sizeof(*bottomRightLongRangeTable),     adcValues.IRSensors.rightFBSensor);
+    GetDistanceFromLookupTableIR(&distances->ir.leftFTSensor,       topLeftLongRangeTable,      sizeof(topLeftLongRangeTable) / sizeof(*topLeftLongRangeTable),             adcValues.IRSensors.leftFTSensor);
+    GetDistanceFromLookupTableIR(&distances->ir.rightFTSensor,      topRightLongRangeTable,     sizeof(topRightLongRangeTable) / sizeof(*topRightLongRangeTable),           adcValues.IRSensors.rightFTSensor);
+    GetDistanceFromLookupTableIR(&distances->ir.middleFBSensor,     middleMidRangeTable,        sizeof(middleMidRangeTable) / sizeof(*middleMidRangeTable),                 adcValues.IRSensors.middleFBSensor);
+    GetDistanceFromLookupTableIR(&distances->ir.farLeftFBSensor,    leftMidRangeTable,          sizeof(leftMidRangeTable) / sizeof(*leftMidRangeTable),                     adcValues.IRSensors.farLeftFBSensor);
+    GetDistanceFromLookupTableIR(&distances->ir.farRightFBSensor,   rightMidRangeTable,         sizeof(rightMidRangeTable) / sizeof(*rightMidRangeTable),                   adcValues.IRSensors.farRightFBSensor);
 }
 
 
@@ -242,132 +329,6 @@ void GetDistanceFromLookupTableIR(float* distanceCM, LookupTable_t lookupTable[]
 		*distanceCM = -1;
 	}
 }
-
-void ConvertShortRangeToCM(float* distanceCM, uint32_t adcValue) {
-    float voltage = adcValue/(310.303);
-    *distanceCM = 0;
-    if(voltage <= 0.52) {
-        *distanceCM = 20;
-    }
-    else if(voltage < 1) {
-        *distanceCM = 12.115/(voltage+0.01042);
-    }
-    else if(voltage < 2.74) {
-        *distanceCM = 21.6282*(pow(0.491235, voltage));
-    }
-    else {
-        *distanceCM = -1;
-    }
-    *distanceCM = voltage;
-}
-
-void ConvertMidRangeToCM(float* distanceCM, uint32_t adcValue) {
-    float voltage = adcValue/(310.303);
-    *distanceCM = 0;
-    if(voltage < 0.82) {
-        *distanceCM = 30;
-    }
-    else if(voltage < 2.284) {
-        *distanceCM = 22.053/(voltage-0.0915);
-    }
-    else if(voltage < 3) {
-        *distanceCM = 15.45/(voltage-0.7419);
-    }
-    else {
-        *distanceCM = -1;
-    }
-    *distanceCM = voltage;
-}
-
-void ConvertBottomLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
-    float avgAdcValue = adcValue;
-    float voltage = avgAdcValue/(310.303);
-    
-    if(voltage < 0.66) {
-        *distanceCM = 70;
-    }
-    else if(voltage < 0.97) {
-        *distanceCM = 79.765/(voltage+0.4716);
-    }
-    else if(voltage < 2.42) {
-        *distanceCM = 107.703*(pow(0.5, voltage));
-    }
-    else {
-        *distanceCM = -1;
-    }
-    *distanceCM = voltage;
-}
-
-void ConvertBottomRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
-    float avgAdcValue = adcValue;
-    float voltage = avgAdcValue/(310.303);
-    
-    if(voltage < 0.77) {
-        *distanceCM = 70;
-    }
-    else if(voltage < 1.132) {
-        *distanceCM = 63.402/(voltage+0.1329);
-    }
-    else if(voltage < 2.47) {
-        *distanceCM = 106.133*(pow(0.5102, voltage));
-    }
-    else {
-        *distanceCM = -1;
-    }
-    *distanceCM = voltage;
-}
-
-
-void ConvertBottomFarLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
-    float avgAdcValue = adcValue;
-    float voltage = avgAdcValue/(310.303);
-    *distanceCM = voltage;
-}
-
-void ConvertBottomFarRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
-    float avgAdcValue = adcValue;
-    float voltage = avgAdcValue/(310.303);
-    *distanceCM = voltage;
-}
-
-void ConvertTopLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
-    float avgAdcValue = adcValue;
-    float voltage = avgAdcValue/(310.303);
-    
-    if(voltage < 0.87) {
-        *distanceCM = 70;
-    }
-    else if(voltage < 1.170) {
-        *distanceCM = 51.833/(voltage-0.1318);
-    }
-    else if(voltage < 2.46) {
-        *distanceCM = 110.775*(pow(0.501, voltage));
-    }
-    else {
-        *distanceCM = -1;
-    }
-    *distanceCM = voltage;
-}
-
-void ConvertTopRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
-    float avgAdcValue = adcValue;
-    float voltage = avgAdcValue/(310.303);
-    
-    if(voltage < 0.87) {
-        *distanceCM = 70;
-    }
-    else if(voltage < 1.170) {
-        *distanceCM = 51.833/(voltage-0.1318);
-    }
-    else if(voltage < 2.46) {
-        *distanceCM = 110.775*(pow(0.501, voltage));
-    }
-    else {
-        *distanceCM = -1;
-    }
-    *distanceCM = voltage;
-}
-
 
 bool FilterIRSensors(SensorDataType sensors) {
     if(sensors.ir.middleFBSensor < 17 || sensors.ir.rightFBSensor == -1 || sensors.ir.leftFBSensor == -1) {

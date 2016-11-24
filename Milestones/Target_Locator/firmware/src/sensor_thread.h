@@ -119,7 +119,6 @@ typedef struct {
 	float voltage;
 } LookupTable_t; 
 
-
 /*******************************************************************************
   Function:
     void SENSOR_THREAD_Initialize ( void )
@@ -191,6 +190,8 @@ void SENSOR_THREAD_InitializeQueue();
 void SENSOR_THREAD_ReadFromQueue(TL_Queue_t* pvBuffer);
 
 void ConvertSensorADCToDistance(SensorDataType* distances, SensorADC_t adcValues);
+
+void GetDistanceFromLookupTableIR(float* distanceCM, LookupTable_t lookupTable[], size_t size, uint32_t adcValue);
 
 void UpdateSensorLocations(SensorDataContainerType* sensors, SensorDataType distances, point_t roverLocation, int orientation);
 
