@@ -399,14 +399,15 @@ void updateOccupanyGrid2(SensorDataContainerType sensorData, Grid::GridType grid
             point_t rayTracePoint(minDistancePoint.x() + i*cosX, minDistancePoint.y() + i*sinY);
             point_t  rayTraceOrigin(minSensor.sensorLocation.x() + i*cosX, minSensor.sensorLocation.y() + i*sinY);
 
-            raytrace3(rayTraceOrigin.x(), rayTraceOrigin.y(), rayTracePoint.x(), rayTracePoint.y(), true, grid);
+            raytrace3(rayTraceOrigin.x(), rayTraceOrigin.y(), rayTracePoint.x(), rayTracePoint.y(), false, grid);
         }
     }
 
 }
 
 void updateOccupanyGrid3(SensorDataContainerType sensorData, Grid::GridType grid) {
-    if(sensorData.LongRangeIsValid) {
+//    if(sensorData.LongRangeIsValid) {
+    {
         SensorData_t minSensor, nonMinSensor;
         int angleOffset;
         if(sensorData.leftFrontSensor.distance <= sensorData.rightFrontSensor.distance) {
@@ -429,39 +430,51 @@ void updateOccupanyGrid3(SensorDataContainerType sensorData, Grid::GridType grid
             // We are going to walk along the rover's front face from the sensor that returned the minimum distance to the other one
             for(int i = 0; i <= sensorDistanceBetween; i++) {
                 point_t rayTracePoint(minDistancePoint.x() + i*cosX, minDistancePoint.y() + i*sinY);
-                point_t  rayTraceOrigin(minSensor.sensorLocation.x() + i*cosX, minSensor.sensorLocation.y() + i*sinY);
+                point_t rayTraceOrigin(minSensor.sensorLocation.x() + i*cosX, minSensor.sensorLocation.y() + i*sinY);
 
                 raytrace3(rayTraceOrigin.x(), rayTraceOrigin.y(), rayTracePoint.x(), rayTracePoint.y(), true, grid);
             }
         }
     }
-    if(sensorData.MidRangeIsValid) {
+//    if(sensorData.MidRangeIsValid) {
+    {
         SensorData_t minSensor, nonMinSensor;
+        float minDistance;
+        SensorData_t middleSensor = sensorData.middleFrontSensor;
         int angleOffset;
-        if(sensorData.leftFrontSensor.distance <= sensorData.rightFrontSensor.distance) {
-            minSensor = sensorData.leftFrontSensor;
-            nonMinSensor = sensorData.rightFrontSensor;
+        if(sensorData.farLeftSensor.distance <= sensorData.farRightSensor.distance && sensorData.farLeftSensor.distance <= sensorData.middleFrontSensor.distance) {
+            minSensor = sensorData.farLeftSensor;
+            nonMinSensor = sensorData.farRightSensor;
+            minDistance = minSensor.distance;
             angleOffset = -90;
+
         }
-        else {
-            minSensor = sensorData.rightFrontSensor;
-            nonMinSensor = sensorData.leftFrontSensor;
+        else if(sensorData.farRightSensor.distance <= sensorData.farLeftSensor.distance && sensorData.farRightSensor.distance <= sensorData.middleFrontSensor.distance) {
+            minSensor = sensorData.farRightSensor;
+            nonMinSensor = sensorData.farLeftSensor;
+            minDistance = minSensor.distance;
             angleOffset = 90;
         }
-        if(minSensor.distance > 0 && nonMinSensor.distance > 0) {
-            minSensor.distance -= 1;
+        else {
+            minSensor = sensorData.farRightSensor;
+            nonMinSensor = sensorData.farLeftSensor;
+            minDistance = middleSensor.distance;
+            angleOffset = 90;
+        }
+        if(minSensor.distance > 0 && nonMinSensor.distance > 0 && middleSensor.distance > 0) {
+            minDistance -= 2;
             int sensorDistanceBetween = 8;
-            point_t minDistancePoint = point_t(minSensor.sensorLocation.x() + minSensor.distance*cos(minSensor.orientation*M_PI/180),
-                                    minSensor.sensorLocation.y() + minSensor.distance*sin(minSensor.orientation*M_PI/180));
+            point_t minDistancePoint = point_t(minSensor.sensorLocation.x() + minDistance*cos(minSensor.orientation*M_PI/180),
+                                    minSensor.sensorLocation.y() + minDistance*sin(minSensor.orientation*M_PI/180));
             float cosX = cos((minSensor.orientation + angleOffset)*M_PI/180);
             float sinY = sin((minSensor.orientation + angleOffset)*M_PI/180);
-            // We are going to walk along the rover's front face from the sensor that returned the minimum distance to the other one
-            for(int i = 0; i <= sensorDistanceBetween; i++) {
+            for(int i = 0; i < sensorDistanceBetween; i++) {
                 point_t rayTracePoint(minDistancePoint.x() + i*cosX, minDistancePoint.y() + i*sinY);
-                point_t  rayTraceOrigin(minSensor.sensorLocation.x() + i*cosX, minSensor.sensorLocation.y() + i*sinY);
+                point_t rayTraceOrigin(minSensor.sensorLocation.x() + i*cosX, minSensor.sensorLocation.y() + i*sinY);
 
                 raytrace3(rayTraceOrigin.x(), rayTraceOrigin.y(), rayTracePoint.x(), rayTracePoint.y(), true, grid);
             }
+
         }
     }
 

@@ -146,4 +146,87 @@ void updateOccupanyGrid2(SensorDataContainerType sensorData, GridType grid) {
     }
 }
 
+void updateOccupanyGrid3(SensorDataContainerType sensorData, GridType grid) {
+    int i = 0;
+    if(sensorData.LongRangeIsValid == true) {
+        SensorData_t minSensor, nonMinSensor;
+        int angleOffset;
+        if(sensorData.leftFrontSensor.distance <= sensorData.rightFrontSensor.distance) {
+            minSensor = sensorData.leftFrontSensor;
+            nonMinSensor = sensorData.rightFrontSensor;
+            angleOffset = -90;
+        }
+        else {
+            minSensor = sensorData.rightFrontSensor;
+            nonMinSensor = sensorData.leftFrontSensor;
+            angleOffset = 90;
+        }
+        if(minSensor.distance > 0 && nonMinSensor.distance > 0) {
+            minSensor.distance -= 2;
+            int sensorDistanceBetween = 4;
+            point_t minDistancePoint;
+            minDistancePoint.x = minSensor.sensorLocation.x + minSensor.distance*cos(minSensor.orientation*M_PI/180);
+            minDistancePoint.y = minSensor.sensorLocation.y + minSensor.distance*sin(minSensor.orientation*M_PI/180);
+            float cosX = cos((minSensor.orientation + angleOffset)*M_PI/180);
+            float sinY = sin((minSensor.orientation + angleOffset)*M_PI/180);
+            // We are going to walk along the rover's front face from the sensor that returned the minimum distance to the other one
+            for(i = 0; i <= sensorDistanceBetween; i++) {
+                point_t rayTracePoint;
+                rayTracePoint.x = minDistancePoint.x + i*cosX;
+                rayTracePoint.y = minDistancePoint.y + i*sinY;
+                point_t rayTraceOrigin;
+                rayTraceOrigin.x = minSensor.sensorLocation.x + i*cosX;
+                rayTraceOrigin.y = minSensor.sensorLocation.y + i*sinY;
+
+                raytrace3(rayTraceOrigin.x, rayTraceOrigin.y, rayTracePoint.x, rayTracePoint.y, true, grid);
+            }
+        }
+    }
+    if(sensorData.MidRangeIsValid == true) {
+        SensorData_t minSensor, nonMinSensor;
+        float minDistance;
+        SensorData_t middleSensor = sensorData.middleFrontSensor;
+        int angleOffset;
+        if(sensorData.farLeftSensor.distance <= sensorData.farRightSensor.distance && sensorData.farLeftSensor.distance <= sensorData.middleFrontSensor.distance) {
+            minSensor = sensorData.farLeftSensor;
+            nonMinSensor = sensorData.farRightSensor;
+            minDistance = minSensor.distance;
+            angleOffset = -90;
+
+        }
+        else if(sensorData.farRightSensor.distance <= sensorData.farLeftSensor.distance && sensorData.farRightSensor.distance <= sensorData.middleFrontSensor.distance) {
+            minSensor = sensorData.farRightSensor;
+            nonMinSensor = sensorData.farLeftSensor;
+            minDistance = minSensor.distance;
+            angleOffset = 90;
+        }
+        else {
+            minSensor = sensorData.farRightSensor;
+            nonMinSensor = sensorData.farLeftSensor;
+            minDistance = middleSensor.distance;
+            angleOffset = 90;
+        }
+        if(minSensor.distance > 0 && nonMinSensor.distance > 0 && middleSensor.distance > 0) {
+            minDistance -= 2;
+            int sensorDistanceBetween = 8;
+            point_t minDistancePoint;
+            minDistancePoint.x = minSensor.sensorLocation.x + minDistance*cos(minSensor.orientation*M_PI/180);
+            minDistancePoint.y = minSensor.sensorLocation.y + minDistance*sin(minSensor.orientation*M_PI/180);
+            float cosX = cos((minSensor.orientation + angleOffset)*M_PI/180);
+            float sinY = sin((minSensor.orientation + angleOffset)*M_PI/180);
+            for(i = 0; i < sensorDistanceBetween; i++) {
+                point_t rayTracePoint;
+                rayTracePoint.x = minDistancePoint.x + i*cosX;
+                rayTracePoint.y = minDistancePoint.y + i*sinY;
+                point_t rayTraceOrigin;
+                rayTraceOrigin.x = minSensor.sensorLocation.x + i*cosX;
+                rayTraceOrigin.y = minSensor.sensorLocation.y + i*sinY;
+
+                raytrace3(rayTraceOrigin.x, rayTraceOrigin.y, rayTracePoint.x, rayTracePoint.y, true, grid);
+            }
+        }
+    }
+
+}
+
 

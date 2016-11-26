@@ -193,7 +193,7 @@ void ConvertSensorADCToDistance(SensorDataType* distances, SensorADC_t adcValues
 
 void GetDistanceFromLookupTableIR(float* distanceCM, LookupTable_t lookupTable[], size_t size, uint32_t adcValue);
 
-void UpdateSensorLocations(SensorDataContainerType* sensors, SensorDataType distances, point_t roverLocation, int orientation);
+void UpdateSensorInformation(SensorDataContainerType* sensors, SensorDataType distances, point_t roverLocation, int orientation);
 
 void ConvertShortRangeToCM(float* distanceCM, uint32_t adcValue);
 
@@ -212,6 +212,8 @@ void ConvertTopLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
 void ConvertTopRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
 
 bool FilterIRSensors(SensorDataType sensors);
+
+void UpdateProximityInformation(Proximity_t *proximity, SensorDataType sensors);
 
 #endif /* _SENSOR_THREAD_H */
 

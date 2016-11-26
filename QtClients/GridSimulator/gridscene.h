@@ -53,8 +53,8 @@ public slots:
         middleFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
         leftFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
         rightFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
-        rightSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
-        leftSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+//        rightSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+//        leftSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
         this->update();
     }
 signals:

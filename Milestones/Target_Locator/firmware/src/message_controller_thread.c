@@ -442,6 +442,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                     case SENSORDATA: {
                         internalData.sensordata = obj.message.Update.Data.sensordata;
                         internalData.sensorInformation = obj.message.Update.Data.sensorInformation;
+                        internalData.proximity = obj.message.Update.Data.proximity;
                         break;
                     }
                     default: {
