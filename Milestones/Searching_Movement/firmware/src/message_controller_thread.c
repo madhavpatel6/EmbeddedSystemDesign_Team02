@@ -268,8 +268,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 // Handle request for rover movement
                                 case R1_Movement: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), 
-                                            ",\"R1_Movement\":{\"x\":\"%0.02f\",\"y\":\"%0.02f\",\"orientation\":\"%0.02f\","
-                                            "\"action\":\"%i\",\"amount\":\"%0.02f\"}",
+                                            ",\"R1_Movement\":[\"%0.02f\",\"%0.02f\",\"%0.02f\",\"%i\",\"%0.02f\"]",
                                             internalData.location.x, internalData.location.y, internalData.orientation,
                                             internalData.movement.action, internalData.movement.amount
                                             );
