@@ -42,17 +42,31 @@ void ClientSocket::sendProximity(int proxVal){
 void ClientSocket::sendMovement(bool movementBool){
     QString response_begin = "{\"type\":\"Response\",\"movementStopped\":\"";
     QString response_end = "\"}";
-    QString curResp = response_begin + QString::number(movementBool) + response_end;
-    emit sendCurRespSignal(curResp);
-    SendJSONRequestToSocket(response_begin + QString::number(movementBool) + response_end, TARGETGRABBER);
+    if(movementBool == true){
+        QString curResp = response_begin + "true" + response_end;
+        emit sendCurRespSignal(curResp);
+        SendJSONRequestToSocket(response_begin + "true" + response_end, TARGETGRABBER);
+    }
+    else{
+        QString curResp = response_begin + "false" + response_end;
+        emit sendCurRespSignal(curResp);
+        SendJSONRequestToSocket(response_begin + "false" + response_end, TARGETGRABBER);
+    }
 }
 
 void ClientSocket::sendOutsideArena(bool arenaBool){
     QString response_begin = "{\"type\":\"Response\",\"outsideArena\":\"";
     QString response_end = "\"}";
-    QString curResp = response_begin + QString::number(arenaBool) + response_end;
-    emit sendCurRespSignal(curResp);
-    SendJSONRequestToSocket(response_begin + QString::number(arenaBool) + response_end, TARGETGRABBER);
+    if(arenaBool == true){
+        QString curResp = response_begin + "true" + response_end;
+        emit sendCurRespSignal(curResp);
+        SendJSONRequestToSocket(response_begin + "true" + response_end, TARGETGRABBER);
+    }
+    else{
+        QString curResp = response_begin + "false" + response_end;
+        emit sendCurRespSignal(curResp);
+        SendJSONRequestToSocket(response_begin + "false" + response_end, TARGETGRABBER);
+    }
 }
 
 void ClientSocket::alignmentRequestedSlot(){
