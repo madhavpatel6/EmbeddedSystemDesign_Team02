@@ -205,12 +205,12 @@ void ClientSocket::SendJSONResponseToSocket(QString response, char destination) 
 
 void ClientSocket::HandleResponse(QJsonObject obj) {
     QJsonObject response;
+    QJsonArray array;
     if(obj.contains(QStringLiteral("R1_Movement"))) {
-        response = obj["R1_Movement"].toObject();
-        emit sendMovement(SEARCHERMOVER, response["x"].toString(), response["y"].toString(),
-                response["orientation"].toString(), response["action"].toString(),
-                response["amount"].toString());
-//        qDebug() << obj["R1_Movement"];
+        array = obj["R1_Movement"].toArray();
+        emit sendMovement(SEARCHERMOVER, array[0].toString(), array[1].toString(),
+                array[2].toString(), array[3].toString(), array[4].toString());
+        qDebug() << obj["R1_Movement"];
     }
     if(obj.contains(QStringLiteral("LineLocation"))) {
         int location = 0;
