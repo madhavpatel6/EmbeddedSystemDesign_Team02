@@ -7,9 +7,9 @@
 typedef struct Point{
 	float x;
 	float y;
-	int gScore;
-	int hScore;
-	int parent;
+	unsigned char gScore;
+	unsigned char hScore;
+	unsigned short parent;
 } Point;
 
 

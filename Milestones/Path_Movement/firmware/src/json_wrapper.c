@@ -180,6 +180,19 @@ bool extractResponse_targetAlignment(bool *g_align, float *distance, float *angl
     return result;
         
 }
+int extractResponse_val(float *val){
+    int i;
+    
+    for(i = 1; i < r; i++){
+        if (jsoneq(stored_js_str, &t[i], "val") == 0) {
+            sprintf(buf, "%.*s\0", t[i+1].end-t[i+1].start, stored_js_str + t[i+1].start);
+            *val = atoi(buf);
+            return true;
+        }
+    }
+    return false;
+    
+}
 
 
 

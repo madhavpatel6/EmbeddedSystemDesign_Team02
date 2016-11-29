@@ -25,8 +25,8 @@ void incrementIndex(int x, int y, GridType grid) {
 
 void decrementIndex(int x, int y, GridType grid) {
     if(checkBounds(x,y)) {
-        if(grid[y][x] > MINIMUM + 5) {
-            grid[y][x]-=5;
+        if(grid[y][x] > MINIMUM + 10) {
+            grid[y][x]-= 10;
         }
         if(grid[y][x] == 0) {
             grid[y][x] = -1;

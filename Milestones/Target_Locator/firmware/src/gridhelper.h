@@ -12,21 +12,21 @@ typedef struct PointF {
 typedef PointF point_t;
 
 typedef struct {
-    float minimumMeasuringDistance;
-    float maximumMeasuringDistance;
+//    float minimumMeasuringDistance;
+//    float maximumMeasuringDistance;
     float distance;
     float orientation;
-//    float coneAngle;
     point_t sensorLocation;
-//    point_t maxSensorLocation;
 } SensorData_t;
 
 typedef struct {
+    bool LongRangeIsValid;
+    bool MidRangeIsValid;
     SensorData_t middleFrontSensor;
     SensorData_t rightFrontSensor;
     SensorData_t leftFrontSensor;
-//    SensorData_t rightSideSensor;
-//    SensorData_t leftSideSensor;
+    SensorData_t farRightSensor;
+    SensorData_t farLeftSensor;
     point_t roverLocation;
     float orientation;
 } SensorDataContainerType;

@@ -39,29 +39,29 @@ void SensorClass::updatePosition(QPointF roverLocation, int roverOrientation) {
     switch(type) {
         case MIDDLESENSOR: {
             sensorLocation = rotatePoint(roverLocation.x(), roverLocation.y(),
-                    roverLocation.x() + 3, roverLocation.y(),
+                    roverLocation.x() + 5, roverLocation.y(),
                         roverOrientation);
             sensorPixelLocation = rotatePoint(roverLocation.x()*cell_pixel_size, roverLocation.y()*cell_pixel_size,
-                                              roverLocation.x()*cell_pixel_size + 3*cell_pixel_size, roverLocation.y()*cell_pixel_size,
+                                              roverLocation.x()*cell_pixel_size + 5*cell_pixel_size, roverLocation.y()*cell_pixel_size,
                                                   roverOrientation);
 
             break;
         }
         case LEFTSENSOR: {
             sensorLocation = rotatePoint(roverLocation.x(), roverLocation.y(),
-                    roverLocation.x() + 3, roverLocation.y() + 2,
+                    roverLocation.x() + 5, roverLocation.y() + 2,
                         roverOrientation);
             sensorPixelLocation = rotatePoint(roverLocation.x()*cell_pixel_size, roverLocation.y()*cell_pixel_size,
-                                              roverLocation.x()*cell_pixel_size + 3*cell_pixel_size, roverLocation.y()*cell_pixel_size + 2*cell_pixel_size,
+                                              roverLocation.x()*cell_pixel_size + 5*cell_pixel_size, roverLocation.y()*cell_pixel_size + 2*cell_pixel_size,
                                                   roverOrientation);
             break;
         }
         case RIGHTSENSOR: {
             sensorLocation = rotatePoint(roverLocation.x(), roverLocation.y(),
-                    roverLocation.x() + 3, roverLocation.y() - 2,
+                    roverLocation.x() + 5, roverLocation.y() - 2,
                         roverOrientation);
             sensorPixelLocation = rotatePoint(roverLocation.x()*cell_pixel_size, roverLocation.y()*cell_pixel_size,
-                                              roverLocation.x()*cell_pixel_size + 3*cell_pixel_size, roverLocation.y()*cell_pixel_size - 2*cell_pixel_size,
+                                              roverLocation.x()*cell_pixel_size + 5*cell_pixel_size, roverLocation.y()*cell_pixel_size - 2*cell_pixel_size,
                                                   roverOrientation);
             break;
         }
@@ -82,6 +82,24 @@ void SensorClass::updatePosition(QPointF roverLocation, int roverOrientation) {
                         roverOrientation);
             sensorPixelLocation = rotatePoint(roverLocation.x()*cell_pixel_size, roverLocation.y()*cell_pixel_size,
                                               roverLocation.x()*cell_pixel_size, roverLocation.y()*cell_pixel_size + 3*cell_pixel_size,
+                                                  roverOrientation);
+            break;
+        }
+        case FARLEFTSENSOR: {
+            sensorLocation = rotatePoint(roverLocation.x(), roverLocation.y(),
+                    roverLocation.x() + 5, roverLocation.y() + 4,
+                        roverOrientation);
+            sensorPixelLocation = rotatePoint(roverLocation.x()*cell_pixel_size, roverLocation.y()*cell_pixel_size,
+                                              roverLocation.x()*cell_pixel_size + 5*cell_pixel_size, roverLocation.y()*cell_pixel_size + 4*cell_pixel_size,
+                                                  roverOrientation);
+            break;
+        }
+        case FARRIGHTSENSOR: {
+            sensorLocation = rotatePoint(roverLocation.x(), roverLocation.y(),
+                    roverLocation.x() + 5, roverLocation.y() - 4,
+                        roverOrientation);
+            sensorPixelLocation = rotatePoint(roverLocation.x()*cell_pixel_size, roverLocation.y()*cell_pixel_size,
+                                              roverLocation.x()*cell_pixel_size + 5*cell_pixel_size, roverLocation.y()*cell_pixel_size - 4*cell_pixel_size,
                                                   roverOrientation);
             break;
         }

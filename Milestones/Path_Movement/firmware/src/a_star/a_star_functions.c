@@ -22,6 +22,8 @@ static int obstacleLen;
 static Point verticies[maxVerticies];
 static int vertexLen;
 
+static int skip = -1;
+
 
 /* initializes grid and open, closed, and final path lists */
 void initWorld(){
@@ -605,6 +607,8 @@ void resetPath(){
 //	}
 //}
 
+static int startingPoint = 0;
+
 bool can_I_go_targ(Point start){
     int i, j;
     
@@ -612,8 +616,8 @@ bool can_I_go_targ(Point start){
     Point destination;
     
     bool res = false;
-    
-    for(i = 0; i < targetLen; i++){
+    int targIndex = -1;
+    for(i = startingPoint; i < targetLen; i++){
         for( j = 0; j < pointsToObject; j++){
             resetPath();
             if(findPath(start, targets[i][j])){
@@ -621,6 +625,7 @@ bool can_I_go_targ(Point start){
                     minPath = finalLen;
                     destination = targets[i][j];
                     res =  true;
+                    targIndex = i;
                 }
             }
         }
@@ -629,6 +634,7 @@ bool can_I_go_targ(Point start){
     if(res){
         findPath(start, destination);
     }
+
     return res;
 }
 
@@ -647,4 +653,8 @@ void getPath(Point path[], int* len){
     for(i = 0; i < finalLen; i++){
         path[i] = finalPath[finalLen - i -1];
     }
+}
+
+void incStartingPoint(){
+    startingPoint++;
 }

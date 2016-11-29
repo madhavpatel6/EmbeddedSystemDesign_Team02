@@ -32,7 +32,6 @@ void ClientSocket::sendRequest(){
     QString request_begin = "{\"type\":\"Request\",\"items\":[\"";
     QString request_end = "\"]}";
     SendJSONRequestToSocket(request_begin + "TargetLocatorSensorData" + request_end, TARGETLOCATOR);
-//    SendJSONRequestToSocket(request_begin + "TimerTickCount" + request_end, TARGETLOCATOR);
 }
 
 void ClientSocket::connected()
@@ -104,8 +103,8 @@ void ClientSocket::SendJSONRequestToSocket(QString request, char destination) {
 void ClientSocket::HandleResponse(QJsonObject obj) {
     if(obj.contains(QStringLiteral("TargetLocatorSensorData"))) {
         QJsonObject ir = obj["TargetLocatorSensorData"].toObject()["IR"].toObject();
-        QJsonObject us = obj["TargetLocatorSensorData"].toObject()["US"].toObject();
-        emit sendUpdate(ir["leftFT"].toString(), ir["rightFT"].toString(), ir["leftFB"].toString(), ir["middleFB"].toString(), ir["rightFB"].toString(), us["leftFT"].toString(), us["middleFT"].toString(), us["rightFT"].toString(), us["leftSD"].toString(), us["rightSD"].toString());
+
+        emit sendUpdate(ir["farLeftFB"].toString(), ir["leftFB"].toString(), ir["middleFB"].toString(), ir["rightFB"].toString(), ir["farRightFB"].toString(), ir["leftFT"].toString(), ir["rightFT"].toString());
     }
 
 }

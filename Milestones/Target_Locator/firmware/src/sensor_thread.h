@@ -70,11 +70,13 @@ extern "C" {
 // DOM-IGNORE-END 
 
 typedef struct {
-    uint32_t rightFTSensor;
     uint32_t leftFTSensor;
+    uint32_t rightFTSensor;
+    uint32_t farLeftFBSensor;
+    uint32_t leftFBSensor;
     uint32_t middleFBSensor;
     uint32_t rightFBSensor;
-    uint32_t leftFBSensor;
+    uint32_t farRightFBSensor;
 } IRSensorsADC_t;
 
 
@@ -95,7 +97,7 @@ typedef struct {
 typedef union {
 	SensorADC_t sensors;
 	Movement_t r1_movement;
-}TL_Message_t;
+} TL_Message_t;
 
 typedef struct {
 	TLUpdate_t type;
@@ -112,10 +114,10 @@ typedef struct {
     bool rightside;
 } UltrasonicIsSet_t;
 
-//typedef struct {
-//    UltrasonicIsSet_t isSet;
-////    UltrasonicSensorDistance_t distance;
-//} UltrasonicContainer;
+typedef struct {
+	float distance;
+	float voltage;
+} LookupTable_t; 
 
 /*******************************************************************************
   Function:
@@ -189,7 +191,9 @@ void SENSOR_THREAD_ReadFromQueue(TL_Queue_t* pvBuffer);
 
 void ConvertSensorADCToDistance(SensorDataType* distances, SensorADC_t adcValues);
 
-void UpdateSensorLocations(SensorDataContainerType* sensors, SensorDataType distances, point_t roverLocation, int orientation);
+void GetDistanceFromLookupTableIR(float* distanceCM, LookupTable_t lookupTable[], size_t size, uint32_t adcValue);
+
+void UpdateSensorInformation(SensorDataContainerType* sensors, SensorDataType distances, point_t roverLocation, int orientation);
 
 void ConvertShortRangeToCM(float* distanceCM, uint32_t adcValue);
 
@@ -199,9 +203,17 @@ void ConvertBottomLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
 
 void ConvertBottomRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
 
+void ConvertBottomFarLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
+
+void ConvertBottomFarRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
+
 void ConvertTopLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
 
+void ConvertTopRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue);
+
 bool FilterIRSensors(SensorDataType sensors);
+
+void UpdateProximityInformation(Proximity_t *proximity, SensorDataType sensors);
 
 #endif /* _SENSOR_THREAD_H */
 

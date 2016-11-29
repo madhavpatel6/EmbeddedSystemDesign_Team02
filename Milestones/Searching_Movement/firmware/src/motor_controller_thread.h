@@ -62,11 +62,10 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "motor_controller_thread_public.h"
 
 #define TICKS_PER_CM    38.84955752f
-#define TICKS_PER_DEG   3.357512953f
+#define TICKS_PER_DEG   3.428767123f
 #define MAX_PWM         655
 
 #define DEBUG           'D'
-#define LAWNMOWER       'L'
 #define RANDOM          'R'
 
 // DOM-IGNORE-BEGIN

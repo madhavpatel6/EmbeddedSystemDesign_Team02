@@ -39,6 +39,7 @@ extern "C" {
     
 typedef enum MotorType { NORMAL, UPDATE_POSITION } MotorObjType;
 
+// Defines the struct sent to the motor_controller queue
 typedef struct {
     MotorObjType type;
     char stop;

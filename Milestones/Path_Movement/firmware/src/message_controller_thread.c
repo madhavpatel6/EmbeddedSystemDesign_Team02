@@ -70,6 +70,10 @@ static int systemClock;
 #define TYPEOFQUEUE MessageObj
 #define SIZEOFQUEUE 36
 
+static float targetProximityVal = -1.0f;
+static bool outsideArenaVal = false;
+static bool movementStoppedVal = false;
+
 /*******************************************************************************
   Function:
     void MESSAGE_CONTROLLER_THREAD_Initialize ( void )
@@ -285,6 +289,22 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     tx_thread_obj.Destination = obj.External.Source;
                                     break;
                                 }
+                                case targetProximity:{
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"targetProximity\":\"%f\"", targetProximityVal);
+                                    tx_thread_obj.Destination = obj.External.Source;
+                                    break;
+                                }
+                                case outsideArena:{
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"outsideArena\":\"%s\"", outsideArenaVal ? "true": "false");
+                                    tx_thread_obj.Destination = obj.External.Source;
+                                    break;
+                                }
+                                case movementStopped:{
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"movementStopped\":\"%s\"", movementStoppedVal ? "true": "false");
+                                    tx_thread_obj.Destination = obj.External.Source;
+                                    break;
+                                }
+                                
                                 default:
                                     break;
                             }
@@ -342,7 +362,14 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         }
                         bool g_align, t_acq;
                         float distance, angle;
-                        if(extractResponse_targetAlignment(&g_align,&distance,&angle, &t_acq)){
+                        float val;
+                        
+                        if(extractResponse_val(&val)){
+                            message_in_t msg;
+                            msg.type = debug;
+                            msg.targetDistance = val;
+                            MOTOR_CONTROLLER_THREAD_SendToQueue(msg);
+                        } else if(extractResponse_targetAlignment(&g_align,&distance,&angle, &t_acq)){
                             message_in_t msg;
                             msg.type = targetAlignment;
                             msg.targetAligned = g_align;
@@ -475,6 +502,18 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                     }
                     case SENSORDATA: {
                         internalData.sensordata = obj.Update.Data.sensordata;
+                        break;
+                    }
+                    case TARG_PROX: {
+                        targetProximityVal = obj.Update.Data.targetProx;
+                        break;
+                    }
+                    case OUTS_ARENA: {
+                        outsideArenaVal = obj.Update.Data.outsArena;
+                        break;
+                    }
+                    case MOV_STOP: {
+                        movementStoppedVal = obj.Update.Data.movStop;
                         break;
                     }
                     default: {

@@ -69,25 +69,24 @@ extern "C" {
 //Depending on what data you would need to send out you should create a member of this struct that can hold that data
 
 typedef struct {
+    float leftFTSensor;
     float middleFTSensor;
     float rightFTSensor;
-    float leftFTSensor;
+    float farLeftFBSensor;
+    float leftFBSensor;
     float middleFBSensor;
     float rightFBSensor;
-    float leftFBSensor;
+    float farRightFBSensor;
 } IRSensorDistance_t;
 
-//typedef struct {
-//    float leftfront;
-//    float middlefront;
-//    float rightfront;
-//    float leftside;
-//    float rightside;
-//} UltrasonicSensorDistance_t;
+typedef struct {
+    bool leftProximity;
+    bool middleProximity;
+    bool rightProximity;
+} Proximity_t;
 
 typedef struct {
     IRSensorDistance_t ir;
-//    UltrasonicSensorDistance_t ultrasonic;
 } SensorDataType;
 
 
@@ -95,6 +94,7 @@ typedef struct {
 typedef struct {
     SensorDataType sensordata;
     SensorDataContainerType sensorInformation;
+    Proximity_t proximity;
 } InternalData;
 
 //This should include a new enum for anything in the InternalData

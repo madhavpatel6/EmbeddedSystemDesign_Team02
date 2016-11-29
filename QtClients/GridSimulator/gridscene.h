@@ -53,8 +53,8 @@ public slots:
         middleFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
         leftFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
         rightFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
-        rightSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
-        leftSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+//        rightSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+//        leftSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
         this->update();
     }
 signals:
@@ -71,6 +71,8 @@ private:
     SensorClass *leftFrontSensor;
     SensorClass *rightSideSensor;
     SensorClass *leftSideSensor;
+    SensorClass *farLeftSensor;
+    SensorClass *farRightSensor;
     void paintEvent(QPaintEvent *);
     QPolygonF newRect;
     QPolygonF newRotatedRect;

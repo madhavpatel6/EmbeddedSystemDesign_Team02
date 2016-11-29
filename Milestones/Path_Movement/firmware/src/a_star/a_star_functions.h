@@ -81,6 +81,7 @@ int indexSmallerChild(int index);
 bool can_I_go_targ(Point start);
 Point getNextLoc(Point start);
 
+void incStartingPoint();
 
 
 

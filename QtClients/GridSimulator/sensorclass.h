@@ -14,7 +14,7 @@ public:
         float random;
         float bias;
     } ErrorType;
-    typedef enum { MIDDLESENSOR, RIGHTSENSOR, LEFTSENSOR, RIGHTSIDESENSOR, LEFTSIDESENSOR } SensorLocation;
+    typedef enum { MIDDLESENSOR, RIGHTSENSOR, LEFTSENSOR, RIGHTSIDESENSOR, LEFTSIDESENSOR, FARLEFTSENSOR, FARRIGHTSENSOR} SensorLocation;
     typedef enum { IRSENSOR, ULTRASONICSENSOR } SensorType;
     SensorClass(SensorType _sensorType, SensorLocation location, int _minimumDistanceCM, int _maximumDistanceCM, int _coneAngle, int _sensorOrientationOffset, QPointF roverLocation, int roverOrientation, int _cell_pixel_size);
     void updatePosition(QPointF roverLocation, int roverOrientation);

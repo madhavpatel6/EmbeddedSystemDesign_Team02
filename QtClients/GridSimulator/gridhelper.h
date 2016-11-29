@@ -29,11 +29,15 @@ typedef struct {
 } SensorData_t;
 
 typedef struct {
+    bool LongRangeIsValid;
     SensorData_t middleFrontSensor;
     SensorData_t rightFrontSensor;
     SensorData_t leftFrontSensor;
     SensorData_t rightSideSensor;
     SensorData_t leftSideSensor;
+    bool MidRangeIsValid;
+    SensorData_t farLeftSensor;
+    SensorData_t farRightSensor;
 } SensorDataContainerType;
 
 typedef struct {
@@ -53,6 +57,8 @@ RayTraceReturnType raytrace3(int x1, int y1, int x2, int y2, bool maximum, Grid:
 void updateOccupanyGrid(SensorDataContainerType sensorData, Grid::GridType grid);
 
 void updateOccupanyGrid2(SensorDataContainerType sensorData, Grid::GridType grid);
+
+void updateOccupanyGrid3(SensorDataContainerType sensorData, Grid::GridType grid);
 
 }
 #endif // GRIDHELPER_H

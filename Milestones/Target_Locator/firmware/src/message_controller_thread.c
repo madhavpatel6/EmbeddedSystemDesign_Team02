@@ -249,7 +249,9 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                             "\"rightFT\":\"%.2f\","
                                             "\"leftFB\":\"%.2f\","
                                             "\"middleFB\":\"%.2f\","
-                                            "\"rightFB\":\"%.2f\"},"
+                                            "\"rightFB\":\"%.2f\","
+                                            "\"farLeftFB\":\"%.2f\","
+                                            "\"farRightFB\":\"%.2f\"},"
                                             "\"leftFT\":[\"%.1f\",\"%.1f\",\"%.1f\"],"
                                             "\"middleFT\":[\"%.1f\",\"%.1f\",\"%.1f\"],"
                                             "\"rightFT\":[\"%.1f\",\"%.1f\",\"%.1f\"]"
@@ -259,6 +261,8 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                             internalData.sensordata.ir.leftFBSensor,
                                             internalData.sensordata.ir.middleFBSensor,
                                             internalData.sensordata.ir.rightFBSensor,
+                                            internalData.sensordata.ir.farLeftFBSensor,
+                                            internalData.sensordata.ir.farRightFBSensor,
                                             internalData.sensorInformation.leftFrontSensor.sensorLocation.x,
                                             internalData.sensorInformation.leftFrontSensor.sensorLocation.y,
                                             internalData.sensorInformation.leftFrontSensor.orientation,
@@ -287,6 +291,15 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                             internalData.sensorInformation.roverLocation.x,
                                             internalData.sensorInformation.roverLocation.y,
                                             internalData.sensorInformation.orientation
+                                            );
+                                    tx_thread_obj.Destination = obj.message.External.Source;
+                                    break;
+                                }
+                                case ProximityInformation: {
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),",\"ProximityInformation\":[\"%.1f\",\"%.1f\",\"%.1f\"]",
+                                            internalData.sensordata.ir.middleFBSensor - 0.2,
+                                            internalData.sensordata.ir.middleFBSensor,
+                                            internalData.sensordata.ir.middleFBSensor + 0.3
                                             );
                                     tx_thread_obj.Destination = obj.message.External.Source;
                                     break;
@@ -429,6 +442,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                     case SENSORDATA: {
                         internalData.sensordata = obj.message.Update.Data.sensordata;
                         internalData.sensorInformation = obj.message.Update.Data.sensorInformation;
+                        internalData.proximity = obj.message.Update.Data.proximity;
                         break;
                     }
                     default: {
