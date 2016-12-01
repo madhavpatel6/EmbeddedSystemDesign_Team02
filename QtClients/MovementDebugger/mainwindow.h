@@ -63,7 +63,7 @@ private slots:
     void on_pb_send_clicked();
     void on_pb_sendLineTuning_clicked();
     void on_rb_white_toggled(bool checked);
-    void on_sb_threshold_valueChanged();
+    void on_sb_threshold_valueChanged(int val);
 
 private:
     Ui::MainWindow *ui;

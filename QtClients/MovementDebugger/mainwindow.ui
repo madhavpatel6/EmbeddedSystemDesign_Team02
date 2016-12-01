@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>943</width>
-    <height>573</height>
+    <width>796</width>
+    <height>475</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -425,6 +425,51 @@
               <row/>
               <column/>
               <column/>
+              <item row="0" column="0">
+               <property name="text">
+                <string>0</string>
+               </property>
+              </item>
+              <item row="0" column="1">
+               <property name="text">
+                <string>0</string>
+               </property>
+              </item>
+              <item row="1" column="0">
+               <property name="text">
+                <string>0</string>
+               </property>
+              </item>
+              <item row="1" column="1">
+               <property name="text">
+                <string>0</string>
+               </property>
+              </item>
+              <item row="2" column="0">
+               <property name="text">
+                <string>0</string>
+               </property>
+              </item>
+              <item row="2" column="1">
+               <property name="text">
+                <string>0</string>
+               </property>
+              </item>
+              <item row="3" column="0">
+               <property name="text">
+                <string>0</string>
+               </property>
+              </item>
+              <item row="3" column="1">
+               <property name="text">
+                <string>0</string>
+               </property>
+              </item>
+              <item row="4" column="0">
+               <property name="text">
+                <string/>
+               </property>
+              </item>
              </widget>
             </item>
            </layout>

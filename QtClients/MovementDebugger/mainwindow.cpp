@@ -298,7 +298,7 @@ void MainWindow::on_rb_white_toggled(bool checked)
     emit lineColorChanged(lineColor);
 }
 
-void MainWindow::on_sb_threshold_valueChanged()
+void MainWindow::on_sb_threshold_valueChanged(int val)
 {
     emit lineThresholdChanged(ui->sb_threshold->value());
 }
