@@ -21,7 +21,8 @@ MainWindow::MainWindow(QWidget *parent)
     movementTimer = new QTimer();
     movementTimer->setInterval(333); //original 333
     sensorReadingTimer->setInterval(50); //original 50
-
+    requestTimer = new QTimer();
+    requestTimer->setInterval(150);
     connect(sensorReadingTimer, SIGNAL(timeout()), this, SLOT(handleSimulate()));
     connect(showObjects, SIGNAL(released()), this, SLOT(handleShowObjects()));
     connect(gridwidget, SIGNAL(updateRoverPosition(float,float,float)), this, SLOT(handleRoverCoordinateUpdate(float,float,float)));
@@ -39,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(socket, SIGNAL(updateGrid(int,QVector<char>)), gridwidget, SLOT(handleUpdate(int,QVector<char>)));
     connect(socket, SIGNAL(updateRoverPosition(float,float,float)), gridwidget, SLOT(updateRoverPosition(float,float,float)));
     connect(sendResponse, SIGNAL(released()), this, SLOT(handlePICPositionUpdate()));
+    connect(requestTimer, SIGNAL(timeout()), this, SLOT(handleOccupyTimer()));
     middleFIRDistance->setText(QString::number(20));
     rightFIRDistance->setText(QString::number(20));
     leftFIRDistance->setText(QString::number(20));

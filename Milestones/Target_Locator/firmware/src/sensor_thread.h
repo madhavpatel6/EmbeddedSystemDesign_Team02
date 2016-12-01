@@ -90,13 +90,14 @@ typedef struct {
     float x;
     float y;
     float orientation;
-    char action;
+    int action;
     float amount;
 } Movement_t;
 
 typedef union {
 	SensorADC_t sensors;
 	Movement_t r1_movement;
+    int row;
 } TL_Message_t;
 
 typedef struct {
@@ -193,7 +194,7 @@ void ConvertSensorADCToDistance(SensorDataType* distances, SensorADC_t adcValues
 
 void GetDistanceFromLookupTableIR(float* distanceCM, LookupTable_t lookupTable[], size_t size, uint32_t adcValue);
 
-void UpdateSensorInformation(SensorDataContainerType* sensors, SensorDataType distances, point_t roverLocation, int orientation);
+void UpdateSensorInformation(SensorDataContainerType* sensors, SensorDataType distances, point_t roverLocation, float orientation);
 
 void ConvertShortRangeToCM(float* distanceCM, uint32_t adcValue);
 

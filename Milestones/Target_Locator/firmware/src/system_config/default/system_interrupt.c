@@ -143,7 +143,7 @@ void IntHandlerDrvTmrInstance1(void)
             break;
         case TARGETLOCATOR:
             obj.message.Request = TLtoSM;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+//            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             obj.message.Request = TLtoPF;
 //            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             break;

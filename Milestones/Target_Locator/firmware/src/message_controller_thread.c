@@ -103,6 +103,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
     items_t items[12];
     int numItems;
     TL_Queue_t sendTL;
+    bool stopRequesting = false;
     while(1) {
         initParser();
         MessageObj obj;
@@ -114,6 +115,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
         dbgOutputLoc(BEFORE_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD);
         MESSAGE_CONTROLLER_THREAD_ReadFromQueue(&obj);
         dbgOutputLoc(AFTER_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD);
+        int row = 0;
         switch(obj.type) {
             case EXTERNAL_REQUEST_RESPONSE: {
                 dbgOutputLoc(CASE_EXTERNAL_REQUEST_RESPONSE_MESSAGE_CONTROLLER_THREAD);
@@ -124,7 +126,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
 
                 statObject.GoodCount++;
 
-                parseJSON(obj.message.External.Data, &type, items,  &numItems, &r1_movement);
+                parseJSON(obj.message.External.Data, &type, items,  &numItems, &r1_movement, &row);
 
                 switch(type) {
                     case request: {
@@ -283,6 +285,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 }
                                 case OccupancyGrid: {
                                     sendTL.type = REQUESTOCCUPANYGRID;
+                                    sendTL.contents.row = row;
                                     SENSOR_THREAD_SendToQueue(sendTL);
                                     break;
                                 }
@@ -295,11 +298,9 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     tx_thread_obj.Destination = obj.message.External.Source;
                                     break;
                                 }
-                                case ProximityInformation: {
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),",\"ProximityInformation\":[\"%.1f\",\"%.1f\",\"%.1f\"]",
-                                            internalData.sensordata.ir.middleFBSensor - 0.2,
-                                            internalData.sensordata.ir.middleFBSensor,
-                                            internalData.sensordata.ir.middleFBSensor + 0.3
+                                case SensorData: {
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),",\"SensorData\":\"%c\"",
+                                            (internalData.proximity.leftProximity || internalData.proximity.middleProximity || internalData.proximity.rightProximity) ? '1' : '0'
                                             );
                                     tx_thread_obj.Destination = obj.message.External.Source;
                                     break;
@@ -334,13 +335,18 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 break;
                             }
                         }
-                        TX_THREAD_SendToQueue(tx_thread_obj);
+                        if(items[0] != OccupancyGrid) {
+                            TX_THREAD_SendToQueue(tx_thread_obj);
+                        }
                         break;
                     }
                     case response: {
                         switch(obj.message.External.Source) {
                             case SEARCHERMOVER: {
                                 statObject.Res_From_SearcherMover++;
+                                sendTL.type = RV1_POSUPDATE;
+                                sendTL.contents.r1_movement = r1_movement;
+                                SENSOR_THREAD_SendToQueue(sendTL);
                                 break;
                             }
                             case TARGETLOCATOR: {
@@ -356,9 +362,9 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 break;
                             }
                             case SERVER: {
-                                sendTL.type = RV1_POSUPDATE;
-                                sendTL.contents.r1_movement = r1_movement;
-                                SENSOR_THREAD_SendToQueue(sendTL);
+//                                sendTL.type = RV1_POSUPDATE;
+//                                sendTL.contents.r1_movement = r1_movement;
+//                                SENSOR_THREAD_SendToQueue(sendTL);
                                 break;
                             }
                             default: {

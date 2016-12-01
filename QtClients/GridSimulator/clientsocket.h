@@ -42,7 +42,7 @@ public slots:
     void connected();
     void disconnected();
     void readyRead();
-    void sendRequest();
+    void sendRequest(int i);
 
 private:
     void SendJSONRequestToSocket(QString request, char destination);

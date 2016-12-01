@@ -30,7 +30,7 @@ public slots:
     void connected();
     void disconnected();
     void readyRead();
-    void sendPositionUpdate(QString x, QString y, QString angle);
+    void sendPositionUpdate(QString x, QString y, QString angle, int mode);
     void sendProximityRequest();
 private:
     void SendJSONRequestToSocket(QString request, char destionation);

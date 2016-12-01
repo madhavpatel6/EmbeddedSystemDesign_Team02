@@ -1,7 +1,7 @@
 #include "grid.h"
 
 bool checkBounds(int x, int y) {
-    return y < HEIGHT && x < WIDTH && y >= 0 && x >= 0;
+    return (y < HEIGHT) && (x < WIDTH) && (y >= 0) && (x >= 0);
 }
 
 void initializeGrid(GridType grid) {
@@ -23,13 +23,15 @@ void incrementIndex(int x, int y, GridType grid) {
     }
 }
 
-void decrementIndex(int x, int y, GridType grid) {
+void decrementIndex(int x, int y, GridType grid, GridUpdatedType updated) {
     if(checkBounds(x,y)) {
         if(grid[y][x] > MINIMUM + 10) {
             grid[y][x]-= 10;
+            updated[y] = true;
         }
         if(grid[y][x] == 0) {
             grid[y][x] = -1;
+            updated[y] = true;
         }
     }
 }

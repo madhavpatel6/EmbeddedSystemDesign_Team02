@@ -49,6 +49,7 @@ private:
     float deltay;
     float deltaangle;
     float change;
+    int mode;
     Ui::MainWindow *ui;
     ClientSocket *tcpSocket;
     QTimer *requestTimer;

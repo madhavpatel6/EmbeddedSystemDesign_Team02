@@ -53,9 +53,11 @@ void MainWindow::on_commStatsButton_clicked()
         numberofiterations = 0;
         if(deltaangle == 0) {
             change = sqrt(pow(deltax,2) + pow(deltay,2));
+            mode = 0;
             numberofiterations = change / ui->speed->text().toFloat();
         }
         else {
+            mode = 2;
             numberofiterations = abs(deltaangle / ui->speed->text().toFloat());
         }
 
@@ -79,7 +81,7 @@ void MainWindow::sendPosition()
         ui->currAngle->setText(angle);
         ui->currX->setText(x);
         ui->currY->setText(y);
-        tcpSocket->sendPositionUpdate(x,y,angle);
+        tcpSocket->sendPositionUpdate(x,y,angle, mode);
         itr++;
         ui->progressBar->setValue(1.0*itr/numberofiterations*100);
         if(numberofiterations < itr) {

@@ -33,8 +33,8 @@ typedef struct {
 
 void rotatePoint(point_t* point, float originX, float originY, float pointX, float pointY, double rotationAngle);
 
-void raytrace3(int x1, int y1, int x2, int y2, bool maximum, GridType grid);
+void raytrace3(int x1, int y1, int x2, int y2, bool maximum, GridType grid, GridUpdatedType updated);
 
-void updateOccupanyGrid2(SensorDataContainerType sensorData, GridType grid);
+void updateOccupanyGrid3(SensorDataContainerType sensorData, GridType grid, GridUpdatedType updated);
 
 #endif // GRIDHELPER_H

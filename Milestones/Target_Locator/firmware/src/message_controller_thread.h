@@ -70,7 +70,7 @@ extern "C" {
 
 typedef struct {
     float leftFTSensor;
-    float middleFTSensor;
+//    float middleFTSensor;
     float rightFTSensor;
     float farLeftFBSensor;
     float leftFBSensor;

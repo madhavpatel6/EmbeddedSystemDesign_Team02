@@ -65,6 +65,8 @@ public:
     QVector<SimulationSetupType> polygons;
     QVector<int> keys;
     int index;
+    QTimer *requestTimer;
+        int i = 0;
 public slots:
     void handleSimulationReset();
     void handleGridClear();
@@ -79,7 +81,17 @@ public slots:
     void handleLoadSimulation();
     void handleRequestOccupanyGrid() {
         if(requestMode->isChecked()) {
-            socket->sendRequest();
+//            socket->sendRequest();
+            i = 0;
+            requestTimer->start();
+        }
+    }
+    void handleOccupyTimer() {
+        socket->sendRequest(i);
+        i++;
+        if(i == 161) {
+            i = 0;
+            requestTimer->stop();
         }
     }
 

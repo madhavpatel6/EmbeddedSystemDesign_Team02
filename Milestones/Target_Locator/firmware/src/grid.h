@@ -8,9 +8,10 @@
 #define MINIMUM -128
 
 typedef char GridType[HEIGHT][WIDTH];
+typedef bool GridUpdatedType[HEIGHT];
 void initializeGrid(GridType grid);
 void incrementIndex(int x, int y, GridType grid);
-void decrementIndex(int x, int y, GridType grid);
+void decrementIndex(int x, int y, GridType grid, GridUpdatedType updated);
 
 
 #endif // GRIDCELL_H

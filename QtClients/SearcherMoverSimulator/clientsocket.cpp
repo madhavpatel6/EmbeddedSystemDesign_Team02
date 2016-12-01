@@ -25,13 +25,13 @@ QTcpSocket* ClientSocket::getClient(){
     return socket;
 }
 
-void ClientSocket::sendPositionUpdate(QString x, QString y, QString angle){
-    QString response = "{\"type\":\"Response\",\"R1_Movement\":[\"" + x + "\",\"" + y + "\",\"" + angle + "\",\"F\",\"0\"]}";
+void ClientSocket::sendPositionUpdate(QString x, QString y, QString angle, int mode){
+    QString response = "{\"type\":\"Response\",\"R1_Movement\":[\"" + x + "\",\"" + y + "\",\"" + angle + "\",\""+QString::number(mode)+"\",\"0\"]}";
     SendJSONRequestToSocket(response, TARGETLOCATOR);
 }
 
 void ClientSocket::sendProximityRequest() {
-    QString request = "{\"type\":\"Request\",\"items\":[\"ProximityInformation\"]}";
+    QString request = "{\"type\":\"Request\",\"items\":[\"SensorData\",\"R1_Location\"]}";
     SendJSONRequestToSocket(request, TARGETLOCATOR);
 }
 
@@ -69,7 +69,7 @@ void ClientSocket::readyRead()
             QString type = json["type"].toString();
             if(type == QStringLiteral("Response")) {
                 if(json.contains(QStringLiteral("ProximityInformation"))) {
-                    HandleCommStatsResponse(json);
+//                    HandleCommStatsResponse(json);
                 }
             }
             else if(type == QStringLiteral("Request")){
