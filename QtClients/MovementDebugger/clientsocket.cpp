@@ -14,7 +14,7 @@ ClientSocket::ClientSocket(QObject *parent) :
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     isConnected = false;
     isClear = true;
-    sendData = true;
+    sendData = false;
     v_lineColor = WHITE;
     v_threshold = 512;
 }
@@ -110,9 +110,13 @@ void ClientSocket::sendLineTuning(QString lineColor, QString threshold)
     qDebug() << response_begin + "\"lineColor\":\"" + lineColor + "\",\"threshold\":\"" + threshold + "\"" + response_end;
 }
 
-void ClientSocket::updateLineTuning(int lineColor, int threshold)
+void ClientSocket::updateLineColor(int lineColor)
 {
     v_lineColor = lineColor;
+}
+
+void ClientSocket::updateLineThreshold(int threshold)
+{
     v_threshold = threshold;
 }
 

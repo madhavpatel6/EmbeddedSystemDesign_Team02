@@ -45,7 +45,8 @@ public slots:
     void sendInitialData(QString mode, QString position, QString numTargets, QString numVertices, QString vertices);
     void sendCorrectedPosition(QString x, QString y, QString orientation);
     void sendLineTuning(QString lineColor, QString threshold);
-    void updateLineTuning(int lineColor, int threshold);
+    void updateLineColor(int lineColor);
+    void updateLineThreshold(int threshold);
     void sendClear(bool send);
     void sendObstacle(bool send);
 

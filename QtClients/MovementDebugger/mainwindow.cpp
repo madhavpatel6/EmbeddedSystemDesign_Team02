@@ -33,7 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(sendInitialData(QString,QString,QString,QString,QString)), tcpSocket, SLOT(sendInitialData(QString,QString,QString,QString,QString)));
     connect(this, SIGNAL(pb_sendClicked(QString,QString,QString)), tcpSocket, SLOT(sendCorrectedPosition(QString,QString,QString)));
     connect(this, SIGNAL(pb_sendLineTuningClicked(QString,QString)), tcpSocket, SLOT(sendLineTuning(QString,QString)));
-    connect(this, SIGNAL(lineTuningChanged(int,int)), tcpSocket, SLOT(updateLineTuning(int,int)));
+    connect(this, SIGNAL(lineColorChanged(int)), tcpSocket, SLOT(updateLineColor(int)));
+    connect(this, SIGNAL(lineThresholdChanged(int)), tcpSocket, SLOT(updateLineThreshold(int)));
 
     QStringList colHeaders;
     colHeaders << "x" << "y";
@@ -294,5 +295,10 @@ void MainWindow::on_rb_white_toggled(bool checked)
         lineColor = 1;
     }
 
-    emit lineTuningChanged(lineColor, ui->sb_threshold->value());
+    emit lineColorChanged(lineColor);
+}
+
+void MainWindow::on_sb_threshold_valueChanged()
+{
+    emit lineThresholdChanged(ui->sb_threshold->value());
 }

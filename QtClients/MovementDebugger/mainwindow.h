@@ -33,6 +33,8 @@ signals:
     void pb_sendClicked(QString x, QString y, QString orientation);
     void pb_sendLineTuningClicked(QString lineColor, QString threshold);
     void lineTuningChanged(int lineColor, int threshold);
+    void lineColorChanged(int lineColor);
+    void lineThresholdChanged(int threshold);
 
 public slots:
     void on_pb_connectToServer_clicked();
@@ -61,6 +63,7 @@ private slots:
     void on_pb_send_clicked();
     void on_pb_sendLineTuning_clicked();
     void on_rb_white_toggled(bool checked);
+    void on_sb_threshold_valueChanged();
 
 private:
     Ui::MainWindow *ui;
