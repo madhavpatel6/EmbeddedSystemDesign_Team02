@@ -274,13 +274,19 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                             movement.amount = totalDistance;
                             rightSign = 1;
                             leftSign = 1;
-                        } else {
-                        	// If line or obstacle encountered, inch backwards
+                        } else if (motorObj.lineLocation) {
+                            // If line encountered, inch backwards
                             completeMotion();
-                            state = turnRight;
+                            state = inchBackward;
                             srand(PLIB_TMR_Counter16BitGet(TMR_ID_1));
                             angle = rand() % 180;
-//                            state = inchBackward;
+                        }
+                        else {
+                        	// If obstacle encountered, turn
+                            completeMotion();
+                            srand(PLIB_TMR_Counter16BitGet(TMR_ID_1));
+                            state = (rand() % 2) + 3;
+                            angle = rand() % 180;
                         }
                         break;
                     }
@@ -295,8 +301,8 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
 
                         if (totalDistance < -3) {
                             completeMotion();
-                            state = turnRight;
                             srand(PLIB_TMR_Counter16BitGet(TMR_ID_1));
+                            state = (rand() % 2) + 3;
                             angle = rand() % 180;
                         }
                         break;
@@ -312,6 +318,23 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                         
                         // Stop rotating when desired angular displacement is achieved
                         if ((orientation - initialOrientation) < -angle) {
+                        	// Go forward again
+                            completeMotion();
+                            state = forward;
+                        }
+                        break;
+                    }
+                    case turnLeft: {
+                    	// Turn left until desired angular displacement achieved
+                        setDirectionLeft();
+                        enableMotors(1);
+                        movement.action = LEFT;
+                        movement.amount = (orientation - initialOrientation);
+                        rightSign = 1;
+                        leftSign = -1;
+                        
+                        // Stop rotating when desired angular displacement is achieved
+                        if ((orientation - initialOrientation) > angle) {
                         	// Go forward again
                             completeMotion();
                             state = forward;
