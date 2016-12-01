@@ -271,11 +271,13 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 }
                                 // Handle request for rover movement
                                 case R1_Movement: {
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), 
-                                        ",\"R1_Movement\":[\"%0.02f\",\"%0.02f\",\"%0.02f\",\"%i\",\"%0.02f\"]",
-                                        internalData.location.x, internalData.location.y, internalData.orientation,
-                                        internalData.movement.action, internalData.movement.amount
+                                    if (!RESPONDONLY) {
+                                        sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), 
+                                            ",\"R1_Movement\":[\"%0.02f\",\"%0.02f\",\"%0.02f\",\"%i\",\"%0.02f\"]",
+                                            internalData.location.x, internalData.location.y, internalData.orientation,
+                                            internalData.movement.action, internalData.movement.amount
                                         );
+                                    }
                                     break;
                                 }
                                 // Send forward command to motor_controller thread
@@ -371,7 +373,9 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 break;
                             }
                         }
-                        TX_THREAD_SendToQueue(tx_thread_obj);
+                        if (!stopSending) {
+                            TX_THREAD_SendToQueue(tx_thread_obj);
+                        }
                         break;
                     }
                     case response: {
@@ -421,7 +425,6 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                         // Handle initial data from server
                                         case InitialData: {
                                             // Assert initialized bool to begin operation of rover
-                                            initialized = true;
                                             motorObj.type = UPDATE_POSITION;
                                             MOTOR_CONTROLLER_THREAD_SendToQueue(motorObj);
                                             break;
@@ -471,15 +474,29 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                 if (!initialized) {
                     sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"InitialData\"]}");
                     tx_thread_obj.Destination = SERVER;
+                    TX_THREAD_SendToQueue(tx_thread_obj);
                 } else {
                     // Send requests to appropriate modules based on MYNAME
                     switch(messageObj.Request) {
                         case REQ_TO_TL: {
                             if (!stopSending) {
+                                if (RESPONDONLY) {
+                                    sprintf(tx_thread_obj.Data, 
+                                        "{\"type\":\"Response\",\"R1_Movement\":[\"%0.02f\",\"%0.02f\",\"%0.02f\",\"%i\",\"%0.02f\"]}",
+                                        internalData.location.x, internalData.location.y, internalData.orientation,
+                                        internalData.movement.action, internalData.movement.amount
+                                    );
+                                    tx_thread_obj.Destination = TARGETLOCATOR;
+                                    tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
+                                    statObject.Req_To_TargetLocator++;
+                                    TX_THREAD_SendToQueue(tx_thread_obj);
+                                }
+                                
                                 sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"SensorData\",\"R1_Location\"]}");
                                 tx_thread_obj.Destination = TARGETLOCATOR;
                                 tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;
                                 statObject.Req_To_TargetLocator++;
+                                TX_THREAD_SendToQueue(tx_thread_obj);
                             }
                             break;
                         }
@@ -487,9 +504,6 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                             continue;
                         }
                     }
-                }
-                if (!stopSending) {
-                    TX_THREAD_SendToQueue(tx_thread_obj);
                 }
                 break;
             }
@@ -503,6 +517,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         internalData.orientation = messageObj.Update.Data.orientation;
                         internalData.movement.action = messageObj.Update.Data.movement.action;
                         internalData.movement.amount = messageObj.Update.Data.movement.amount;
+                        initialized = true;
                         break;
                     }
                     // Update internal line sensor readings

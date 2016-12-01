@@ -62,7 +62,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "motor_controller_thread_public.h"
 
 #define TICKS_PER_CM    38.84955752f
-#define TICKS_PER_DEG   3.428767123f
+#define TICKS_PER_DEG   3.664201183f
 #define MAX_PWM         655
 
 #define DEBUG           'D'
