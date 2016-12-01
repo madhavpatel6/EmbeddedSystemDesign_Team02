@@ -30,8 +30,10 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(updateMovement(char,QString,QString,QString,QString,QString)));
     connect(tcpSocket, SIGNAL(sendLineLocation(int)), this, SLOT(updateLineLocation(int)));
     connect(tcpSocket, SIGNAL(initialRequest()), this, SLOT(sendInitialResponse()));
-    connect(this, SIGNAL(sendInitialData(QString,QString,QString,QString)), tcpSocket, SLOT(sendInitialData(QString,QString,QString,QString)));
+    connect(this, SIGNAL(sendInitialData(QString,QString,QString,QString,QString)), tcpSocket, SLOT(sendInitialData(QString,QString,QString,QString,QString)));
     connect(this, SIGNAL(pb_sendClicked(QString,QString,QString)), tcpSocket, SLOT(sendCorrectedPosition(QString,QString,QString)));
+    connect(this, SIGNAL(pb_sendLineTuningClicked(QString,QString)), tcpSocket, SLOT(sendLineTuning(QString,QString)));
+    connect(this, SIGNAL(lineTuningChanged(int,int)), tcpSocket, SLOT(updateLineTuning(int,int)));
 
     QStringList colHeaders;
     colHeaders << "x" << "y";
@@ -132,8 +134,10 @@ void MainWindow::sendInitialResponse()
 {
     QString mode;
     QString position;
+    QString numTargets;
     QString numVertices;
     QString vertices;
+
     int count = 0;
 
     mode = "\"mode\":";
@@ -147,6 +151,8 @@ void MainWindow::sendInitialResponse()
     position = "\"x\":\"" + QString::number(ui->sb_x_initial->value()) + "\"," +
             "\"y\":\"" + QString::number(ui->sb_y_initial->value()) + "\"," +
             "\"orientation\":\"" + QString::number(ui->sb_orientation_initial->value()) + "\"";
+
+    numTargets = "\"numTargets\":\"" + QString::number(ui->sb_numTargets->value()) + "\"";
 
     numVertices = "\"numVertices\":\"" + QString::number(ui->sb_numVertices->value()) + "\"";
 
@@ -167,7 +173,7 @@ void MainWindow::sendInitialResponse()
     vertices.append("]");
 
     if (count == ui->sb_numVertices->value()) {
-        emit sendInitialData(mode, position, numVertices, vertices);
+        emit sendInitialData(mode, position, numTargets, numVertices, vertices);
     }
 }
 
@@ -264,4 +270,29 @@ void MainWindow::on_pb_send_clicked()
 {
     emit pb_sendClicked(QString::number(ui->sb_x_corrected->value()),QString::number(ui->sb_y_corrected->value()),
                         QString::number(ui->sb_orientation_corrected->value()));
+}
+
+void MainWindow::on_pb_sendLineTuning_clicked()
+{
+    QString color;
+
+    if (ui->rb_white->isChecked()) {
+        color = "0";
+    } else if (ui->rb_black->isChecked()) {
+        color = "1";
+    }
+    emit pb_sendLineTuningClicked(color, QString::number(ui->sb_threshold->value()));
+}
+
+void MainWindow::on_rb_white_toggled(bool checked)
+{
+    int lineColor;
+
+    if (checked) {
+        lineColor = 0;
+    } else {
+        lineColor = 1;
+    }
+
+    emit lineTuningChanged(lineColor, ui->sb_threshold->value());
 }
