@@ -94,14 +94,7 @@ typedef enum UpdateType_enum { MOVEMENT, LINELOCATION } UpdateType;
 
 //This is any request that you would want to ... well ... request
 // these are really the categories of requests. the specific objects in them is added later
-typedef enum InternalRequestType_enum { SMtoTL,
-                                        TLtoSM, 
-                                        TLtoPF, 
-                                        PFtoTL, 
-                                        PFtoTG, 
-                                        TGtoPF,
-                                        SD
- } InternalRequestType;
+typedef enum InternalRequestType_enum { REQ_TO_TL } InternalRequestType;
 
 //------------------------------------------------------------------------------
 //You should not need to change anything beyond this point

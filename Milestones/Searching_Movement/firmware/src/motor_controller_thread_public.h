@@ -51,6 +51,7 @@ typedef struct {
     uint8_t sensorData;
     Coordinates location;
     float orientation;
+    int numTargets;
 } MotorObj;
     
 void MOTOR_CONTROLLER_THREAD_SendToQueue(MotorObj obj);

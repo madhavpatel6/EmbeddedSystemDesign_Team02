@@ -316,7 +316,6 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                         PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
                         PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
 
-
                         // Check for start command from server
                         if (motorObj.stop == 'N') {
                             state = forward;
@@ -425,16 +424,16 @@ void MOTOR_CONTROLLER_THREAD_CorrectSpeed(int timer) {
     leftSpeed = outputLeft;
     
     // Send PI controller data to debugger
-    if(timer % 2 == 0) {
-            Tx_Thead_Queue_DataType tx_thread_obj;
-            memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
-            tx_thread_obj.Destination = TARGETLOCATOR;
-            BaseType_t *ptr;
-            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"1\", \"vel\": \"%4d\", \"time\": \"%4d\", \"output\": \"%4f\", \"pwm\": \"%4d\"}", leftCount, timer, outputLeft, leftSpeed);
-            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
-            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"2\", \"vel\": \"%4d\", \"time\": \"%4d\"}", rightCount, timer);
-            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
-    }
+//    if(timer % 2 == 0) {
+//            Tx_Thead_Queue_DataType tx_thread_obj;
+//            memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
+//            tx_thread_obj.Destination = TARGETLOCATOR;
+//            BaseType_t *ptr;
+//            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"1\", \"vel\": \"%4d\", \"time\": \"%4d\", \"output\": \"%4f\", \"pwm\": \"%4d\"}", leftCount, timer, outputLeft, leftSpeed);
+//            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+//            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"2\", \"vel\": \"%4d\", \"time\": \"%4d\"}", rightCount, timer);
+//            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+//    }
     
     prevRightPID = rightCount;
     prevLeftPID = leftCount;
@@ -480,14 +479,12 @@ void disableMotors(void) {
     
     while ((right > 0) && (left > 0)) {
         Tx_Thead_Queue_DataType tx_thread_obj;
-            memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
-            tx_thread_obj.Destination = TARGETLOCATOR;
-            BaseType_t *ptr;
-            sprintf(tx_thread_obj.Data, "right: %d, left: %d", right, left);
-            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
-            
-            sprintf(tx_thread_obj.Data, "msTimer: %d, currentTime: %d", msTimer, currentTime);
-            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+        memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
+//        tx_thread_obj.Destination = SERVER;
+        sprintf(tx_thread_obj.Data, "right: %d, left: %d", right, left);
+//        TX_THREAD_SendToQueue(tx_thread_obj);
+//        sprintf(tx_thread_obj.Data, "msTimer: %d, currentTime: %d", msTimer, currentTime);
+//        TX_THREAD_SendToQueue(tx_thread_obj);
             
         if ((msTimer-currentTime) >= 1) {
             right = right/2;

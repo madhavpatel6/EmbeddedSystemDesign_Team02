@@ -39,7 +39,7 @@ void initParser(){
 }
 
 
-void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, int *value, char *mode, uint8_t *data, MotorObj *motorObj){
+void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, int *value, uint8_t *data, MotorObj *motorObj, LineProperties *lineProperties){
     int r, i;
     r = jsmn_parse(&p, JSON_STRING, strlen(JSON_STRING), t, sizeof(t)/sizeof(t[0]));
     for(i = 1; i < r; i++){
@@ -100,7 +100,7 @@ void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numI
                     items[k] = Dictionary[l].enumValue;
                     // Get mode of operation
                     sprintf(buf, "%.*s\0", t[i+3].end - t[i+3].start, JSON_STRING + t[i+3].start);
-                    *mode = buf[0];
+                    motorObj->mode = buf[0];
                     // Get initial x coordinate
                     sprintf(buf, "%.*s\0", t[i+5].end - t[i+5].start, JSON_STRING + t[i+5].start);
                     motorObj->location.x = atof(buf);
@@ -110,7 +110,29 @@ void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numI
                     // Get initial orientation
                     sprintf(buf, "%.*s\0", t[i+9].end - t[i+9].start, JSON_STRING + t[i+9].start);
                     motorObj->orientation = atof(buf);
+                    // Get number of targets
+                    sprintf(buf, "%.*s\0", t[i+9].end - t[i+11].start, JSON_STRING + t[i+11].start);
+                    motorObj->numTargets = atoi(buf);
                     // Optional: handle number of vertices and actual list of vertices
+                    k++;
+                    break;
+                }
+            }
+            *numItems = k;
+        }
+        // Handle line tuning
+        else if (jsoneq(JSON_STRING, &t[i], "LineTuning") == 0) {
+            int l = 0;
+            int k = 0;
+            for (l = 0; (l < (sizeof(Dictionary) / sizeof(*Dictionary))); l++) {
+                if (strcmp("LineTuning", Dictionary[l].stringValue) == 0) {
+                    items[k] = Dictionary[l].enumValue;
+                    // Get color of line
+                    sprintf(buf, "%.*s\0", t[i+3].end - t[i+3].start, JSON_STRING + t[i+3].start);
+                    lineProperties->color = atoi(buf);
+                    // Get threshold
+                    sprintf(buf, "%.*s\0", t[i+5].end - t[i+5].start, JSON_STRING + t[i+5].start);
+                    lineProperties->threshold = atoi(buf);
                     k++;
                     break;
                 }

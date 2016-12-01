@@ -86,14 +86,40 @@ void DRV_ADC_Initialize(void)
     PLIB_ADC_MuxChannel0InputNegativeSelect(DRV_ADC_ID_1, ADC_MUX_A, ADC_INPUT_NEGATIVE_VREF_MINUS);
  
 /*scan enable*/
-    /* Select Scan Input 8-15 */
-    PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN8 | ADC_INPUT_SCAN_AN9 | ADC_INPUT_SCAN_AN10 |
-                                ADC_INPUT_SCAN_AN11 | ADC_INPUT_SCAN_AN12 | ADC_INPUT_SCAN_AN13 |
-                                ADC_INPUT_SCAN_AN14 | ADC_INPUT_SCAN_AN15);
+    /* Select Scan Input 0 */
+    PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN0);
 
      /* Enable Scan mode */
     PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1); 
 
+ 
+ 
+/*scan enable*/
+    /* Select Scan Input 1 */
+    PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN1);
+    
+    /* Enable Scan mode */
+    PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
+
+ 
+ 
+/*scan enable*/
+    /* Select Scan Input 2 */
+    PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN2);
+    
+    /* Enable Scan mode */
+    PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
+
+ 
+ 
+/*scan enable*/
+    /* Select Scan Input 3 */
+    PLIB_ADC_InputScanMaskAdd(DRV_ADC_ID_1, ADC_INPUT_SCAN_AN3);
+    
+    /* Enable Scan mode */
+    PLIB_ADC_MuxAInputScanEnable(DRV_ADC_ID_1);
+
+ 
     /* Initialize ADC Interrupt */
     PLIB_INT_SourceFlagClear(INT_ID_0, INT_SOURCE_ADC_1);
 //    PLIB_INT_SourceEnable(INT_ID_0, INT_SOURCE_ADC_1);
