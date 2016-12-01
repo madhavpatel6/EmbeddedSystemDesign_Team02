@@ -86,6 +86,7 @@ void SENSOR_THREAD_Initialize ( void )
 static GridType grid;
 static Queue sensorDataQ;
 static GridUpdatedType updated;
+SensorDataType currentSensorData;
 LookupTable_t bottomLeftLongRangeTable[] = {
     {20,	2.508},
     {25,	2.213},
@@ -173,6 +174,17 @@ LookupTable_t rightMidRangeTable[] = {
 //    {35,	0.730},
 //    {40,	0.644},  
 };
+
+void addRayTrace(SensorData_t sensorData, bool maximum) {
+    if(sensorData.distance != -1) {
+        point_t rayTracePoint;
+        rayTracePoint.x = sensorData.sensorLocation.x + sensorData.distance*cos(sensorData.orientation*M_PI/180);
+        rayTracePoint.y = sensorData.sensorLocation.y + sensorData.distance*sin(sensorData.orientation*M_PI/180);
+        raytrace3(sensorData.sensorLocation.x, sensorData.sensorLocation.y,
+                rayTracePoint.x, rayTracePoint.y, maximum, grid, updated);
+    }
+}
+
 /******************************************************************************
   Function:
     void SENSOR_THREAD_Tasks ( void )
@@ -192,13 +204,7 @@ void SENSOR_THREAD_Tasks ( void )
 
 
     initializeGrid(grid);
-    Movement_t previousAction;
-    previousAction.x = 100;
-    previousAction.y = 100;
-    previousAction.orientation = 100;
-    previousAction.action = 100;
     
-    bool previousActionIsSet = false;
     
     while(1) {
         memset(&objRecv, 0, sizeof(TL_Queue_t));
@@ -208,6 +214,7 @@ void SENSOR_THREAD_Tasks ( void )
                 ConvertSensorADCToDistance(&objSend.message.Update.Data.sensordata, objRecv.contents.sensors);
                 /* Queue up the sensor data */
                 if(FilterIRSensors(objSend.message.Update.Data.sensordata)) {
+                    currentSensorData = objSend.message.Update.Data.sensordata;
                     if(isFull(&sensorDataQ)) {
                         removeData(&sensorDataQ);
                         insertData(&sensorDataQ, objSend.message.Update.Data.sensordata);
@@ -221,63 +228,74 @@ void SENSOR_THREAD_Tasks ( void )
                 break;
             }
             case RV1_POSUPDATE: {
-                if(previousActionIsSet && size(&sensorDataQ) != 0) {
+//                if(previousActionIsSet && size(&sensorDataQ) != 0) {
                     // Stop the ADC timer
                     DRV_TMR0_Stop();
-                    point_t deltaPosition;
-                    int i = 0;
-                    deltaPosition.x = previousAction.x - objRecv.contents.r1_movement.x;
-                    deltaPosition.y = previousAction.y - objRecv.contents.r1_movement.y;
-                    float dtheta;
-                    float distance;
-                    if(objRecv.contents.r1_movement.action == 0 || objRecv.contents.r1_movement.action == 1) {
-                        dtheta = 0;
-                        distance = sqrt(pow(deltaPosition.x,2) + pow(deltaPosition.y,2));
-                        if(distance == 0) {
-                            clearQueue(&sensorDataQ);
-                            DRV_TMR0_Start();
-                            continue;
-                        }
-                    }
-                    else if(objRecv.contents.r1_movement.action == 2 || objRecv.contents.r1_movement.action == 3) {
-                        distance = 0;
-                        dtheta = objRecv.contents.r1_movement.orientation - previousAction.orientation;
-                        if(dtheta == 0) {
-                            clearQueue(&sensorDataQ);
-                            DRV_TMR0_Start();
-                            continue;
-                        }
-                    }
-                    
-                    float distance_increments = distance / size(&sensorDataQ);
-                    float theta_increments = dtheta / size(&sensorDataQ);
-                    float cosX = cos(objRecv.contents.r1_movement.orientation*M_PI/180)*distance_increments;
-                    float sinY = sin(objRecv.contents.r1_movement.orientation*M_PI/180)*distance_increments;
-                    int sizeofqueue = size(&sensorDataQ);
-                    
-                    for(i = 0; i < sizeofqueue; i++) {
-                        SensorDataType data = removeData(&sensorDataQ);
-                        point_t location;
-                        float theta = previousAction.orientation + (theta_increments*i);
-                        location.x = (cosX*i)+previousAction.x;
-                        location.y = (sinY*i)+previousAction.y;
-                        UpdateSensorInformation(&sensorInformation, data, location, theta);
-                        updateOccupanyGrid3(sensorInformation, grid, updated);
-                    }
-                    point_t loc;
-                    loc.x = objRecv.contents.r1_movement.x;
-                    loc.y = objRecv.contents.r1_movement.y;
-                    SensorDataType data;
-                    UpdateSensorInformation(&sensorInformation, data, loc, objRecv.contents.r1_movement.orientation);                    
-                    objSend.message.Update.Data.sensorInformation = sensorInformation;
+                    point_t location;
+                    float theta = objRecv.contents.r1_movement.orientation;
+                    location.x = objRecv.contents.r1_movement.x;
+                    location.y = objRecv.contents.r1_movement.y;
+                    UpdateSensorInformation(&sensorInformation, currentSensorData, location, theta);
+                    addRayTrace(sensorInformation.middleFrontSensor, sensorInformation.middleFrontSensor.distance == 30.00);
+                    addRayTrace(sensorInformation.farLeftSensor, sensorInformation.farLeftSensor.distance == 30.00);
+                    addRayTrace(sensorInformation.farRightSensor, sensorInformation.farRightSensor.distance == 30.00);
+                    addRayTrace(sensorInformation.leftFrontSensor, sensorInformation.leftFrontSensor.distance == 45.00);
+                    addRayTrace(sensorInformation.rightFrontSensor, sensorInformation.rightFrontSensor.distance == 45.00);
+//                    updateOccupanyGrid3(sensorInformation, grid, updated);
+//                    point_t deltaPosition;
+//                    int i = 0;
+//                    deltaPosition.x = previousAction.x - objRecv.contents.r1_movement.x;
+//                    deltaPosition.y = previousAction.y - objRecv.contents.r1_movement.y;
+//                    float dtheta;
+//                    float distance;
+//                    if(objRecv.contents.r1_movement.action == 0 || objRecv.contents.r1_movement.action == 1) {
+//                        dtheta = 0;
+//                        distance = sqrt(pow(deltaPosition.x,2) + pow(deltaPosition.y,2));
+//                        if(distance == 0) {
+//                            clearQueue(&sensorDataQ);
+//                            DRV_TMR0_Start();
+//                            continue;
+//                        }
+//                    }
+//                    else if(objRecv.contents.r1_movement.action == 2 || objRecv.contents.r1_movement.action == 3) {
+//                        distance = 0;
+//                        dtheta = objRecv.contents.r1_movement.orientation - previousAction.orientation;
+//                        if(dtheta == 0) {
+//                            clearQueue(&sensorDataQ);
+//                            DRV_TMR0_Start();
+//                            continue;
+//                        }
+//                    }
+//                    
+//                    float distance_increments = distance / size(&sensorDataQ);
+//                    float theta_increments = dtheta / size(&sensorDataQ);
+//                    float cosX = cos(objRecv.contents.r1_movement.orientation*M_PI/180)*distance_increments;
+//                    float sinY = sin(objRecv.contents.r1_movement.orientation*M_PI/180)*distance_increments;
+//                    int sizeofqueue = size(&sensorDataQ);
+//                    
+//                    for(i = 0; i < sizeofqueue; i++) {
+//                        SensorDataType data = removeData(&sensorDataQ);
+//                        point_t location;
+//                        float theta = previousAction.orientation + (theta_increments*i);
+//                        location.x = (cosX*i)+previousAction.x;
+//                        location.y = (sinY*i)+previousAction.y;
+//                        UpdateSensorInformation(&sensorInformation, data, location, theta);
+//                        updateOccupanyGrid3(sensorInformation, grid, updated);
+//                    }
+//                    point_t loc;
+//                    loc.x = objRecv.contents.r1_movement.x;
+//                    loc.y = objRecv.contents.r1_movement.y;
+//                    SensorDataType data;
+//                    UpdateSensorInformation(&sensorInformation, data, loc, objRecv.contents.r1_movement.orientation);                    
+//                    objSend.message.Update.Data.sensorInformation = sensorInformation;
                     // Start the ADC timer
                     DRV_TMR0_Start();
-                }
-                else {
-                    clearQueue(&sensorDataQ);
-                    previousActionIsSet = true;
-                }
-                previousAction = objRecv.contents.r1_movement;
+//                }
+//                else {
+//                    clearQueue(&sensorDataQ);
+//                    previousActionIsSet = true;
+//                }
+//                previousAction = objRecv.contents.r1_movement;
                 break;
             }
             case REQUESTOCCUPANYGRID: {
