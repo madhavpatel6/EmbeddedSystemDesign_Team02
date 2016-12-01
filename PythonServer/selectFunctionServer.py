@@ -4,7 +4,7 @@
 # Server Author: Chris Cox via Online w/ modifications
 # State Machine: Madhav Patel
 
-
+ 
 import socket
 import select
 from timeit import default_timer
@@ -27,6 +27,7 @@ class States(Enum):
 
 # Building parser object
 class Parser:
+
     def __init__(self):
         self.currentState = States.IDLE_STATE
         self.message = str("")
@@ -105,20 +106,20 @@ def broadcast_data(incoming_socket, message, CONNECTION_LIST, server_socket):
 
 
 def main():
-    CONNECTION_LIST = []  # list of socket clients
-    RECV_BUFFER = 512  # Advisable to keep it as an exponent of 2
+    CONNECTION_LIST = []    # list of socket clients
+    RECV_BUFFER = 512 # Advisable to keep it as an exponent of 2
     PORT = 2000
     SERVER_ADDRESS = socket.gethostbyname(socket.gethostname())
-
+         
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # this has no effect, why ?
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server_socket.bind((SERVER_ADDRESS, PORT))
     server_socket.listen(10)
-
+ 
     # Add server socket to the list of readable connections
     CONNECTION_LIST.append(server_socket)
-
+ 
     print("Server started on port ", PORT)
     print("Server started on IP:  ", SERVER_ADDRESS)
     ps = Parser()
@@ -133,8 +134,8 @@ def main():
                 # Handle the case in which there is a new connection recieved through server_socket
                 sockfd, addr = server_socket.accept()
                 CONNECTION_LIST.append(sockfd)
-                print("Client connected: ", sockfd, addr)
-
+                print ("Client connected: ", sockfd, addr)
+                 
             # Some incoming message from a client
             else:
                 # Data recieved from client, process it
@@ -147,27 +148,25 @@ def main():
                         duration = default_timer() - start
                         # print("Time since last valid message: ", duration)
                         start = default_timer()
-                        # for c in data:
-                        # if ps.parse(c):
-                        # duration = default_timer() - start
-                        # print("Time since last valid message: ", duration)
-                        # start = default_timer()
-                        # print("Message: ", str(ps.message))
-                        # sock.send(str(ps.packedmessage).encode('utf-8'))
-                        broadcast_data(sock, data, CONNECTION_LIST,
-                                       server_socket)  # This calls to broadcast messages to all pics
+                        #for c in data:
+                            #if ps.parse(c):
+                                # duration = default_timer() - start
+                                # print("Time since last valid message: ", duration)
+                                # start = default_timer()
+                                #print("Message: ", str(ps.message))
+                                # sock.send(str(ps.packedmessage).encode('utf-8'))
+                        broadcast_data(sock, data, CONNECTION_LIST, server_socket)  # This calls to broadcast messages to all pics
                         print(data)
 
                 # client disconnected, so remove from socket list
                 except:
                     # broadcast_data(sock, "Client (%s, %s) is offline" % addr)
-                    print("Client is offline ", sock, addr)
+                    print ("Client is offline %s  %s ", sockfd, addr)
                     sock.close()
                     CONNECTION_LIST.remove(sock)
                     continue
 
     server_socket.close()
-
 
 if __name__ == "__main__":
     main()

@@ -8,7 +8,9 @@
 #include "picCode/communication/messages.h"
 #include <QJsonArray>
 
-#define ANALOG 0
+#define ANALOG  1
+#define WHITE   0
+#define BLACK   1
 
 class ClientSocket : public QObject
 {
@@ -40,8 +42,11 @@ public slots:
     void sendRightCommand(int degrees);
     void sendStartCommand();
     void sendStopCommand();
-    void sendInitialData(QString mode, QString position, QString numVertices, QString vertices);
+    void sendInitialData(QString mode, QString position, QString numTargets, QString numVertices, QString vertices);
     void sendCorrectedPosition(QString x, QString y, QString orientation);
+    void sendLineTuning(QString lineColor, QString threshold);
+    void updateLineColor(int lineColor);
+    void updateLineThreshold(int threshold);
     void sendClear(bool send);
     void sendObstacle(bool send);
 
@@ -54,7 +59,8 @@ private:
     bool isClear;
     bool sendData;
     QTcpSocket *socket;
-
+    int v_lineColor;
+    int v_threshold;
 };
 
 #endif // CLIENTSOCKET_H

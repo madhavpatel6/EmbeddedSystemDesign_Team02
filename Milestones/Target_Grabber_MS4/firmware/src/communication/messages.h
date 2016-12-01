@@ -30,7 +30,7 @@
 #define PATHFINDER 'P'
 #define TARGETGRABBER 'G'
 #define SERVER 'H'
-#define MAXMESSAGESIZE 400
+#define MAXMESSAGESIZE 300
 #define MYMODULE TARGETGRABBER
 #define MYMODULESTRING "TargetGrabber"
 

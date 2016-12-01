@@ -97,15 +97,15 @@ void IntHandlerDrvAdc(void)
     
     // Sum ADC sample readings
     if (ANALOG) {
-        for (i = 0; i < 16; i += 8) {
+        for (i = 0; i < 16; i += 4) {
             lineObj.IR_0 += DRV_ADC_SamplesRead(i);
-            lineObj.IR_1 += DRV_ADC_SamplesRead(i+1);
-            lineObj.IR_2 += DRV_ADC_SamplesRead(i+2);
-            lineObj.IR_3 += DRV_ADC_SamplesRead(i+3);
-            lineObj.IR_4 += DRV_ADC_SamplesRead(i+4);
-            lineObj.IR_5 += DRV_ADC_SamplesRead(i+5);
-            lineObj.IR_6 += DRV_ADC_SamplesRead(i+6);
-            lineObj.IR_7 += DRV_ADC_SamplesRead(i+7);
+//            lineObj.IR_1 += DRV_ADC_SamplesRead(i+1);
+//            lineObj.IR_2 += DRV_ADC_SamplesRead(i+2);
+            lineObj.IR_3 += DRV_ADC_SamplesRead(i+1);
+            lineObj.IR_4 += DRV_ADC_SamplesRead(i+2);
+//            lineObj.IR_5 += DRV_ADC_SamplesRead(i+5);
+//            lineObj.IR_6 += DRV_ADC_SamplesRead(i+6);
+            lineObj.IR_7 += DRV_ADC_SamplesRead(i+3);
         }
     }
     // Read digital pin values if ANALOG is not asserted
@@ -166,24 +166,10 @@ void IntHandlerDrvTmrInstance1(void)
         dbgOutputLoc(BEFORE_SEND_TO_Q_TMR_INSTANCE_1_ISR);
         switch(MYMODULE){
             case SEARCHERMOVER:
-                obj.Request = SMtoTL;
+                obj.Request = REQ_TO_TL;
                 MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
                 break;
-            case TARGETLOCATOR:
-                obj.Request = TLtoSM;
-                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-                obj.Request = TLtoPF;
-                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-                break;
-            case PATHFINDER:
-                obj.Request = PFtoTL;
-                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-                obj.Request = PFtoTG;
-                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
-                break;
-            case TARGETGRABBER:
-                obj.Request = TGtoPF;
-                MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+            default:
                 break;
         }
     }

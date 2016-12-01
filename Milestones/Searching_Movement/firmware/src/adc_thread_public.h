@@ -33,10 +33,15 @@ typedef struct {
     float IR_6;
     float IR_7;
 } LineObj;
+
+typedef struct {
+    int color;
+    int threshold;
+} LineProperties;
     
+    void ADC_THREAD_TuneLineSensor(int color, int thresh);
     int ADC_THREAD_SendToQueue(LineObj lineObj);
     int ADC_THREAD_SendToQueueISR(LineObj lineObj, BaseType_t *pxHigherPriorityTaskWoken);
-
 
     /* Provide C++ Compatibility */
 #ifdef __cplusplus

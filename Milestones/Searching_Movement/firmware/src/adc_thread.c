@@ -79,6 +79,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
     Application strings and buffers are be defined outside this structure.
 */
 static QueueHandle_t _queue;
+static int lineColor = WHITE;
+static int threshold = 512;
 
 #define SIZEOFQUEUE 10
 #define TYPEOFQUEUE LineObj
@@ -127,11 +129,21 @@ void ADC_THREAD_Initialize ( void )
         ADC_THREAD_ReadFromQueue(&lineObj);
         if (ANALOG) {
             averageData(&lineObj);
-        }
-        messageObj.Update.Data.lineLocation = lineObj;
-        motorObj.lineLocation = ~(((int)lineObj.IR_7 << 7) | ((int)lineObj.IR_6 << 6) | 
+            if (lineColor == WHITE) {
+                motorObj.lineLocation = (((lineObj.IR_7 < 512) << 7) | ((lineObj.IR_6 < 512) << 6) | 
+                ((lineObj.IR_5 < threshold) << 5) | ((lineObj.IR_4 < threshold) << 4) | ((lineObj.IR_3 < threshold) << 3) | 
+                ((lineObj.IR_2 < threshold) << 2) | ((lineObj.IR_1 < threshold) << 1) | ((lineObj.IR_0 < threshold) << 0));
+            } else if (lineColor == BLACK) {
+                motorObj.lineLocation = (((lineObj.IR_7 > 512) << 7) | ((lineObj.IR_6 > 512) << 6) | 
+                ((lineObj.IR_5 > threshold) << 5) | ((lineObj.IR_4 > threshold) << 4) | ((lineObj.IR_3 > threshold) << 3) | 
+                ((lineObj.IR_2 > threshold) << 2) | ((lineObj.IR_1 > threshold) << 1) | ((lineObj.IR_0 > threshold) << 0));
+            }
+        } else {
+            motorObj.lineLocation = ~(((int)lineObj.IR_7 << 7) | ((int)lineObj.IR_6 << 6) | 
                 ((int)lineObj.IR_5 << 5) | ((int)lineObj.IR_4 << 4) | ((int)lineObj.IR_3 << 3) | 
                 ((int)lineObj.IR_2 << 2) | ((int)lineObj.IR_1 << 1) | ((int)lineObj.IR_0 << 0));
+        }
+        messageObj.Update.Data.lineLocation = lineObj;
 
         // Sending to message controller queue for an update
         MESSAGE_CONTROLLER_THREAD_SendToQueue(messageObj);
@@ -144,16 +156,31 @@ void ADC_THREAD_Initialize ( void )
 
  /* This averages the data coming from the line sensor*/
  void averageData(LineObj* lineObj) {
-     float samples = 2.0;
-     
-     (*lineObj).IR_0 = ((*lineObj).IR_0/samples);
-     (*lineObj).IR_1 = ((*lineObj).IR_1/samples);
-     (*lineObj).IR_2 = ((*lineObj).IR_2/samples);
-     (*lineObj).IR_3 = ((*lineObj).IR_3/samples);
-     (*lineObj).IR_4 = ((*lineObj).IR_4/samples);
-     (*lineObj).IR_5 = ((*lineObj).IR_5/samples);
-     (*lineObj).IR_6 = ((*lineObj).IR_6/samples);
-     (*lineObj).IR_7 = ((*lineObj).IR_7/samples);
+    float samples = 4.0;
+    
+    // Sensors being scanned
+    (*lineObj).IR_0 = ((*lineObj).IR_0/samples);
+    (*lineObj).IR_3 = ((*lineObj).IR_3/samples);
+    (*lineObj).IR_4 = ((*lineObj).IR_4/samples);
+    (*lineObj).IR_7 = ((*lineObj).IR_7/samples);
+    
+    // Sensors not in use when in analog mode
+    if (lineColor == WHITE) {
+        (*lineObj).IR_1 = 1024;
+        (*lineObj).IR_2 = 1024;
+        (*lineObj).IR_5 = 1024;
+        (*lineObj).IR_6 = 1024;
+    } else if (lineColor == BLACK) {
+        (*lineObj).IR_1 = 0;
+        (*lineObj).IR_2 = 0;
+        (*lineObj).IR_5 = 0;
+        (*lineObj).IR_6 = 0;
+    }
+ }
+ 
+ void ADC_THREAD_TuneLineSensor(int color, int thresh) {
+     lineColor = color;
+     threshold = thresh;
  }
  
 void ADC_THREAD_InitializeQueue() {

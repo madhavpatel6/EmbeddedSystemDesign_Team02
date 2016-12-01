@@ -102,7 +102,9 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
     type_t type = unknown;
     pathFinderResponse_t pathFinderResponseMC;
     items_t items[12];
-    int pathFinderResponseValue;
+    int pathFinderResponseValueProximity;
+    bool pathFinderResponseValueOutsideArena;
+    bool pathFinderResponseValueMovementStopped;
     int numItems;
     while(1) {
         initParser();
@@ -128,7 +130,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                 
                 statObject.GoodCount++;
                 
-                parseJSON(obj.External.Data, &type, items,  &numItems, &pathFinderResponseMC, &pathFinderResponseValue);
+                parseJSON(obj.External.Data, &type, items,  &numItems, &pathFinderResponseMC, &pathFinderResponseValueProximity, &pathFinderResponseValueOutsideArena, &pathFinderResponseValueMovementStopped);
                 
                 switch(type) {
                     case request: {
@@ -248,35 +250,45 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 }
                                 case targetAlignment: {
                                     sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"targetAlignment\":{"
-                                                                                           "\"IR_0\":\"%0.2f\","
-                                                                                           "\"IR_1\":\"%0.2f\","
-                                                                                           "\"IR_2\":\"%0.2f\","
-                                                                                           "\"IR_3\":\"%0.2f\","
-                                                                                           "\"IR_4\":\"%0.2f\","
                                                                                            "\"Target_Distance\":\"%0.2f\","
                                                                                            "\"Target_Angle\":\"%0.2f\","
-                                                                                           "\"IR_0_bool\":\"%d\","
-                                                                                           "\"IR_1_bool\":\"%d\","
-                                                                                           "\"IR_2_bool\":\"%d\","
-                                                                                           "\"IR_3_bool\":\"%d\","
-                                                                                           "\"IR_4_bool\":\"%d\","
                                                                                            "\"Grabber_Aligned\":\"%d\","
                                                                                            "\"Alignment_Info\":\"%s\"}",
-                                                                                           internalData.alignmentData.IR_0,
-                                                                                           internalData.alignmentData.IR_1,
-                                                                                           internalData.alignmentData.IR_2,
-                                                                                           internalData.alignmentData.IR_3,
-                                                                                           internalData.alignmentData.IR_4,
                                                                                            internalData.alignmentData.Target_Distance,
                                                                                            internalData.alignmentData.Target_Angle,
-                                                                                           internalData.alignmentData.IR_0_bool,
-                                                                                           internalData.alignmentData.IR_1_bool,
-                                                                                           internalData.alignmentData.IR_2_bool,
-                                                                                           internalData.alignmentData.IR_3_bool,
-                                                                                           internalData.alignmentData.IR_4_bool,
                                                                                            internalData.alignmentData.Grabber_Aligned,
                                                                                            getAlignment(internalData.alignmentData.internalAlignment)
                                                                                            );
+//                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"targetAlignment\":{"
+//                                                                                           "\"IR_0\":\"%0.2f\","
+//                                                                                           "\"IR_1\":\"%0.2f\","
+//                                                                                           "\"IR_2\":\"%0.2f\","
+//                                                                                           "\"IR_3\":\"%0.2f\","
+//                                                                                           "\"IR_4\":\"%0.2f\","
+//                                                                                           "\"Target_Distance\":\"%0.2f\","
+//                                                                                           "\"Target_Angle\":\"%0.2f\","
+//                                                                                           "\"IR_0_bool\":\"%d\","
+//                                                                                           "\"IR_1_bool\":\"%d\","
+//                                                                                           "\"IR_2_bool\":\"%d\","
+//                                                                                           "\"IR_3_bool\":\"%d\","
+//                                                                                           "\"IR_4_bool\":\"%d\","
+//                                                                                           "\"Grabber_Aligned\":\"%d\","
+//                                                                                           "\"Alignment_Info\":\"%s\"}",
+//                                                                                           internalData.alignmentData.IR_0,
+//                                                                                           internalData.alignmentData.IR_1,
+//                                                                                           internalData.alignmentData.IR_2,
+//                                                                                           internalData.alignmentData.IR_3,
+//                                                                                           internalData.alignmentData.IR_4,
+//                                                                                           internalData.alignmentData.Target_Distance,
+//                                                                                           internalData.alignmentData.Target_Angle,
+//                                                                                           internalData.alignmentData.IR_0_bool,
+//                                                                                           internalData.alignmentData.IR_1_bool,
+//                                                                                           internalData.alignmentData.IR_2_bool,
+//                                                                                           internalData.alignmentData.IR_3_bool,
+//                                                                                           internalData.alignmentData.IR_4_bool,
+//                                                                                           internalData.alignmentData.Grabber_Aligned,
+//                                                                                           getAlignment(internalData.alignmentData.internalAlignment)
+//                                                                                           );
                                     //tx_thread_obj.Destination = obj.External.Source; // looks like it is set at top
                                     break;
                                 }
@@ -339,28 +351,11 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 break;
                             }
                             case PATHFINDER: {
-                                switch(pathFinderResponseMC) {
-                                    case targetProximity:{
-                                        alignmentPFResponse.targetProximityInt = pathFinderResponseValue;
-                                        computation_thread_SendValToMsgQ(alignmentPFResponse);
-                                        statObject.Res_From_PathFinder++;
-                                        break;
-                                    }
-                                    case outsideArena:{
-                                        alignmentPFResponse.outsideArenaBool = pathFinderResponseValue;
-                                        computation_thread_SendValToMsgQ(alignmentPFResponse);
-                                        statObject.Res_From_PathFinder++;
-                                        break;
-                                    }
-                                    case movementStopped:{
-                                        alignmentPFResponse.movementStoppedBool = pathFinderResponseValue;
-                                        computation_thread_SendValToMsgQ(alignmentPFResponse);
-                                        statObject.Res_From_PathFinder++;
-                                        break;
-                                    }
-                                    default:
-                                        break;
-                                }
+                                alignmentPFResponse.targetProximityInt = pathFinderResponseValueProximity;
+                                alignmentPFResponse.outsideArenaBool = pathFinderResponseValueOutsideArena;
+                                alignmentPFResponse.movementStoppedBool = pathFinderResponseValueMovementStopped;
+                                computation_thread_SendValToMsgQ(alignmentPFResponse);
+                                statObject.Res_From_PathFinder++;
                                 break;
                             }
                             case TARGETGRABBER: {

@@ -75,8 +75,8 @@ static unsigned int rightCount = 0;
 static unsigned int leftCount = 0;
 
 // Initialize speed to 75%
-static int rightSpeed = (int)MAX_PWM*0.75;
-static int leftSpeed = (int)MAX_PWM*0.75;
+static int rightSpeed = (int)MAX_PWM*0.8;
+static int leftSpeed = (int)MAX_PWM*0.8;
 
 static float totalDistance = 0;
 static float initialOrientation = 0;
@@ -149,11 +149,11 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
     prevState = turnRight;
     disableMotors();
     setDirectionForward();
-    srand(PLIB_TMR_Counter16BitGet(TMR_ID_1));
     
     while(1) {
         // Keep reading from queue until initial data is received
         if (!initialized) {
+            memset(&motorObj, 0, sizeof(MotorObj));
             dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
             MOTOR_CONTROLLER_THREAD_ReadFromQueue(&motorObj);
             dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
@@ -170,6 +170,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
             if (mode == DEBUG) {
                 // Read direction command from queue
                 if (motionComplete) {
+                    memset(&motorObj, 0, sizeof(MotorObj));
                     dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
                     MOTOR_CONTROLLER_THREAD_ReadFromQueue(&motorObj);
                     dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
@@ -246,6 +247,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                     }
                 }
             } else if (mode == RANDOM) {
+                memset(&motorObj, 0, sizeof(MotorObj));
                 dbgOutputLoc(BEFORE_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
                 MOTOR_CONTROLLER_THREAD_ReadFromQueue(&motorObj);
                 dbgOutputLoc(AFTER_RECEIVE_FR_QUEUE_MOTORCONTROLLERTHREAD);
@@ -272,10 +274,19 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                             movement.amount = totalDistance;
                             rightSign = 1;
                             leftSign = 1;
-                        } else {
-                        	// If line or obstacle encountered, inch backwards
+                        } else if (motorObj.lineLocation) {
+                            // If line encountered, inch backwards
                             completeMotion();
                             state = inchBackward;
+                            srand(PLIB_TMR_Counter16BitGet(TMR_ID_1));
+                            angle = rand() % 180;
+                        }
+                        else {
+                        	// If obstacle encountered, turn
+                            completeMotion();
+                            srand(PLIB_TMR_Counter16BitGet(TMR_ID_1));
+                            state = (rand() % 2) + 3;
+                            angle = rand() % 180;
                         }
                         break;
                     }
@@ -290,7 +301,8 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
 
                         if (totalDistance < -3) {
                             completeMotion();
-                            state = turnRight;
+                            srand(PLIB_TMR_Counter16BitGet(TMR_ID_1));
+                            state = (rand() % 2) + 3;
                             angle = rand() % 180;
                         }
                         break;
@@ -312,10 +324,26 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                         }
                         break;
                     }
+                    case turnLeft: {
+                    	// Turn left until desired angular displacement achieved
+                        setDirectionLeft();
+                        enableMotors(1);
+                        movement.action = LEFT;
+                        movement.amount = (orientation - initialOrientation);
+                        rightSign = 1;
+                        leftSign = -1;
+                        
+                        // Stop rotating when desired angular displacement is achieved
+                        if ((orientation - initialOrientation) > angle) {
+                        	// Go forward again
+                            completeMotion();
+                            state = forward;
+                        }
+                        break;
+                    }
                     case stop: {
                         PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
                         PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
-
 
                         // Check for start command from server
                         if (motorObj.stop == 'N') {
@@ -361,8 +389,8 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
             orientation += ((deltaRight-deltaLeft)/2.0)/TICKS_PER_DEG;
 
             // Update position of rover - location & orientation
-            x += distance*cos(orientation*2*M_PI/360.0);
-            y += distance*sin(orientation*2*M_PI/360.0);
+            x += distance*cos(orientation*M_PI/180.0);
+            y += distance*sin(orientation*M_PI/180.0);
             
             // Send updated position to message controller thread
             messageObj.Update.Data.location.x = x;
@@ -425,16 +453,16 @@ void MOTOR_CONTROLLER_THREAD_CorrectSpeed(int timer) {
     leftSpeed = outputLeft;
     
     // Send PI controller data to debugger
-    if(timer % 2 == 0) {
-            Tx_Thead_Queue_DataType tx_thread_obj;
-            memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
-            tx_thread_obj.Destination = TARGETLOCATOR;
-            BaseType_t *ptr;
-            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"1\", \"vel\": \"%4d\", \"time\": \"%4d\", \"output\": \"%4f\", \"pwm\": \"%4d\"}", leftCount, timer, outputLeft, leftSpeed);
-            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
-            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"2\", \"vel\": \"%4d\", \"time\": \"%4d\"}", rightCount, timer);
-            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
-    }
+//    if(timer % 10 == 0) {
+//            Tx_Thead_Queue_DataType tx_thread_obj;
+//            memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
+//            tx_thread_obj.Destination = TARGETLOCATOR;
+//            BaseType_t *ptr;
+//            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"1\", \"vel\": \"%4d\", \"time\": \"%4d\", \"output\": \"%4f\", \"pwm\": \"%4d\"}", leftCount, timer, outputLeft, leftSpeed);
+//            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+//            sprintf(tx_thread_obj.Data, "{\"type\": \"PID\", \"motor\": \"2\", \"vel\": \"%4d\", \"time\": \"%4d\"}", rightCount, timer);
+//            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+//    }
     
     prevRightPID = rightCount;
     prevLeftPID = leftCount;
@@ -480,14 +508,12 @@ void disableMotors(void) {
     
     while ((right > 0) && (left > 0)) {
         Tx_Thead_Queue_DataType tx_thread_obj;
-            memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
-            tx_thread_obj.Destination = TARGETLOCATOR;
-            BaseType_t *ptr;
-            sprintf(tx_thread_obj.Data, "right: %d, left: %d", right, left);
-            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
-            
-            sprintf(tx_thread_obj.Data, "msTimer: %d, currentTime: %d", msTimer, currentTime);
-            TX_THREAD_SendToQueueISR(tx_thread_obj, ptr);
+        memset(&tx_thread_obj, 0, sizeof(Tx_Thead_Queue_DataType));
+//        tx_thread_obj.Destination = SERVER;
+        sprintf(tx_thread_obj.Data, "right: %d, left: %d", right, left);
+//        TX_THREAD_SendToQueue(tx_thread_obj);
+//        sprintf(tx_thread_obj.Data, "msTimer: %d, currentTime: %d", msTimer, currentTime);
+//        TX_THREAD_SendToQueue(tx_thread_obj);
             
         if ((msTimer-currentTime) >= 1) {
             right = right/2;
