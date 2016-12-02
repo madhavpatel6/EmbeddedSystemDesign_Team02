@@ -84,7 +84,7 @@ typedef struct {
     IRSensorsADC_t IRSensors;
 } SensorADC_t;
 
-typedef enum { SENSORADC, RV1_POSUPDATE, REQUESTOCCUPANYGRID} TLUpdate_t;
+typedef enum { SENSORADC, RV1_POSUPDATE, REQUESTOCCUPANYGRID, INTERPRETGRIDREQUEST} TLUpdate_t;
 
 typedef struct {
     float x;

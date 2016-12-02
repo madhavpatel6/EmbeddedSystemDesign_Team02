@@ -3,14 +3,6 @@
 
 #include "grid.h"
 
-
-typedef struct PointF {
-    float x;
-    float y;
-} PointF;
-
-typedef PointF point_t;
-
 typedef struct {
 //    float minimumMeasuringDistance;
 //    float maximumMeasuringDistance;

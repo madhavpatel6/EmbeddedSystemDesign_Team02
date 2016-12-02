@@ -30,6 +30,7 @@ GridScene::GridScene(QWidget *parent) : QWidget(parent)
     newRotatedRect = QPolygonF();
     newRectCenter = QPointF();
     mouseState = FIRSTCLICK;
+    Grid::initializeVertices();
     recordKeys = true;
 }
 
@@ -90,6 +91,13 @@ void GridScene::paintEvent(QPaintEvent *) {
 //    leftSideSensor->draw(&painter);
     farLeftSensor->draw(&painter);
     farRightSensor->draw(&painter);
+    Grid::InterpretedInformationType intr;
+    intr.number = 0;
+    GridHelper::interpretGrid(grid, &intr);
+    painter.setPen(QPen(QBrush(Qt::red),5));
+    for(int i = 0; i < intr.number; i++) {
+        painter.drawEllipse(intr.interpreted[i].x*CELL_SIZE, intr.interpreted[i].y*CELL_SIZE, 10, 10);
+    }
     painter.drawLines(lines);
     painter.end();
 }
@@ -104,12 +112,12 @@ void GridScene::addLine(double x1, double y1, double x2, double y2) {
 
 void GridScene::updateSensorReading() {
     SensorDataContainerType data = getSensorData();
-    GridHelper::updateOccupanyGrid3(data, grid);
-//    addRayTrace(middleFrontSensor);
-//    addRayTrace(leftFrontSensor);
-//    addRayTrace(rightFrontSensor);
-//    addRayTrace(farLeftSensor);
-//    addRayTrace(farRightSensor);
+//    GridHelper::updateOccupanyGrid3(data, grid);
+    addRayTrace(middleFrontSensor);
+    addRayTrace(leftFrontSensor);
+    addRayTrace(rightFrontSensor);
+    addRayTrace(farLeftSensor);
+    addRayTrace(farRightSensor);
     update();
 }
 
@@ -128,7 +136,7 @@ void GridScene::addRayTrace(SensorClass* impl) {
     else {
         distancePoint = QPointF(sensorLocation.x() + distance*cos(sensorOrientation*M_PI/180), sensorLocation.y() + distance*sin(sensorOrientation*M_PI/180));
     }
-    GridHelper::raytrace3(sensorLocation.x(), sensorLocation.y(), distancePoint.x(), distancePoint.y(), maximum, grid);
+    GridHelper::raytrace3(sensorLocation.x(), sensorLocation.y(), distancePoint.x(), distancePoint.y(), false, grid);
 }
 
 SensorDataContainerType GridScene::getSensorData() {

@@ -127,8 +127,10 @@ SensorData_t SensorClass::getParamAndDistance(QVector<QPolygonF> objs) {
         ret.distance = ret.distance + computeTotalError();
     }
     ret.orientation = this->sensorOrientation;
-    ret.sensorLocation = this->sensorLocation;
-    ret.maxSensorLocation = this->getMaximumSensorLocation();
+    ret.sensorLocation.x = this->sensorLocation.x();
+    ret.sensorLocation.y = this->sensorLocation.y();
+    ret.maxSensorLocation.x = this->getMaximumSensorLocation().x();
+    ret.maxSensorLocation.y = this->getMaximumSensorLocation().y();
     ret.minimumMeasuringDistance = this->minimumDistanceCM;
     ret.maximumMeasuringDistance = this->maximumDistanceCM;
     return ret;

@@ -114,7 +114,7 @@ typedef enum InternalRequestType_enum { SMtoTL,
 //------------------------------------------------------------------------------
 // You should not need to change anything beyond this point
 //------------------------------------------------------------------------------
-typedef enum MessageItemType_enum {EXTERNAL_REQUEST_RESPONSE, SEND_REQUEST, UPDATE} MessageItemType;
+typedef enum MessageItemType_enum {EXTERNAL_REQUEST_RESPONSE, SEND_REQUEST, UPDATE, INTERPRETEDUPDATE} MessageItemType;
 
 typedef struct {
     //Set this to

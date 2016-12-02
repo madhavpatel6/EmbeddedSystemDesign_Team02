@@ -305,6 +305,10 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     tx_thread_obj.Destination = obj.message.External.Source;
                                     break;
                                 }
+                                case InterpretGrid: {
+                                    sendTL.type = INTERPRETGRIDREQUEST;
+                                    SENSOR_THREAD_SendToQueue(sendTL);
+                                }
                                 default:
                                     break;
                             }
@@ -335,7 +339,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 break;
                             }
                         }
-                        if(items[0] != OccupancyGrid) {
+                        if(items[0] != OccupancyGrid && items[0] != InterpretGrid) {
                             TX_THREAD_SendToQueue(tx_thread_obj);
                         }
                         break;

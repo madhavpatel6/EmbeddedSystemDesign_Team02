@@ -87,6 +87,7 @@ static GridType grid;
 static Queue sensorDataQ;
 static GridUpdatedType updated;
 SensorDataType currentSensorData;
+InterpretedInformationType intr;
 LookupTable_t bottomLeftLongRangeTable[] = {
     {20,	2.508},
     {25,	2.213},
@@ -199,7 +200,6 @@ void SENSOR_THREAD_Tasks ( void )
     TL_Queue_t objRecv;
     MessageObj objSend;
     objSend.type = UPDATE;
-    objSend.message.Update.Type = SENSORDATA;
     SensorDataContainerType sensorInformation;
 
 
@@ -211,6 +211,7 @@ void SENSOR_THREAD_Tasks ( void )
         SENSOR_THREAD_ReadFromQueue(&objRecv);
         switch(objRecv.type) {
             case SENSORADC: {
+                objSend.message.Update.Type = SENSORDATA;
                 ConvertSensorADCToDistance(&objSend.message.Update.Data.sensordata, objRecv.contents.sensors);
                 /* Queue up the sensor data */
                 if(FilterIRSensors(objSend.message.Update.Data.sensordata)) {
@@ -241,77 +242,28 @@ void SENSOR_THREAD_Tasks ( void )
                     addRayTrace(sensorInformation.farRightSensor, sensorInformation.farRightSensor.distance == 30.00);
                     addRayTrace(sensorInformation.leftFrontSensor, sensorInformation.leftFrontSensor.distance == 45.00);
                     addRayTrace(sensorInformation.rightFrontSensor, sensorInformation.rightFrontSensor.distance == 45.00);
-//                    updateOccupanyGrid3(sensorInformation, grid, updated);
-//                    point_t deltaPosition;
-//                    int i = 0;
-//                    deltaPosition.x = previousAction.x - objRecv.contents.r1_movement.x;
-//                    deltaPosition.y = previousAction.y - objRecv.contents.r1_movement.y;
-//                    float dtheta;
-//                    float distance;
-//                    if(objRecv.contents.r1_movement.action == 0 || objRecv.contents.r1_movement.action == 1) {
-//                        dtheta = 0;
-//                        distance = sqrt(pow(deltaPosition.x,2) + pow(deltaPosition.y,2));
-//                        if(distance == 0) {
-//                            clearQueue(&sensorDataQ);
-//                            DRV_TMR0_Start();
-//                            continue;
-//                        }
-//                    }
-//                    else if(objRecv.contents.r1_movement.action == 2 || objRecv.contents.r1_movement.action == 3) {
-//                        distance = 0;
-//                        dtheta = objRecv.contents.r1_movement.orientation - previousAction.orientation;
-//                        if(dtheta == 0) {
-//                            clearQueue(&sensorDataQ);
-//                            DRV_TMR0_Start();
-//                            continue;
-//                        }
-//                    }
-//                    
-//                    float distance_increments = distance / size(&sensorDataQ);
-//                    float theta_increments = dtheta / size(&sensorDataQ);
-//                    float cosX = cos(objRecv.contents.r1_movement.orientation*M_PI/180)*distance_increments;
-//                    float sinY = sin(objRecv.contents.r1_movement.orientation*M_PI/180)*distance_increments;
-//                    int sizeofqueue = size(&sensorDataQ);
-//                    
-//                    for(i = 0; i < sizeofqueue; i++) {
-//                        SensorDataType data = removeData(&sensorDataQ);
-//                        point_t location;
-//                        float theta = previousAction.orientation + (theta_increments*i);
-//                        location.x = (cosX*i)+previousAction.x;
-//                        location.y = (sinY*i)+previousAction.y;
-//                        UpdateSensorInformation(&sensorInformation, data, location, theta);
-//                        updateOccupanyGrid3(sensorInformation, grid, updated);
-//                    }
-//                    point_t loc;
-//                    loc.x = objRecv.contents.r1_movement.x;
-//                    loc.y = objRecv.contents.r1_movement.y;
-//                    SensorDataType data;
-//                    UpdateSensorInformation(&sensorInformation, data, loc, objRecv.contents.r1_movement.orientation);                    
-//                    objSend.message.Update.Data.sensorInformation = sensorInformation;
                     // Start the ADC timer
                     DRV_TMR0_Start();
-//                }
-//                else {
-//                    clearQueue(&sensorDataQ);
-//                    previousActionIsSet = true;
-//                }
-//                previousAction = objRecv.contents.r1_movement;
                 break;
             }
             case REQUESTOCCUPANYGRID: {
-//                if(updated[objRecv.contents.row] == true) {
-                    Tx_Thead_Queue_DataType txObj;
-                    memset(&txObj, 0, sizeof(Tx_Thead_Queue_DataType));
-                    txObj.Destination = SERVER;
-                    int j = 0;
-                    sprintf(txObj.Data, "{\"type\":\"Response\",\"OccupancyGrid\":{\"row\":\"%d\",\"data\":\"", objRecv.contents.row);
-                    for(j = 0; j < WIDTH; j++) {
-                        sprintf(txObj.Data + strlen(txObj.Data), "%c", grid[objRecv.contents.row][j]);
-                    }
-                    sprintf(txObj.Data + strlen(txObj.Data), "\"}}");
-                    updated[objRecv.contents.row] = false;
-                    TX_THREAD_SendToQueue(txObj);
-//                }
+                Tx_Thead_Queue_DataType txObj;
+                memset(&txObj, 0, sizeof(Tx_Thead_Queue_DataType));
+                txObj.Destination = SERVER;
+                int j = 0;
+                sprintf(txObj.Data, "{\"type\":\"Response\",\"OccupancyGrid\":{\"row\":\"%d\",\"data\":\"", objRecv.contents.row);
+                for(j = 0; j < WIDTH; j++) {
+                    sprintf(txObj.Data + strlen(txObj.Data), "%c", grid[objRecv.contents.row][j]);
+                }
+                sprintf(txObj.Data + strlen(txObj.Data), "\"}}");
+                updated[objRecv.contents.row] = false;
+                TX_THREAD_SendToQueue(txObj);
+                break;
+            }
+            case INTERPRETGRIDREQUEST: {
+                interpretGrid(grid, &intr);
+                objSend.message.Update.Type = INTERPRETEDUPDATE;
+                MESSAGE_CONTROLLER_THREAD_SendToQueue(objSend);
                 break;
             }
         }

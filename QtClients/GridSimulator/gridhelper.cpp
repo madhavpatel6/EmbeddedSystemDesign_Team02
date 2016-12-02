@@ -300,8 +300,9 @@ point_t rotatePoint(float originX, float originY, float pointX, float pointY, do
     int translatedX = pointX - originX;
     int translatedY = pointY - originY;
     rotationAngle = rotationAngle*M_PI/180.0;
-    point_t point = point_t(translatedX * cos(rotationAngle) - translatedY * sin(rotationAngle) + originX,
-                  translatedX * sin(rotationAngle) + translatedY * cos(rotationAngle) + originY);
+    point_t point;
+    point.x = translatedX * cos(rotationAngle) - translatedY * sin(rotationAngle) + originX;
+    point.y = translatedX * sin(rotationAngle) + translatedY * cos(rotationAngle) + originY;
     return point;
 }
 
@@ -320,9 +321,10 @@ void handleIRSensor(SensorData_t data, Grid::GridType grid) {
         maximum = true;
     }
     else {
-        distancePoint = point_t(data.sensorLocation.x() + data.distance*cos(data.orientation*M_PI/180), data.sensorLocation.y() + data.distance*sin(data.orientation*M_PI/180));
+        distancePoint.x = data.sensorLocation.x + data.distance*cos(data.orientation*M_PI/180);
+        distancePoint.y = data.sensorLocation.y + data.distance*sin(data.orientation*M_PI/180);
     }
-    raytrace3(data.sensorLocation.x(), data.sensorLocation.y(), distancePoint.x(), distancePoint.y(), maximum, grid);
+    raytrace3(data.sensorLocation.x, data.sensorLocation.y, distancePoint.x, distancePoint.y, maximum, grid);
 }
 
 /**
@@ -351,12 +353,13 @@ void handleUltrasonicSensor(SensorData_t data, Grid::GridType grid) {
         // If we get any other number then we update the occupany grid by decrementing all the cells within the cone up to the distance measured
         // Decrease the distance point so that we only decrement the cells up to the distance measured
         data.distance -= 2;
-        distancePoint = point_t(data.sensorLocation.x() + data.distance*cos(data.orientation*M_PI/180), data.sensorLocation.y() + data.distance*sin(data.orientation*M_PI/180));
+        distancePoint.x = data.sensorLocation.x + data.distance*cos(data.orientation*M_PI/180);
+        distancePoint.y = data.sensorLocation.y + data.distance*sin(data.orientation*M_PI/180);
     }
     for(float angle = -data.coneAngle/2.0; angle < data.coneAngle/2.0; angle++) {
         //distancePoint = PointF(data.sensorLocation.x() + data.distance*cos((data.orientation + angle)*M_PI/180), data.sensorLocation.y() + data.distance*sin((data.orientation + angle)*M_PI/180));
-        point_t rotatedDistancePoint = rotatePoint(data.sensorLocation.x(), data.sensorLocation.y(), distancePoint.x(), distancePoint.y(), angle);
-        raytrace3(data.sensorLocation.x(), data.sensorLocation.y(), rotatedDistancePoint.x(), rotatedDistancePoint.y(), maximum, grid);
+        point_t rotatedDistancePoint = rotatePoint(data.sensorLocation.x, data.sensorLocation.y, distancePoint.x, distancePoint.y, angle);
+        raytrace3(data.sensorLocation.x, data.sensorLocation.y, rotatedDistancePoint.x, rotatedDistancePoint.y, maximum, grid);
     }
 
 }
@@ -374,7 +377,7 @@ void updateOccupanyGrid(SensorDataContainerType sensorData, Grid::GridType grid)
     handleUltrasonicSensor(sensorData.rightSideSensor, grid);
 }
 
-void updateOccupanyGrid2(SensorDataContainerType sensorData, Grid::GridType grid) {
+/*void updateOccupanyGrid2(SensorDataContainerType sensorData, Grid::GridType grid) {
     SensorData_t minSensor, nonMinSensor;
     int angleOffset;
     if(sensorData.leftFrontSensor.distance <= sensorData.rightFrontSensor.distance) {
@@ -390,8 +393,9 @@ void updateOccupanyGrid2(SensorDataContainerType sensorData, Grid::GridType grid
     if(minSensor.distance > 0 && nonMinSensor.distance > 0) {
         minSensor.distance -= 2;
         int sensorDistanceBetween = 4;
-        point_t minDistancePoint = point_t(minSensor.sensorLocation.x() + minSensor.distance*cos(minSensor.orientation*M_PI/180),
-                                minSensor.sensorLocation.y() + minSensor.distance*sin(minSensor.orientation*M_PI/180));
+        point_t minDistancePoint;
+        minDistancePoint.x = minSensor.sensorLocation.x() + minSensor.distance*cos(minSensor.orientation*M_PI/180);
+        minDistancePoint.y = minSensor.sensorLocation.y() + minSensor.distance*sin(minSensor.orientation*M_PI/180);
         float cosX = cos((minSensor.orientation + angleOffset)*M_PI/180);
         float sinY = sin((minSensor.orientation + angleOffset)*M_PI/180);
         // We are going to walk along the rover's front face from the sensor that returned the minimum distance to the other one
@@ -403,10 +407,11 @@ void updateOccupanyGrid2(SensorDataContainerType sensorData, Grid::GridType grid
         }
     }
 
-}
+}*/
 
 void updateOccupanyGrid3(SensorDataContainerType sensorData, Grid::GridType grid) {
-//    if(sensorData.LongRangeIsValid) {
+    int i = 0;
+//    if(sensorData.LongRangeIsValid == true) {
     {
         SensorData_t minSensor, nonMinSensor;
         int angleOffset;
@@ -421,35 +426,42 @@ void updateOccupanyGrid3(SensorDataContainerType sensorData, Grid::GridType grid
             angleOffset = 90;
         }
         if(minSensor.distance > 0 && nonMinSensor.distance > 0) {
+            bool maximum = minSensor.distance == 45.00;
             minSensor.distance -= 2;
             int sensorDistanceBetween = 4;
-            point_t minDistancePoint = point_t(minSensor.sensorLocation.x() + minSensor.distance*cos(minSensor.orientation*M_PI/180),
-                                    minSensor.sensorLocation.y() + minSensor.distance*sin(minSensor.orientation*M_PI/180));
+            point_t minDistancePoint;
+            minDistancePoint.x = minSensor.sensorLocation.x + minSensor.distance*cos(minSensor.orientation*M_PI/180);
+            minDistancePoint.y = minSensor.sensorLocation.y + minSensor.distance*sin(minSensor.orientation*M_PI/180);
             float cosX = cos((minSensor.orientation + angleOffset)*M_PI/180);
             float sinY = sin((minSensor.orientation + angleOffset)*M_PI/180);
             // We are going to walk along the rover's front face from the sensor that returned the minimum distance to the other one
-            for(int i = 0; i <= sensorDistanceBetween; i++) {
-                point_t rayTracePoint(minDistancePoint.x() + i*cosX, minDistancePoint.y() + i*sinY);
-                point_t rayTraceOrigin(minSensor.sensorLocation.x() + i*cosX, minSensor.sensorLocation.y() + i*sinY);
+            for(i = 0; i <= sensorDistanceBetween; i++) {
+                point_t rayTracePoint;
+                rayTracePoint.x = minDistancePoint.x + i*cosX;
+                rayTracePoint.y = minDistancePoint.y + i*sinY;
+                point_t rayTraceOrigin;
+                rayTraceOrigin.x = minSensor.sensorLocation.x + i*cosX;
+                rayTraceOrigin.y = minSensor.sensorLocation.y + i*sinY;
 
-                raytrace3(rayTraceOrigin.x(), rayTraceOrigin.y(), rayTracePoint.x(), rayTracePoint.y(), true, grid);
+                raytrace3(rayTraceOrigin.x, rayTraceOrigin.y, rayTracePoint.x, rayTracePoint.y, maximum, grid);
             }
         }
+//    }
     }
-//    if(sensorData.MidRangeIsValid) {
     {
+//    if(sensorData.MidRangeIsValid == true) {
         SensorData_t minSensor, nonMinSensor;
         float minDistance;
         SensorData_t middleSensor = sensorData.middleFrontSensor;
         int angleOffset;
-        if(sensorData.farLeftSensor.distance <= sensorData.farRightSensor.distance && sensorData.farLeftSensor.distance <= sensorData.middleFrontSensor.distance) {
+        if((sensorData.farLeftSensor.distance <= sensorData.farRightSensor.distance) && (sensorData.farLeftSensor.distance <= sensorData.middleFrontSensor.distance)) {
             minSensor = sensorData.farLeftSensor;
             nonMinSensor = sensorData.farRightSensor;
             minDistance = minSensor.distance;
             angleOffset = -90;
 
         }
-        else if(sensorData.farRightSensor.distance <= sensorData.farLeftSensor.distance && sensorData.farRightSensor.distance <= sensorData.middleFrontSensor.distance) {
+        else if((sensorData.farRightSensor.distance <= sensorData.farLeftSensor.distance) && (sensorData.farRightSensor.distance <= sensorData.middleFrontSensor.distance)) {
             minSensor = sensorData.farRightSensor;
             nonMinSensor = sensorData.farLeftSensor;
             minDistance = minSensor.distance;
@@ -461,23 +473,63 @@ void updateOccupanyGrid3(SensorDataContainerType sensorData, Grid::GridType grid
             minDistance = middleSensor.distance;
             angleOffset = 90;
         }
-        if(minSensor.distance > 0 && nonMinSensor.distance > 0 && middleSensor.distance > 0) {
+        if((minSensor.distance > 2) && (nonMinSensor.distance > 2) && (middleSensor.distance > 2)) {
+            bool maximum = minDistance == 30.00;
             minDistance -= 2;
             int sensorDistanceBetween = 8;
-            point_t minDistancePoint = point_t(minSensor.sensorLocation.x() + minDistance*cos(minSensor.orientation*M_PI/180),
-                                    minSensor.sensorLocation.y() + minDistance*sin(minSensor.orientation*M_PI/180));
+            point_t minDistancePoint;
+            minDistancePoint.x = minSensor.sensorLocation.x + (minDistance*cos(minSensor.orientation*M_PI/180));
+            minDistancePoint.y = minSensor.sensorLocation.y + (minDistance*sin(minSensor.orientation*M_PI/180));
             float cosX = cos((minSensor.orientation + angleOffset)*M_PI/180);
             float sinY = sin((minSensor.orientation + angleOffset)*M_PI/180);
-            for(int i = 0; i < sensorDistanceBetween; i++) {
-                point_t rayTracePoint(minDistancePoint.x() + i*cosX, minDistancePoint.y() + i*sinY);
-                point_t rayTraceOrigin(minSensor.sensorLocation.x() + i*cosX, minSensor.sensorLocation.y() + i*sinY);
+            for(i = 0; i <= sensorDistanceBetween; i++) {
+                point_t rayTracePoint;
+                rayTracePoint.x = minDistancePoint.x + (i*cosX);
+                rayTracePoint.y = minDistancePoint.y + (i*sinY);
+                point_t rayTraceOrigin;
+                rayTraceOrigin.x = minSensor.sensorLocation.x + (i*cosX);
+                rayTraceOrigin.y = minSensor.sensorLocation.y + (i*sinY);
 
-                raytrace3(rayTraceOrigin.x(), rayTraceOrigin.y(), rayTracePoint.x(), rayTracePoint.y(), true, grid);
+                raytrace3(rayTraceOrigin.x, rayTraceOrigin.y, rayTracePoint.x, rayTracePoint.y, maximum, grid);
             }
-
         }
     }
+//    }
 
+}
+
+float getDistance(int x1, int y1, int x2, int y2) {
+    return sqrt(pow(x1 - x2,2) + pow(y1 - y2,2));
+}
+
+void interpretGrid(Grid::GridType grid, Grid::InterpretedInformationType* interpretedPoints) {
+    if(interpretedPoints->number == 20) {
+        return;
+    }
+    for(int y = 0; y < Grid::HEIGHT; y++) {
+        for(int x = 0; x < Grid::WIDTH; x++) {
+            if(interpretedPoints->number == 20) {
+                return;
+            }
+            if(grid[y][x] >= 60) {
+                if(interpretedPoints->number == 0) {
+                    interpretedPoints->interpreted[interpretedPoints->number].x = x;
+                    interpretedPoints->interpreted[interpretedPoints->number].y = y;
+                    interpretedPoints->number++;
+                }
+                else {
+                    for(int i = 0; i < interpretedPoints->number; i++) {
+                        if(getDistance(x,y,interpretedPoints->interpreted[i].x, interpretedPoints->interpreted[i].y) > 10) {
+                            interpretedPoints->interpreted[interpretedPoints->number].x = x;
+                            interpretedPoints->interpreted[interpretedPoints->number].y = y;
+                            interpretedPoints->number++;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 

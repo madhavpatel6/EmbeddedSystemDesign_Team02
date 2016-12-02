@@ -1,7 +1,26 @@
 #include "grid.h"
 #include <QDebug>
 #include <QPainter>
+#include "polygon.h"
 namespace Grid {
+VertexInformationType vertices;
+void initializeVertices() {
+    vertices.number = 7;
+    vertices.vertices[0] = {10, 15};
+    vertices.vertices[1] = {20, 10};
+    vertices.vertices[2] = {60, 13};
+    vertices.vertices[3] = {65, 45};
+    vertices.vertices[4] = {45, 55};
+    vertices.vertices[5] = {40, 42};
+    vertices.vertices[6] = {20, 40};
+}
+
+bool isWithinArena(int x, int y) {
+    point_t p;
+    p.x = x;
+    p.y = y;
+    return PointInPolygon(p, vertices.number, vertices.vertices);
+}
 
 bool checkBounds(int x, int y) {
     return y < HEIGHT && x < WIDTH && y >= 0 && x >= 0;
@@ -10,13 +29,15 @@ bool checkBounds(int x, int y) {
 void initializeGrid(GridType grid) {
     for(int locY = 0; locY < HEIGHT; locY++) {
         for(int locX = 0; locX < WIDTH; locX++) {
-            grid[locY][locX] = MAXIMUM;
+            grid[locY][locX] = MINIMUM;
         }
     }
 }
 
 void incrementIndex(int x, int y, GridType grid) {
 //    qDebug() << "Max (x,y) = (" << x << ", " << y <<")";
+    if(!checkBounds(x,y) || !isWithinArena(x,y))
+        return;
     if(grid[y][x] < (MAXIMUM - 15)) {
         grid[y][x]+=15;
     }
@@ -24,6 +45,8 @@ void incrementIndex(int x, int y, GridType grid) {
 
 void decrementIndex(int x, int y, GridType grid) {
 //    qDebug() << "(x,y) = (" << x << ", " << y <<")";
+    if(!checkBounds(x,y) || !isWithinArena(x,y))
+        return;
     if(grid[y][x] > MINIMUM + 5) {
         grid[y][x]-=5;
     }
