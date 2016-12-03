@@ -6,7 +6,7 @@
 #define HEIGHT 160
 #define MAXIMUM 127
 #define MINIMUM -128
-
+#define MAXINTERPRET 1
 typedef struct PointF {
     float x;
     float y;
@@ -20,7 +20,7 @@ typedef struct {
     int number;
 } VertexInformationType;
 
-typedef point_t InterpretedType[20];
+typedef point_t InterpretedType[MAXINTERPRET];
 typedef struct {
     InterpretedType interpreted;
     int number;

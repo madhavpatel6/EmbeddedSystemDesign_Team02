@@ -263,6 +263,7 @@ void SENSOR_THREAD_Tasks ( void )
             case INTERPRETGRIDREQUEST: {
                 interpretGrid(grid, &intr);
                 objSend.message.Update.Type = INTERPRETEDUPDATE;
+                objSend.message.Update.Data.interpreted = intr;
                 MESSAGE_CONTROLLER_THREAD_SendToQueue(objSend);
                 break;
             }

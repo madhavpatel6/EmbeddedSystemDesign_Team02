@@ -43,7 +43,7 @@ void initializeGrid(GridType grid) {
 void incrementIndex(int x, int y, GridType grid) {
     if(checkBounds(x,y)) {// && isWithinArena(x,y)) {
         if(grid[y][x] < (MAXIMUM - 32)) {
-            grid[y][x]+=32;
+            grid[y][x]+=64;
         }
         if(grid[y][x] == 0) {
             grid[y][x] = 1;
@@ -69,7 +69,7 @@ float getDistance(int x1, int y1, int x2, int y2) {
 }
 
 void interpretGrid(GridType grid, InterpretedInformationType* interpretedPoints) {
-    if(interpretedPoints->number == 20) {
+    if(interpretedPoints->number == MAXINTERPRET) {
         return;
     }
     int x = 0;
@@ -77,7 +77,7 @@ void interpretGrid(GridType grid, InterpretedInformationType* interpretedPoints)
     int i = 0;
     for(y = 0; y < HEIGHT; y++) {
         for(x = 0; x < WIDTH; x++) {
-            if(interpretedPoints->number == 20) {
+            if(interpretedPoints->number == MAXINTERPRET) {
                 return;
             }
             if(grid[y][x] >= 60) {

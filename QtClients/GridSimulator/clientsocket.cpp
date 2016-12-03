@@ -43,6 +43,12 @@ void ClientSocket::sendRequest(int i){
 //    }
 }
 
+void ClientSocket::handleInterpret() {
+    QString request_begin = "{\"type\":\"Request\",\"items\":[\"";
+    QString request_end = "\"]}";
+    SendJSONRequestToSocket(request_begin + "InterpretGrid" + request_end, TARGETLOCATOR);
+}
+
 void ClientSocket::connected()
 {
     qDebug() << "Client connected event";

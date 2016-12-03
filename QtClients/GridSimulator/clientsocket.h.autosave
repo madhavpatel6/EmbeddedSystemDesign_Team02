@@ -32,6 +32,9 @@ public:
         QString request_begin = "{\"type\":\"Request\",\"items\":[\"";
         QString request_end = "\"]}";
         SendJSONRequestToSocket(request_begin + "StartResponding" + request_end, TARGETLOCATOR);
+        QString request_begin = "{\"type\":\"Request\",\"items\":[\"";
+        QString request_end = "\"]}";
+        SendJSONRequestToSocket(request_begin + "StartResponding" + request_end, TARGETLOCATOR);
     }
 
 signals:

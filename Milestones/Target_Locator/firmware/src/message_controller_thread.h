@@ -95,10 +95,11 @@ typedef struct {
     SensorDataType sensordata;
     SensorDataContainerType sensorInformation;
     Proximity_t proximity;
+    InterpretedInformationType interpreted; 
 } InternalData;
 
 //This should include a new enum for anything in the InternalData
-typedef enum UpdateType_enum { LOCATION, ORIENTATION, SENSORDATA, TIMERTICK} UpdateType;
+typedef enum UpdateType_enum { LOCATION, ORIENTATION, SENSORDATA, TIMERTICK, INTERPRETEDUPDATE} UpdateType;
 
 //This is any request that you would want to ... well ... request
 // these are really the categories of requests. the specific objects in them is added later
@@ -114,7 +115,7 @@ typedef enum InternalRequestType_enum { SMtoTL,
 //------------------------------------------------------------------------------
 // You should not need to change anything beyond this point
 //------------------------------------------------------------------------------
-typedef enum MessageItemType_enum {EXTERNAL_REQUEST_RESPONSE, SEND_REQUEST, UPDATE, INTERPRETEDUPDATE} MessageItemType;
+typedef enum MessageItemType_enum {EXTERNAL_REQUEST_RESPONSE, SEND_REQUEST, UPDATE, } MessageItemType;
 
 typedef struct {
     //Set this to

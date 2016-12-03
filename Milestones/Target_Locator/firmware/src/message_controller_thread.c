@@ -100,11 +100,12 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
     StatObjectType statObject;
     memset(&statObject, 0, sizeof(StatObjectType));
     type_t type = unknown;
-    items_t items[12];
+    
     int numItems;
     TL_Queue_t sendTL;
-    bool stopRequesting = false;
+    bool startResponding = false;
     while(1) {
+        items_t items[12];
         initParser();
         MessageObj obj;
         memset(&obj, 0, sizeof(MessageObj));
@@ -116,6 +117,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
         MESSAGE_CONTROLLER_THREAD_ReadFromQueue(&obj);
         dbgOutputLoc(AFTER_READ_FROM_Q_MESSAGE_CONTROLLER_THREAD);
         int row = 0;
+        bool exit = false;
         switch(obj.type) {
             case EXTERNAL_REQUEST_RESPONSE: {
                 dbgOutputLoc(CASE_EXTERNAL_REQUEST_RESPONSE_MESSAGE_CONTROLLER_THREAD);
@@ -308,38 +310,35 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                 case InterpretGrid: {
                                     sendTL.type = INTERPRETGRIDREQUEST;
                                     SENSOR_THREAD_SendToQueue(sendTL);
+                                    break;
+                                }
+                                case StartResponding: {
+                                    startResponding = !startResponding;
+                                    break;
+                                }
+                                case Targets: {
+                                    if(startResponding == true) {
+                                        sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),",\"Targets\":[[");
+                                        int i = 0;
+                                        for(i = 0; i < internalData.interpreted.number; i++) {
+                                            sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), "[\"%.1f\",\"%.1f\"]]", internalData.interpreted.interpreted[i].x, internalData.interpreted.interpreted[i].y);
+                                        }
+                                        sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),"]");
+                                        tx_thread_obj.Destination = obj.message.External.Source;
+                                    }
+                                    else {
+                                        exit = true;
+                                    }
+                                    break;
                                 }
                                 default:
                                     break;
                             }
                         }
+                        
                         sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data),"}");
-                        switch(obj.message.External.Source) {
-                            case SEARCHERMOVER: {
-                                tx_thread_obj.MessageCount = statObject.Res_To_SearcherMover;
-                                statObject.Res_To_SearcherMover++;
-                                break;
-                            }
-                            case TARGETLOCATOR: {
-                                tx_thread_obj.MessageCount = statObject.Res_To_TargetLocator;
-                                statObject.Res_To_TargetLocator++;
-                                break;
-                            }
-                            case PATHFINDER: {
-                                tx_thread_obj.MessageCount = statObject.Res_To_PathFinder;
-                                statObject.Res_To_PathFinder++;
-                                break;
-                            }
-                            case TARGETGRABBER: {
-                                tx_thread_obj.MessageCount = statObject.Res_To_TargetGrabber;
-                                statObject.Res_To_TargetGrabber++;
-                                break;
-                            }
-                            default: {
-                                break;
-                            }
-                        }
-                        if(items[0] != OccupancyGrid && items[0] != InterpretGrid) {
+                        if(items[0] != OccupancyGrid && items[0] != InterpretGrid && items[0] != StartResponding && exit != true) {
+                            exit = false;
                             TX_THREAD_SendToQueue(tx_thread_obj);
                         }
                         break;
@@ -453,6 +452,10 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                         internalData.sensordata = obj.message.Update.Data.sensordata;
                         internalData.sensorInformation = obj.message.Update.Data.sensorInformation;
                         internalData.proximity = obj.message.Update.Data.proximity;
+                        break;
+                    }
+                    case INTERPRETEDUPDATE: {
+                        internalData.interpreted = obj.message.Update.Data.interpreted;
                         break;
                     }
                     default: {
