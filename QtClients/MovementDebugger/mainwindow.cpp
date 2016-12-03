@@ -98,8 +98,11 @@ void MainWindow::updateMovement(char source, QString x, QString y, QString orien
     switch(source) {
         case SEARCHERMOVER: {
             ui->lbl_x_positionVal->setText(x);
+            ui->sb_x_corrected->setValue(x.toFloat());
             ui->lbl_y_positionVal->setText(y);
+            ui->sb_y_corrected->setValue(y.toFloat());
             ui->lbl_orientationVal->setText(QString::number(temp));
+            ui->sb_orientation_corrected->setValue(temp);
             if (action == "0") {
                 action = "F";
             } else if (action == "1") {
