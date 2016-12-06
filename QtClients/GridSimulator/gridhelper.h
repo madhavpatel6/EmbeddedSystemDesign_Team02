@@ -7,16 +7,6 @@
 
 
 
-typedef struct PointF {
-    PointF() : xVal(0), yVal(0) {}
-    PointF(float _x, float _y) : xVal(_x), yVal(_y) {}
-    float x() { return xVal; }
-    float y() { return yVal; }
-    float xVal;
-    float yVal;
-} PointF;
-
-typedef QPointF point_t;
 
 typedef struct {
     float minimumMeasuringDistance;
@@ -29,11 +19,15 @@ typedef struct {
 } SensorData_t;
 
 typedef struct {
+    bool LongRangeIsValid;
     SensorData_t middleFrontSensor;
     SensorData_t rightFrontSensor;
     SensorData_t leftFrontSensor;
     SensorData_t rightSideSensor;
     SensorData_t leftSideSensor;
+    bool MidRangeIsValid;
+    SensorData_t farLeftSensor;
+    SensorData_t farRightSensor;
 } SensorDataContainerType;
 
 typedef struct {
@@ -43,6 +37,7 @@ typedef struct {
 } RayTraceReturnType;
 
 namespace GridHelper {
+
 
 RayTraceReturnType raytrace(double x1, double y1, double x2, double y2,bool maximum, Grid::GridType grid);
 
@@ -54,5 +49,8 @@ void updateOccupanyGrid(SensorDataContainerType sensorData, Grid::GridType grid)
 
 void updateOccupanyGrid2(SensorDataContainerType sensorData, Grid::GridType grid);
 
+void updateOccupanyGrid3(SensorDataContainerType sensorData, Grid::GridType grid);
+
+void interpretGrid(Grid::GridType grid, Grid::InterpretedInformationType* interpretedPoints);
 }
 #endif // GRIDHELPER_H

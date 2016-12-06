@@ -69,25 +69,24 @@ extern "C" {
 //Depending on what data you would need to send out you should create a member of this struct that can hold that data
 
 typedef struct {
-    float middleFTSensor;
-    float rightFTSensor;
     float leftFTSensor;
+//    float middleFTSensor;
+    float rightFTSensor;
+    float farLeftFBSensor;
+    float leftFBSensor;
     float middleFBSensor;
     float rightFBSensor;
-    float leftFBSensor;
+    float farRightFBSensor;
 } IRSensorDistance_t;
 
-//typedef struct {
-//    float leftfront;
-//    float middlefront;
-//    float rightfront;
-//    float leftside;
-//    float rightside;
-//} UltrasonicSensorDistance_t;
+typedef struct {
+    bool leftProximity;
+    bool middleProximity;
+    bool rightProximity;
+} Proximity_t;
 
 typedef struct {
     IRSensorDistance_t ir;
-//    UltrasonicSensorDistance_t ultrasonic;
 } SensorDataType;
 
 
@@ -95,10 +94,12 @@ typedef struct {
 typedef struct {
     SensorDataType sensordata;
     SensorDataContainerType sensorInformation;
+    Proximity_t proximity;
+    InterpretedInformationType interpreted; 
 } InternalData;
 
 //This should include a new enum for anything in the InternalData
-typedef enum UpdateType_enum { LOCATION, ORIENTATION, SENSORDATA, TIMERTICK} UpdateType;
+typedef enum UpdateType_enum { LOCATION, ORIENTATION, SENSORDATA, TIMERTICK, INTERPRETEDUPDATE} UpdateType;
 
 //This is any request that you would want to ... well ... request
 // these are really the categories of requests. the specific objects in them is added later
@@ -114,7 +115,7 @@ typedef enum InternalRequestType_enum { SMtoTL,
 //------------------------------------------------------------------------------
 // You should not need to change anything beyond this point
 //------------------------------------------------------------------------------
-typedef enum MessageItemType_enum {EXTERNAL_REQUEST_RESPONSE, SEND_REQUEST, UPDATE} MessageItemType;
+typedef enum MessageItemType_enum {EXTERNAL_REQUEST_RESPONSE, SEND_REQUEST, UPDATE, } MessageItemType;
 
 typedef struct {
     //Set this to

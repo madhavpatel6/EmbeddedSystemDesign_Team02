@@ -14,14 +14,14 @@ GridScene::GridScene(QWidget *parent) : QWidget(parent)
     this->setAutoFillBackground(true);
     this->setPalette(Pal);
     rover = new RoverClass();
-    middleFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::MIDDLESENSOR, 7, 25, 0, 0,rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
+    middleFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::MIDDLESENSOR, 7, 30, 0, 0,rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
     leftFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::LEFTSENSOR, 20, 70, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
     rightFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::RIGHTSENSOR, 20, 70, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
-//    leftFrontSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::LEFTSENSOR, 2, 70, 30, 30, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
-//    rightFrontSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::RIGHTSENSOR, 2, 70, 30, -30, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
+    farLeftSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::FARLEFTSENSOR, 7, 30, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
+    farRightSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::FARRIGHTSENSOR, 7, 30, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
 
-    rightSideSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::RIGHTSIDESENSOR, 2, 2, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
-    leftSideSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::LEFTSIDESENSOR, 2, 2, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
+//    rightSideSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::RIGHTSIDESENSOR, 2, 2, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
+//    leftSideSensor = new SensorClass(SensorClass::ULTRASONICSENSOR, SensorClass::LEFTSIDESENSOR, 2, 2, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
     this->setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
     showObjects = true;
@@ -30,6 +30,7 @@ GridScene::GridScene(QWidget *parent) : QWidget(parent)
     newRotatedRect = QPolygonF();
     newRectCenter = QPointF();
     mouseState = FIRSTCLICK;
+    Grid::initializeVertices();
     recordKeys = true;
 }
 
@@ -49,8 +50,10 @@ void GridScene::resetRoverPosition() {
     middleFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
     leftFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
     rightFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
-    rightSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
-    leftSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+//    rightSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+//    leftSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+    farLeftSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+    farRightSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
 }
 
 void GridScene::paintEvent(QPaintEvent *) {
@@ -81,12 +84,19 @@ void GridScene::paintEvent(QPaintEvent *) {
     else {
         painter.drawPolygon(newRotatedRect);
     }
-    if(showObjects){
     middleFrontSensor->draw(&painter);
     leftFrontSensor->draw(&painter);
     rightFrontSensor->draw(&painter);
-    rightSideSensor->draw(&painter);
-    leftSideSensor->draw(&painter);
+//    rightSideSensor->draw(&painter);
+//    leftSideSensor->draw(&painter);
+    farLeftSensor->draw(&painter);
+    farRightSensor->draw(&painter);
+    Grid::InterpretedInformationType intr;
+    intr.number = 0;
+    GridHelper::interpretGrid(grid, &intr);
+    painter.setPen(QPen(QBrush(Qt::red),5));
+    for(int i = 0; i < intr.number; i++) {
+        painter.drawEllipse(intr.interpreted[i].x*CELL_SIZE, intr.interpreted[i].y*CELL_SIZE, 10, 10);
     }
     painter.drawLines(lines);
     painter.end();
@@ -102,10 +112,12 @@ void GridScene::addLine(double x1, double y1, double x2, double y2) {
 
 void GridScene::updateSensorReading() {
     SensorDataContainerType data = getSensorData();
-    GridHelper::updateOccupanyGrid2(data, grid);
-//    addRayTrace(middleFrontSensor);
-//    addRayTrace(leftFrontSensor);
-//    addRayTrace(rightFrontSensor);
+//    GridHelper::updateOccupanyGrid3(data, grid);
+    addRayTrace(middleFrontSensor);
+    addRayTrace(leftFrontSensor);
+    addRayTrace(rightFrontSensor);
+    addRayTrace(farLeftSensor);
+    addRayTrace(farRightSensor);
     update();
 }
 
@@ -124,7 +136,7 @@ void GridScene::addRayTrace(SensorClass* impl) {
     else {
         distancePoint = QPointF(sensorLocation.x() + distance*cos(sensorOrientation*M_PI/180), sensorLocation.y() + distance*sin(sensorOrientation*M_PI/180));
     }
-    GridHelper::raytrace3(sensorLocation.x(), sensorLocation.y(), distancePoint.x(), distancePoint.y(), maximum, grid);
+    GridHelper::raytrace3(sensorLocation.x(), sensorLocation.y(), distancePoint.x(), distancePoint.y(), false, grid);
 }
 
 SensorDataContainerType GridScene::getSensorData() {
@@ -132,8 +144,11 @@ SensorDataContainerType GridScene::getSensorData() {
     data.leftFrontSensor = leftFrontSensor->getParamAndDistance(objects);
     data.middleFrontSensor = middleFrontSensor->getParamAndDistance(objects);
     data.rightFrontSensor = rightFrontSensor->getParamAndDistance(objects);
-    data.leftSideSensor = leftSideSensor->getParamAndDistance(objects);
-    data.rightSideSensor = rightSideSensor->getParamAndDistance(objects);
+    data.farLeftSensor = farLeftSensor->getParamAndDistance(objects);
+    data.farRightSensor = farRightSensor->getParamAndDistance(objects);
+//    data.leftSideSensor = leftSideSensor->getParamAndDistance(objects);
+//    data.rightSideSensor = rightSideSensor->getParamAndDistance(objects);
+
     return data;
 }
 
@@ -250,8 +265,10 @@ void GridScene::keyPressEvent(QKeyEvent *event) {
     middleFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
     leftFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
     rightFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
-    rightSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
-    leftSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+//    rightSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+//    leftSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+    farLeftSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+    farRightSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
     this->update();
 }
 
@@ -259,8 +276,10 @@ void GridScene::toggleError() {
     middleFrontSensor->simulateWithError = !middleFrontSensor->simulateWithError;
     leftFrontSensor->simulateWithError = !leftFrontSensor->simulateWithError;
     rightFrontSensor->simulateWithError = !rightFrontSensor->simulateWithError;
-    rightSideSensor->simulateWithError = !rightSideSensor->simulateWithError;
-    leftSideSensor->simulateWithError = !leftSideSensor->simulateWithError;
+    farLeftSensor->simulateWithError = !farLeftSensor->simulateWithError;
+    farRightSensor->simulateWithError = !farRightSensor->simulateWithError;
+//    rightSideSensor->simulateWithError = !rightSideSensor->simulateWithError;
+//    leftSideSensor->simulateWithError = !leftSideSensor->simulateWithError;
 }
 
 QPointF GridScene::rotatePoint(float originX, float originY, float pointX, float pointY, double rotationAngle) {

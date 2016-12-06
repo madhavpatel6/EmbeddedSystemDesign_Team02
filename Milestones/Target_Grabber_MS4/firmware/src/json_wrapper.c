@@ -39,7 +39,7 @@ void initParser(){
 }
 
 
-void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, pathFinderResponse_t *pf_resp, int *pf_respVal){
+void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numItems, pathFinderResponse_t *pf_resp, int *pf_respVal_proximity, bool *pf_respVal_outsideArena, bool *pf_respVal_movementStopped){
     int r, i;
     r = jsmn_parse(&p, JSON_STRING, strlen(JSON_STRING), t, sizeof(t)/sizeof(t[0]));
     for(i = 1; i < r; i++){
@@ -81,61 +81,61 @@ void parseJSON(const char* JSON_STRING, type_t *type, items_t items[], int *numI
             i++;
             if(strcmp(buf, "0") == 0){
                 *pf_resp = targetProximity;
-                *pf_respVal = 0;
+                *pf_respVal_proximity = 0;
             }
             else if(strcmp(buf, "1") == 0){
                 *pf_resp = targetProximity;
-                *pf_respVal = 1;
+                *pf_respVal_proximity = 1;
             }
             else if(strcmp(buf, "2") == 0){
                 *pf_resp = targetProximity;
-                *pf_respVal = 2;
+                *pf_respVal_proximity = 2;
             }
             else if(strcmp(buf, "3") == 0){
                 *pf_resp = targetProximity;
-                *pf_respVal = 3;
+                *pf_respVal_proximity = 3;
             }
             else if(strcmp(buf, "4") == 0){
                 *pf_resp = targetProximity;
-                *pf_respVal = 4;
+                *pf_respVal_proximity = 4;
             }
             else if(strcmp(buf, "5") == 0){
                 *pf_resp = targetProximity;
-                *pf_respVal = 5;
+                *pf_respVal_proximity = 5;
             }
             else if(strcmp(buf, "6") == 0){
                 *pf_resp = targetProximity;
-                *pf_respVal = 6;
+                *pf_respVal_proximity = 6;
             }
             // This send back 10. I did this instead of adding unecessary IF Statements
             // Because if it is above 6" then I dont care anyway
             else{
                 *pf_resp = targetProximity;
-                *pf_respVal = 10;
+                *pf_respVal_proximity = 10;
             }
         }
         else if (jsoneq(JSON_STRING, &t[i], "outsideArena") == 0) {
             sprintf(buf, "%.*s\0", t[i+1].end-t[i+1].start, JSON_STRING + t[i+1].start);
             i++;
-            if(strcmp(buf, "0") == 0){
+            if(strcmp(buf, "true") == 0){
                 *pf_resp = outsideArena;
-                *pf_respVal = 0;
+                *pf_respVal_outsideArena = 1;
             }
-            else if(strcmp(buf, "1") == 0){
+            else {
                 *pf_resp = outsideArena;
-                *pf_respVal = 1;
+                *pf_respVal_outsideArena = 0;
             }
         }
         else if (jsoneq(JSON_STRING, &t[i], "movementStopped") == 0) {
             sprintf(buf, "%.*s\0", t[i+1].end-t[i+1].start, JSON_STRING + t[i+1].start);
             i++;
-            if(strcmp(buf, "0") == 0){
+            if(strcmp(buf, "true") == 0){
                 *pf_resp = movementStopped;
-                *pf_respVal = 0;
+                *pf_respVal_movementStopped = 1;
             }
-            else if(strcmp(buf, "1") == 0){
+            else{
                 *pf_resp = movementStopped;
-                *pf_respVal = 1;
+                *pf_respVal_movementStopped = 0;
             }
         }
     }

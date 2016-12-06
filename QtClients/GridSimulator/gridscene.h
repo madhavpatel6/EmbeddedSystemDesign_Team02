@@ -20,7 +20,7 @@ class GridScene : public QWidget
 public:
     typedef enum { MIDDLESENSOR, RIGHTSENSOR, LEFTSENSOR, RIGHTSIDESENSOR, LEFTSIDESENSOR } SensorLocation;
     typedef enum { FIRSTCLICK, SECONDCLICK, ROTATE } MouseStateType;
-    static const int CELL_SIZE = 5;
+    static const int CELL_SIZE = 4;
     static const int PADDING = 2;
     GridScene(QWidget* parent = 0);
     void resetGrid();
@@ -53,8 +53,10 @@ public slots:
         middleFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
         leftFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
         rightFrontSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
-        rightSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
-        leftSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+        farRightSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+        farLeftSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+//        rightSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
+//        leftSideSensor->updatePosition(rover->getRealLocationInformation().center, rover->getRealLocationInformation().orientation);
         this->update();
     }
 signals:
@@ -71,6 +73,8 @@ private:
     SensorClass *leftFrontSensor;
     SensorClass *rightSideSensor;
     SensorClass *leftSideSensor;
+    SensorClass *farLeftSensor;
+    SensorClass *farRightSensor;
     void paintEvent(QPaintEvent *);
     QPolygonF newRect;
     QPolygonF newRotatedRect;

@@ -57,6 +57,8 @@ public:
     QPushButton* saveSimulationButton;
     QPushButton* simulateMap;
     QComboBox* comboBox;
+    QPushButton* sendInterpret;
+    QPushButton* startSendingResponses;
     typedef struct SimulationSetupType {
         QVector<QPolygonF> objects;
         QVector<int> keys;
@@ -65,6 +67,8 @@ public:
     QVector<SimulationSetupType> polygons;
     QVector<int> keys;
     int index;
+    QTimer *requestTimer;
+        int i = 0;
 public slots:
     void handleSimulationReset();
     void handleGridClear();
@@ -79,7 +83,21 @@ public slots:
     void handleLoadSimulation();
     void handleRequestOccupanyGrid() {
         if(requestMode->isChecked()) {
-            socket->sendRequest();
+            i = 0;
+            requestTimer->start();
+        }
+    }
+
+    void handleSendInterpret() {
+        socket->handleInterpret();
+    }
+
+    void handleOccupyTimer() {
+        socket->sendRequest(i);
+        i++;
+        if(i == 161) {
+            i = 0;
+            requestTimer->stop();
         }
     }
 
@@ -89,6 +107,10 @@ public slots:
             qDebug() << "clicked";
             socket->sendResponse(xRoverLoc->text(), yRoverLoc->text(), roverAngle->text());
         }
+    }
+
+    void handleSendResponse() {
+        socket->handleSendResponse();
     }
 
     void handleConnect() {

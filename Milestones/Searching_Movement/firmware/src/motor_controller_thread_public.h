@@ -39,6 +39,7 @@ extern "C" {
     
 typedef enum MotorType { NORMAL, UPDATE_POSITION } MotorObjType;
 
+// Defines the struct sent to the motor_controller queue
 typedef struct {
     MotorObjType type;
     char stop;
@@ -50,6 +51,7 @@ typedef struct {
     uint8_t sensorData;
     Coordinates location;
     float orientation;
+    int numTargets;
 } MotorObj;
     
 void MOTOR_CONTROLLER_THREAD_SendToQueue(MotorObj obj);

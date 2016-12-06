@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     grid.cpp \
     clientsocket.cpp \
     picCode/communication/messages.c \
-    picCode/debug.c
+    picCode/debug.c \
+    polygon.cpp
 
 HEADERS  += mainwindow.h \
     gridscene.h \
@@ -32,4 +33,5 @@ HEADERS  += mainwindow.h \
     grid.h \
     clientsocket.h \
     picCode/communication/messages.h \
-    picCode/debug.h
+    picCode/debug.h \
+    polygon.h

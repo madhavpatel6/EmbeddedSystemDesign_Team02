@@ -30,14 +30,23 @@ QTcpSocket* ClientSocket::getClient(){
     return socket;
 }
 
-void ClientSocket::sendRequest(){
-    {
+void ClientSocket::sendRequest(int i){
+    if(i != 160) {
+        QString request_begin = "{\"type\":\"Request\",\"items\":[\"";
+        QString request_end = "\"],\"row\":\""+ QString::number(i) +"\"}";
+        SendJSONRequestToSocket(request_begin + "OccupancyGrid" + request_end, TARGETLOCATOR);
+    }
+//    else {
+//        QString request_begin = "{\"type\":\"Request\",\"items\":[\"";
+//        QString request_end = "\"]}";
+//        SendJSONRequestToSocket(request_begin + "LocationInformation" + request_end, TARGETLOCATOR);
+//    }
+}
+
+void ClientSocket::handleInterpret() {
     QString request_begin = "{\"type\":\"Request\",\"items\":[\"";
     QString request_end = "\"]}";
-    SendJSONRequestToSocket(request_begin + "OccupancyGrid" + request_end, TARGETLOCATOR);
-    SendJSONRequestToSocket(request_begin + "LocationInformation" + request_end, TARGETLOCATOR);
-//    SendJSONRequestToSocket(request_begin + "TimerTickCount" + request_end, TARGETLOCATOR);
-    }
+    SendJSONRequestToSocket(request_begin + "InterpretGrid" + request_end, TARGETLOCATOR);
 }
 
 void ClientSocket::connected()
@@ -107,8 +116,8 @@ void ClientSocket::readyRead()
                 QJsonObject json = doc.object();
                 QString type = json["type"].toString();
                 if(type == QStringLiteral("Response")) {
-                    if(json.contains("LocationInformation")) {
-                        QJsonArray arry = json["LocationInformation"].toArray();
+                    if(json.contains("R1_Movement")) {
+                        QJsonArray arry = json["R1_Movement"].toArray();
                         QString a0 = arry[0].toString();
                         QString a1 = arry[1].toString();
                         QString a2 = arry[2].toString();

@@ -21,7 +21,8 @@ MainWindow::MainWindow(QWidget *parent)
     movementTimer = new QTimer();
     movementTimer->setInterval(333); //original 333
     sensorReadingTimer->setInterval(50); //original 50
-
+    requestTimer = new QTimer();
+    requestTimer->setInterval(150);
     connect(sensorReadingTimer, SIGNAL(timeout()), this, SLOT(handleSimulate()));
     connect(showObjects, SIGNAL(released()), this, SLOT(handleShowObjects()));
     connect(gridwidget, SIGNAL(updateRoverPosition(float,float,float)), this, SLOT(handleRoverCoordinateUpdate(float,float,float)));
@@ -39,6 +40,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(socket, SIGNAL(updateGrid(int,QVector<char>)), gridwidget, SLOT(handleUpdate(int,QVector<char>)));
     connect(socket, SIGNAL(updateRoverPosition(float,float,float)), gridwidget, SLOT(updateRoverPosition(float,float,float)));
     connect(sendResponse, SIGNAL(released()), this, SLOT(handlePICPositionUpdate()));
+    connect(requestTimer, SIGNAL(timeout()), this, SLOT(handleOccupyTimer()));
+    connect(sendInterpret, SIGNAL(released()), this, SLOT(handleSendInterpret()));
+    connect(startSendingResponses, SIGNAL(released()), this, SLOT(handleSendResponse()));
     middleFIRDistance->setText(QString::number(20));
     rightFIRDistance->setText(QString::number(20));
     leftFIRDistance->setText(QString::number(20));
@@ -98,6 +102,8 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     simulateMap = new QPushButton("Start Simulation");
     simulationMode = new QRadioButton("Simulation Mode");
     requestMode = new QRadioButton("Request Mode");
+    sendInterpret = new QPushButton("Send Interpret Grid");
+    startSendingResponses = new QPushButton("Start Sending Responses");
     verticalLayout1->addWidget(roverLocXLabel);
     verticalLayout1->addWidget(xRoverLoc);
     verticalLayout1->addWidget(roverLocYLabel);
@@ -118,7 +124,9 @@ void MainWindow::setupUi(QWidget* mainwindow) {
     verticalLayout1->addWidget(ipaddress);
     verticalLayout1->addWidget(connectToServer);
     verticalLayout1->addWidget(requestOccupanyGridButton);
+    verticalLayout1->addWidget(sendInterpret);
     verticalLayout1->addWidget(cursorPosition);
+    verticalLayout1->addWidget(startSendingResponses);
     verticalLayout1->addItem(verticalSpacer1);
     middleFIRDistance = new QLineEdit();
     rightFIRDistance = new QLineEdit();

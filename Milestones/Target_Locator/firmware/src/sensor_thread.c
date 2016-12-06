@@ -66,6 +66,8 @@ static QueueHandle_t _queue;
 #define TYPEOFQUEUE TL_Queue_t
 #define SIZEOFQUEUE 10
 
+#define M_PI 3.14159265358979323846
+
 /*******************************************************************************
   Function:
     void SENSOR_THREAD_Initialize ( void )
@@ -83,6 +85,107 @@ void SENSOR_THREAD_Initialize ( void )
 }
 static GridType grid;
 static Queue sensorDataQ;
+static GridUpdatedType updated;
+SensorDataType currentSensorData;
+InterpretedInformationType intr;
+LookupTable_t bottomLeftLongRangeTable[] = {
+    {20,	2.508},
+    {25,	2.213},
+    {30,	1.881},
+    {35,	1.621},
+    {40,	1.415},
+    {45,	1.245},
+//    {50,	1.113},
+//    {55,	1.007},
+//    {60,	0.922},
+//    {65,	0.841},
+//    {70,	0.781},
+};
+
+LookupTable_t bottomRightLongRangeTable[] = {
+    {20,	2.430},
+    {25,	2.127},
+    {30,	1.854},
+    {35,	1.588},
+    {40,	1.387},
+    {45,	1.219},
+//    {50,	1.098},
+//    {55,	0.980},
+//    {60,	0.881},
+//    {65,	0.804},
+//    {70,	0.732},
+};
+
+LookupTable_t topLeftLongRangeTable[] = {
+    {20,	2.535},
+    {25,	2.233},
+    {30,	1.941},
+    {35,	1.683},
+    {40,	1.479},
+    {45,	1.318},
+//    {50,	1.173},
+//    {55,	1.067},
+//    {60,	0.963},
+//    {65,	0.889},
+//    {70,	0.838},
+};
+LookupTable_t topRightLongRangeTable[] = {
+    {20,	2.510},
+    {25,	2.221},
+    {30,	1.948},
+    {35,	1.688},
+    {40,	1.489},
+    {45,	1.330},
+//    {50,	1.211},
+//    {55,	1.099},
+//    {60,	1.001},
+//    {65,	0.930},
+//    {70,	0.865},
+};
+
+LookupTable_t middleMidRangeTable[] = {
+    {7,     3.051},
+    {10,	2.312},
+    {15,	1.600},
+    {20,	1.232},
+    {25,	0.981},
+    {30,	0.825},
+//    {35,	0.731},
+//    {40,	0.647},
+};
+
+LookupTable_t leftMidRangeTable[] = {
+    {7, 	3.048},
+    {10,	2.301},
+    {15,	1.562},
+    {20,	1.213},
+    {25,	0.983},
+    {30,	0.842},
+//    {35,	0.733},
+//    {40,	0.666},
+};
+
+LookupTable_t rightMidRangeTable[] = {
+    {7,     2.959},
+    {10,	2.218},
+    {15,	1.569},
+    {20,	1.221},
+    {25,	0.991},
+    {30,	0.833},
+//    {35,	0.730},
+//    {40,	0.644},  
+};
+
+void addRayTrace(SensorData_t sensorData, bool maximum) {
+    if(sensorData.distance != -1) {
+        point_t rayTracePoint;
+        rayTracePoint.x = sensorData.sensorLocation.x + sensorData.distance*cos(sensorData.orientation*M_PI/180);
+        rayTracePoint.y = sensorData.sensorLocation.y + sensorData.distance*sin(sensorData.orientation*M_PI/180);
+        raytrace3(sensorData.sensorLocation.x, sensorData.sensorLocation.y,
+                rayTracePoint.x, rayTracePoint.y, maximum, grid, updated);
+    }
+}
+
 /******************************************************************************
   Function:
     void SENSOR_THREAD_Tasks ( void )
@@ -97,30 +200,22 @@ void SENSOR_THREAD_Tasks ( void )
     TL_Queue_t objRecv;
     MessageObj objSend;
     objSend.type = UPDATE;
-    objSend.message.Update.Type = SENSORDATA;
     SensorDataContainerType sensorInformation;
-    sensorInformation.middleFrontSensor.minimumMeasuringDistance = 20;
-    sensorInformation.rightFrontSensor.maximumMeasuringDistance = 70;
-    sensorInformation.rightFrontSensor.minimumMeasuringDistance = 20;
-    sensorInformation.rightFrontSensor.orientation = 0;
-    sensorInformation.leftFrontSensor.maximumMeasuringDistance = 70;
-    sensorInformation.leftFrontSensor.minimumMeasuringDistance = 20;
-    sensorInformation.leftFrontSensor.orientation = 0;
-    sensorInformation.middleFrontSensor.maximumMeasuringDistance = 30;
-    sensorInformation.middleFrontSensor.minimumMeasuringDistance = 7;
-    sensorInformation.middleFrontSensor.orientation = 0;
+
 
     initializeGrid(grid);
-    Movement_t previousAction;
-    bool previousActionIsSet = false;
+    
+    
     while(1) {
         memset(&objRecv, 0, sizeof(TL_Queue_t));
         SENSOR_THREAD_ReadFromQueue(&objRecv);
         switch(objRecv.type) {
             case SENSORADC: {
+                objSend.message.Update.Type = SENSORDATA;
                 ConvertSensorADCToDistance(&objSend.message.Update.Data.sensordata, objRecv.contents.sensors);
                 /* Queue up the sensor data */
-                if(FilterIRSensors(objSend.message.Update.Data.sensordata)) {\
+                if(FilterIRSensors(objSend.message.Update.Data.sensordata)) {
+                    currentSensorData = objSend.message.Update.Data.sensordata;
                     if(isFull(&sensorDataQ)) {
                         removeData(&sensorDataQ);
                         insertData(&sensorDataQ, objSend.message.Update.Data.sensordata);
@@ -128,97 +223,125 @@ void SENSOR_THREAD_Tasks ( void )
                     else {
                         insertData(&sensorDataQ, objSend.message.Update.Data.sensordata);
                     }
-                    MESSAGE_CONTROLLER_THREAD_SendToQueue(objSend);
                 }
+                UpdateProximityInformation(&objSend.message.Update.Data.proximity, objSend.message.Update.Data.sensordata);
+                MESSAGE_CONTROLLER_THREAD_SendToQueue(objSend);
                 break;
             }
             case RV1_POSUPDATE: {
-//                SensorDataType data = removeData(&sensorDataQ);
-//                point_t loc;
-//                loc.x = objRecv.contents.r1_movement.x;
-//                loc.y = objRecv.contents.r1_movement.y;
-//                UpdateSensorLocations(&sensorInformation, data, loc, objRecv.contents.r1_movement.orientation);
-//                updateOccupanyGrid2(sensorInformation, grid);
-                if(previousActionIsSet && size(&sensorDataQ) != 0) {
+//                if(previousActionIsSet && size(&sensorDataQ) != 0) {
                     // Stop the ADC timer
                     DRV_TMR0_Stop();
-                    point_t deltaPosition;
-                    int i = 0;
-                    deltaPosition.x = previousAction.x - objRecv.contents.r1_movement.x;
-                    deltaPosition.y = previousAction.y - objRecv.contents.r1_movement.y;
-                    float dtheta =  objRecv.contents.r1_movement.orientation - previousAction.orientation;
-                    float distance = sqrt(pow(deltaPosition.x,2) + pow(deltaPosition.y,2));
-                    float distance_increments = distance / size(&sensorDataQ);
-                    float theta_increments = dtheta / size(&sensorDataQ);
-                    float cosX = cos(objRecv.contents.r1_movement.orientation)*distance_increments;
-                    float sinY = sin(objRecv.contents.r1_movement.orientation)*distance_increments;
-                    int sizeofqueue = size(&sensorDataQ);
-                    for(i = 0; i < sizeofqueue; i++) {
-                        SensorDataType data = removeData(&sensorDataQ);
-                        point_t location;
-                        float theta = previousAction.orientation + theta_increments*i;
-                        location.x = cosX*i+previousAction.x;
-                        location.y = sinY*i+previousAction.y;
-                        UpdateSensorLocations(&sensorInformation, data, location, theta);
-                        updateOccupanyGrid2(sensorInformation, grid);
-                    }
-                    point_t loc;
-                    loc.x = objRecv.contents.r1_movement.x;
-                    loc.y = objRecv.contents.r1_movement.y;
-                    SensorDataType data;
-                    UpdateSensorLocations(&sensorInformation, data, loc, objRecv.contents.r1_movement.orientation);                    
-                    objSend.message.Update.Data.sensorInformation = sensorInformation;
+                    point_t location;
+                    float theta = objRecv.contents.r1_movement.orientation;
+                    location.x = objRecv.contents.r1_movement.x;
+                    location.y = objRecv.contents.r1_movement.y;
+                    UpdateSensorInformation(&sensorInformation, currentSensorData, location, theta);
+                    addRayTrace(sensorInformation.middleFrontSensor, sensorInformation.middleFrontSensor.distance == 30.00);
+                    addRayTrace(sensorInformation.farLeftSensor, sensorInformation.farLeftSensor.distance == 30.00);
+                    addRayTrace(sensorInformation.farRightSensor, sensorInformation.farRightSensor.distance == 30.00);
+                    addRayTrace(sensorInformation.leftFrontSensor, sensorInformation.leftFrontSensor.distance == 45.00);
+                    addRayTrace(sensorInformation.rightFrontSensor, sensorInformation.rightFrontSensor.distance == 45.00);
                     // Start the ADC timer
                     DRV_TMR0_Start();
-                }
-                else {
-                    clearQueue(&sensorDataQ);
-                    previousActionIsSet = true;
-                }
-                previousAction = objRecv.contents.r1_movement;
                 break;
             }
             case REQUESTOCCUPANYGRID: {
-                int i = 0;
-                for(i = 0; i < HEIGHT; i++) {
-                    Tx_Thead_Queue_DataType txObj;
-                    memset(&txObj, 0, sizeof(Tx_Thead_Queue_DataType));
-                    txObj.Destination = SERVER;
-                    int j = 0;
-                    sprintf(txObj.Data, "{\"type\":\"Response\",\"OccupancyGrid\":{\"row\":\"%d\",\"data\":\"", i);
-                    for(j = 0; j < WIDTH; j++) {
-                        sprintf(txObj.Data + strlen(txObj.Data), "%c", grid[i][j]);
-                    }
-                    sprintf(txObj.Data + strlen(txObj.Data), "\"}}");
-                    TX_THREAD_SendToQueue(txObj);
+                Tx_Thead_Queue_DataType txObj;
+                memset(&txObj, 0, sizeof(Tx_Thead_Queue_DataType));
+                txObj.Destination = SERVER;
+                int j = 0;
+                sprintf(txObj.Data, "{\"type\":\"Response\",\"OccupancyGrid\":{\"row\":\"%d\",\"data\":\"", objRecv.contents.row);
+                for(j = 0; j < WIDTH; j++) {
+                    sprintf(txObj.Data + strlen(txObj.Data), "%c", grid[objRecv.contents.row][j]);
                 }
+                sprintf(txObj.Data + strlen(txObj.Data), "\"}}");
+                updated[objRecv.contents.row] = false;
+                TX_THREAD_SendToQueue(txObj);
+                break;
+            }
+            case INTERPRETGRIDREQUEST: {
+                interpretGrid(grid, &intr);
+                objSend.message.Update.Type = INTERPRETEDUPDATE;
+                objSend.message.Update.Data.interpreted = intr;
+                MESSAGE_CONTROLLER_THREAD_SendToQueue(objSend);
                 break;
             }
         }
     }
 }
 
-void ConvertSensorADCToDistance(SensorDataType* distances, SensorADC_t adcValues) {
-    ConvertBottomLeftLongRangeIRToCM(&distances->ir.leftFBSensor, adcValues.IRSensors.leftFBSensor);
-    ConvertMidRangeToCM(&(distances->ir.middleFBSensor), adcValues.IRSensors.middleFBSensor);
-    ConvertBottomRightLongRangeIRToCM(&(distances->ir.rightFBSensor),  adcValues.IRSensors.rightFBSensor);
-    ConvertTopLeftLongRangeIRToCM(&(distances->ir.leftFTSensor),  adcValues.IRSensors.leftFTSensor);
-}
-
-void UpdateSensorLocations(SensorDataContainerType* sensors, SensorDataType distances, point_t roverLocation, int orientation) {
+void UpdateSensorInformation(SensorDataContainerType* sensors, SensorDataType distances, point_t roverLocation, float orientation) {
     /* Update the distances */
     sensors->leftFrontSensor.distance = distances.ir.leftFBSensor;
     sensors->middleFrontSensor.distance = distances.ir.middleFBSensor;
     sensors->rightFrontSensor.distance = distances.ir.rightFBSensor;
+    sensors->farLeftSensor.distance = distances.ir.farLeftFBSensor;
+    sensors->farRightSensor.distance = distances.ir.farRightFBSensor;
     sensors->leftFrontSensor.orientation = orientation;
     sensors->middleFrontSensor.orientation = orientation;
     sensors->rightFrontSensor.orientation = orientation;
+    sensors->farLeftSensor.orientation = orientation;
+    sensors->farRightSensor.orientation = orientation;
     /* Compute a new sensor location */
     sensors->roverLocation = roverLocation;
     sensors->orientation = orientation;
-    rotatePoint(&sensors->leftFrontSensor.sensorLocation, roverLocation.x, roverLocation.y, roverLocation.x + 5, roverLocation.y + 3, orientation);
-    rotatePoint(&sensors->middleFrontSensor.sensorLocation, roverLocation.x, roverLocation.y, roverLocation.x + 5, roverLocation.y, orientation);
-    rotatePoint(&sensors->rightFrontSensor.sensorLocation, roverLocation.x, roverLocation.y, roverLocation.x + 5, roverLocation.y - 3, orientation);
+    /* Compute Is Valid */
+    sensors->LongRangeIsValid = sensors->middleFrontSensor.distance > 15 && !(sensors->leftFrontSensor.distance == -1) && !(sensors->rightFrontSensor.distance == -1);
+    sensors->MidRangeIsValid = !(sensors->farLeftSensor.distance == -1) && !(sensors->farRightSensor.distance == -1);
+    /* Rotate the sensor positions */
+    rotatePoint(&sensors->leftFrontSensor.sensorLocation,   roverLocation.x, roverLocation.y, roverLocation.x + 6, roverLocation.y + 2, orientation);
+    rotatePoint(&sensors->middleFrontSensor.sensorLocation, roverLocation.x, roverLocation.y, roverLocation.x + 6, roverLocation.y,     orientation);
+    rotatePoint(&sensors->rightFrontSensor.sensorLocation,  roverLocation.x, roverLocation.y, roverLocation.x + 6, roverLocation.y - 2, orientation);
+    rotatePoint(&sensors->farLeftSensor.sensorLocation,     roverLocation.x, roverLocation.y, roverLocation.x + 6, roverLocation.y + 4, orientation);
+    rotatePoint(&sensors->farRightSensor.sensorLocation,    roverLocation.x, roverLocation.y, roverLocation.x + 6, roverLocation.y - 4, orientation);
+}
+
+void ConvertSensorADCToDistance(SensorDataType* distances, SensorADC_t adcValues) {
+    GetDistanceFromLookupTableIR(&distances->ir.leftFBSensor,       bottomLeftLongRangeTable,   sizeof(bottomLeftLongRangeTable) / sizeof(*bottomLeftLongRangeTable),       adcValues.IRSensors.leftFBSensor);
+    GetDistanceFromLookupTableIR(&distances->ir.rightFBSensor,      bottomRightLongRangeTable,  sizeof(bottomRightLongRangeTable) / sizeof(*bottomRightLongRangeTable),     adcValues.IRSensors.rightFBSensor);
+    GetDistanceFromLookupTableIR(&distances->ir.leftFTSensor,       topLeftLongRangeTable,      sizeof(topLeftLongRangeTable) / sizeof(*topLeftLongRangeTable),             adcValues.IRSensors.leftFTSensor);
+    GetDistanceFromLookupTableIR(&distances->ir.rightFTSensor,      topRightLongRangeTable,     sizeof(topRightLongRangeTable) / sizeof(*topRightLongRangeTable),           adcValues.IRSensors.rightFTSensor);
+    GetDistanceFromLookupTableIR(&distances->ir.middleFBSensor,     middleMidRangeTable,        sizeof(middleMidRangeTable) / sizeof(*middleMidRangeTable),                 adcValues.IRSensors.middleFBSensor);
+    GetDistanceFromLookupTableIR(&distances->ir.farLeftFBSensor,    leftMidRangeTable,          sizeof(leftMidRangeTable) / sizeof(*leftMidRangeTable),                     adcValues.IRSensors.farLeftFBSensor);
+    GetDistanceFromLookupTableIR(&distances->ir.farRightFBSensor,   rightMidRangeTable,         sizeof(rightMidRangeTable) / sizeof(*rightMidRangeTable),                   adcValues.IRSensors.farRightFBSensor);
+}
+
+
+void GetDistanceFromLookupTableIR(float* distanceCM, LookupTable_t lookupTable[], size_t size, uint32_t adcValue) {
+	float voltage = adcValue / (310.303);
+	if (voltage < lookupTable[size - 1].voltage) {
+		*distanceCM = lookupTable[size - 1].distance;
+	}
+	else if (voltage < lookupTable[0].voltage){
+		size_t i = 0;
+		for (i = 0; i < size - 1; i++) {
+			if (lookupTable[i].voltage >= voltage && voltage >= lookupTable[i + 1].voltage) {
+				float slope = (lookupTable[i + 1].distance - lookupTable[i].distance) / (lookupTable[i + 1].voltage - lookupTable[i].voltage);
+				
+				float yintercept = lookupTable[i].distance - slope*lookupTable[i].voltage;
+				*distanceCM = slope*voltage + yintercept;
+				break;
+			}
+		}
+	}
+	else {
+		*distanceCM = -1;
+	}
+//    *distanceCM = voltage;
+}
+
+bool FilterIRSensors(SensorDataType sensors) {
+    if((sensors.ir.farLeftFBSensor == -1 || sensors.ir.farRightFBSensor == -1 || sensors.ir.middleFBSensor == -1) && (sensors.ir.rightFBSensor == -1 || sensors.ir.leftFBSensor == -1)) {
+        return false;
+    }
+    return true;
+}
+
+void UpdateProximityInformation(Proximity_t *proximity, SensorDataType sensors) {
+    proximity->leftProximity = sensors.ir.farLeftFBSensor < 15;
+    proximity->middleProximity = sensors.ir.middleFBSensor < 15;
+    proximity->rightProximity = sensors.ir.farRightFBSensor < 15;
 }
 
 void SENSOR_THREAD_InitializeQueue() {
@@ -237,102 +360,6 @@ void SENSOR_THREAD_SendToQueueISR(TYPEOFQUEUE buffer, BaseType_t *pxHigherPriori
     xQueueSendFromISR(_queue, &buffer, pxHigherPriorityTaskWoken);
 }
 
-
-void ConvertShortRangeToCM(float* distanceCM, uint32_t adcValue) {
-    float voltage = adcValue/(310.303);
-    *distanceCM = 0;
-    if(voltage <= 0.52) {
-        *distanceCM = 20;
-    }
-    else if(voltage < 1) {
-        *distanceCM = 12.115/(voltage+0.01042);
-    }
-    else if(voltage < 2.74) {
-        *distanceCM = 21.6282*(pow(0.491235, voltage));
-    }
-    else {
-        *distanceCM = -1;
-    }
-}
-
-void ConvertMidRangeToCM(float* distanceCM, uint32_t adcValue) {
-    float voltage = adcValue/(310.303);
-    *distanceCM = 0;
-    if(voltage < 0.82) {
-        *distanceCM = 30;
-    }
-    else if(voltage < 2.284) {
-        *distanceCM = 22.053/(voltage-0.0915);
-    }
-    else if(voltage < 3) {
-        *distanceCM = 15.45/(voltage-0.7419);
-    }
-    else {
-        *distanceCM = -1;
-    }
-}
-
-void ConvertBottomLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
-    float avgAdcValue = adcValue;
-    float voltage = avgAdcValue/(310.303);
-    
-    if(voltage < 0.66) {
-        *distanceCM = 70;
-    }
-    else if(voltage < 0.97) {
-        *distanceCM = 79.765/(voltage+0.4716);
-    }
-    else if(voltage < 2.42) {
-        *distanceCM = 107.703*(pow(0.5, voltage));
-    }
-    else {
-        *distanceCM = -1;
-    }
-}
-
-void ConvertBottomRightLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
-    float avgAdcValue = adcValue;
-    float voltage = avgAdcValue/(310.303);
-    
-    if(voltage < 0.77) {
-        *distanceCM = 70;
-    }
-    else if(voltage < 1.132) {
-        *distanceCM = 63.402/(voltage+0.1329);
-    }
-    else if(voltage < 2.47) {
-        *distanceCM = 106.133*(pow(0.5102, voltage));
-    }
-    else {
-        *distanceCM = -1;
-    }
-
-}
-
-void ConvertTopLeftLongRangeIRToCM(float* distanceCM, uint32_t adcValue) {
-    float avgAdcValue = adcValue;
-    float voltage = avgAdcValue/(310.303);
-    
-    if(voltage < 0.87) {
-        *distanceCM = 70;
-    }
-    else if(voltage < 1.170) {
-        *distanceCM = 51.833/(voltage-0.1318);
-    }
-    else if(voltage < 2.46) {
-        *distanceCM = 110.775*(pow(0.501, voltage));
-    }
-    else {
-        *distanceCM = -1;
-    }
-}
-
-bool FilterIRSensors(SensorDataType sensors) {
-    if(sensors.ir.middleFBSensor < 17 || sensors.ir.rightFBSensor == -1 || sensors.ir.leftFBSensor == -1) {
-        return false;
-    }
-    return true;
-}
 
 /*******************************************************************************
  End of File

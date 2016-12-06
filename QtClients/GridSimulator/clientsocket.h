@@ -27,6 +27,13 @@ public:
                                     "\"0\"]}";
         SendJSONRequestToSocket(response, TARGETLOCATOR);
     }
+    void handleInterpret();
+    void handleSendResponse() {
+        QString request_begin = "{\"type\":\"Request\",\"items\":[\"";
+        QString request_end = "\"]}";
+        SendJSONRequestToSocket(request_begin + "StartResponding" + request_end, TARGETLOCATOR);
+    }
+
 signals:
     void updateError(int val);
     void sendCommStatTargetLocator(QByteArray commStatTargetLocator);
@@ -42,7 +49,7 @@ public slots:
     void connected();
     void disconnected();
     void readyRead();
-    void sendRequest();
+    void sendRequest(int i);
 
 private:
     void SendJSONRequestToSocket(QString request, char destination);

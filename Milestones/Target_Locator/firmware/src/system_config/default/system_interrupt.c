@@ -92,12 +92,14 @@ void IntHandlerDrvAdc(void)
     
     int i = 0;
     dbgOutputLoc(ADDING_ADC_VAL_ISR);
-    for(i; i < 5; i=i+5) {
+    for(i; i < 7; i=i+7) {
         obj.contents.sensors.IRSensors.leftFBSensor += DRV_ADC_SamplesRead(i);
         obj.contents.sensors.IRSensors.middleFBSensor += DRV_ADC_SamplesRead(i + 1);
         obj.contents.sensors.IRSensors.rightFBSensor += DRV_ADC_SamplesRead(i + 2);
         obj.contents.sensors.IRSensors.leftFTSensor += DRV_ADC_SamplesRead(i + 3);
         obj.contents.sensors.IRSensors.rightFTSensor += DRV_ADC_SamplesRead(i + 4);
+        obj.contents.sensors.IRSensors.farLeftFBSensor += DRV_ADC_SamplesRead(i + 5);
+        obj.contents.sensors.IRSensors.farRightFBSensor += DRV_ADC_SamplesRead(i + 6);
     }
     dbgOutputLoc(BEFORE_SEND_TO_Q_ISR);
     SENSOR_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
@@ -141,7 +143,7 @@ void IntHandlerDrvTmrInstance1(void)
             break;
         case TARGETLOCATOR:
             obj.message.Request = TLtoSM;
-            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
+//            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             obj.message.Request = TLtoPF;
 //            MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
             break;

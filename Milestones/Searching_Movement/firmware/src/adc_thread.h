@@ -60,7 +60,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #include "queue.h"
 #include "adc_thread_public.h"
 
-#define ANALOG  0
+#define ANALOG  1
+#define WHITE   0
+#define BLACK   1
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility

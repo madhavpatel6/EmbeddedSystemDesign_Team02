@@ -154,7 +154,7 @@ float convertTocmIR(uint32_t irDigitalVal){
 /* Inputs: float converted cm value                                     */
 /* Outputs: true or false based on cm value                             */
 bool cmValChecker(float cmVal){
-    if((cmVal < 3.5) || (cmVal > 15.24)){
+    if((cmVal < 3.5) || (cmVal > 22.86)){ // WAS 15.24
         return false;
     }
     else{
@@ -5963,6 +5963,7 @@ void COMPUTATION_THREAD_Tasks ( void )
         /* Application's initial state. */
         case COMPUTATION_THREAD_STATE_INIT:
         {
+            openServo(); // EDIT
             /* Going to next State: COMPUTATION_THREAD_STATE_REQUEST_TARGET_PROXIMITY */
             computation_threadData.state = COMPUTATION_THREAD_STATE_REQUEST_TARGET_PROXIMITY;
             break;
@@ -5978,6 +5979,7 @@ void COMPUTATION_THREAD_Tasks ( void )
                 /* Starting the ADC TMR_0 and opening the ADC for scanning        */
                 DRV_TMR0_Start();
                 DRV_ADC_Open();
+                //openServo(); // EDIT
                 computation_threadData.state = COMPUTATION_THREAD_STATE_TARGET_ALIGNMENT;
             }
             else{

@@ -14,7 +14,9 @@ ClientSocket::ClientSocket(QObject *parent) :
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     isConnected = false;
     isClear = true;
-    sendData = true;
+    sendData = false;
+    v_lineColor = WHITE;
+    v_threshold = 512;
 }
 
 
@@ -85,10 +87,11 @@ void ClientSocket::sendStopCommand(){
     qDebug() << request_begin + "\"Stop\"" + request_end;
 }
 
-void ClientSocket::sendInitialData(QString mode, QString position, QString numVertices, QString vertices) {
+void ClientSocket::sendInitialData(QString mode, QString position, QString numTargets, QString numVertices, QString vertices) {
     QString response_begin = "{\"type\":\"Response\",\"InitialData\":{";
     QString response_end = "}}";
-    SendJSONResponseToSocket(response_begin + mode + "," + position + "," + numVertices + "," + vertices + response_end, SEARCHERMOVER);
+    SendJSONResponseToSocket(response_begin + mode + "," + position + "," + numTargets + "," + numVertices + "," + vertices + response_end, SEARCHERMOVER);
+    qDebug() << response_begin + mode + "," + position + "," + numTargets + "," + numVertices + "," + vertices + response_end;
 }
 
 void ClientSocket::sendCorrectedPosition(QString x, QString y, QString orientation)
@@ -97,6 +100,24 @@ void ClientSocket::sendCorrectedPosition(QString x, QString y, QString orientati
     QString response_end = "}}";
     SendJSONResponseToSocket(response_begin + "\"x\":\"" + x + "\",\"y\":\"" + y + "\",\"orientation\":\"" + orientation + "\"" + response_end, SEARCHERMOVER);
     qDebug() << response_begin + "\"x\":\"" + x + "\",\"y\":\"" + y + "\",\"orientation\":\"" + orientation + "\"" + response_end;
+}
+
+void ClientSocket::sendLineTuning(QString lineColor, QString threshold)
+{
+    QString response_begin = "{\"type\":\"Response\",\"LineTuning\":{";
+    QString response_end = "}}";
+    SendJSONResponseToSocket(response_begin + "\"lineColor\":\"" + lineColor + "\",\"threshold\":\"" + threshold + "\"" + response_end, SEARCHERMOVER);
+    qDebug() << response_begin + "\"lineColor\":\"" + lineColor + "\",\"threshold\":\"" + threshold + "\"" + response_end;
+}
+
+void ClientSocket::updateLineColor(int lineColor)
+{
+    v_lineColor = lineColor;
+}
+
+void ClientSocket::updateLineThreshold(int threshold)
+{
+    v_threshold = threshold;
 }
 
 void ClientSocket::sendClear(bool send){
@@ -205,11 +226,11 @@ void ClientSocket::SendJSONResponseToSocket(QString response, char destination) 
 
 void ClientSocket::HandleResponse(QJsonObject obj) {
     QJsonObject response;
+    QJsonArray array;
     if(obj.contains(QStringLiteral("R1_Movement"))) {
-        response = obj["R1_Movement"].toObject();
-        emit sendMovement(SEARCHERMOVER, response["x"].toString(), response["y"].toString(),
-                response["orientation"].toString(), response["action"].toString(),
-                response["amount"].toString());
+        array = obj["R1_Movement"].toArray();
+        emit sendMovement(SEARCHERMOVER, array[0].toString(), array[1].toString(),
+                array[2].toString(), array[3].toString(), array[4].toString());
 //        qDebug() << obj["R1_Movement"];
     }
     if(obj.contains(QStringLiteral("LineLocation"))) {
@@ -217,15 +238,18 @@ void ClientSocket::HandleResponse(QJsonObject obj) {
         response = obj["LineLocation"].toObject();
         for (int i = 0; i < 8; i++) {
             if (ANALOG) {
-                location |= (response[QString::number(i)].toString().toFloat() < 512) << i;
+                if (v_lineColor == WHITE) {
+                    location |= (response[QString::number(i)].toString().toFloat() < v_threshold) << i;
+                } else if (v_lineColor == BLACK) {
+                    location |= (response[QString::number(i)].toString().toFloat() > v_threshold) << i;
+                }
             } else {
                 location |= !(response[QString::number(i)].toString().toFloat()) << i;
             }
         }
         emit sendLineLocation(location);
-//        qDebug() << obj["LineLocation"];
+        qDebug() << obj["LineLocation"];
     }
-
 }
 
 void ClientSocket::HandleRequest(QJsonArray array)

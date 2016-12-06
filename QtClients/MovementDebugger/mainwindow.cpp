@@ -30,8 +30,11 @@ MainWindow::MainWindow(QWidget *parent) :
             this, SLOT(updateMovement(char,QString,QString,QString,QString,QString)));
     connect(tcpSocket, SIGNAL(sendLineLocation(int)), this, SLOT(updateLineLocation(int)));
     connect(tcpSocket, SIGNAL(initialRequest()), this, SLOT(sendInitialResponse()));
-    connect(this, SIGNAL(sendInitialData(QString,QString,QString,QString)), tcpSocket, SLOT(sendInitialData(QString,QString,QString,QString)));
+    connect(this, SIGNAL(sendInitialData(QString,QString,QString,QString,QString)), tcpSocket, SLOT(sendInitialData(QString,QString,QString,QString,QString)));
     connect(this, SIGNAL(pb_sendClicked(QString,QString,QString)), tcpSocket, SLOT(sendCorrectedPosition(QString,QString,QString)));
+    connect(this, SIGNAL(pb_sendLineTuningClicked(QString,QString)), tcpSocket, SLOT(sendLineTuning(QString,QString)));
+    connect(this, SIGNAL(lineColorChanged(int)), tcpSocket, SLOT(updateLineColor(int)));
+    connect(this, SIGNAL(lineThresholdChanged(int)), tcpSocket, SLOT(updateLineThreshold(int)));
 
     QStringList colHeaders;
     colHeaders << "x" << "y";
@@ -95,8 +98,20 @@ void MainWindow::updateMovement(char source, QString x, QString y, QString orien
     switch(source) {
         case SEARCHERMOVER: {
             ui->lbl_x_positionVal->setText(x);
+            ui->sb_x_corrected->setValue(x.toFloat());
             ui->lbl_y_positionVal->setText(y);
+            ui->sb_y_corrected->setValue(y.toFloat());
             ui->lbl_orientationVal->setText(QString::number(temp));
+            ui->sb_orientation_corrected->setValue(temp);
+            if (action == "0") {
+                action = "F";
+            } else if (action == "1") {
+                action = "B";
+            } else if (action == "2") {
+                action = "R";
+            } else if (action == "3") {
+                action = "L";
+            }
             ui->lbl_actionVal->setText(action);
             ui->lbl_amountVal->setText(amount);
             break;
@@ -123,16 +138,16 @@ void MainWindow::sendInitialResponse()
 {
     QString mode;
     QString position;
+    QString numTargets;
     QString numVertices;
     QString vertices;
+
     int count = 0;
 
     mode = "\"mode\":";
 
     if (ui->rb_debug->isChecked()) {
         mode.append("\"D\"");
-    } else if (ui->rb_lawnmower->isChecked()) {
-        mode.append("\"L\"");
     } else if (ui->rb_random->isChecked()) {
         mode.append("\"R\"");
     }
@@ -140,6 +155,8 @@ void MainWindow::sendInitialResponse()
     position = "\"x\":\"" + QString::number(ui->sb_x_initial->value()) + "\"," +
             "\"y\":\"" + QString::number(ui->sb_y_initial->value()) + "\"," +
             "\"orientation\":\"" + QString::number(ui->sb_orientation_initial->value()) + "\"";
+
+    numTargets = "\"numTargets\":\"" + QString::number(ui->sb_numTargets->value()) + "\"";
 
     numVertices = "\"numVertices\":\"" + QString::number(ui->sb_numVertices->value()) + "\"";
 
@@ -160,7 +177,7 @@ void MainWindow::sendInitialResponse()
     vertices.append("]");
 
     if (count == ui->sb_numVertices->value()) {
-        emit sendInitialData(mode, position, numVertices, vertices);
+        emit sendInitialData(mode, position, numTargets, numVertices, vertices);
     }
 }
 
@@ -257,4 +274,34 @@ void MainWindow::on_pb_send_clicked()
 {
     emit pb_sendClicked(QString::number(ui->sb_x_corrected->value()),QString::number(ui->sb_y_corrected->value()),
                         QString::number(ui->sb_orientation_corrected->value()));
+}
+
+void MainWindow::on_pb_sendLineTuning_clicked()
+{
+    QString color;
+
+    if (ui->rb_white->isChecked()) {
+        color = "0";
+    } else if (ui->rb_black->isChecked()) {
+        color = "1";
+    }
+    emit pb_sendLineTuningClicked(color, QString::number(ui->sb_threshold->value()));
+}
+
+void MainWindow::on_rb_white_toggled(bool checked)
+{
+    int lineColor;
+
+    if (checked) {
+        lineColor = 0;
+    } else {
+        lineColor = 1;
+    }
+
+    emit lineColorChanged(lineColor);
+}
+
+void MainWindow::on_sb_threshold_valueChanged(int val)
+{
+    emit lineThresholdChanged(ui->sb_threshold->value());
 }

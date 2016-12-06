@@ -261,12 +261,12 @@
       <Template>
         <Name>drv_adc_static.h</Name>
         <Path>Header Files/app/system_config/default/framework/driver/adc</Path>
-        <Checksum>E840E55346971BE272529AD0C523F287</Checksum>
+        <Checksum>E5CFAED2E1085428FBBA1A985336B439</Checksum>
       </Template>
       <Template>
         <Name>drv_adc_static.c</Name>
         <Path>Source Files/app/system_config/default/framework/driver/adc/src</Path>
-        <Checksum>710FA4B0167173AA5E81E4D330EAA60E</Checksum>
+        <Checksum>19B345F6DA1D60B6E335599A5254D0F4</Checksum>
         <ProjectFileChecksum>800C39599E91CBC480B935D97DEB73B3</ProjectFileChecksum>
       </Template>
       <Template>
@@ -285,7 +285,7 @@
       <Template>
         <Name>FreeRTOSConfig.h</Name>
         <Path>Header Files/app/system_config/default</Path>
-        <Checksum>AA3E08FD391EB61342134DE4314C8E1D</Checksum>
+        <Checksum>DC682951BE09918E9CDD42D393BC0C3A</Checksum>
       </Template>
       <Template>
         <Name>sensor_thread.c</Name>
