@@ -48,14 +48,14 @@ void grippersimulator::on_targetAlignment_clicked(bool checked)
     {
         {"targetAcquired", "checked"}
     };
-    object["targetAcquired"] = checked ? "true" : "false" ;
+    object["targetAcquired"] = checked ? "1" : "0" ;
     config->changeResponse(object);
 
 }
 
 void grippersimulator::on_Grabber_Aligned_clicked(bool checked)
 {
-    targetAlig["Grabber_Aligned"] = checked ? "true" : "false";
+    targetAlig["Grabber_Aligned"] = checked ? "1" : "0";
     QJsonObject container;
     container["targetAlignment"] = targetAlig;
     config->changeResponse(container);

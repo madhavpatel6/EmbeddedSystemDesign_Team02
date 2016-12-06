@@ -162,6 +162,11 @@ void MainWindow::dataReadSlot(QByteArray data){
 
                 QString jsonMessage = "{\"type\": \"Response\",";
                 for(int i = 0; i < json["items"].toArray().size(); i++){
+
+                    if(json["items"].toArray()[i].toString() == "InitialData"){
+                        return;
+                    }
+
                     if(resEnabled.contains(json["items"].toArray()[i].toString())){
                         QString key = "\"" + json["items"].toArray()[i].toString() + "\"";
                         QString value;
