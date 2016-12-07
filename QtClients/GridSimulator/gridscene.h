@@ -20,7 +20,7 @@ class GridScene : public QWidget
 public:
     typedef enum { MIDDLESENSOR, RIGHTSENSOR, LEFTSENSOR, RIGHTSIDESENSOR, LEFTSIDESENSOR } SensorLocation;
     typedef enum { FIRSTCLICK, SECONDCLICK, ROTATE } MouseStateType;
-    static const int CELL_SIZE = 4;
+    static const int CELL_SIZE = 5;
     static const int PADDING = 2;
     GridScene(QWidget* parent = 0);
     void resetGrid();

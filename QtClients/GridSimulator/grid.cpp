@@ -36,7 +36,7 @@ void initializeGrid(GridType grid) {
 
 void incrementIndex(int x, int y, GridType grid) {
 //    qDebug() << "Max (x,y) = (" << x << ", " << y <<")";
-    if(!checkBounds(x,y) || !isWithinArena(x,y))
+    if(!checkBounds(x,y))
         return;
     if(grid[y][x] < (MAXIMUM - 15)) {
         grid[y][x]+=15;
@@ -45,7 +45,7 @@ void incrementIndex(int x, int y, GridType grid) {
 
 void decrementIndex(int x, int y, GridType grid) {
 //    qDebug() << "(x,y) = (" << x << ", " << y <<")";
-    if(!checkBounds(x,y) || !isWithinArena(x,y))
+    if(!checkBounds(x,y))
         return;
     if(grid[y][x] > MINIMUM + 5) {
         grid[y][x]-=5;

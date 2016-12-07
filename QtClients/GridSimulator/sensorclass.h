@@ -38,6 +38,9 @@ public:
 //        }
         return error.random + error.bias;
     }
+    bool isMaximum(int distance) {
+        return distance == maximumDistanceCM;
+    }
 
     void draw(QPainter* painter);
     SensorData_t getParamAndDistance(QVector<QPolygonF> objs);

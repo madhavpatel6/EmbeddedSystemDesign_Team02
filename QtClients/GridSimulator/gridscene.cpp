@@ -15,8 +15,8 @@ GridScene::GridScene(QWidget *parent) : QWidget(parent)
     this->setPalette(Pal);
     rover = new RoverClass();
     middleFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::MIDDLESENSOR, 7, 30, 0, 0,rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
-    leftFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::LEFTSENSOR, 20, 70, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
-    rightFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::RIGHTSENSOR, 20, 70, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
+    leftFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::LEFTSENSOR, 20, 45, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
+    rightFrontSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::RIGHTSENSOR, 20, 45, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
     farLeftSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::FARLEFTSENSOR, 7, 30, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
     farRightSensor = new SensorClass(SensorClass::IRSENSOR, SensorClass::FARRIGHTSENSOR, 7, 30, 0, 0, rover->getEstimatedLocationInformation().center, rover->getEstimatedLocationInformation().orientation, CELL_SIZE);
 
@@ -123,20 +123,22 @@ void GridScene::updateSensorReading() {
 
 void GridScene::addRayTrace(SensorClass* impl) {
     float distance = impl->readDistance(objects);
+    bool maximum = impl->isMaximum(distance);
     QPointF sensorLocation = impl->getSensorLocation();
     int sensorOrientation = impl->getSensorOrientation();
     QPointF distancePoint;
-    bool maximum = false;
+//    qDebug() << distance << " " << maximum;
+//    bool maximum = false;
     if(distance == -2)
         return;
-    if(distance == -1) {
-        distancePoint = impl->getMaximumSensorLocation();
-        maximum = true;
-    }
-    else {
+//    if(distance == -1) {
+//        distancePoint = impl->getMaximumSensorLocation();
+//        maximum = true;
+//    }
+//    else {
         distancePoint = QPointF(sensorLocation.x() + distance*cos(sensorOrientation*M_PI/180), sensorLocation.y() + distance*sin(sensorOrientation*M_PI/180));
-    }
-    GridHelper::raytrace3(sensorLocation.x(), sensorLocation.y(), distancePoint.x(), distancePoint.y(), false, grid);
+//    }
+    GridHelper::raytrace3(sensorLocation.x(), sensorLocation.y(), distancePoint.x(), distancePoint.y(), maximum, grid);
 }
 
 SensorDataContainerType GridScene::getSensorData() {
