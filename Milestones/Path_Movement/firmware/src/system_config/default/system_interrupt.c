@@ -214,7 +214,7 @@ void IntHandlerDrvTmrInstance1(void)
                 break;
         }
     }  
-    if(time % 10 == 0){
+    if(time % 20 == 0){
         obj.Request = PFtoTG;
         MESSAGE_CONTROLLER_THREAD_SendToQueueISR(obj, &pxHigherPriorityTaskWoken);
     }

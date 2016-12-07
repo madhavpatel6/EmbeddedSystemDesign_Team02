@@ -138,13 +138,13 @@ int extractResponse_Targets(float arrX[10][4], float arrY[10][4]){
             if (t[i+1].type == JSMN_ARRAY) {
                 // lets loop thru the set of targets
                 for(j = 0; j < t[i+1].size; j++){
-                    numVert = 4;
+                    numVert = 1;
                     for(k = 0; k < numVert; k++){
                         int xIndex = i+4+ (j*13) + k * 3;
                         sprintf(buf, "%.*s\0", t[xIndex].end-t[xIndex].start, stored_js_str + t[xIndex].start);
-                        arrX[j][k] = atof(buf);
+                        arrX[j][k] = atof(buf) / 2.54;
                         sprintf(buf, "%.*s\0", t[xIndex+1].end-t[xIndex+1].start, stored_js_str + t[xIndex+1].start);
-                        arrY[j][k] = atof(buf);
+                        arrY[j][k] = atof(buf) / 2.54;
                     }
                 }
                 return t[i+1].size;
@@ -153,7 +153,7 @@ int extractResponse_Targets(float arrX[10][4], float arrY[10][4]){
     }
     
 }
-bool extractResponse_targetAlignment(bool *g_align, float *distance, float *angle, bool *acquired){
+bool extractResponse_targetAlignment(bool *g_align, float *distance, float *angle, bool *acquired, bool *obstacle){
     int i;
     bool result = false;
     for(i = 1; i < r; i++){
@@ -162,19 +162,27 @@ bool extractResponse_targetAlignment(bool *g_align, float *distance, float *angl
             for(j = 0; j < t[i+1].size * 2; j++){
                 if (jsoneq(stored_js_str, &t[i+1+j], "Grabber_Aligned") == 0){
                     sprintf(buf, "%.*s\0", t[i+2+j].end-t[i+2+j].start, stored_js_str + t[i+2+j].start);
-                    *g_align = strcmp(buf, "true") == 0 ? true : false;
+                    *g_align = strcmp(buf, "1") == 0 ? true : false;
                 }else if (jsoneq(stored_js_str, &t[i+1+j], "Target_Distance") == 0){
                     sprintf(buf, "%.*s\0", t[i+2+j].end-t[i+2+j].start, stored_js_str + t[i+2+j].start);
                     *distance = atof(buf);
                 }else if (jsoneq(stored_js_str, &t[i+1+j], "Target_Angle") == 0){
                     sprintf(buf, "%.*s\0", t[i+2+j].end-t[i+2+j].start, stored_js_str + t[i+2+j].start);
                     *angle = atof(buf);
+                }else if (jsoneq(stored_js_str, &t[i+1+j], "Alignment_Info") == 0){
+                    sprintf(buf, "%.*s\0", t[i+2+j].end-t[i+2+j].start, stored_js_str + t[i+2+j].start);
+                    if(strcmp(buf, "Obstacle") == 0){
+                        *obstacle = true;
+                    }else{
+                        *obstacle = false;
+                    }
                 }
+                
             }
             result = true;
         } else if (jsoneq(stored_js_str, &t[i], "targetAcquired") == 0) {
             sprintf(buf, "%.*s\0", t[i+1].end-t[i+1].start, stored_js_str + t[i+1].start);
-            *acquired = strcmp(buf, "true") == 0 ? true : false;
+            *acquired = strcmp(buf, "1") == 0 ? true : false;
         }
     }
     return result;

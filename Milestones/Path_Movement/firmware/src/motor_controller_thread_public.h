@@ -50,6 +50,7 @@ typedef struct {
     float targetAngle;
     bool targetAligned;
     bool targetAcquired;
+    bool obstacle;
 } message_in_t;
 
 void MOTOR_CONTROLLER_THREAD_SendToQueue(message_in_t buffer);
