@@ -290,7 +290,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                                     break;
                                 }
                                 case targetProximity:{
-                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"targetProximity\":\"%f\"", targetProximityVal);
+                                    sprintf(tx_thread_obj.Data+strlen(tx_thread_obj.Data), ",\"targetProximity\":\"%d\"", (int) targetProximityVal);
                                     tx_thread_obj.Destination = obj.External.Source;
                                     break;
                                 }
@@ -361,6 +361,7 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                             }
                         }
                         bool g_align, t_acq;
+                        bool obstacle = false;
                         float distance, angle;
                         float val;
                         
@@ -369,13 +370,14 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                             msg.type = debug;
                             msg.targetDistance = val;
                             MOTOR_CONTROLLER_THREAD_SendToQueue(msg);
-                        } else if(extractResponse_targetAlignment(&g_align,&distance,&angle, &t_acq)){
+                        } else if(extractResponse_targetAlignment(&g_align,&distance,&angle, &t_acq, &obstacle)){
                             message_in_t msg;
                             msg.type = targetAlignment;
                             msg.targetAligned = g_align;
                             msg.targetAcquired = t_acq;
                             msg.targetAngle = angle;
                             msg.targetDistance = distance;
+                            msg.obstacle = obstacle;
                             MOTOR_CONTROLLER_THREAD_SendToQueue(msg);
                         }else{
                         
@@ -410,11 +412,11 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                             len = extractResponse_Targets(tarXArr, tarYArr);
                             for(i = 0; i < len; i++){
                                 msg.type = target;
-                                for(j = 0; j < 4; j++){
+                                for(j = 0; j < 1; j++){
                                     msg.x[j] = tarXArr[i][j];
                                     msg.y[j] = tarYArr[i][j];
                                 }
-                                msg.len = 4;
+                                msg.len = 1;
                                 MOTOR_CONTROLLER_THREAD_SendToQueue(msg);
                             }
                         }
@@ -457,6 +459,10 @@ void MESSAGE_CONTROLLER_THREAD_Tasks ( void )
                     }
                     case PFtoTL: {
                         // for now we are requesting vertices from the tl because i am lazy
+                        sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"Obstacles\", \"SafeRegions\", \"R2_Location\", \"Vertices\"]}");
+                        tx_thread_obj.Destination = SERVER;
+                        TX_THREAD_SendToQueue(tx_thread_obj);
+                        
                         sprintf(tx_thread_obj.Data, "{\"type\":\"Request\",\"items\":[\"Obstacles\", \"Targets\", \"SafeRegions\", \"R2_Location\", \"Vertices\"]}");
                         tx_thread_obj.Destination = TARGETLOCATOR;
                         tx_thread_obj.MessageCount = statObject.Req_To_TargetLocator;

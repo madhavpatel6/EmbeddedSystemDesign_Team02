@@ -142,7 +142,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
     
     initWorld();
     // lets start at 9 9 cuz were starting at a target
-    myLoc.x = 6;
+    myLoc.x = 0;
     myLoc.y = 6;
 //    int myDir = 0;
 //    int desiredDir = 0;
@@ -167,14 +167,14 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 disableMotors();
                 setDirectionForward();
                 addMotorTask(2, 3); // get on edge
-                motor_controller_threadData.state = tuneDir;
+                motor_controller_threadData.state = wait_calc_path;
                 enableTrue();
                 // motor_controller_threadData.state = spin;
                 Nop();
                 MessageObj upObj;
                 upObj.Type = UPDATE;
                 upObj.Update.Type = TARG_PROX;
-                upObj.Update.Data.targetProx = 10.0f;
+                upObj.Update.Data.targetProx = 10;
                 MESSAGE_CONTROLLER_THREAD_SendToQueue(upObj);
                 upObj.Update.Type = OUTS_ARENA;
                 upObj.Update.Data.outsArena = false;
@@ -214,7 +214,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 MessageObj upObj;
                 upObj.Type = UPDATE;
                 upObj.Update.Type = TARG_PROX;
-                upObj.Update.Data.targetProx = 10.0f;
+                upObj.Update.Data.targetProx = 10;
                 MESSAGE_CONTROLLER_THREAD_SendToQueue(upObj);
                 upObj.Type = UPDATE;
                 upObj.Update.Type = MOV_STOP;
@@ -327,7 +327,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 MessageObj upObj;
                 upObj.Type = UPDATE;
                 upObj.Update.Type = TARG_PROX;
-                upObj.Update.Data.targetProx = 5.9f;
+                upObj.Update.Data.targetProx = 5;
                 MESSAGE_CONTROLLER_THREAD_SendToQueue(upObj);
                 upObj.Type = UPDATE;
                 upObj.Update.Type = MOV_STOP;
@@ -339,21 +339,25 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                 MOTOR_CONTROLLER_THREAD_ReadFromQueue(&msg);
                 addToMap(msg);
                 if(msg.type == targetAlignment){
-                    if(msg.targetAligned == true){
+                    if(msg.obstacle == true){
+                        setDirectionRight();
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535);// /3
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535);// /3
+                    }else if(msg.targetAligned == true){
                         setDirectionForward();
                         PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
                         PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);  
                         motor_controller_threadData.state = waitAcquired;
                     } else if(msg.targetAngle > MAX_ANGLE){
-                        setDirectionLeft();
-                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/3);
-                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/3);
-                    }else if (msg.targetAngle < MIN_ANGLE){
                         setDirectionRight();
-                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/3);
-                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/3);
-                        driftAng -= 10;
-                    }else{
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/2);// /3
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/2);// /3
+                    }else if (msg.targetAngle < MIN_ANGLE){
+                        setDirectionLeft();
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/2);// /3
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/2);// /3
+                        // driftAng -= 10;
+                    }else {
                         PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
                         PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);
                         motor_controller_threadData.state = tuneDist;
@@ -372,24 +376,28 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                         motor_controller_threadData.state = tuneDir;                    
                     }
                     
-                    if(msg.targetAligned == true){
+                    if(msg.obstacle == true){
+                        setDirectionRight();
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535);// /3
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535);// /3
+                    }else if(msg.targetAligned == true){
                         setDirectionForward();
                         PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
                         PLIB_OC_PulseWidth16BitSet(OC_ID_2, 0);  
                         motor_controller_threadData.state = waitAcquired;
                     } else if(msg.targetDistance > FAR_DIST){
                         setDirectionForward();
-                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/3);
-                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/3);     
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/2);// /3
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/2);// /3
                         
                     } else if(msg.targetDistance > CLOSE_DIST){
                         setDirectionForward();
-                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/4);
-                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/4);                  
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/2);// /4
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/2);// /4                  
                     } else if(msg.targetAligned == false){
                         setDirectionForward();
-                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/4);
-                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/4); 
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_1, 65535/2);// /4
+                        PLIB_OC_PulseWidth16BitSet(OC_ID_2, 65535/2);// /4 
                     }else{
                         setDirectionForward();
                         PLIB_OC_PulseWidth16BitSet(OC_ID_1, 0);
@@ -440,7 +448,7 @@ void MOTOR_CONTROLLER_THREAD_Tasks ( void )
                     if(msg.targetAcquired == false){
                         holdingTarg = false;
                         motor_controller_threadData.state = wait_calc_path;
-                                            upObj.Type = UPDATE;
+                        upObj.Type = UPDATE;
                         upObj.Update.Type = OUTS_ARENA;
                         upObj.Update.Data.outsArena = false;
                         MESSAGE_CONTROLLER_THREAD_SendToQueue(upObj);
@@ -563,14 +571,14 @@ void addTargetToMap(float arrX[], float arrY[], int len){
     one.x = arrX[0];
     one.y = arrY[0];
     Point two;
-    two.x = arrX[1];
-    two.y = arrY[1];
+    two.x = arrX[0] + 1;
+    two.y = arrY[0];
     Point three;
-    three.x = arrX[2];
-    three.y = arrY[2];
+    three.x = arrX[0] + 1 ;
+    three.y = arrY[0] + 1 ;
     Point four;
-    four.x = arrX[3];
-    four.y = arrY[3];
+    four.x = arrX[0] + 1;
+    four.y = arrY[0];
     addTarget(one, two, three, four);
 }
 

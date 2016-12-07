@@ -81,7 +81,7 @@ int extractResponse_Vertices(float xArr[], float yArr[]);
 int extractResponse_Obstacles(float arrX[10][4], float arrY[10][4]);
 int extractResponse_Targets(float arrX[10][4], float arrY[10][4]);
 
-bool extractResponse_targetAlignment(bool *g_align, float *distance, float *angle, bool *acquired);
+bool extractResponse_targetAlignment(bool *g_align, float *distance, float *angle, bool *acquired, bool* obstacle);
   
 
 #endif /* _EXAMPLE_FILE_NAME_H */
